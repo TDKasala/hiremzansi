@@ -98,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // File upload and analysis endpoint
-  app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/upload", isAuthenticated, upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -107,20 +107,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const file = req.file;
       let content = "";
 
+      console.log("Processing file upload:", file.originalname, "mimetype:", file.mimetype);
+
       // Extract text from file based on mimetype
       if (file.mimetype === "application/pdf") {
+        console.log("Extracting text from PDF");
         content = await extractTextFromPDF(file.buffer);
       } else if (file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        console.log("Extracting text from DOCX");
         content = await extractTextFromDOCX(file.buffer);
+      } else {
+        return res.status(400).json({ 
+          error: "Unsupported file type", 
+          message: "Please upload a PDF or DOCX file" 
+        });
       }
 
       if (!content) {
         return res.status(400).json({ error: "Could not extract content from file" });
       }
 
-      // Get user id from authenticated user or use guest id
-      let userId = req.isAuthenticated() ? req.user!.id : 0;
+      // Get user id from authenticated user - we know it exists because of isAuthenticated middleware
+      const userId = req.user!.id;
       let title = req.body.title || file.originalname.replace(/\.[^/.]+$/, "");
+      
+      console.log("Creating CV for user ID:", userId);
       
       // Store the CV
       const cvData = {
