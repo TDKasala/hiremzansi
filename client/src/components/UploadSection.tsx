@@ -44,10 +44,16 @@ export default function UploadSection() {
             <h2 className="text-2xl md:text-3xl font-bold text-secondary mb-6">
               Upload Your CV for Free ATS Analysis
             </h2>
-            <p className="text-neutral-600 mb-8">
+            <p className="text-neutral-600 mb-4">
               Our AI-powered tool analyzes your CV against Applicant Tracking Systems 
               used by South African employers. Get a free score and improve your chances of landing interviews.
             </p>
+            <div className="flex items-center mb-8 p-3 bg-primary/5 border border-primary/20 rounded-md">
+              <Lightbulb className="h-5 w-5 text-primary shrink-0 mr-3" />
+              <p className="text-sm text-neutral-700">
+                Try our <Link href="/realtime-ats" className="text-primary font-medium hover:underline">Real-Time ATS Scanner</Link> to instantly see how your resume performs and get immediate feedback!
+              </p>
+            </div>
             
             <div 
               {...getRootProps()} 

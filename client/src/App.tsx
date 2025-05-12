@@ -21,6 +21,7 @@ import DashboardPage from "@/pages/dashboard-page";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
+import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/terms" component={TermsPage} />
                 <Route path="/contact" component={ContactPage} />
                 <Route path="/auth" component={AuthPage} />
+                <Route path="/realtime-ats" component={RealtimeATSPage} />
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />
                 <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />

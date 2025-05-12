@@ -630,6 +630,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Realtime ATS analysis endpoint
+  app.post("/api/analyze-resume-text", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { resumeContent, jobDescription } = req.body;
+      
+      if (!resumeContent) {
+        return res.status(400).json({ error: "Resume content is required" });
+      }
+      
+      // In a real implementation, this would perform NLP analysis on the resume content
+      // For now, we'll provide a simplified analysis for demo purposes
+      
+      // Check for South African context
+      const resumeLower = resumeContent.toLowerCase();
+      
+      // Check for B-BBEE mention
+      const bbbeeDetected = /b-bbee|bbbee|broad.?based black economic empowerment|bee/i.test(resumeLower);
+      
+      // Check for NQF level mention
+      const nqfDetected = /nqf level|saqa|qualification framework/i.test(resumeLower);
+      
+      // South African specific keywords
+      const saKeywords = [
+        "b-bbee", "nqf", "seta", "saqa", "employment equity", 
+        "johannesburg", "cape town", "durban", "pretoria", "gauteng", "western cape",
+        "south africa", "south african", "popia", "protection of personal information"
+      ];
+      
+      // Count South African keywords found
+      const foundSaKeywords = saKeywords.filter(keyword => 
+        resumeLower.includes(keyword.toLowerCase())
+      );
+      
+      // Calculate SA context score
+      const saContextScore = Math.min(100, 
+        Math.round(
+          (foundSaKeywords.length / 5) * 50 + // Up to 50 points for keywords
+          (bbbeeDetected ? 25 : 0) +           // 25 points for B-BBEE
+          (nqfDetected ? 25 : 0)               // 25 points for NQF
+        )
+      );
+      
+      // Format score - check for proper sections, bullet points, etc.
+      const hasProperSections = /education|experience|skills|qualifications/i.test(resumeLower);
+      const hasBulletPoints = /•|-|\*/i.test(resumeContent);
+      const hasDates = /20\d{2}|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december/i.test(resumeLower);
+      
+      const formatScore = Math.round(
+        (hasProperSections ? 40 : 0) +
+        (hasBulletPoints ? 30 : 0) +
+        (hasDates ? 30 : 0)
+      );
+      
+      // Skills score - would compare to job description in real implementation
+      const skillsScore = jobDescription ? 
+        Math.round(40 + Math.random() * 40) : 65;
+      
+      // Overall weighted score
+      const overallScore = Math.round(
+        (skillsScore * 0.4) +
+        (formatScore * 0.3) +
+        (saContextScore * 0.3)
+      );
+      
+      // Generate improvement suggestions
+      const suggestions = [];
+      
+      if (!bbbeeDetected) {
+        suggestions.push("Add your B-BBEE status to increase your chances with South African employers");
+      }
+      
+      if (!nqfDetected) {
+        suggestions.push("Include NQF levels for your qualifications to align with South African standards");
+      }
+      
+      if (foundSaKeywords.length < 3) {
+        suggestions.push("Add more South African context (locations, regulatory frameworks, etc.)");
+      }
+      
+      if (!hasProperSections) {
+        suggestions.push("Structure your resume with clear sections (Education, Experience, Skills)");
+      }
+      
+      if (!hasBulletPoints) {
+        suggestions.push("Use bullet points to make achievements and responsibilities more scannable");
+      }
+      
+      if (skillsScore < 70) {
+        suggestions.push("Enhance skills section to better match typical job requirements");
+      }
+      
+      // Job description keywords - would normally be extracted through NLP
+      const jobKeywords = jobDescription ? 
+        ["communication", "teamwork", "leadership", "problem-solving", "analytical", "technical", "project management"] :
+        ["excel", "communication", "management", "reporting", "analysis", "strategic", "budget"];
+      
+      // Find keywords that exist in the resume
+      const foundKeywords = jobKeywords.filter(keyword => 
+        resumeLower.includes(keyword.toLowerCase())
+      );
+      
+      // Return the analysis
+      res.json({
+        overall: overallScore,
+        skills: skillsScore,
+        format: formatScore,
+        saContext: saContextScore,
+        keywords: jobKeywords,
+        foundKeywords,
+        bbbeeDetected,
+        nqfDetected,
+        suggestions,
+        analyzed: true,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // WhatsApp settings endpoints
   app.get("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {

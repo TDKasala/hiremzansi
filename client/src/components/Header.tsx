@@ -27,6 +27,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/how-it-works", label: "How It Works" },
+    { href: "/realtime-ats", label: "ATS Scanner" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
