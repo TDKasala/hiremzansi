@@ -45,7 +45,7 @@ export default function BlogPage() {
       image: "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
     },
     {
-      id: 3,
+      id: 4,
       title: "How to Address Employment Gaps in Your CV",
       slug: "employment-gaps",
       date: "June 1, 2023",
@@ -54,7 +54,7 @@ export default function BlogPage() {
       image: "https://images.unsplash.com/photo-1560264280-88b68371db39?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
     },
     {
-      id: 4,
+      id: 5,
       title: "B-BBEE and Your CV: What You Need to Know",
       slug: "bbbee-and-cv",
       date: "May 25, 2023",
@@ -63,7 +63,7 @@ export default function BlogPage() {
       image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
     },
     {
-      id: 5,
+      id: 6,
       title: "NQF Levels Explained: Showcasing Qualifications Correctly",
       slug: "nqf-levels-explained",
       date: "May 18, 2023",
@@ -72,7 +72,7 @@ export default function BlogPage() {
       image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
     },
     {
-      id: 6,
+      id: 7,
       title: "The Impact of Formatting on ATS Scanning",
       slug: "formatting-impact",
       date: "May 11, 2023",
