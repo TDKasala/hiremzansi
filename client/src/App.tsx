@@ -4,6 +4,8 @@ import { queryClient } from "./lib/queryClient";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
@@ -14,6 +16,8 @@ import AboutPage from "@/pages/AboutPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import TermsPage from "@/pages/TermsPage";
 import ContactPage from "@/pages/ContactPage";
+import AuthPage from "@/pages/auth-page";
+import DashboardPage from "@/pages/dashboard-page";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -21,20 +25,24 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class">
         <TooltipProvider>
-          <Layout>
-            <Switch>
-              <Route path="/" component={HomePage} />
-              <Route path="/how-it-works" component={HowItWorksPage} />
-              <Route path="/pricing" component={PricingPage} />
-              <Route path="/blog" component={BlogPage} />
-              <Route path="/about" component={AboutPage} />
-              <Route path="/privacy" component={PrivacyPage} />
-              <Route path="/terms" component={TermsPage} />
-              <Route path="/contact" component={ContactPage} />
-              <Route component={NotFound} />
-            </Switch>
-          </Layout>
-          <Toaster />
+          <AuthProvider>
+            <Layout>
+              <Switch>
+                <Route path="/" component={HomePage} />
+                <Route path="/how-it-works" component={HowItWorksPage} />
+                <Route path="/pricing" component={PricingPage} />
+                <Route path="/blog" component={BlogPage} />
+                <Route path="/about" component={AboutPage} />
+                <Route path="/privacy" component={PrivacyPage} />
+                <Route path="/terms" component={TermsPage} />
+                <Route path="/contact" component={ContactPage} />
+                <Route path="/auth" component={AuthPage} />
+                <ProtectedRoute path="/dashboard" component={DashboardPage} />
+                <Route component={NotFound} />
+              </Switch>
+            </Layout>
+            <Toaster />
+          </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
