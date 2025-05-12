@@ -120,7 +120,7 @@ export default function Header() {
                 className="hidden md:inline-flex"
                 asChild
               >
-                <Link href="/auth?tab=register">Sign Up</Link>
+                <Link href="/auth?tab=register">{t('common.signup')}</Link>
               </Button>
             </div>
           )}

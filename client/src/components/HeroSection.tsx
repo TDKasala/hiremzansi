@@ -3,13 +3,16 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Shield, CheckCircle, Star, LineChart, BarChart, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 export default function HeroSection() {
+  const { t } = useTranslation();
+  
   // Stats for South African context
   const stats = [
-    { label: "ATS Success Rate", value: "85%" },
-    { label: "Interview Callback", value: "3.2x" },
-    { label: "SA Companies", value: "400+" }
+    { label: t('home.statsAtsSuccess'), value: "85%" },
+    { label: t('home.statsInterviewCallback'), value: "3.2x" },
+    { label: t('home.statsSaCompanies'), value: "400+" }
   ];
   
   // Animation states for CV elements
@@ -35,7 +38,7 @@ export default function HeroSection() {
           <div className="md:w-1/2 mb-8 md:mb-0">
             <div className="relative">
               <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary">
-                South African Focused
+                {t('home.southAfricanFocused')}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4">
                 Beat ATS & Land Your <span className="text-primary">Dream Job!</span>

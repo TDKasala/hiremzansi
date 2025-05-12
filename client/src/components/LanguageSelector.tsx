@@ -13,14 +13,19 @@ const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
 
   const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'zu', name: 'isiZulu' },
-    { code: 'st', name: 'Sesotho' },
-    { code: 'af', name: 'Afrikaans' },
-    { code: 'xh', name: 'isiXhosa' },
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'zu', name: 'Zulu', nativeName: 'isiZulu' },
+    { code: 'st', name: 'Sotho', nativeName: 'Sesotho' },
+    { code: 'af', name: 'Afrikaans', nativeName: 'Afrikaans' },
+    { code: 'xh', name: 'Xhosa', nativeName: 'isiXhosa' },
   ];
   
-  console.log("Current language:", i18n.language);
+  // Get the base language code (e.g., 'en' from 'en-US')
+  const getCurrentLanguage = () => {
+    const langCode = i18n.language;
+    // Handle en-ZA format by getting the base language
+    return langCode?.split('-')[0] || 'en';
+  };
 
   const changeLanguage = (value: string) => {
     i18n.changeLanguage(value);
@@ -28,7 +33,7 @@ const LanguageSelector = () => {
 
   return (
     <div className="flex items-center">
-      <Select value={i18n.language} onValueChange={changeLanguage}>
+      <Select value={getCurrentLanguage()} onValueChange={changeLanguage}>
         <SelectTrigger className="w-[140px] h-9 border-muted-foreground/20">
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
