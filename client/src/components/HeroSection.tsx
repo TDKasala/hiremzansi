@@ -40,13 +40,14 @@ export default function HeroSection() {
               <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary">
                 {t('home.southAfricanFocused')}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                Beat ATS & Land Your <span className="text-primary">Dream Job!</span>
-              </h1>
+              <h1 className="text-3xl md:text-5xl font-bold mb-4" 
+                dangerouslySetInnerHTML={{ 
+                  __html: t('home.heroTitle').replace('<span>', '<span class="text-primary">').replace('</span>', '</span>') 
+                }} 
+              />
             </div>
             <p className="text-lg md:text-xl mb-6 text-white">
-              Get your CV past Applicant Tracking Systems used by 70% of South African employers. 
-              Optimize your resume to stand out in a competitive job market.
+              {t('home.heroSubtitle')}
             </p>
             
             <div className="grid grid-cols-3 gap-4 mb-6">
@@ -61,18 +62,18 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <Link href="/upload">
                 <Button size="lg" className="bg-primary text-white hover:bg-opacity-90 transition-colors w-full sm:w-auto text-base md:text-lg">
-                  Get Your Free ATS Score
+                  {t('home.getFreeAtsScore')}
                 </Button>
               </Link>
               <Link href="#pricing">
                 <Button size="lg" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-base md:text-lg">
-                  View Premium Features
+                  {t('home.viewPremiumFeatures')}
                 </Button>
               </Link>
             </div>
             <div className="mt-6 text-white flex items-center text-sm">
               <Shield className="h-4 w-4 mr-2 text-primary" />
-              <span>POPIA Compliant. Your data is secure with us.</span>
+              <span>{t('home.dataSecure')}</span>
             </div>
           </div>
           
@@ -94,7 +95,7 @@ export default function HeroSection() {
               <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 0 ? 'bg-primary/10 border border-primary/30' : ''}`}>
                 <div className="flex items-center mb-2">
                   <Star className={`h-4 w-4 mr-2 ${highlightedSection === 0 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">Key Skills</h3>
+                  <h3 className="font-semibold">{t('home.keySkills')}</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs bg-gray-100 px-2 py-1 rounded">Digital Marketing</span>

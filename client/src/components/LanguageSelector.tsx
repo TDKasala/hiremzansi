@@ -26,6 +26,13 @@ const LanguageSelector = () => {
     // Handle en-ZA format by getting the base language
     return langCode?.split('-')[0] || 'en';
   };
+  
+  // Get native name for display in dropdown trigger
+  const getCurrentNativeName = () => {
+    const code = getCurrentLanguage();
+    const language = languages.find(lang => lang.code === code);
+    return language?.nativeName || 'English';
+  };
 
   const changeLanguage = (value: string) => {
     i18n.changeLanguage(value);
@@ -37,13 +44,16 @@ const LanguageSelector = () => {
         <SelectTrigger className="w-[140px] h-9 border-muted-foreground/20">
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
-            <SelectValue placeholder={t('common.language')} />
+            <span>{getCurrentNativeName()}</span>
           </div>
         </SelectTrigger>
         <SelectContent>
           {languages.map((language) => (
             <SelectItem key={language.code} value={language.code}>
-              {language.name}
+              <span className="flex items-center gap-2">
+                <span>{language.nativeName}</span>
+                <span className="text-xs text-muted-foreground">({language.name})</span>
+              </span>
             </SelectItem>
           ))}
         </SelectContent>
