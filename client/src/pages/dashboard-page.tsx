@@ -303,7 +303,7 @@ export default function DashboardPage() {
                       <div className="mb-4 md:mb-0">
                         <h3 className="font-medium text-lg">{cv.title || cv.fileName}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Uploaded on {new Date(cv.createdAt).toLocaleDateString()}
+                          Uploaded on {typeof cv.createdAt === 'string' ? new Date(cv.createdAt).toLocaleDateString() : 'N/A'}
                         </p>
                         {cv.targetPosition && (
                           <p className="text-sm">Target: {cv.targetPosition}</p>

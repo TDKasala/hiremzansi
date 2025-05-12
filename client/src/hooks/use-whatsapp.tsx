@@ -1,41 +1,44 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { getQueryFn } from "@/lib/queryClient";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface WhatsAppSettings {
   enabled: boolean;
   phoneNumber?: string;
-  verified: boolean;
-}
-
-interface UpdateWhatsAppSettingsInput {
-  enabled: boolean;
-  phoneNumber?: string;
+  verified?: boolean;
 }
 
 export function useWhatsApp() {
   const { toast } = useToast();
-  const [isVerifying, setIsVerifying] = useState(false);
+  const queryClient = useQueryClient();
 
+  // Fetch WhatsApp settings
   const { 
     data: settings, 
     isLoading,
-    error
+    error 
   } = useQuery<WhatsAppSettings>({
-    queryKey: ['/api/whatsapp-settings'],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryKey: ["/api/whatsapp-settings"],
+    queryFn: async () => {
+      try {
+        const res = await apiRequest("GET", "/api/whatsapp-settings");
+        return await res.json();
+      } catch (error) {
+        // Default settings if API fails
+        return { enabled: false };
+      }
+    }
   });
 
-  const updateSettingsMutation = useMutation({
-    mutationFn: async (input: UpdateWhatsAppSettingsInput) => {
-      const res = await apiRequest('POST', '/api/whatsapp-settings', input);
+  // Update WhatsApp settings
+  const { mutate: updateSettings, isPending: isPendingUpdate } = useMutation({
+    mutationFn: async (updatedSettings: WhatsAppSettings) => {
+      const res = await apiRequest("POST", "/api/whatsapp-settings", updatedSettings);
       return await res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/whatsapp-settings'] });
-      
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/whatsapp-settings"], data);
       toast({
         title: "Settings updated",
         description: "Your WhatsApp notification settings have been saved.",
@@ -43,33 +46,31 @@ export function useWhatsApp() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to save settings",
-        description: error.message,
+        title: "Update failed",
+        description: error.message || "Failed to update WhatsApp settings. Please try again.",
         variant: "destructive",
       });
     }
   });
 
-  const sendVerificationMutation = useMutation({
+  // Send verification code
+  const { mutate: sendVerification, isPending: isVerifying } = useMutation({
     mutationFn: async (phoneNumber: string) => {
-      setIsVerifying(true);
-      const res = await apiRequest('POST', '/api/whatsapp-verify', { phoneNumber });
+      const res = await apiRequest("POST", "/api/whatsapp-verify", { phoneNumber });
       return await res.json();
     },
     onSuccess: () => {
       toast({
         title: "Verification sent",
-        description: "A verification message has been sent to your WhatsApp number.",
+        description: "Please check your WhatsApp for a verification code.",
       });
-      setIsVerifying(false);
     },
     onError: (error: Error) => {
       toast({
         title: "Verification failed",
-        description: error.message,
+        description: error.message || "Failed to send verification. Please check your number and try again.",
         variant: "destructive",
       });
-      setIsVerifying(false);
     }
   });
 
@@ -77,9 +78,9 @@ export function useWhatsApp() {
     settings,
     isLoading,
     error,
-    updateSettings: updateSettingsMutation.mutate,
-    isPendingUpdate: updateSettingsMutation.isPending,
-    sendVerification: sendVerificationMutation.mutate,
-    isVerifying: isVerifying || sendVerificationMutation.isPending,
+    updateSettings,
+    isPendingUpdate,
+    sendVerification,
+    isVerifying
   };
 }
