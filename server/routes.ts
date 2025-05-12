@@ -133,6 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Creating CV for user ID:", userId);
       
+      // Get job description if provided
+      const jobDescription = req.body.jobDescription || "";
+      
       // Store the CV
       const cvData = {
         userId,
@@ -144,13 +147,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         targetPosition: req.body.targetPosition,
         targetIndustry: req.body.targetIndustry,
         description: req.body.description,
-        isDefault: req.body.isDefault === "true"
+        isDefault: req.body.isDefault === "true",
+        jobDescription: jobDescription
       };
 
       const cv = await storage.createCV(cvData);
 
       // Begin background analysis of the CV
-      const analysis = analyzeCV(content);
+      // Pass job description if available for better analysis
+      const analysis = analyzeCV(content, jobDescription);
       
       // Store the analysis results
       const atsScore = await storage.createATSScore({

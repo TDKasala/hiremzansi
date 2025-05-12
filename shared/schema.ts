@@ -85,6 +85,7 @@ export const cvs = pgTable("cvs", {
   isDefault: boolean("is_default").default(false),
   targetPosition: text("target_position"),
   targetIndustry: text("target_industry"),
+  jobDescription: text("job_description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -108,6 +109,7 @@ export const insertCvSchema = createInsertSchema(cvs).pick({
   isDefault: true,
   targetPosition: true,
   targetIndustry: true,
+  jobDescription: true,
 });
 
 // ATS Score schema with enhanced South African context
