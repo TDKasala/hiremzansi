@@ -99,7 +99,7 @@ export default function Header() {
                     {logoutMutation.isPending ? "Logging out..." : (
                       <>
                         <LogOut className="mr-2 h-4 w-4" />
-                        <span>Logout</span>
+                        <span>{t('common.logout')}</span>
                       </>
                     )}
                   </DropdownMenuItem>
