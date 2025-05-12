@@ -55,9 +55,9 @@ export default function ReferralPage() {
   
   // Referral rewards explanation
   const referralRewards = [
-    { type: "Free User Sign Up", reward: "R10 credit" },
-    { type: "Deep Analysis Purchase", reward: "R15 credit" },
-    { type: "Premium Subscription", reward: "R50 credit + 5% monthly commission" }
+    { type: "1 Friend Signs Up", reward: "Free CV Template" },
+    { type: "3 Friends Sign Up", reward: "Free CV Deep Analysis (R30 value)" },
+    { type: "5 Friends Sign Up", reward: "1-Month Premium Subscription" }
   ];
   
   // Copy referral link to clipboard
@@ -101,25 +101,25 @@ export default function ReferralPage() {
   return (
     <>
       <Helmet>
-        <title>Refer Friends & Earn Rewards | ATSBoost</title>
+        <title>Refer 3 Friends, Get Free CV Deep Analysis | ATSBoost</title>
         <meta 
           name="description" 
-          content="Refer friends to ATSBoost and earn rewards for each sign-up and premium conversion. Help your network improve their CVs while you earn cash rewards." 
+          content="Refer 3 friends to ATSBoost and get a FREE CV Deep Analysis (R30 value). Help your network improve their CVs while earning valuable resume optimization benefits." 
         />
         <meta 
           name="keywords" 
-          content="CV referral program, resume optimization rewards, ATSBoost referral, South African CV tool, job application referral" 
+          content="free CV deep analysis, resume optimization rewards, ATSBoost referral, South African CV tool, job application referral" 
         />
       </Helmet>
       
       <div className="container mx-auto px-4 py-10 max-w-5xl">
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Refer Friends & <span className="text-primary">Earn Rewards</span>
+            Refer 3 Friends, Get a <span className="text-primary">Free Deep Analysis</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Help your network improve their job applications while earning rewards.
-            Get paid when your referrals use ATSBoost to optimize their CVs for the South African job market.
+            Help your network improve their job applications and earn valuable rewards.
+            Get a FREE CV Deep Analysis (R30 value) when 3 friends sign up using your referral link.
           </p>
         </div>
         
@@ -301,13 +301,13 @@ export default function ReferralPage() {
         
         {/* Call to Action */}
         <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 text-center mb-10">
-          <h2 className="text-2xl font-bold mb-2">Ready to help your network succeed?</h2>
+          <h2 className="text-2xl font-bold mb-2">Get Your Free CV Deep Analysis</h2>
           <p className="mb-4 max-w-2xl mx-auto">
-            Share your referral link today and help your friends and colleagues optimize 
-            their CVs for South African employers while earning rewards.
+            Share your referral link with 3 friends and unlock a comprehensive CV Deep Analysis 
+            worth R30—your key to standing out in the competitive South African job market.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button onClick={copyToClipboard}>
+            <Button onClick={copyToClipboard} className="bg-green-600 hover:bg-green-700">
               <Copy className="mr-2 h-4 w-4" />
               Copy Referral Link
             </Button>
@@ -325,24 +325,24 @@ export default function ReferralPage() {
           <h2 className="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
           <div className="grid gap-4">
             <div className="p-4 border rounded-lg">
-              <h3 className="font-bold mb-2">How does the referral program work?</h3>
+              <h3 className="font-bold mb-2">How do I get my free CV Deep Analysis?</h3>
               <p className="text-muted-foreground">
-                When someone uses your unique referral link to create an account, they're 
-                tracked as your referral. You earn rewards when they use ATSBoost services.
+                Share your unique referral link with friends. Once 3 friends create accounts using 
+                your link, you'll automatically receive a free Deep Analysis credit in your account.
               </p>
             </div>
             <div className="p-4 border rounded-lg">
-              <h3 className="font-bold mb-2">When do I get paid my rewards?</h3>
+              <h3 className="font-bold mb-2">What's included in the CV Deep Analysis?</h3>
               <p className="text-muted-foreground">
-                Rewards accumulate in your account and can be withdrawn once you reach 
-                the R100 minimum threshold. Payouts are processed on the 15th of each month.
+                The Deep Analysis (worth R30) includes professional CV feedback with South African context, 
+                industry-specific keyword recommendations, B-BBEE optimization, and personalized improvement tips.
               </p>
             </div>
             <div className="p-4 border rounded-lg">
-              <h3 className="font-bold mb-2">Is there a limit to how many people I can refer?</h3>
+              <h3 className="font-bold mb-2">Is there a limit to how many rewards I can earn?</h3>
               <p className="text-muted-foreground">
-                No! There's no limit to how many people you can refer or how much you can earn. 
-                The more people you help, the more rewards you'll receive.
+                No! You can earn multiple rewards. For every 3 referrals, you get another free CV Deep Analysis. 
+                At 5 referrals, you'll also unlock a free month of Premium access.
               </p>
             </div>
           </div>
@@ -353,15 +353,15 @@ export default function ReferralPage() {
           <CardContent className="pt-6 pb-6">
             <div className="text-center">
               <h3 className="text-xl md:text-2xl font-bold mb-2">
-                South Africa's #1 CV Optimization Platform
+                3 Referrals = Free CV Deep Analysis
               </h3>
               <p className="mb-4 max-w-2xl mx-auto">
-                Join thousands of South Africans who have improved their job search 
-                success with ATSBoost's locally-optimized tools and features.
+                Your network needs quality CV feedback to succeed in South Africa's job market.
+                Share ATSBoost and get valuable tools to boost your own career journey.
               </p>
               <Button variant="default" className="bg-white text-secondary hover:bg-white/90" asChild>
                 <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
-                  Optimize Your CV Now
+                  Start Referring Now
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -378,8 +378,8 @@ export default function ReferralPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="italic mb-4">
-                  "I referred 5 friends from my university, and three of them got interviews 
-                  within weeks of using ATSBoost. Plus, I earned enough rewards to cover my premium subscription!"
+                  "I referred 3 friends from my university and got the free Deep Analysis. It completely 
+                  transformed my CV with South African-specific keywords, and I landed two interviews the following week!"
                 </p>
                 <p className="font-semibold">Thembi M.</p>
                 <p className="text-sm text-muted-foreground">Cape Town</p>
@@ -388,8 +388,8 @@ export default function ReferralPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="italic mb-4">
-                  "The referral program is a win-win. My colleagues improved their CVs, 
-                  and I earned R200 in two months just by sharing my link in our WhatsApp group."
+                  "After referring 3 friends, I used my free Deep Analysis on my CV. The detailed feedback on 
+                  B-BBEE and NQF presentation helped me tailor my application to South African companies perfectly."
                 </p>
                 <p className="font-semibold">James T.</p>
                 <p className="text-sm text-muted-foreground">Johannesburg</p>
