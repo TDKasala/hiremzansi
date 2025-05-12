@@ -33,10 +33,10 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
 import { CV, ATSScore, AnalysisReport } from '@shared/schema';
 
-type CombinedData = {
+interface CombinedData {
   cv: CV;
   atsScore: ATSScore;
-};
+}
 
 export default function CVDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,10 +44,29 @@ export default function CVDetailsPage() {
   const { user } = useAuth();
   const numericId = parseInt(id);
 
-  // Fetch CV details
+  // Fetch the combined data
   const { data, isLoading, error } = useQuery<CombinedData>({
-    queryKey: [`/api/cv/${id}`],
-    queryFn: getQueryFn({ on401: 'throw' }),
+    queryKey: [`/api/cv/${id}`, `/api/ats-score/${id}`],
+    queryFn: async () => {
+      // Fetch CV data
+      const cvResponse = await fetch(`/api/cv/${id}`);
+      if (!cvResponse.ok) {
+        throw new Error('Failed to fetch CV data');
+      }
+      const cvData = await cvResponse.json();
+      
+      // Fetch ATS score data
+      const scoreResponse = await fetch(`/api/ats-score/${id}`);
+      if (!scoreResponse.ok) {
+        throw new Error('Failed to fetch ATS score data');
+      }
+      const scoreData = await scoreResponse.json();
+      
+      return { 
+        cv: cvData, 
+        atsScore: scoreData 
+      };
+    },
     enabled: !!id && !isNaN(numericId),
   });
 
@@ -82,6 +101,7 @@ export default function CVDetailsPage() {
     );
   }
 
+  // Safely extract data
   const { cv, atsScore } = data;
   
   // Format scores as percentages
@@ -149,25 +169,31 @@ export default function CVDetailsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Skills Match</span>
-                    <span className={getScoreClass(atsScore.skillsScore)}>{formatScore(atsScore.skillsScore)}</span>
+                    <span className={getScoreClass(atsScore.skillsScore || 0)}>
+                      {formatScore(atsScore.skillsScore || 0)}
+                    </span>
                   </div>
-                  <Progress value={atsScore.skillsScore} className={getProgressColor(atsScore.skillsScore)} />
+                  <Progress value={atsScore.skillsScore || 0} className={getProgressColor(atsScore.skillsScore || 0)} />
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Context Match</span>
-                    <span className={getScoreClass(atsScore.contextScore)}>{formatScore(atsScore.contextScore)}</span>
+                    <span className={getScoreClass(atsScore.contextScore || 0)}>
+                      {formatScore(atsScore.contextScore || 0)}
+                    </span>
                   </div>
-                  <Progress value={atsScore.contextScore} className={getProgressColor(atsScore.contextScore)} />
+                  <Progress value={atsScore.contextScore || 0} className={getProgressColor(atsScore.contextScore || 0)} />
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Format Score</span>
-                    <span className={getScoreClass(atsScore.formatScore)}>{formatScore(atsScore.formatScore)}</span>
+                    <span className={getScoreClass(atsScore.formatScore || 0)}>
+                      {formatScore(atsScore.formatScore || 0)}
+                    </span>
                   </div>
-                  <Progress value={atsScore.formatScore} className={getProgressColor(atsScore.formatScore)} />
+                  <Progress value={atsScore.formatScore || 0} className={getProgressColor(atsScore.formatScore || 0)} />
                 </div>
                 
                 {atsScore.saContextScore !== null && (
@@ -232,12 +258,14 @@ export default function CVDetailsPage() {
                   </p>
                   
                   <ul className="space-y-3">
-                    {atsScore.strengths?.map((strength, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                        <span>{strength}</span>
-                      </li>
-                    )) || (
+                    {atsScore.strengths && atsScore.strengths.length > 0 ? (
+                      atsScore.strengths.map((strength, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                          <span>{strength}</span>
+                        </li>
+                      ))
+                    ) : (
                       <li className="text-muted-foreground text-sm">No strengths data available</li>
                     )}
                   </ul>
@@ -250,12 +278,14 @@ export default function CVDetailsPage() {
                   </p>
                   
                   <ul className="space-y-3">
-                    {atsScore.improvements?.map((improvement, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
-                        <span>{improvement}</span>
-                      </li>
-                    )) || (
+                    {atsScore.improvements && atsScore.improvements.length > 0 ? (
+                      atsScore.improvements.map((improvement, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
+                          <span>{improvement}</span>
+                        </li>
+                      ))
+                    ) : (
                       <li className="text-muted-foreground text-sm">No improvement suggestions available</li>
                     )}
                   </ul>
