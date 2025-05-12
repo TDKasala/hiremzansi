@@ -100,9 +100,9 @@ export default function BlogPage() {
       
       <div className="bg-secondary py-16 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">ATS Insights Blog</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('blog.pageTitle')}</h1>
           <p className="text-xl max-w-2xl mx-auto">
-            Expert advice on CV optimization and navigating the South African job market
+            {t('blog.pageSubtitle')}
           </p>
         </div>
       </div>
@@ -112,11 +112,11 @@ export default function BlogPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-1">
               <div className="sticky top-24">
-                <h2 className="text-xl font-bold mb-4">Categories</h2>
+                <h2 className="text-xl font-bold mb-4">{t('blog.categories')}</h2>
                 <ul className="space-y-2">
                   <li>
                     <Link href="/blog">
-                      <a className="text-primary font-medium">All Posts</a>
+                      <a className="text-primary font-medium">{t('blog.allPosts')}</a>
                     </Link>
                   </li>
                   {categories.map((category, index) => (
@@ -161,10 +161,10 @@ export default function BlogPage() {
                     <div className="p-6">
                       <div className="flex items-center text-sm text-neutral-500 mb-2">
                         <span className="bg-neutral-100 px-2 py-1 rounded text-xs mr-2">
-                          {post.category}
+                          {t('blog.category')}: {post.category}
                         </span>
                         <Calendar className="h-4 w-4 mr-1" />
-                        {post.date}
+                        {t('blog.publishedOn')} {post.date}
                       </div>
                       <h2 className="text-xl font-semibold mb-2">
                         <Link href={`/blog/${post.slug}`} className="text-secondary hover:text-primary">
@@ -173,7 +173,7 @@ export default function BlogPage() {
                       </h2>
                       <p className="text-neutral-600 mb-4 line-clamp-3">{post.summary}</p>
                       <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary font-medium hover:underline">
-                        Read More <ArrowRight className="ml-1 h-4 w-4" />
+                        {t('blog.readMore')} <ArrowRight className="ml-1 h-4 w-4" />
                       </Link>
                     </div>
                   </div>
