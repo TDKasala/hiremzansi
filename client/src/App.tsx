@@ -23,6 +23,7 @@ import CVDetailsPage from "@/pages/CVDetailsPage";
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import ReferralPage from "@/pages/ReferralPage";
+import BlogPost1 from "@/pages/BlogPost1";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -43,6 +44,8 @@ function App() {
                 <Route path="/contact" component={ContactPage} />
                 <Route path="/auth" component={AuthPage} />
                 <Route path="/realtime-ats" component={RealtimeATSPage} />
+                <Route path="/refer" component={ReferralPage} />
+                <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />
                 <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />

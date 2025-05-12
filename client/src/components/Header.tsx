@@ -29,6 +29,7 @@ export default function Header() {
     { href: "/how-it-works", label: "How It Works" },
     { href: "/realtime-ats", label: "ATS Scanner" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/refer", label: "Refer & Earn" },
     { href: "/blog", label: "Blog" },
     { href: "/about", label: "About" },
   ];
