@@ -105,10 +105,13 @@ const provincialKeywords: Record<string, string[]> = {
  * Analyzes CV content and generates a comprehensive ATS score with South African specific recommendations
  * 
  * @param content The full text content of the CV to analyze
+ * @param jobDescription Optional job description to compare CV against
  * @returns A detailed analysis report with scores, strengths, improvements and issues
  */
-export function analyzeCV(content: string): AnalysisReport {
+export function analyzeCV(content: string, jobDescription?: string): AnalysisReport {
   const normalizedContent = content.toLowerCase();
+  const hasJobDescription = !!jobDescription;
+  const normalizedJobDesc = hasJobDescription ? jobDescription.toLowerCase() : "";
   
   // Check skill keyword matches
   const skillMatches = skillsKeywords.filter(keyword => 
@@ -144,10 +147,36 @@ export function analyzeCV(content: string): AnalysisReport {
     }
   }
   
+  // Extract job description keywords if available
+  let jobDescKeywords: string[] = [];
+  let jobDescMatches = 0;
+  let jobMatchBonus = 0;
+  
+  if (hasJobDescription && normalizedJobDesc.length > 0) {
+    // Extract important words from job description (excluding common words)
+    const commonWords = ["and", "the", "a", "an", "is", "are", "in", "to", "for", "of", "with", "on"];
+    jobDescKeywords = normalizedJobDesc
+      .replace(/[^\w\s]/gi, '') // Remove punctuation
+      .split(/\s+/) // Split by whitespace
+      .filter(word => 
+        word.length > 3 && // Only words longer than 3 chars
+        !commonWords.includes(word) && // Exclude common words
+        /^[a-z]+$/.test(word) // Only alphabetical words
+      );
+    
+    // Count matches between CV and job description keywords
+    jobDescMatches = jobDescKeywords.filter(keyword => 
+      normalizedContent.includes(keyword)
+    ).length;
+    
+    // Calculate job match bonus (max 15 points)
+    jobMatchBonus = Math.min(15, Math.round((jobDescMatches / Math.max(5, jobDescKeywords.length * 0.3)) * 15));
+  }
+  
   // Calculate score components
-  const skillScore = Math.min(50, Math.round((skillMatches.length / 15) * 50));
-  const saContextScore = Math.min(30, Math.round((saKeywordsFound.length / 8) * 30));
-  const formatScore = Math.max(0, 20 - (foundFormatIssues.length * 4));
+  const skillScore = Math.min(40, Math.round((skillMatches.length / 15) * 40)); // Reduced from 50 to make room for job match
+  const saContextScore = Math.min(25, Math.round((saKeywordsFound.length / 8) * 25)); // Reduced from 30
+  const formatScore = Math.max(0, 20 - (foundFormatIssues.length * 4)); // Keep at 20
   
   // Apply South African context bonuses
   let contextBonus = 0;
@@ -155,8 +184,8 @@ export function analyzeCV(content: string): AnalysisReport {
   if (nqfDetected) contextBonus += 3;
   if (topProvinceMatches >= 3) contextBonus += 4;
   
-  // Calculate total score with contextual bonus
-  const totalScore = Math.min(100, skillScore + saContextScore + formatScore + contextBonus);
+  // Calculate total score with contextual bonus and job match bonus
+  const totalScore = Math.min(100, skillScore + saContextScore + formatScore + contextBonus + jobMatchBonus);
   
   // Generate strengths based on the analysis
   const strengths: string[] = [];
@@ -221,10 +250,36 @@ export function analyzeCV(content: string): AnalysisReport {
     improvements.push("Your CV is too brief for South African employers. Add more relevant details");
   }
   
+  // Add job description-specific improvements if available
+  if (hasJobDescription) {
+    if (jobDescMatches < jobDescKeywords.length * 0.3 && jobDescKeywords.length > 5) {
+      improvements.push("Your CV doesn't match well with the job description. Consider tailoring it with more relevant keywords.");
+    }
+    
+    if (jobMatchBonus < 8) {
+      improvements.push("Enhance your CV by incorporating more phrases and terminology from the job description.");
+    }
+  }
+  
   // Generate keyword recommendations
   const keywordRecommendations: string[][] = [];
   
-  if (skillMatches.length < 10) {
+  // If job description is available, prioritize keywords from it
+  if (hasJobDescription && jobDescKeywords.length > 5) {
+    // Extract missing keywords from job description
+    const missingJobKeywords = jobDescKeywords
+      .filter(keyword => !normalizedContent.includes(keyword))
+      .slice(0, 6);
+      
+    if (missingJobKeywords.length > 0) {
+      keywordRecommendations.push([
+        "Add these keywords from the job description:",
+        ...missingJobKeywords.map(keyword => `- ${keyword}`)
+      ]);
+    }
+  }
+  // Otherwise use general skill recommendations
+  else if (skillMatches.length < 10) {
     // Recommend relevant skills not found in the CV
     const missingSkills = skillsKeywords
       .filter(skill => !normalizedContent.includes(skill.toLowerCase()))
@@ -274,6 +329,9 @@ export function analyzeCV(content: string): AnalysisReport {
     skillsScore: skillScore,
     contextScore: saContextScore,
     formatScore: formatScore,
+    jobMatchScore: jobMatchBonus, // Include the job match bonus
+    jobDescKeywords: hasJobDescription ? jobDescKeywords : [], // Include job desc keywords
+    jobDescMatches: hasJobDescription ? jobDescMatches : 0, // Include matched keywords count
     strengths: strengths.length ? strengths : ["You've started creating your CV"],
     improvements: improvements.length ? improvements : ["Continue improving your CV with more relevant content"],
     issues,
