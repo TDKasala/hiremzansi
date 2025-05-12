@@ -19,10 +19,13 @@ const enTranslations = {
     dashboard: 'Dashboard',
     atsScanner: 'ATS Scanner',
     language: 'Language',
+    signInToStart: 'Sign in to start earning',
+    createAccount: 'Create Account',
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
     subtitle: 'Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis (R30 value) when 3 friends sign up using your referral link.',
+    createAccountDescription: 'Create an account or log in to get your unique referral link and start earning rewards.',
     yourReferralLink: 'Your Referral Link',
     shareLink: 'Share this link with friends, family, and colleagues to earn rewards',
     copyLink: 'Copy Link',
@@ -153,6 +156,7 @@ const afTranslations = {
     logout: 'Teken uit',
     dashboard: 'Paneelbord',
     atsScanner: 'ATS Skandeerder',
+    language: 'Taal',
   },
   referral: {
     title: 'Verwys 3 Vriende, Kry \'n Gratis Diep Analise',
@@ -197,6 +201,7 @@ const xhTranslations = {
     logout: 'Phuma',
     dashboard: 'Ibhodi',
     atsScanner: 'Iskena se-ATS',
+    language: 'Ulwimi',
   },
   referral: {
     title: 'Thumela Abahlobo aba-3, Ufumane Uhlalutyo Olunzulu Olumahla',

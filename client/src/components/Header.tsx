@@ -180,7 +180,7 @@ export default function Header() {
                   {logoutMutation.isPending ? "Logging out..." : (
                     <>
                       <LogOut className="h-4 w-4" />
-                      <span>Logout</span>
+                      <span>{t('common.logout')}</span>
                     </>
                   )}
                 </button>
@@ -192,14 +192,14 @@ export default function Header() {
                   className="flex-1 px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
                   onClick={closeMobileMenu}
                 >
-                  Log In
+                  {t('common.login')}
                 </Link>
                 <Link 
                   href="/auth?tab=register"
                   className="flex-1 px-4 py-2 bg-primary text-white text-center rounded-md hover:bg-opacity-90 transition-colors"
                   onClick={closeMobileMenu}
                 >
-                  Sign Up
+                  {t('common.signup')}
                 </Link>
               </div>
             )}

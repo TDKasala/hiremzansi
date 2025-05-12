@@ -117,24 +117,23 @@ export default function ReferralPage() {
       <div className="container mx-auto px-4 py-10 max-w-5xl">
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Refer 3 Friends, Get a <span className="text-primary">Free Deep Analysis</span>
+            {t('referral.title')}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Help your network improve their job applications and earn valuable rewards.
-            Get a FREE CV Deep Analysis (R30 value) when 3 friends sign up using your referral link.
+            {t('referral.subtitle')}
           </p>
         </div>
         
         {!user && (
           <Alert className="mb-8 border-primary/50 bg-primary/10">
             <Gift className="h-5 w-5 text-primary" />
-            <AlertTitle>Sign in to start earning</AlertTitle>
+            <AlertTitle>{t('common.signInToStart')}</AlertTitle>
             <AlertDescription>
-              Create an account or log in to get your unique referral link and start earning rewards.
+              {t('referral.createAccountDescription')}
               <div className="mt-2">
                 <Link href="/auth">
                   <Button variant="default" size="sm" className="mr-2">
-                    Create Account <ArrowRight className="ml-2 h-4 w-4" />
+                    {t('common.createAccount')} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </div>
@@ -147,10 +146,10 @@ export default function ReferralPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Share2 className="h-5 w-5 text-primary" />
-              Your Referral Link
+              {t('referral.yourReferralLink')}
             </CardTitle>
             <CardDescription>
-              Share this link with friends, family, and colleagues to earn rewards
+              {t('referral.shareLink')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -168,12 +167,12 @@ export default function ReferralPage() {
                 {copied ? (
                   <>
                     <Check className="mr-2 h-4 w-4" />
-                    Copied
+                    {t('referral.copied')}
                   </>
                 ) : (
                   <>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Link
+                    {t('referral.copyLink')}
                   </>
                 )}
               </Button>
