@@ -15,10 +15,19 @@ type BlogPost = {
 };
 
 export default function BlogPage() {
-  // Mock blog posts
+  // Blog posts
   const blogPosts: BlogPost[] = [
     {
       id: 1,
+      title: "7 ATS-Friendly CV Tips for South African Job Seekers",
+      slug: "7-ats-friendly-cv-tips-for-south-african-job-seekers",
+      date: "May 10, 2023",
+      summary: "Learn how to create an ATS-compliant CV that stands out in the South African job market with our expert tips covering B-BBEE, NQF levels, and local language proficiencies.",
+      category: "CV Tips",
+      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=400&h=250&auto=format&fit=crop"
+    },
+    {
+      id: 2,
       title: "What is an ATS and Why It Matters for SA Job Seekers",
       slug: "ats-explained",
       date: "June 15, 2023",
@@ -27,7 +36,7 @@ export default function BlogPage() {
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
     },
     {
-      id: 2,
+      id: 3,
       title: "Top 10 Keywords for South African CVs in 2023",
       slug: "top-keywords",
       date: "June 8, 2023",
@@ -156,15 +165,13 @@ export default function BlogPage() {
                         {post.date}
                       </div>
                       <h2 className="text-xl font-semibold mb-2">
-                        <Link href={`/blog/${post.slug}`}>
-                          <a className="text-secondary hover:text-primary">{post.title}</a>
+                        <Link href={`/blog/${post.slug}`} className="text-secondary hover:text-primary">
+                          {post.title}
                         </Link>
                       </h2>
                       <p className="text-neutral-600 mb-4 line-clamp-3">{post.summary}</p>
-                      <Link href={`/blog/${post.slug}`}>
-                        <a className="inline-flex items-center text-primary font-medium hover:underline">
-                          Read More <ArrowRight className="ml-1 h-4 w-4" />
-                        </a>
+                      <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary font-medium hover:underline">
+                        Read More <ArrowRight className="ml-1 h-4 w-4" />
                       </Link>
                     </div>
                   </div>
