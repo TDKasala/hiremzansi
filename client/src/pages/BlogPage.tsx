@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { Calendar, ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 // Blog post type
 type BlogPost = {
@@ -15,6 +16,7 @@ type BlogPost = {
 };
 
 export default function BlogPage() {
+  const { t } = useTranslation();
   // Blog posts
   const blogPosts: BlogPost[] = [
     {

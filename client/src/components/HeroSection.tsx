@@ -109,7 +109,7 @@ export default function HeroSection() {
               <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 1 ? 'bg-primary/10 border border-primary/30' : ''}`}>
                 <div className="flex items-center mb-2">
                   <Zap className={`h-4 w-4 mr-2 ${highlightedSection === 1 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">Experience</h3>
+                  <h3 className="font-semibold">{t('home.experience')}</h3>
                 </div>
                 <div className="text-sm">
                   <div className="mb-2">
@@ -123,7 +123,7 @@ export default function HeroSection() {
               <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 2 ? 'bg-primary/10 border border-primary/30' : ''}`}>
                 <div className="flex items-center mb-2">
                   <LineChart className={`h-4 w-4 mr-2 ${highlightedSection === 2 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">Education</h3>
+                  <h3 className="font-semibold">{t('home.education')}</h3>
                 </div>
                 <div className="text-sm">
                   <div className="font-medium">B.Com Marketing (NQF Level 7)</div>
@@ -137,9 +137,9 @@ export default function HeroSection() {
                   <div>
                     <div className="flex items-center">
                       <BarChart className={`h-4 w-4 mr-2 ${highlightedSection === 3 ? 'text-primary' : 'text-gray-400'}`} />
-                      <h3 className="font-semibold">ATS Score</h3>
+                      <h3 className="font-semibold">{t('home.atsScore')}</h3>
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">Optimized for South African market</div>
+                    <div className="text-xs text-gray-600 mt-1">{t('home.optimizedForSA')}</div>
                   </div>
                   <div 
                     className={`flex items-center justify-center h-12 w-12 rounded-full bg-green-100 text-green-600 font-bold text-lg
@@ -152,11 +152,11 @@ export default function HeroSection() {
                 {/* Little ATS checks */}
                 <div className="mt-2 flex items-center text-xs text-green-600">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  <span>B-BBEE info included</span>
+                  <span>{t('home.bbbeeIncluded')}</span>
                 </div>
                 <div className="mt-1 flex items-center text-xs text-green-600">
                   <CheckCircle className="h-3 w-3 mr-1" />
-                  <span>NQF levels specified</span>
+                  <span>{t('home.nqfSpecified')}</span>
                 </div>
               </div>
               

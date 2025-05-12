@@ -40,6 +40,17 @@ const enTranslations = {
     bbbeeIncluded: 'B-BBEE info included',
     nqfSpecified: 'NQF levels specified',
   },
+  blog: {
+    pageTitle: 'ATS Insights Blog',
+    pageSubtitle: 'Expert advice on CV optimization and navigating the South African job market',
+    categories: 'Categories',
+    allPosts: 'All Posts',
+    readMore: 'Read More',
+    category: 'Category',
+    publishedOn: 'Published on',
+    relatedPosts: 'Related Posts',
+    viewAll: 'View All Posts',
+  },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
     subtitle: 'Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis (R30 value) when 3 friends sign up using your referral link.',
