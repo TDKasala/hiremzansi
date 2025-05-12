@@ -14,19 +14,60 @@ const skillsKeywords = [
   "human resources", "recruitment", "training", "development", "performance management",
   "operations", "logistics", "supply chain", "procurement", "inventory management",
   "quality control", "quality assurance", "business analysis", "business development",
-  "strategy", "planning", "execution", "implementation", "stakeholder management"
+  "strategy", "planning", "execution", "implementation", "stakeholder management",
+  // Additional South African focused skills
+  "mobile money", "fintech", "telecommunications", "ecommerce", "retail banking",
+  "mining", "agriculture", "tourism", "hospitality", "conservation", 
+  "renewable energy", "sustainable development", "public sector", "government",
+  "healthcare", "pharmaceuticals", "education", "teaching", "social services"
 ];
 
 // South African context-specific keywords
 const saContextKeywords = [
-  "b-bbee", "bee", "broad-based black economic empowerment", "nqf", "national qualifications framework",
-  "saqa", "south african qualifications authority", "seta", "sector education and training authority",
-  "employment equity", "affirmative action", "skills development", "diversity", "transformation",
-  "johannesburg", "cape town", "durban", "pretoria", "bloemfontein", "port elizabeth", "east london",
-  "gauteng", "western cape", "kwazulu-natal", "eastern cape", "free state", "mpumalanga", "limpopo",
-  "north west", "northern cape", "south africa", "bilingual", "multilingual", "afrikaans", "zulu",
-  "xhosa", "sotho", "tswana", "venda", "tsonga", "swati", "ndebele", "popi", "popia", "protection of personal information",
-  "bcom", "bsc", "ba", "llb", "ca(sa)", "saica", "saipa", "cima", "acca", "ict", "matric"
+  // Regulatory frameworks and certifications
+  "b-bbee", "bee", "broad-based black economic empowerment", 
+  "nqf", "national qualifications framework",
+  "saqa", "south african qualifications authority", 
+  "seta", "sector education and training authority",
+  "employment equity", "affirmative action", "skills development", 
+  "diversity", "transformation", "popi", "popia", "protection of personal information",
+  
+  // Cities and provinces
+  "johannesburg", "cape town", "durban", "pretoria", "bloemfontein", 
+  "port elizabeth", "east london", "nelspruit", "polokwane", "kimberley",
+  "rustenburg", "pietermaritzburg", "vereeniging", "soweto", "tembisa",
+  "gauteng", "western cape", "kwazulu-natal", "eastern cape", "free state", 
+  "mpumalanga", "limpopo", "north west", "northern cape", 
+  
+  // Languages
+  "south africa", "bilingual", "multilingual", "afrikaans", "zulu", "isiZulu",
+  "xhosa", "isiXhosa", "sotho", "sesotho", "tswana", "setswana", "venda", "tsonga", 
+  "swati", "ndebele", "proficient in multiple languages",
+  
+  // Education and qualifications
+  "bcom", "bsc", "ba", "llb", "ca(sa)", "saica", "saipa", "cima", "acca", 
+  "ict", "matric", "senior certificate", "nsc", "national senior certificate",
+  "diploma", "higher certificate", "higher diploma", "degree", "masters", "doctorate",
+  "technical qualification", "trade test", "apprenticeship", "learnership",
+  "honors", "honours", "cum laude", "distinction",
+  
+  // B-BBEE specific terms
+  "black-owned", "black ownership", "level 1", "level 2", "level 3", "level 4",
+  "contributor", "generic scorecard", "qse", "emc", "black-owned business",
+  "previously disadvantaged", "economic inclusion", "black economic empowerment",
+  
+  // Industry bodies
+  "sabs", "sans", "iso", "sacnasp", "ecsa", "hpcsa", "sacssp", "saica", "irba",
+  "sahpra", "fica", "fsca", "sarb", "icasa", "nersa", "samrc", "teta",
+  
+  // NQF specific terms
+  "nqf level", "level 1", "level 2", "level 3", "level 4", "level 5", 
+  "level 6", "level 7", "level 8", "level 9", "level 10",
+  
+  // South African companies
+  "eskom", "sasol", "mtn", "vodacom", "standard bank", "fnb", "absa", "nedbank", 
+  "sanlam", "discovery", "multichoice", "shoprite", "checkers", "pick n pay", 
+  "woolworths", "telkom", "transnet", "sabc", "sars", "denel", "sappi"
 ];
 
 // Format issues that can impact ATS scanning
@@ -37,10 +78,35 @@ const formatIssues = [
   { regex: /([^\s]*\d+[^\s]*){10,}/g, issue: "Too many numbers/codes in CV may confuse ATS systems." },
   { regex: /([A-Z][a-z]*\s){7,}/g, issue: "Long sentences without keywords may reduce ATS relevance." },
   { regex: /\/(\/[^\n]*)/g, issue: "Comments or unusual formatting may not be readable by ATS." },
-  { regex: /(\.{2,})/g, issue: "Multiple periods or unusual punctuation may confuse ATS systems." }
+  { regex: /(\.{2,})/g, issue: "Multiple periods or unusual punctuation may confuse ATS systems." },
+  { regex: /\s{2,}/g, issue: "Multiple spaces can disrupt ATS parsing. Use consistent spacing." },
+  { regex: /\t/g, issue: "Tab characters may cause issues with ATS parsing. Use standard spacing." },
+  { regex: /[^\x00-\x7F]/g, issue: "Non-standard characters detected. These may cause issues with some ATS systems." }
 ];
 
-// Analyze CV content and generate ATS score with recommendations
+// South African specific B-BBEE and NQF detection patterns
+const bbeeRegex = /b-?bbee|bee|broad.?based black economic empowerment|level \d contributor/i;
+const nqfRegex = /nqf\s*level\s*\d+|national qualifications framework level \d+/i;
+
+// Regional job market keywords - for specific provincial suggestions
+const provincialKeywords: Record<string, string[]> = {
+  "gauteng": ["johannesburg", "pretoria", "midrand", "sandton", "centurion", "soweto", "financial services", "banking", "mining"],
+  "western_cape": ["cape town", "stellenbosch", "paarl", "technology", "wine", "tourism", "it", "tech startup"],
+  "kwazulu_natal": ["durban", "pietermaritzburg", "umhlanga", "manufacturing", "logistics", "shipping", "automotive"],
+  "eastern_cape": ["port elizabeth", "east london", "gqeberha", "automotive", "manufacturing", "logistics"],
+  "free_state": ["bloemfontein", "welkom", "agriculture", "mining", "manufacturing"],
+  "mpumalanga": ["nelspruit", "witbank", "secunda", "mining", "agriculture", "forestry", "energy"],
+  "limpopo": ["polokwane", "mining", "agriculture", "tourism", "public sector"],
+  "north_west": ["rustenburg", "potchefstroom", "mining", "agriculture", "tourism"],
+  "northern_cape": ["kimberley", "upington", "mining", "agriculture", "renewable energy", "solar power"]
+};
+
+/**
+ * Analyzes CV content and generates a comprehensive ATS score with South African specific recommendations
+ * 
+ * @param content The full text content of the CV to analyze
+ * @returns A detailed analysis report with scores, strengths, improvements and issues
+ */
 export function analyzeCV(content: string): AnalysisReport {
   const normalizedContent = content.toLowerCase();
   
@@ -50,7 +116,7 @@ export function analyzeCV(content: string): AnalysisReport {
   );
   
   // Check SA context keyword matches
-  const contextMatches = saContextKeywords.filter(keyword => 
+  const saKeywordsFound = saContextKeywords.filter(keyword => 
     normalizedContent.includes(keyword.toLowerCase())
   );
   
@@ -59,54 +125,162 @@ export function analyzeCV(content: string): AnalysisReport {
     regex.test(content)
   ).map(({ issue }) => issue);
   
-  // Calculate score based on matches and issues
-  // Base score out of 100
+  // Detect B-BBEE and NQF specific mentions
+  const bbbeeDetected = bbeeRegex.test(normalizedContent);
+  const nqfDetected = nqfRegex.test(normalizedContent);
+  
+  // Calculate provincial relevance - find which province has most keyword matches
+  let topProvince = "";
+  let topProvinceMatches = 0;
+  
+  for (const [province, keywords] of Object.entries(provincialKeywords)) {
+    const matches = keywords.filter(keyword => 
+      normalizedContent.includes(keyword.toLowerCase())
+    ).length;
+    
+    if (matches > topProvinceMatches) {
+      topProvinceMatches = matches;
+      topProvince = province;
+    }
+  }
+  
+  // Calculate score components
   const skillScore = Math.min(50, Math.round((skillMatches.length / 15) * 50));
-  const contextScore = Math.min(30, Math.round((contextMatches.length / 5) * 30));
-  const formatScore = Math.max(0, 20 - (foundFormatIssues.length * 5));
+  const saContextScore = Math.min(30, Math.round((saKeywordsFound.length / 8) * 30));
+  const formatScore = Math.max(0, 20 - (foundFormatIssues.length * 4));
   
-  const totalScore = skillScore + contextScore + formatScore;
+  // Apply South African context bonuses
+  let contextBonus = 0;
+  if (bbbeeDetected) contextBonus += 3;
+  if (nqfDetected) contextBonus += 3;
+  if (topProvinceMatches >= 3) contextBonus += 4;
   
-  // Generate strengths
+  // Calculate total score with contextual bonus
+  const totalScore = Math.min(100, skillScore + saContextScore + formatScore + contextBonus);
+  
+  // Generate strengths based on the analysis
   const strengths: string[] = [];
-  if (skillMatches.length > 5) {
-    strengths.push("You've included key skills that match many job descriptions");
+  if (skillMatches.length > 8) {
+    strengths.push("You've included key skills that match many South African job descriptions");
+  } else if (skillMatches.length > 4) {
+    strengths.push("You've included some relevant skills that employers look for");
   }
-  if (contextMatches.length > 2) {
-    strengths.push("Your CV contains South African specific terminology that employers look for");
+  
+  if (saKeywordsFound.length > 5) {
+    strengths.push("Your CV contains strong South African context that local employers value");
+  } else if (saKeywordsFound.length > 2) {
+    strengths.push("Your CV includes some South African specific terminology");
   }
+  
+  if (bbbeeDetected) {
+    strengths.push("Including B-BBEE status helps with employment equity requirements");
+  }
+  
+  if (nqfDetected) {
+    strengths.push("NQF qualification level clearly indicated, which aids in skills verification");
+  }
+  
   if (foundFormatIssues.length === 0) {
     strengths.push("Your CV format is clean and ATS-friendly");
   }
-  if (normalizedContent.length > 1500) {
+  
+  if (topProvinceMatches >= 3) {
+    strengths.push(`Your CV is well-targeted for the ${topProvince.replace('_', ' ')} job market`);
+  }
+  
+  if (normalizedContent.length > 1800) {
+    strengths.push("Your CV has excellent content length with comprehensive details");
+  } else if (normalizedContent.length > 1200) {
     strengths.push("Your CV has good content length with sufficient detail");
   }
   
-  // Generate improvements
+  // Generate improvements based on gaps
   const improvements: string[] = [];
-  if (skillMatches.length <= 10) {
-    improvements.push("Add more industry-specific keywords found in CareerJunction job ads");
-  }
-  if (contextMatches.length <= 3) {
-    improvements.push("Include South African qualifications (NQF levels) and B-BBEE status if applicable");
-  }
-  if (normalizedContent.length < 1000) {
-    improvements.push("Your CV may be too brief. Consider adding more relevant experience and skills");
+  
+  if (skillMatches.length < 10) {
+    improvements.push("Add more industry-specific keywords from South African job sites like CareerJunction or PNet");
   }
   
-  // Generate issues (serious problems)
-  const issues: string[] = foundFormatIssues.slice(0, 3); // Limit to top 3 issues
-  if (skillMatches.length < 3) {
-    issues.push("Very few relevant skills detected. Your CV needs significant keyword optimization");
+  if (!bbbeeDetected) {
+    improvements.push("Consider adding your B-BBEE status if applicable (important for South African employers)");
   }
-  if (contextMatches.length === 0) {
-    issues.push("No South African context found. Add location, qualifications, and local terminology");
+  
+  if (!nqfDetected) {
+    improvements.push("Add NQF levels to your qualifications to meet South African standards");
+  }
+  
+  if (saKeywordsFound.length < 4) {
+    improvements.push("Include more South African context like provinces, cities, and local terminology");
+  }
+  
+  if (topProvinceMatches < 2 && saKeywordsFound.length > 0) {
+    improvements.push("Consider targeting your CV to a specific South African province or region");
+  }
+  
+  if (normalizedContent.length < 1000) {
+    improvements.push("Your CV is too brief for South African employers. Add more relevant details");
+  }
+  
+  // Generate keyword recommendations
+  const keywordRecommendations: string[][] = [];
+  
+  if (skillMatches.length < 10) {
+    // Recommend relevant skills not found in the CV
+    const missingSkills = skillsKeywords
+      .filter(skill => !normalizedContent.includes(skill.toLowerCase()))
+      .slice(0, 5);
+    
+    if (missingSkills.length > 0) {
+      keywordRecommendations.push([
+        "Consider adding these skills (if relevant):",
+        ...missingSkills.map(skill => `- ${skill}`)
+      ]);
+    }
+  }
+  
+  if (saKeywordsFound.length < 4) {
+    // Recommend SA-specific terms not found
+    const missingSATerms = [
+      "B-BBEE status level",
+      "NQF qualification level",
+      "South African city/province",
+      "Local industry terminology",
+      "Relevant local certifications"
+    ];
+    
+    keywordRecommendations.push([
+      "Add these South African specific elements:",
+      ...missingSATerms.map(term => `- ${term}`)
+    ]);
+  }
+  
+  // Generate serious issues
+  const issues: string[] = foundFormatIssues.slice(0, 3); // Limit to top 3 format issues
+  
+  if (skillMatches.length < 3) {
+    issues.push("Very few relevant skills detected. Your CV needs significant keyword optimization for South African employers");
+  }
+  
+  if (saKeywordsFound.length === 0) {
+    issues.push("No South African context found. Add location, qualifications, and local terminology for better ATS performance");
+  }
+  
+  if (normalizedContent.length < 600) {
+    issues.push("CV is severely lacking in content. South African employers expect detailed CVs with comprehensive information");
   }
   
   return {
     score: totalScore,
+    skillsScore: skillScore,
+    contextScore: saContextScore,
+    formatScore: formatScore,
     strengths: strengths.length ? strengths : ["You've started creating your CV"],
     improvements: improvements.length ? improvements : ["Continue improving your CV with more relevant content"],
-    issues
+    issues,
+    saKeywordsFound: saKeywordsFound,
+    saContextScore: saContextScore,
+    bbbeeDetected,
+    nqfDetected,
+    keywordRecommendations: keywordRecommendations.length > 0 ? keywordRecommendations : undefined
   };
 }

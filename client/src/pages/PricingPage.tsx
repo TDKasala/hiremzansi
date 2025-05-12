@@ -60,6 +60,12 @@ export default function PricingPage() {
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">Advanced</td>
                   </tr>
                   <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">WhatsApp Notifications</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">Detailed PDF Report</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
@@ -72,7 +78,13 @@ export default function PricingPage() {
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Job Alerts</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">WhatsApp Job Alerts</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Regional Job Matching</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
@@ -92,8 +104,8 @@ export default function PricingPage() {
                   <tr>
                     <td className="py-3 px-4 font-medium">Price</td>
                     <td className="py-3 px-4 text-center">Free</td>
-                    <td className="py-3 px-4 text-center">ZAR 55.50 <span className="text-sm">(once-off)</span></td>
-                    <td className="py-3 px-4 text-center">ZAR 185 <span className="text-sm">/month</span></td>
+                    <td className="py-3 px-4 text-center">ZAR 30 <span className="text-sm">(once-off)</span></td>
+                    <td className="py-3 px-4 text-center">ZAR 100 <span className="text-sm">/month</span></td>
                   </tr>
                 </tbody>
               </table>
