@@ -22,6 +22,7 @@ import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
+import ReferralPage from "@/pages/ReferralPage";
 import NotFound from "@/pages/not-found";
 
 function App() {
