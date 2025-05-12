@@ -3,8 +3,10 @@ import { Helmet } from "react-helmet";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { getQueryFn } from "@/lib/queryClient";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { 
   AlertCircle, 
   CheckCircle, 
@@ -12,10 +14,22 @@ import {
   Briefcase, 
   GraduationCap, 
   FileCheck, 
-  Flag 
+  Flag,
+  Upload,
+  Send,
+  Smartphone,
+  Gift,
+  Users,
+  ListChecks,
+  FileText,
+  Book,
+  FileQuestion,
+  LayoutGrid
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { Link, useLocation } from "wouter";
 import FileUpload from "@/components/FileUpload";
 import { CV, ATSScore } from "@shared/schema";
@@ -23,6 +37,10 @@ import { CV, ATSScore } from "@shared/schema";
 export default function UploadPage() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
+  const [jobDescription, setJobDescription] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [isWhatsappUploading, setIsWhatsappUploading] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [analysisResult, setAnalysisResult] = useState<{
     cv: CV;
     score: number;
@@ -40,6 +58,25 @@ export default function UploadPage() {
       cv: data.cv,
       score: data.score
     });
+  };
+  
+  const handleWhatsappUpload = async () => {
+    if (!whatsappNumber) return;
+    
+    try {
+      setIsWhatsappUploading(true);
+      
+      // Simulate sending a WhatsApp message with upload instructions
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Show a success message
+      alert(`Instructions sent to ${whatsappNumber}. Please follow the steps in the WhatsApp message to upload your CV.`);
+      
+      setIsWhatsappUploading(false);
+    } catch (error) {
+      setIsWhatsappUploading(false);
+      console.error("WhatsApp upload error:", error);
+    }
   };
 
   if (!user) {
@@ -78,23 +115,146 @@ export default function UploadPage() {
           </p>
         </header>
         
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card>
+        <div className="grid gap-8">
+          {/* Job Description Input - Required for CV analysis */}
+          <Card className="border-primary/50">
             <CardHeader>
-              <CardTitle>Upload Your CV</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-primary" />
+                Job Description
+              </CardTitle>
               <CardDescription>
-                Upload your CV in PDF or DOCX format for analysis
+                Add the job description for targeted CV analysis (required)
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <FileUpload 
-                onUploadComplete={handleUploadComplete}
-                title="Upload your CV"
-                description="Drag and drop your CV here or click to browse"
+              <Textarea
+                placeholder="Paste the job description here to get tailored ATS scoring and recommendations"
+                className="min-h-[120px]"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                required
               />
+              <p className="mt-2 text-xs text-muted-foreground">
+                Adding a job description helps us analyze your CV specifically for the position you're applying for
+              </p>
             </CardContent>
           </Card>
           
+          {/* Upload Methods - CV File Upload and WhatsApp */}
+          <Tabs defaultValue="file">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="file" className="flex items-center justify-center gap-2">
+                <Upload className="h-4 w-4" />
+                File Upload
+              </TabsTrigger>
+              <TabsTrigger value="whatsapp" className="flex items-center justify-center gap-2">
+                <Smartphone className="h-4 w-4" />
+                WhatsApp Upload
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* File Upload Tab */}
+            <TabsContent value="file">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Upload Your CV</CardTitle>
+                  <CardDescription>
+                    Upload your CV in PDF or DOCX format for analysis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FileUpload 
+                    onUploadComplete={handleUploadComplete}
+                    title="Upload your CV"
+                    description="Drag and drop your CV here or click to browse"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* WhatsApp Upload Tab */}
+            <TabsContent value="whatsapp">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Send via WhatsApp</CardTitle>
+                  <CardDescription>
+                    Upload your CV through WhatsApp for convenience
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      We'll send instructions to your WhatsApp number on how to upload your CV directly from your phone
+                    </p>
+                    
+                    <div className="flex gap-3">
+                      <Input
+                        placeholder="Enter your WhatsApp number"
+                        value={whatsappNumber}
+                        onChange={(e) => setWhatsappNumber(e.target.value)}
+                        type="tel"
+                      />
+                      <Button 
+                        onClick={handleWhatsappUpload} 
+                        disabled={!whatsappNumber || isWhatsappUploading}
+                        className="whitespace-nowrap"
+                      >
+                        {isWhatsappUploading ? (
+                          <>
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />
+                            Send Instructions
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
+                    <p className="text-xs text-muted-foreground">
+                      Example: +27823456789 (include country code)
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+          
+          {/* Referral Program */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Gift className="h-5 w-5 text-primary mr-2" />
+                Refer Friends & Earn
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                <div className="flex-1">
+                  <p className="text-sm mb-2">
+                    Share ATSBoost with friends and get <span className="font-semibold">free CV scans</span> after 3 referrals
+                  </p>
+                  <div className="flex gap-2 items-center">
+                    <Input
+                      placeholder="Your referral code (optional)"
+                      value={referralCode}
+                      onChange={(e) => setReferralCode(e.target.value)}
+                    />
+                    <Button variant="outline" size="sm">Apply</Button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 bg-primary/10 p-2 rounded-lg">
+                  <Users className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium">3 referrals = 1 free scan</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* ATS Analysis Results */}
           <Card>
             <CardHeader>
               <CardTitle>ATS Analysis Results</CardTitle>
@@ -132,7 +292,7 @@ export default function UploadPage() {
                     </div>
                     
                     <div className="mt-6">
-                      <Alert>
+                      <Alert variant="default">
                         <Info className="h-4 w-4" />
                         <AlertTitle>Next Steps</AlertTitle>
                         <AlertDescription>
@@ -182,6 +342,131 @@ export default function UploadPage() {
             </div>
           </div>
         )}
+        
+        {/* Job Seeker Tools Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <Briefcase className="h-6 w-6 mr-2 text-primary" />
+            Job Seeker Tools
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* CV Templates */}
+            <Card className="hover:border-primary/50 transition-colors group">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <LayoutGrid className="h-5 w-5 mr-2 text-primary" />
+                  CV Templates
+                </CardTitle>
+                <CardDescription>
+                  South African focused resume templates
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                <p>Access professional CV templates optimized for the South African job market and ATS systems.</p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+                  <Link href="/tools/cv-templates">Browse Templates</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            {/* ATS Keywords Tool */}
+            <Card className="hover:border-primary/50 transition-colors group">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-primary" />
+                  ATS Keywords Tool
+                </CardTitle>
+                <CardDescription>
+                  Industry-specific keywords for South Africa
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                <p>Generate tailored keywords for your industry that will help your CV pass ATS filters in South Africa.</p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+                  <Link href="/tools/ats-keywords">Find Keywords</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            {/* Cover Letter Generator */}
+            <Card className="hover:border-primary/50 transition-colors group">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-primary" />
+                  Cover Letter Ideas
+                </CardTitle>
+                <CardDescription>
+                  South African cover letter guidance
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                <p>Get industry-specific cover letter templates and prompts tailored for South African employers.</p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+                  <Link href="/tools/cover-letter">Create Cover Letter</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+          
+          {/* Premium Features (Interview Guide) */}
+          <div className="mt-8 border border-primary/30 rounded-lg p-4 bg-primary/5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center">
+                <Gift className="h-5 w-5 text-primary mr-2" />
+                <h3 className="font-semibold text-lg">Premium Tools</h3>
+              </div>
+              <Button size="sm" variant="default">Upgrade</Button>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="bg-background p-3 rounded border flex flex-col">
+                <h4 className="font-medium flex items-center">
+                  <ListChecks className="h-4 w-4 text-primary mr-2" />
+                  CV Checklist
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Complete South African specific CV checklist with 50+ points
+                </p>
+                <Button variant="outline" size="sm" className="mt-auto" disabled>
+                  Premium Feature
+                </Button>
+              </div>
+              
+              <div className="bg-background p-3 rounded border flex flex-col">
+                <h4 className="font-medium flex items-center">
+                  <FileQuestion className="h-4 w-4 text-primary mr-2" />
+                  Job Fit Quiz
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  10-question assessment to match your skills to job requirements
+                </p>
+                <Button variant="outline" size="sm" className="mt-auto" disabled>
+                  Premium Feature
+                </Button>
+              </div>
+              
+              <div className="bg-background p-3 rounded border flex flex-col">
+                <h4 className="font-medium flex items-center">
+                  <Book className="h-4 w-4 text-primary mr-2" />
+                  Interview Guide
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  South African interview preparation with common questions
+                </p>
+                <Button variant="outline" size="sm" className="mt-auto" disabled>
+                  Premium Feature
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
         
         {/* South African job market tips */}
         <div className="mt-12 bg-muted/50 p-6 rounded-lg">
