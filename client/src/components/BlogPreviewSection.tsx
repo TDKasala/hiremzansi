@@ -56,8 +56,8 @@ export default function BlogPreviewSection() {
                 <div className="text-sm text-neutral-500 mb-2">{post.date}</div>
                 <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
                 <p className="text-neutral-600 mb-4">{post.summary}</p>
-                <Link href={`/blog/${post.slug}`}>
-                  <a className="text-primary font-medium hover:underline">Read More →</a>
+                <Link href={`/blog/${post.slug}`} className="text-primary font-medium hover:underline">
+                  Read More →
                 </Link>
               </div>
             </div>
