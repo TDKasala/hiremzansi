@@ -1,0 +1,44 @@
+import { Switch, Route } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+import Layout from "@/components/Layout";
+import HomePage from "@/pages/HomePage";
+import HowItWorksPage from "@/pages/HowItWorksPage";
+import PricingPage from "@/pages/PricingPage";
+import BlogPage from "@/pages/BlogPage";
+import AboutPage from "@/pages/AboutPage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import TermsPage from "@/pages/TermsPage";
+import ContactPage from "@/pages/ContactPage";
+import NotFound from "@/pages/not-found";
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class">
+        <TooltipProvider>
+          <Layout>
+            <Switch>
+              <Route path="/" component={HomePage} />
+              <Route path="/how-it-works" component={HowItWorksPage} />
+              <Route path="/pricing" component={PricingPage} />
+              <Route path="/blog" component={BlogPage} />
+              <Route path="/about" component={AboutPage} />
+              <Route path="/privacy" component={PrivacyPage} />
+              <Route path="/terms" component={TermsPage} />
+              <Route path="/contact" component={ContactPage} />
+              <Route component={NotFound} />
+            </Switch>
+          </Layout>
+          <Toaster />
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
