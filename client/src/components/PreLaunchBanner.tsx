@@ -11,10 +11,8 @@ export default function PreLaunchBanner() {
           <span className="mb-2 sm:mb-0 sm:mr-3">
             We're fine-tuning ATSBoost for full launch soon.
           </span>
-          <Link href="/contact">
-            <a className="bg-neutral-900 text-white px-4 py-1 rounded text-sm font-medium hover:bg-opacity-80 transition-colors">
-              Get Notified at Launch
-            </a>
+          <Link href="/contact" className="bg-neutral-900 text-white px-4 py-1 rounded text-sm font-medium hover:bg-opacity-80 transition-colors">
+            Get Notified at Launch
           </Link>
         </div>
       </div>
