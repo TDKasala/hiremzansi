@@ -41,16 +41,16 @@ export default function HeroSection() {
                 Beat ATS & Land Your <span className="text-primary">Dream Job!</span>
               </h1>
             </div>
-            <p className="text-lg md:text-xl mb-6 text-neutral-200">
+            <p className="text-lg md:text-xl mb-6 text-white">
               Get your CV past Applicant Tracking Systems used by 70% of South African employers. 
               Optimize your resume to stand out in a competitive job market.
             </p>
             
             <div className="grid grid-cols-3 gap-4 mb-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-white/10 p-3 rounded-lg text-center">
+                <div key={index} className="bg-white/20 p-3 rounded-lg text-center">
                   <div className="text-xl md:text-2xl font-bold text-primary">{stat.value}</div>
-                  <div className="text-xs text-neutral-300">{stat.label}</div>
+                  <div className="text-xs text-white font-medium">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -67,8 +67,8 @@ export default function HeroSection() {
                 </Button>
               </Link>
             </div>
-            <div className="mt-6 text-neutral-300 flex items-center text-sm">
-              <Shield className="h-4 w-4 mr-2" />
+            <div className="mt-6 text-white flex items-center text-sm">
+              <Shield className="h-4 w-4 mr-2 text-primary" />
               <span>POPIA Compliant. Your data is secure with us.</span>
             </div>
           </div>
@@ -81,9 +81,9 @@ export default function HeroSection() {
               
               {/* CV Header */}
               <div className="border-b border-gray-200 pb-4 mb-4">
-                <h2 className="text-xl font-bold text-center mb-1">Sipho Nkosi</h2>
+                <h2 className="text-xl font-bold text-center mb-1">Denis Kasala</h2>
                 <p className="text-gray-600 text-sm text-center">
-                  Marketing Specialist | B-BBEE Level 2 | Cape Town
+                  Marketing Specialist | B-BBEE Level 2 | Johannesburg
                 </p>
               </div>
               

@@ -168,6 +168,7 @@ export default function UploadPage() {
                     onUploadComplete={handleUploadComplete}
                     title="Upload your CV"
                     description="Drag and drop your CV here or click to browse"
+                    withJobDescription={true}
                   />
                 </CardContent>
               </Card>
