@@ -50,7 +50,7 @@ export default function ReferralPage() {
     invited: 7,
     registered: 4,
     premiumConversions: 2,
-    rewards: "R150.00",
+    freeAnalysisEarned: 1,
   };
   
   // Referral rewards explanation
@@ -248,8 +248,8 @@ export default function ReferralPage() {
                   <p className="text-sm text-muted-foreground">Premium Users</p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-green-600">{referralStats.rewards}</p>
-                  <p className="text-sm text-muted-foreground">Rewards Earned</p>
+                  <p className="text-2xl font-bold text-green-600">{referralStats.freeAnalysisEarned}</p>
+                  <p className="text-sm text-muted-foreground">Free Analyses Earned</p>
                 </div>
               </div>
               
