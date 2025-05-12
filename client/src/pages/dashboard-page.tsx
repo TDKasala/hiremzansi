@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { useWhatsApp } from "@/hooks/use-whatsapp";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,17 @@ import { CV } from "@shared/schema";
 export default function DashboardPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+
+  const { 
+    settings: whatsappSettings,
+    isLoading: isWhatsappLoading,
+    updateSettings: updateWhatsappSettings,
+    isPendingUpdate: isUpdatingWhatsapp,
+    sendVerification: sendWhatsappVerification,
+    isVerifying: isVerifyingWhatsapp
+  } = useWhatsApp();
 
   const { data: userCVs, isLoading: isCVsLoading } = useQuery<CV[], Error>({
     queryKey: ["/api/cvs"],
@@ -44,6 +56,30 @@ export default function DashboardPage() {
     queryKey: ["/api/profile"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
+  
+  // Update local state when WhatsApp settings are loaded
+  React.useEffect(() => {
+    if (whatsappSettings) {
+      setWhatsappEnabled(whatsappSettings.enabled);
+      setPhoneNumber(whatsappSettings.phoneNumber || "");
+    }
+  }, [whatsappSettings]);
+  
+  // Handle WhatsApp settings form submission
+  const handleWhatsappSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateWhatsappSettings({
+      enabled: whatsappEnabled,
+      phoneNumber: phoneNumber.trim()
+    });
+  };
+  
+  // Handle verification request
+  const handleSendVerification = () => {
+    if (phoneNumber) {
+      sendWhatsappVerification(phoneNumber);
+    }
+  };
 
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
@@ -433,35 +469,210 @@ export default function DashboardPage() {
               <CardDescription>Manage your ATSBoost subscription</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Award className="h-12 w-12 text-primary mx-auto" />
-                <h3 className="mt-4 text-lg font-medium">Free Tier</h3>
-                <p className="text-muted-foreground mt-1">
-                  You're currently on the free tier plan
-                </p>
-                <div className="mt-6">
-                  <h4 className="font-medium">Features:</h4>
-                  <ul className="mt-2 space-y-2 text-left max-w-xs mx-auto">
+              {isProfileLoading ? (
+                <div className="text-center py-8">
+                  <div className="spinner border-4 border-primary border-t-transparent h-12 w-12 rounded-full mx-auto animate-spin"></div>
+                  <p className="mt-4 text-muted-foreground">Loading subscription details...</p>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Award className="h-12 w-12 text-primary mx-auto" />
+                  <h3 className="mt-4 text-lg font-medium">Free Tier</h3>
+                  <p className="text-muted-foreground mt-1">
+                    You're currently on the free tier plan
+                  </p>
+                  <div className="mt-6">
+                    <h4 className="font-medium">Features:</h4>
+                    <ul className="mt-2 space-y-2 text-left max-w-xs mx-auto">
+                      <li className="flex items-baseline">
+                        <div className="mr-2 text-primary">✓</div>
+                        <span>Basic ATS score analysis</span>
+                      </li>
+                      <li className="flex items-baseline">
+                        <div className="mr-2 text-primary">✓</div>
+                        <span>Upload up to 3 CVs</span>
+                      </li>
+                      <li className="flex items-baseline">
+                        <div className="mr-2 text-primary">✓</div>
+                        <span>Basic improvement recommendations</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <Button className="mt-6" asChild>
+                    <Link href="/pricing">
+                      Upgrade to Premium
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Deep Analysis</CardTitle>
+                <CardDescription>One-time analysis - ZAR 30</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p>Get a comprehensive one-time analysis of your CV:</p>
+                  <ul className="space-y-2">
                     <li className="flex items-baseline">
                       <div className="mr-2 text-primary">✓</div>
-                      <span>Basic ATS score analysis</span>
+                      <span>Detailed PDF report</span>
                     </li>
                     <li className="flex items-baseline">
                       <div className="mr-2 text-primary">✓</div>
-                      <span>Upload up to 3 CVs</span>
+                      <span>Advanced keyword analysis</span>
                     </li>
                     <li className="flex items-baseline">
                       <div className="mr-2 text-primary">✓</div>
-                      <span>Basic improvement recommendations</span>
+                      <span>South African context recommendations</span>
+                    </li>
+                    <li className="flex items-baseline">
+                      <div className="mr-2 text-primary">✓</div>
+                      <span>WhatsApp notifications</span>
                     </li>
                   </ul>
+                  <form action="/api/create-payfast-payment" method="post" className="mt-6">
+                    <input type="hidden" name="plan_type" value="deep_analysis" />
+                    <input type="hidden" name="amount" value="30" />
+                    <Button type="submit" className="w-full">Purchase Analysis</Button>
+                  </form>
                 </div>
-                <Button className="mt-6" asChild>
-                  <Link href="/pricing">
-                    Upgrade to Premium
-                  </Link>
-                </Button>
-              </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Premium Subscription</CardTitle>
+                <CardDescription>ZAR 100/month</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p>Get unlimited access to all ATSBoost features:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-baseline">
+                      <div className="mr-2 text-primary">✓</div>
+                      <span>Real-time CV editor</span>
+                    </li>
+                    <li className="flex items-baseline">
+                      <div className="mr-2 text-primary">✓</div>
+                      <span>Multiple CV versions</span>
+                    </li>
+                    <li className="flex items-baseline">
+                      <div className="mr-2 text-primary">✓</div>
+                      <span>Regional job matching</span>
+                    </li>
+                    <li className="flex items-baseline">
+                      <div className="mr-2 text-primary">✓</div>
+                      <span>WhatsApp job alerts</span>
+                    </li>
+                  </ul>
+                  <form action="/api/create-payfast-subscription" method="post" className="mt-6">
+                    <input type="hidden" name="plan_type" value="premium" />
+                    <input type="hidden" name="amount" value="100" />
+                    <Button type="submit" className="w-full">Subscribe Monthly</Button>
+                  </form>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>WhatsApp Notifications</CardTitle>
+              <CardDescription>Get alerts and updates via WhatsApp</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isWhatsappLoading ? (
+                <div className="text-center py-8">
+                  <div className="spinner border-4 border-primary border-t-transparent h-12 w-12 rounded-full mx-auto animate-spin"></div>
+                  <p className="mt-4 text-muted-foreground">Loading WhatsApp settings...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enter your South African phone number to receive CV analysis results, job alerts, 
+                    and subscription updates via WhatsApp.
+                  </p>
+                  
+                  <form onSubmit={handleWhatsappSubmit} className="grid gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input 
+                        type="checkbox" 
+                        id="enable-whatsapp" 
+                        checked={whatsappEnabled}
+                        onChange={(e) => setWhatsappEnabled(e.target.checked)}
+                        className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
+                      />
+                      <label htmlFor="enable-whatsapp" className="text-sm font-medium">
+                        Enable WhatsApp notifications
+                      </label>
+                    </div>
+                    
+                    <div className="grid gap-2">
+                      <label htmlFor="phone" className="text-sm font-medium">Phone Number</label>
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 text-gray-500 rounded-l-md">
+                          +27
+                        </span>
+                        <input
+                          type="tel"
+                          id="phone"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="82 123 4567" 
+                          className="flex-1 rounded-r-md border border-gray-300 py-2 px-3 text-sm"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">Enter your number without the leading zero (e.g., 82 123 4567)</p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button 
+                        type="submit" 
+                        className="flex-1"
+                        disabled={isUpdatingWhatsapp}
+                      >
+                        {isUpdatingWhatsapp ? (
+                          <>
+                            <span className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                            Saving...
+                          </>
+                        ) : "Save Settings"}
+                      </Button>
+                      
+                      {whatsappSettings?.phoneNumber && !whatsappSettings.verified && (
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={handleSendVerification}
+                          disabled={isVerifyingWhatsapp}
+                          className="whitespace-nowrap"
+                        >
+                          {isVerifyingWhatsapp ? (
+                            <>
+                              <span className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                              Verifying...
+                            </>
+                          ) : "Verify Number"}
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {whatsappSettings?.verified && (
+                      <div className="bg-green-50 border border-green-200 rounded-md p-3 text-green-800 text-sm">
+                        <div className="flex items-center">
+                          <div className="mr-2 text-green-500">✓</div>
+                          <span>Your WhatsApp number has been verified</span>
+                        </div>
+                      </div>
+                    )}
+                  </form>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

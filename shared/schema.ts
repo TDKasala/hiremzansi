@@ -43,6 +43,9 @@ export const saProfiles = pgTable("sa_profiles", {
   preferredLanguages: text("preferred_languages").array(),
   industries: text("industries").array(),
   jobTypes: text("job_types").array(),
+  whatsappEnabled: boolean("whatsapp_enabled").default(false),
+  whatsappNumber: text("whatsapp_number"),
+  whatsappVerified: boolean("whatsapp_verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -64,6 +67,9 @@ export const insertSaProfileSchema = createInsertSchema(saProfiles).pick({
   preferredLanguages: true,
   industries: true,
   jobTypes: true,
+  whatsappEnabled: true,
+  whatsappNumber: true,
+  whatsappVerified: true,
 });
 
 // CV schema

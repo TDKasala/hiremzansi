@@ -124,6 +124,60 @@ export class WhatsAppService {
   }
   
   /**
+   * Send a payment confirmation to the user
+   * 
+   * @param phoneNumber User's phone number
+   * @param serviceType Type of service purchased (e.g., "Deep Analysis")
+   * @param amount Amount paid
+   * @returns Promise resolving to success/failure
+   */
+  async sendPaymentConfirmation(
+    phoneNumber: string,
+    serviceType: string,
+    amount: string
+  ): Promise<boolean> {
+    if (!this.isValidSAPhoneNumber(phoneNumber)) {
+      console.error('Invalid South African phone number:', phoneNumber);
+      return false;
+    }
+    
+    return this.sendNotification({
+      to: phoneNumber,
+      templateName: 'payment_confirmation',
+      templateData: {
+        service_type: serviceType,
+        amount: amount,
+        dashboard_url: 'https://atsboost.co.za/dashboard'
+      }
+    });
+  }
+  
+  /**
+   * Send a verification code to the user's WhatsApp
+   * 
+   * @param phoneNumber User's phone number
+   * @returns Promise resolving to success/failure
+   */
+  async sendVerificationCode(phoneNumber: string): Promise<boolean> {
+    if (!this.isValidSAPhoneNumber(phoneNumber)) {
+      console.error('Invalid South African phone number:', phoneNumber);
+      return false;
+    }
+    
+    // Generate a 6-digit verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    return this.sendNotification({
+      to: phoneNumber,
+      templateName: 'verification_code',
+      templateData: {
+        verification_code: verificationCode,
+        valid_minutes: '10'
+      }
+    });
+  }
+  
+  /**
    * General method to send a notification using a template
    * 
    * @param data Notification data including recipient and template details

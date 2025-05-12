@@ -8,6 +8,8 @@ import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV } from "./services/atsScoring";
 import { insertUserSchema, insertCvSchema, insertAtsScoreSchema, insertDeepAnalysisReportSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
+import { payfastService } from "./services/payfastService";
+import { whatsappService } from "./services/whatsappService";
 
 // File upload configuration
 const upload = multer({
@@ -474,7 +476,273 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Subscription management endpoints
+  // WhatsApp settings endpoints
+  app.get("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const profile = await storage.getSaProfile(req.user!.id);
+      
+      if (!profile) {
+        return res.json({
+          enabled: false,
+          verified: false
+        });
+      }
+      
+      res.json({
+        enabled: profile.whatsappEnabled || false,
+        phoneNumber: profile.whatsappNumber,
+        verified: profile.whatsappVerified || false
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { enabled, phoneNumber } = req.body;
+      
+      // Validate South African phone number if provided
+      if (phoneNumber) {
+        const saPhoneRegex = /^(\+27|0)[6-8][0-9]{8}$/;
+        if (!saPhoneRegex.test(phoneNumber)) {
+          return res.status(400).json({ error: "Invalid South African phone number format" });
+        }
+      }
+      
+      // Get or create profile
+      let profile = await storage.getSaProfile(req.user!.id);
+      
+      if (profile) {
+        // Update existing profile
+        profile = await storage.updateSaProfile(req.user!.id, {
+          whatsappEnabled: enabled,
+          whatsappNumber: phoneNumber,
+          whatsappVerified: profile.whatsappVerified // Preserve existing verification status
+        });
+      } else {
+        // Create new profile
+        profile = await storage.createSaProfile({
+          userId: req.user!.id,
+          whatsappEnabled: enabled,
+          whatsappNumber: phoneNumber,
+          whatsappVerified: false
+        });
+      }
+      
+      res.json({
+        enabled: profile.whatsappEnabled,
+        phoneNumber: profile.whatsappNumber,
+        verified: profile.whatsappVerified
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/whatsapp-verify", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { phoneNumber } = req.body;
+      
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
+      }
+      
+      // Get user profile
+      const profile = await storage.getSaProfile(req.user!.id);
+      
+      if (!profile) {
+        return res.status(404).json({ error: "Profile not found" });
+      }
+      
+      // Send verification message
+      const success = await whatsappService.sendVerificationCode(phoneNumber);
+      
+      if (!success) {
+        return res.status(500).json({ error: "Failed to send verification message" });
+      }
+      
+      // Note: In a real implementation, we would store the verification code
+      // and wait for the user to confirm it. For this demo, we'll mark as verified immediately.
+      await storage.updateSaProfile(req.user!.id, {
+        whatsappVerified: true
+      });
+      
+      res.json({ success: true, message: "Verification message sent" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // PayFast integration endpoints
+  app.post("/api/create-payfast-payment", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { plan_type, amount } = req.body;
+      
+      if (!plan_type || !amount) {
+        return res.status(400).json({ error: "Plan type and amount are required" });
+      }
+      
+      // Create a merchant reference
+      const merchantReference = `deep_analysis_${req.user!.id}_${Date.now()}`;
+      
+      // Create payment URL
+      const paymentUrl = payfastService.createPaymentUrl({
+        merchantReference,
+        amount: Number(amount),
+        itemName: "ATSBoost Deep Analysis",
+        itemDescription: "One-time comprehensive CV analysis with South African context",
+        email: req.user!.email,
+        firstName: req.user!.name?.split(" ")[0] || undefined,
+        lastName: req.user!.name?.split(" ").slice(1).join(" ") || undefined
+      });
+      
+      // Store payment reference
+      // In a real implementation, we would save this reference to track the payment
+      
+      // Redirect to PayFast
+      res.redirect(paymentUrl);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/create-payfast-subscription", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { plan_type, amount } = req.body;
+      
+      if (!plan_type || !amount) {
+        return res.status(400).json({ error: "Plan type and amount are required" });
+      }
+      
+      // Create a merchant reference
+      const merchantReference = `premium_sub_${req.user!.id}_${Date.now()}`;
+      
+      // Create subscription URL
+      const subscriptionUrl = payfastService.createSubscriptionUrl({
+        merchantReference,
+        amount: Number(amount),
+        itemName: "ATSBoost Premium Subscription",
+        itemDescription: "Monthly subscription to ATSBoost premium features",
+        email: req.user!.email,
+        firstName: req.user!.name?.split(" ")[0] || undefined,
+        lastName: req.user!.name?.split(" ").slice(1).join(" ") || undefined,
+        frequency: 'monthly',
+        subscription: true
+      });
+      
+      // Redirect to PayFast
+      res.redirect(subscriptionUrl);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/payfast-notify", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const requestBody = req.body;
+      const signature = req.headers['x-pf-signature'] as string;
+      
+      // Verify the PayFast notification
+      const isValid = await payfastService.verifyPaymentNotification(requestBody, signature);
+      
+      if (!isValid) {
+        return res.status(400).send("Invalid notification");
+      }
+      
+      // Process the payment based on notification data
+      const { payment_status, m_payment_id, pf_payment_id, amount_gross, token } = requestBody;
+      
+      // Check payment status
+      if (payment_status !== 'COMPLETE') {
+        return res.status(200).send("Payment not complete");
+      }
+      
+      // Extract payment details
+      const [paymentType, userId] = m_payment_id.split('_');
+      
+      if (paymentType === 'deep_analysis') {
+        // Process one-time analysis payment
+        // In a real implementation, we would update the database and trigger the analysis
+        console.log(`Deep analysis payment processed for user ${userId}, amount: ${amount_gross}`);
+        
+        // Send WhatsApp notification
+        const user = await storage.getUser(Number(userId));
+        const profile = user ? await storage.getSaProfile(user.id) : null;
+        
+        if (profile?.whatsappEnabled && profile.whatsappNumber && profile.whatsappVerified) {
+          await whatsappService.sendPaymentConfirmation(
+            profile.whatsappNumber,
+            'Deep Analysis',
+            amount_gross
+          );
+        }
+      } else if (paymentType === 'premium_sub') {
+        // Process subscription payment
+        // In a real implementation, we would create or update the subscription
+        console.log(`Premium subscription payment processed for user ${userId}, amount: ${amount_gross}`);
+        
+        // Create or update subscription
+        const user = await storage.getUser(Number(userId));
+        
+        if (user) {
+          // Get all plans
+          const plans = await storage.getActivePlans();
+          const premiumPlan = plans.find(p => p.name.toLowerCase().includes('premium'));
+          
+          if (premiumPlan) {
+            // Check if user already has a subscription
+            const existingSubscription = await storage.getSubscription(user.id);
+            
+            const now = new Date();
+            const endDate = new Date(now);
+            endDate.setMonth(endDate.getMonth() + 1);
+            
+            if (existingSubscription) {
+              // Update existing subscription
+              await storage.updateSubscription(existingSubscription.id, {
+                planId: premiumPlan.id,
+                status: 'active',
+                currentPeriodStart: now,
+                currentPeriodEnd: endDate,
+                paymentMethod: 'payfast',
+                cancelAtPeriodEnd: false
+              });
+            } else {
+              // Create new subscription
+              await storage.createSubscription({
+                userId: user.id,
+                planId: premiumPlan.id,
+                status: 'active',
+                currentPeriodStart: now,
+                currentPeriodEnd: endDate,
+                paymentMethod: 'payfast',
+                cancelAtPeriodEnd: false
+              });
+            }
+            
+            // Send WhatsApp notification
+            const profile = await storage.getSaProfile(user.id);
+            
+            if (profile?.whatsappEnabled && profile.whatsappNumber && profile.whatsappVerified) {
+              await whatsappService.sendSubscriptionConfirmation(
+                profile.whatsappNumber,
+                'Premium',
+                endDate.toLocaleDateString('en-ZA')
+              );
+            }
+          }
+        }
+      }
+      
+      res.status(200).send("Notification processed");
+    } catch (error) {
+      console.error('PayFast notification error:', error);
+      res.status(500).send("Error processing notification");
+    }
+  });
+
+  // Subscription management endpoints - PayFast integration will replace these
   app.post("/api/subscribe", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { planId, paymentMethod } = req.body;
