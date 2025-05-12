@@ -50,6 +50,7 @@ const enTranslations = {
     publishedOn: 'Published on',
     relatedPosts: 'Related Posts',
     viewAll: 'View All Posts',
+    backToBlog: 'Back to Blog',
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',

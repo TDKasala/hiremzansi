@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Tag, Share2, ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/card";
 
 export default function BlogPost1() {
+  const { t } = useTranslation();
   return (
     <>
       <Helmet>
@@ -28,7 +30,7 @@ export default function BlogPost1() {
         <div className="mb-6">
           <Link href="/blog" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Blog
+            {t('blog.backToBlog')}
           </Link>
         </div>
         
@@ -219,7 +221,7 @@ export default function BlogPost1() {
             <Button variant="outline" className="mr-2" asChild>
               <Link href="/blog">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Blog
+                {t('blog.backToBlog')}
               </Link>
             </Button>
             <Button variant="outline" className="flex items-center">
