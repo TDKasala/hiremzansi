@@ -577,8 +577,8 @@ export default function InteractiveResumePreview({
 }
 
 // Sample resumeTemplate for South African market
-const defaultResumeTemplate = `SIPHO MKHIZE
-B-BBEE Level 2 | +27 82 123 4567 | sipho.mkhize@email.co.za | Johannesburg, Gauteng
+const defaultResumeTemplate = `DENIS KASALA
+B-BBEE Level 2 | +27 82 123 4567 | denis.kasala@email.co.za | Johannesburg, Gauteng
 
 PROFESSIONAL SUMMARY
 Dedicated Marketing Manager with 6+ years of experience in digital marketing, campaign management, and market analysis. Strong record of implementing successful marketing strategies in the South African retail sector, improving brand visibility and generating leads.

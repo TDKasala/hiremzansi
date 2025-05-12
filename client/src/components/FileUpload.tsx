@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, File, X, Loader2 } from "lucide-react";
+import { Upload, File, X, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface FileUploadProps {
   onUploadComplete?: (data: any) => void;
@@ -12,6 +14,7 @@ interface FileUploadProps {
   maxSize?: number;
   title?: string;
   description?: string;
+  withJobDescription?: boolean;
 }
 
 export default function FileUpload({
@@ -19,12 +22,14 @@ export default function FileUpload({
   acceptedFileTypes = "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   maxSize = 10 * 1024 * 1024, // 10MB default
   title = "Upload your CV",
-  description = "Drag and drop your CV file here or click to select"
+  description = "Drag and drop your CV file here or click to select",
+  withJobDescription = false
 }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
+  const [jobDescription, setJobDescription] = useState("");
   const { toast } = useToast();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -61,6 +66,11 @@ export default function FileUpload({
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append("title", selectedFile.name.replace(/\.[^/.]+$/, ""));
+      
+      // Add job description if available
+      if (withJobDescription && jobDescription) {
+        formData.append("jobDescription", jobDescription);
+      }
 
       // Simulate progress (actual progress tracking would require specialized API)
       progressInterval = setInterval(() => {
@@ -128,6 +138,28 @@ export default function FileUpload({
 
   return (
     <div className="w-full space-y-4">
+      {/* Job Description Section */}
+      {withJobDescription && (
+        <div className="mb-4 border rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="h-5 w-5 text-primary" />
+            <Label htmlFor="jobDescription" className="font-medium">
+              Job Description (Optional)
+            </Label>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">
+            Paste the job description to match your CV against specific requirements and get better analysis results.
+          </p>
+          <Textarea
+            id="jobDescription"
+            placeholder="Paste job description here..."
+            className="min-h-[120px]"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+          />
+        </div>
+      )}
+      
       {!selectedFile ? (
         <div
           {...getRootProps()}
