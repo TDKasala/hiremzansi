@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GlobeIcon } from 'lucide-react';
+import { Globe } from 'lucide-react';
 
 const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
@@ -19,6 +19,8 @@ const LanguageSelector = () => {
     { code: 'af', name: 'Afrikaans' },
     { code: 'xh', name: 'isiXhosa' },
   ];
+  
+  console.log("Current language:", i18n.language);
 
   const changeLanguage = (value: string) => {
     i18n.changeLanguage(value);
@@ -29,7 +31,7 @@ const LanguageSelector = () => {
       <Select value={i18n.language} onValueChange={changeLanguage}>
         <SelectTrigger className="w-[140px] h-9 border-muted-foreground/20">
           <div className="flex items-center gap-2">
-            <GlobeIcon className="h-4 w-4" />
+            <Globe className="h-4 w-4" />
             <SelectValue placeholder={t('common.language')} />
           </div>
         </SelectTrigger>
