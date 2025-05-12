@@ -31,6 +31,48 @@ interface InteractiveResumePreviewProps {
   jobDescription?: string;
 }
 
+// Sample resumeTemplate for South African market
+const defaultResumeTemplate = `DENIS KASALA
+B-BBEE Level 2 | +27 82 123 4567 | denis.kasala@email.co.za | Johannesburg, Gauteng
+
+PROFESSIONAL SUMMARY
+Dedicated Marketing Manager with 6+ years of experience in digital marketing, campaign management, and market analysis. Strong record of implementing successful marketing strategies in the South African retail sector, improving brand visibility and generating leads.
+
+SKILLS
+• Digital Marketing • Content Creation • SEO/SEM
+• Budget Management • Campaign Analytics • Team Leadership
+• CRM Systems • Adobe Creative Suite • Market Research
+
+PROFESSIONAL EXPERIENCE
+MARKETING MANAGER
+RetailSA Group, Johannesburg
+January 2020 - Present
+• Lead digital marketing campaigns resulting in 35% increase in online engagement and 22% growth in conversion rates
+• Manage a team of 5 marketing specialists, providing mentorship and performance feedback
+• Develop and implement strategic marketing plans aligned with business objectives
+• Coordinate with sales team to ensure marketing initiatives support sales targets
+• Administer annual marketing budget of R1.5 million, consistently coming in under budget while exceeding KPIs
+
+DIGITAL MARKETING SPECIALIST
+MediaWorks SA, Cape Town
+March 2017 - December 2019
+• Created and optimized content for various digital platforms including social media, email, and company website
+• Analyzed campaign performance using Google Analytics and other tools to optimize ROI
+• Collaborated with design team to create compelling marketing materials
+• Implemented SEO strategies resulting in 45% increase in organic search traffic
+
+EDUCATION
+BACHELOR OF COMMERCE IN MARKETING (NQF LEVEL 7)
+University of Cape Town
+2014 - 2017
+
+DIGITAL MARKETING CERTIFICATE (NQF LEVEL 5)
+SETA Accredited Marketing Institute
+2018
+
+LANGUAGES
+English (Fluent), Zulu (Native), Xhosa (Conversational)`;
+
 export default function InteractiveResumePreview({ 
   initialContent = "", 
   jobDescription = ""
@@ -167,9 +209,34 @@ export default function InteractiveResumePreview({
       (hasDates ? 30 : 0)
     );
     
-    // Skills match - would compare to job description in real implementation
-    // Here we'll just use a random score for demo purposes
-    const skillsScore = job ? Math.round(40 + Math.random() * 40) : 65;
+    // Skills match with job description if available
+    let skillsScore = 65;
+    let jobMatchScore = 0;
+    let extractedJobKeywords: string[] = [];
+    
+    if (job) {
+      // Extract keywords from job description
+      const commonWords = ["and", "the", "a", "an", "is", "are", "in", "to", "for", "of", "with", "on"];
+      extractedJobKeywords = job.toLowerCase()
+        .replace(/[^\w\s]/gi, '') // Remove punctuation
+        .split(/\s+/) // Split by whitespace
+        .filter(word => 
+          word.length > 3 && // Only words longer than 3 chars
+          !commonWords.includes(word) // Exclude common words
+        )
+        .slice(0, 15); // Get top 15 keywords
+      
+      // Count matches between resume and job keywords
+      const matchCount = extractedJobKeywords.filter(keyword => 
+        resumeLower.includes(keyword)
+      ).length;
+      
+      // Calculate job match score (max 20 points)
+      jobMatchScore = Math.min(20, Math.round((matchCount / Math.max(1, extractedJobKeywords.length)) * 20));
+      
+      // Adjust skills score based on job match
+      skillsScore = Math.round(40 + (jobMatchScore * 2));
+    }
     
     // Overall weighted score
     const overallScore = Math.round(
@@ -205,13 +272,14 @@ export default function InteractiveResumePreview({
       suggestions.push("Enhance skills section to better match typical job requirements");
     }
     
-    // Job description keywords - would normally be extracted through NLP
-    const jobKeywords = job ? 
-      ["communication", "teamwork", "leadership", "problem-solving", "analytical", "technical", "project management"] :
+    // Job description keywords - use the previously extracted ones or fallback
+    const commonJobKeywords = job ? 
+      (extractedJobKeywords.length > 0 ? extractedJobKeywords : 
+       ["communication", "teamwork", "leadership", "problem-solving", "analytical", "technical", "project management"]) :
       ["excel", "communication", "management", "reporting", "analysis", "strategic", "budget"];
     
     // Find keywords that exist in the resume
-    const foundKeywords = jobKeywords.filter(keyword => 
+    const foundKeywords = commonJobKeywords.filter(keyword => 
       resumeLower.includes(keyword.toLowerCase())
     );
     
@@ -220,7 +288,8 @@ export default function InteractiveResumePreview({
       skills: skillsScore,
       format: formatScore,
       saContext: saContextScore,
-      keywords: jobKeywords,
+      jobMatch: jobMatchScore,
+      keywords: commonJobKeywords,
       foundKeywords,
       bbbeeDetected,
       nqfDetected,
@@ -575,45 +644,3 @@ export default function InteractiveResumePreview({
     </div>
   );
 }
-
-// Sample resumeTemplate for South African market
-const defaultResumeTemplate = `DENIS KASALA
-B-BBEE Level 2 | +27 82 123 4567 | denis.kasala@email.co.za | Johannesburg, Gauteng
-
-PROFESSIONAL SUMMARY
-Dedicated Marketing Manager with 6+ years of experience in digital marketing, campaign management, and market analysis. Strong record of implementing successful marketing strategies in the South African retail sector, improving brand visibility and generating leads.
-
-SKILLS
-• Digital Marketing • Content Creation • SEO/SEM
-• Budget Management • Campaign Analytics • Team Leadership
-• CRM Systems • Adobe Creative Suite • Market Research
-
-PROFESSIONAL EXPERIENCE
-MARKETING MANAGER
-RetailSA Group, Johannesburg
-January 2020 - Present
-• Lead digital marketing campaigns resulting in 35% increase in online engagement and 22% growth in conversion rates
-• Manage a team of 5 marketing specialists, providing mentorship and performance feedback
-• Develop and implement strategic marketing plans aligned with business objectives
-• Coordinate with sales team to ensure marketing initiatives support sales targets
-• Administer annual marketing budget of R1.5 million, consistently coming in under budget while exceeding KPIs
-
-DIGITAL MARKETING SPECIALIST
-MediaWorks SA, Cape Town
-March 2017 - December 2019
-• Created and optimized content for various digital platforms including social media, email, and company website
-• Analyzed campaign performance using Google Analytics and other tools to optimize ROI
-• Collaborated with design team to create compelling marketing materials
-• Implemented SEO strategies resulting in 45% increase in organic search traffic
-
-EDUCATION
-BACHELOR OF COMMERCE IN MARKETING (NQF LEVEL 7)
-University of Cape Town
-2014 - 2017
-
-DIGITAL MARKETING CERTIFICATE (NQF LEVEL 5)
-SETA Accredited Marketing Institute
-2018
-
-LANGUAGES
-English (Fluent), Zulu (Native), Xhosa (Conversational)`;
