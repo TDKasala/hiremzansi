@@ -92,7 +92,7 @@ export default function DashboardPage() {
         </div>
         <div className="mt-4 md:mt-0">
           <Button asChild>
-            <Link href="/#upload">
+            <Link href="/upload">
               <CloudUpload className="mr-2 h-4 w-4" />
               Upload New CV
             </Link>

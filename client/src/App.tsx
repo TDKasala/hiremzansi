@@ -19,6 +19,7 @@ import ContactPage from "@/pages/ContactPage";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import UploadPage from "@/pages/UploadPage";
+import CVDetailsPage from "@/pages/CVDetailsPage";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/auth" component={AuthPage} />
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />
                 <ProtectedRoute path="/upload" component={UploadPage} />
+                <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Layout>
