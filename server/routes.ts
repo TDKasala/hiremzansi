@@ -476,11 +476,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: deepAnalysis.status,
         requiresPayment,
         price: requiresPayment ? 55.50 : 0,
+        currency: "ZAR",
         reportUrl: deepAnalysis.status === 'completed' ? `/api/reports/${deepAnalysis.id}` : null,
+        pdfDownloadUrl: deepAnalysis.status === 'completed' ? `/api/deep-analysis/${deepAnalysis.id}/download` : null,
         createdAt: deepAnalysis.createdAt,
         detailedAnalysis: deepAnalysis.detailedAnalysis,
         industryComparison: deepAnalysis.industryComparison,
         regionalRecommendations: deepAnalysis.regionalRecommendations
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Deep analysis report download (PDF)
+  app.get("/api/deep-analysis/:id/download", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      if (isNaN(reportId)) {
+        return res.status(400).json({ error: "Invalid report ID" });
+      }
+      
+      const report = await storage.getDeepAnalysisReport(reportId);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      
+      // Check if the report belongs to the user
+      if (report.userId !== req.user!.id) {
+        return res.status(403).json({ error: "You don't have permission to access this report" });
+      }
+      
+      // Check if the report is completed
+      if (report.status !== 'completed') {
+        return res.status(400).json({ 
+          error: "Report is not ready for download", 
+          status: report.status 
+        });
+      }
+      
+      // In a real implementation, this would generate a PDF file
+      // For demo purposes, we're just sending a JSON response
+      res.json({
+        success: true,
+        message: "PDF generated successfully",
+        fileName: `ATSBoost_Deep_Analysis_${reportId}.pdf`,
+        generatedDate: new Date().toISOString(),
+        sections: [
+          "Executive Summary",
+          "South African Market Fit Analysis",
+          "B-BBEE Optimization Guide",
+          "Industry Keyword Assessment",
+          "NQF Level Presentation",
+          "Provincial Job Market Alignment",
+          "Improvement Action Plan"
+        ],
+        fileSize: "1.2 MB"
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Process payment for deep analysis
+  app.post("/api/process-deep-analysis-payment", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { analysisId, paymentMethod } = req.body;
+      
+      if (!analysisId) {
+        return res.status(400).json({ error: "Analysis ID is required" });
+      }
+      
+      const deepAnalysis = await storage.getDeepAnalysisReport(Number(analysisId));
+      if (!deepAnalysis) {
+        return res.status(404).json({ error: "Analysis report not found" });
+      }
+      
+      // Check if the report belongs to the user
+      if (deepAnalysis.userId !== req.user!.id) {
+        return res.status(403).json({ error: "You don't have permission to pay for this report" });
+      }
+      
+      // Check if already paid
+      if (deepAnalysis.status === 'completed') {
+        return res.status(400).json({ 
+          error: "This report has already been paid for and completed",
+          reportUrl: `/api/reports/${deepAnalysis.id}`,
+          pdfDownloadUrl: `/api/deep-analysis/${deepAnalysis.id}/download`
+        });
+      }
+      
+      // Mock payment processing with Yoco
+      // In a real implementation, this would integrate with Yoco payment gateway
+      
+      // Update the analysis status
+      const updatedAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {
+        status: 'completed',
+        paymentDate: new Date().toISOString(),
+        paymentMethod: paymentMethod || 'yoco',
+        paymentReference: `yoco-payment-${Date.now()}`,
+        // Add the same mock data as in the deep-analysis endpoint
+        detailedAnalysis: {
+          summary: "Your CV has been thoroughly analyzed with South African context in mind.",
+          keyFindings: [
+            "Strong emphasis on technical skills",
+            "Lacks quantifiable achievements",
+            "Education section well formatted",
+            "Consider adding more South African context",
+            "B-BBEE status needs to be more prominent"
+          ],
+          sectionScores: {
+            professional: 85,
+            education: 90,
+            skills: 75,
+            achievements: 60,
+            saContext: 65
+          }
+        },
+        industryComparison: {
+          industry: deepAnalysis.cv?.targetIndustry || "Technology",
+          averageScore: 72,
+          yourScore: 81,
+          keyDifferences: [
+            "You have more technical certifications than average",
+            "Industry values project management experience",
+            "Include more South African regulatory knowledge"
+          ]
+        },
+        regionalRecommendations: {
+          region: "South Africa",
+          keywords: ["B-BBEE", "NQF Level", "Johannesburg", "Cape Town", "POPIA Compliance"],
+          certifications: ["SETA", "Microsoft Certified", "CompTIA"],
+          marketTrends: "Growing demand for data science and cloud skills in the South African market"
+        }
+      });
+      
+      res.json({
+        success: true,
+        message: "Payment processed successfully",
+        transactionId: `yoco-${Date.now()}`,
+        amount: 55.50,
+        currency: "ZAR",
+        paymentDate: new Date().toISOString(),
+        report: {
+          id: updatedAnalysis.id,
+          status: updatedAnalysis.status,
+          reportUrl: `/api/reports/${updatedAnalysis.id}`,
+          pdfDownloadUrl: `/api/deep-analysis/${updatedAnalysis.id}/download`
+        }
       });
     } catch (error) {
       next(error);
@@ -800,7 +943,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cancelAtPeriodEnd: false
       });
       
-      res.json(subscription);
+      // Return more detailed information about the subscription and premium features
+      res.json({
+        subscription: subscription,
+        details: {
+          planName: plan.name,
+          price: `ZAR ${plan.priceInCents / 100}`,
+          status: 'active',
+          startDate: now.toISOString(),
+          endDate: endDate.toISOString(),
+          nextBillingDate: endDate.toISOString(),
+          paymentMethod: paymentMethod || 'card',
+          transactionId: `trans_${Date.now()}`,
+          receiptUrl: `/receipts/${subscription.id}.pdf`
+        },
+        features: {
+          deepAnalysis: {
+            unlimited: true,
+            description: "Get unlimited deep analysis reports with South African specific insights"
+          },
+          realTimeCvEditor: {
+            enabled: true,
+            description: "Edit your CV with AI-powered suggestions optimized for South African employers"
+          },
+          jobAlerts: {
+            enabled: true,
+            description: "Receive SMS notifications for South African job opportunities matching your skills"
+          },
+          interviewPrep: {
+            enabled: true,
+            description: "Practice with South African specific interview questions including B-BBEE topics"
+          },
+          saOptimization: {
+            enabled: true,
+            description: "Get recommendations specific to South African job market including B-BBEE and NQF presentation"
+          }
+        },
+        message: "Your premium subscription has been activated successfully. You now have access to all premium features tailored for the South African job market."
+      });
     } catch (error) {
       next(error);
     }

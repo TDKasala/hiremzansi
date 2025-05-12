@@ -79,6 +79,9 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/premium-tools">Premium Tools</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => logoutMutation.mutate()}
@@ -150,6 +153,13 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Dashboard
+                </Link>
+                <Link 
+                  href="/premium-tools"
+                  className="block px-4 py-2 border-2 border-primary bg-primary/5 text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Premium Tools
                 </Link>
                 <button
                   onClick={() => {
