@@ -41,6 +41,7 @@ export default function ReferralPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
   
   // Generate a referral link based on user ID or a default code
   const referralCode = user ? `REF${user.id}${Math.floor(Math.random() * 1000)}` : "ATSBOOST10";

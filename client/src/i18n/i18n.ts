@@ -108,6 +108,7 @@ const stTranslations = {
     logout: 'Tsoa',
     dashboard: 'Dashboard',
     atsScanner: 'Skena ea ATS',
+    language: 'Puo',
   },
   referral: {
     title: 'Fetisetsa Metsoalle e 3, Fumana Tlhahlobo e Tebileng ea Mahala',
