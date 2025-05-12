@@ -192,7 +192,15 @@ export default function AuthPage() {
                             <FormItem>
                               <FormLabel>Full Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Your full name" {...field} />
+                                <Input 
+                                  placeholder="Your full name" 
+                                  value={field.value || ''}
+                                  onChange={field.onChange}
+                                  onBlur={field.onBlur}
+                                  disabled={field.disabled}
+                                  name={field.name}
+                                  ref={field.ref}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
