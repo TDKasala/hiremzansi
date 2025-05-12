@@ -671,7 +671,7 @@ export default function DashboardPage() {
                         <div>
                           <h3 className="font-medium">Deep Analysis</h3>
                           <p className="text-sm text-muted-foreground">
-                            ZAR 55.50 per CV
+                            ZAR 30.00 per CV
                           </p>
                           <ul className="text-sm mt-2 space-y-1">
                             <li className="flex items-center">

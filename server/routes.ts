@@ -433,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           cvId: cv.id,
           userId: req.user!.id,
           status: 'pending',
-          paidAmount: requiresPayment ? 5550 : 0 // ZAR 55.50 (stored in cents)
+          paidAmount: requiresPayment ? 3000 : 0 // ZAR 30.00 (stored in cents)
         });
       }
 
@@ -480,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: deepAnalysis.id,
         status: deepAnalysis.status,
         requiresPayment,
-        price: requiresPayment ? 55.50 : 0,
+        price: requiresPayment ? 30.00 : 0,
         currency: "ZAR",
         reportUrl: deepAnalysis.status === 'completed' ? `/api/reports/${deepAnalysis.id}` : null,
         pdfDownloadUrl: deepAnalysis.status === 'completed' ? `/api/deep-analysis/${deepAnalysis.id}/download` : null,
@@ -620,7 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: "Payment processed successfully",
         transactionId: `yoco-${Date.now()}`,
-        amount: 55.50,
+        amount: 30.00,
         currency: "ZAR",
         paymentDate: new Date().toISOString(),
         report: {

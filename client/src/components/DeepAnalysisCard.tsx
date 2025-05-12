@@ -174,7 +174,7 @@ export default function DeepAnalysisCard({ cv, showPaymentForm = true }: DeepAna
               <div className="mt-4 p-3 bg-muted rounded-md">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Price:</span>
-                  <span className="font-bold">ZAR 55.50</span>
+                  <span className="font-bold">ZAR 30.00</span>
                 </div>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default function DeepAnalysisCard({ cv, showPaymentForm = true }: DeepAna
             ) : (
               <>
                 <LineChart className="mr-2 h-4 w-4" />
-                Get Deep Analysis (ZAR 55.50)
+                Get Deep Analysis (ZAR 30.00)
               </>
             )}
           </Button>

@@ -259,6 +259,9 @@ export type AnalysisReport = {
   skillsScore?: number;
   contextScore?: number;
   formatScore?: number;
+  jobMatchScore?: number; // Score for job description match
+  jobDescKeywords?: string[]; // Keywords extracted from job description
+  jobDescMatches?: number; // Number of job keywords found in resume
   strengths: string[];
   improvements: string[];
   issues: string[];
