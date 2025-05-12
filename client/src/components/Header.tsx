@@ -10,11 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
+  const { t } = useTranslation();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -25,13 +28,13 @@ export default function Header() {
   };
 
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/how-it-works", label: "How It Works" },
-    { href: "/realtime-ats", label: "ATS Scanner" },
-    { href: "/pricing", label: "Pricing" },
-    { href: "/refer", label: "Refer & Earn" },
-    { href: "/blog", label: "Blog" },
-    { href: "/about", label: "About" },
+    { href: "/", label: t('common.home') },
+    { href: "/how-it-works", label: t('common.howItWorks') },
+    { href: "/realtime-ats", label: t('common.atsScanner') },
+    { href: "/pricing", label: t('common.pricing') },
+    { href: "/refer", label: t('common.refer') },
+    { href: "/blog", label: t('common.blog') },
+    { href: "/about", label: t('common.about') },
   ];
 
   return (
@@ -57,6 +60,9 @@ export default function Header() {
         </div>
 
         <div className="flex items-center space-x-3">
+          <div className="mr-3">
+            <LanguageSwitcher />
+          </div>
           {user ? (
             // Logged in UI
             <div className="hidden md:flex items-center space-x-3">
