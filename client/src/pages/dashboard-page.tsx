@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Tabs,
@@ -18,6 +19,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Helmet } from "react-helmet";
 import {
   CloudUpload,
   FileText,
@@ -29,8 +32,15 @@ import {
   ChevronRight,
   BarChart3,
   User,
+  Sparkles,
+  LineChart,
+  ScrollText,
+  Bell,
+  Target,
+  CreditCard,
 } from "lucide-react";
 import { CV } from "@shared/schema";
+import DeepAnalysisCard from "@/components/DeepAnalysisCard";
 
 export default function DashboardPage() {
   const { user } = useAuth();

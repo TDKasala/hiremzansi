@@ -20,6 +20,7 @@ import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
+import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />
                 <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
+                <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Layout>
