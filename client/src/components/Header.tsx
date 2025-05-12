@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "./LanguageSwitcher";
+import LanguageSelector from "./LanguageSelector";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -61,7 +61,7 @@ export default function Header() {
 
         <div className="flex items-center space-x-3">
           <div className="mr-3">
-            <LanguageSwitcher />
+            <LanguageSelector />
           </div>
           {user ? (
             // Logged in UI
@@ -114,7 +114,7 @@ export default function Header() {
                 className="border-primary text-primary hover:bg-primary hover:text-white"
                 asChild
               >
-                <Link href="/auth">Log In</Link>
+                <Link href="/auth">{t('common.login')}</Link>
               </Button>
               <Button 
                 className="hidden md:inline-flex"

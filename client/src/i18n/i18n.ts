@@ -18,6 +18,7 @@ const enTranslations = {
     logout: 'Log Out',
     dashboard: 'Dashboard',
     atsScanner: 'ATS Scanner',
+    language: 'Language',
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
@@ -62,6 +63,7 @@ const zuTranslations = {
     logout: 'Phuma',
     dashboard: 'Ibhodi Yokulawula',
     atsScanner: 'Umskeni we-ATS',
+    language: 'Ulimi',
   },
   referral: {
     title: 'Dlulisela Abangani aba-3, Uthole Ukuhlaziywa Okujulile Kwamahhala',
@@ -228,11 +230,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: enTranslations,
-      zu: zuTranslations,
-      st: stTranslations,
-      af: afTranslations,
-      xh: xhTranslations,
+      en: { translation: enTranslations },
+      'en-ZA': { translation: enTranslations }, // Add South African English
+      zu: { translation: zuTranslations },
+      st: { translation: stTranslations },
+      af: { translation: afTranslations },
+      xh: { translation: xhTranslations },
     },
     fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
