@@ -46,28 +46,28 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Home</a>
+                <Link href="/" className="text-neutral-400 hover:text-white transition-colors">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works">
-                  <a className="text-neutral-400 hover:text-white transition-colors">How It Works</a>
+                <Link href="/how-it-works" className="text-neutral-400 hover:text-white transition-colors">
+                  How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/pricing">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Pricing</a>
+                <Link href="/pricing" className="text-neutral-400 hover:text-white transition-colors">
+                  Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/blog">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Blog</a>
+                <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
+                  Blog
                 </Link>
               </li>
               <li>
-                <Link href="/about">
-                  <a className="text-neutral-400 hover:text-white transition-colors">About Us</a>
+                <Link href="/about" className="text-neutral-400 hover:text-white transition-colors">
+                  About Us
                 </Link>
               </li>
             </ul>
@@ -77,28 +77,28 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/#upload">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Free ATS Score</a>
+                <Link href="/#upload" className="text-neutral-400 hover:text-white transition-colors">
+                  Free ATS Score
                 </Link>
               </li>
               <li>
-                <Link href="/blog">
-                  <a className="text-neutral-400 hover:text-white transition-colors">CV Tips</a>
+                <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
+                  CV Tips
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works#faq">
-                  <a className="text-neutral-400 hover:text-white transition-colors">FAQ</a>
+                <Link href="/how-it-works#faq" className="text-neutral-400 hover:text-white transition-colors">
+                  FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/privacy">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a>
+                <Link href="/privacy" className="text-neutral-400 hover:text-white transition-colors">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms">
-                  <a className="text-neutral-400 hover:text-white transition-colors">Terms of Service</a>
+                <Link href="/terms" className="text-neutral-400 hover:text-white transition-colors">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
