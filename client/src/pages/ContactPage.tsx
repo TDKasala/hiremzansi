@@ -123,9 +123,9 @@ export default function ContactPage() {
                 </div>
                 
                 <div className="mt-8">
-                  <h3 className="font-semibold mb-2">Business Hours</h3>
-                  <p className="text-neutral-600 mb-1">Monday - Friday: 8:00 AM - 5:00 PM</p>
-                  <p className="text-neutral-600">Saturday - Sunday: Closed</p>
+                  <h3 className="font-semibold mb-2">{t('contact.businessHours')}</h3>
+                  <p className="text-neutral-600 mb-1">{t('contact.weekdayHours')}</p>
+                  <p className="text-neutral-600">{t('contact.weekendHours')}</p>
                 </div>
               </div>
               
@@ -207,7 +207,7 @@ export default function ContactPage() {
                             required
                           />
                           <label htmlFor="consent" className="text-sm text-neutral-600">
-                            I consent to ATSBoost processing my information (POPIA compliant)
+                            {t('contact.consent')}
                           </label>
                         </div>
                         
@@ -226,20 +226,20 @@ export default function ContactPage() {
             </div>
             
             <div className="mt-12">
-              <h2 className="text-2xl font-bold text-secondary mb-6">Join Our Launch Notification List</h2>
+              <h2 className="text-2xl font-bold text-secondary mb-6">{t('contact.notificationTitle')}</h2>
               <Card>
                 <CardContent className="p-6">
                   <p className="text-neutral-600 mb-4">
-                    ATSBoost is currently in pre-launch phase. Sign up to be notified when we officially launch and receive exclusive early-access offers.
+                    {t('contact.notificationText')}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Input 
                       type="email" 
-                      placeholder="Your email address" 
+                      placeholder={t('contact.emailPlaceholder')} 
                       className="flex-grow"
                     />
                     <Button className="bg-primary text-white hover:bg-opacity-90">
-                      Notify Me at Launch
+                      {t('contact.subscribeButton')}
                     </Button>
                   </div>
                 </CardContent>
