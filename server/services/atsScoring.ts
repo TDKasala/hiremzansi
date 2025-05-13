@@ -1,4 +1,8 @@
 import { AnalysisReport } from "@shared/schema";
+import { analyzeCV as openAIAnalyzeCV, createDeepAnalysis } from "./openaiService";
+
+// Flag to control whether to use OpenAI or the rule-based system
+const USE_OPENAI = true;
 
 // Keyword categories for South African job market
 const skillsKeywords = [
@@ -108,7 +112,18 @@ const provincialKeywords: Record<string, string[]> = {
  * @param jobDescription Optional job description to compare CV against
  * @returns A detailed analysis report with scores, strengths, improvements and issues
  */
-export function analyzeCV(content: string, jobDescription?: string): AnalysisReport {
+export async function analyzeCV(content: string, jobDescription?: string): Promise<AnalysisReport> {
+  // Use OpenAI for analysis if enabled
+  if (USE_OPENAI) {
+    try {
+      return await openAIAnalyzeCV(content, jobDescription);
+    } catch (error) {
+      console.error("OpenAI analysis failed, falling back to rule-based system:", error);
+      // Fall back to rule-based system if OpenAI fails
+    }
+  }
+  
+  // Rule-based analysis (original implementation)
   const normalizedContent = content.toLowerCase();
   const hasJobDescription = !!jobDescription;
   const normalizedJobDesc = hasJobDescription ? jobDescription.toLowerCase() : "";
@@ -341,4 +356,23 @@ export function analyzeCV(content: string, jobDescription?: string): AnalysisRep
     nqfDetected,
     keywordRecommendations: keywordRecommendations.length > 0 ? keywordRecommendations : undefined
   };
+}
+
+/**
+ * Performs a premium deep analysis of CV content with comprehensive recommendations
+ * This is the paid (R30) deep analysis service
+ * 
+ * @param content The full text content of the CV to analyze
+ * @param jobDescription Optional job description to compare CV against
+ * @returns A detailed premium analysis report with comprehensive insights
+ */
+export async function performDeepAnalysis(content: string, jobDescription?: string): Promise<AnalysisReport> {
+  // Always use OpenAI for premium deep analysis
+  try {
+    return await createDeepAnalysis(content, jobDescription);
+  } catch (error) {
+    console.error("Deep analysis with OpenAI failed:", error);
+    // Fall back to the regular analyzeCV as a last resort
+    return await analyzeCV(content, jobDescription);
+  }
 }
