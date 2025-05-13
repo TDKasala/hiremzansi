@@ -70,9 +70,9 @@ export default function ContactPage() {
       
       <div className="bg-secondary py-16 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Contact Us</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('contact.pageTitle')}</h1>
           <p className="text-xl max-w-2xl mx-auto">
-            We're here to help with any questions about CV optimization
+            {t('contact.subtitle')}
           </p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function ContactPage() {
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="md:col-span-1">
-                <h2 className="text-2xl font-bold text-secondary mb-6">Get in Touch</h2>
+                <h2 className="text-2xl font-bold text-secondary mb-6">{t('contact.contactInfo')}</h2>
                 
                 <div className="space-y-6">
                   <Card>
@@ -90,8 +90,8 @@ export default function ContactPage() {
                       <div className="flex items-start">
                         <MapPin className="h-5 w-5 text-primary mr-3 mt-0.5" />
                         <div>
-                          <h3 className="font-semibold mb-1">Our Location</h3>
-                          <p className="text-neutral-600">Cape Town, South Africa</p>
+                          <h3 className="font-semibold mb-1">{t('contact.addressTitle')}</h3>
+                          <p className="text-neutral-600">{t('contact.addressContent')}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -102,8 +102,8 @@ export default function ContactPage() {
                       <div className="flex items-start">
                         <Mail className="h-5 w-5 text-primary mr-3 mt-0.5" />
                         <div>
-                          <h3 className="font-semibold mb-1">Email Us</h3>
-                          <p className="text-neutral-600">support@atsboost.co.za</p>
+                          <h3 className="font-semibold mb-1">{t('contact.emailTitle')}</h3>
+                          <p className="text-neutral-600">{t('contact.emailAddress')}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -114,8 +114,8 @@ export default function ContactPage() {
                       <div className="flex items-start">
                         <Phone className="h-5 w-5 text-primary mr-3 mt-0.5" />
                         <div>
-                          <h3 className="font-semibold mb-1">Call Us</h3>
-                          <p className="text-neutral-600">+27 10 123 4567</p>
+                          <h3 className="font-semibold mb-1">{t('contact.phoneTitle')}</h3>
+                          <p className="text-neutral-600">{t('contact.phoneNumber')}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -132,7 +132,8 @@ export default function ContactPage() {
               <div className="md:col-span-2">
                 <Card>
                   <CardContent className="p-6">
-                    <h2 className="text-2xl font-bold text-secondary mb-6">Send Us a Message</h2>
+                    <h2 className="text-2xl font-bold text-secondary mb-6">{t('contact.formTitle')}</h2>
+                    <p className="text-neutral-600 mb-6">{t('contact.formSubtitle')}</p>
                     
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -142,9 +143,9 @@ export default function ContactPage() {
                             name="name"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>{t('contact.nameLabel')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Your name" {...field} />
+                                  <Input placeholder={t('contact.nameLabel')} {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -156,9 +157,9 @@ export default function ContactPage() {
                             name="email"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t('contact.emailLabel')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Your email" {...field} />
+                                  <Input placeholder={t('contact.emailLabel')} {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -171,9 +172,9 @@ export default function ContactPage() {
                           name="subject"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Subject</FormLabel>
+                              <FormLabel>{t('contact.subjectLabel')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Subject" {...field} />
+                                <Input placeholder={t('contact.subjectLabel')} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -185,10 +186,10 @@ export default function ContactPage() {
                           name="message"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Message</FormLabel>
+                              <FormLabel>{t('contact.messageLabel')}</FormLabel>
                               <FormControl>
                                 <Textarea 
-                                  placeholder="Your message" 
+                                  placeholder={t('contact.messageLabel')} 
                                   className="min-h-[150px]" 
                                   {...field} 
                                 />
@@ -215,7 +216,7 @@ export default function ContactPage() {
                           className="w-full bg-primary text-white hover:bg-opacity-90"
                           disabled={isSubmitting}
                         >
-                          {isSubmitting ? "Sending..." : "Send Message"}
+                          {isSubmitting ? "Sending..." : t('contact.submitButton')}
                         </Button>
                       </form>
                     </Form>

@@ -96,6 +96,14 @@ const enTranslations = {
     phoneNumber: '+27 12 345 6789',
     faqTitle: 'Frequently Asked Questions',
     faqSubtitle: 'Find answers to common questions about our services',
+    consent: 'I consent to ATSBoost processing my information (POPIA compliant)',
+    businessHours: 'Business Hours',
+    weekdayHours: 'Monday - Friday: 8:00 AM - 5:00 PM',
+    weekendHours: 'Saturday - Sunday: Closed',
+    notificationTitle: 'Join Our Launch Notification List',
+    notificationText: 'ATSBoost is currently in pre-launch phase. Sign up to be notified when we officially launch and receive exclusive early-access offers.',
+    emailPlaceholder: 'Your email address',
+    subscribeButton: 'Notify Me'
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
@@ -199,6 +207,14 @@ const zuTranslations = {
     phoneNumber: '+27 12 345 6789',
     faqTitle: 'Imibuzo Evame Ukubuzwa',
     faqSubtitle: 'Thola izimpendulo zemibuzo ejwayelekile mayelana nezinsiza zethu',
+    consent: 'Ngiyavuma ukuthi i-ATSBoost iprocese imininingwane yami (ihambisana ne-POPIA)',
+    businessHours: 'Amahora Ebhizinisi',
+    weekdayHours: 'UMsombuluko - ULwesihlanu: 8:00 AM - 5:00 PM',
+    weekendHours: 'UMgqibelo - ISonto: Kuvaliwe',
+    notificationTitle: 'Joyina Uhlu Lwethu Lwesaziso Sokuqala',
+    notificationText: 'I-ATSBoost okwamanje isesigabeni sokuqala. Bhalisa ukuze waziswe lapho siqala ngokusemthethweni futhi uthole imiklomelo ekhethekile yokufinyelela ekuqaleni.',
+    emailPlaceholder: 'Ikheli lakho le-imeyili',
+    subscribeButton: 'Ngithumele Isaziso'
   },
   referral: {
     title: 'Dlulisela Abangani aba-3, Uthole Ukuhlaziywa Okujulile Kwamahhala',
