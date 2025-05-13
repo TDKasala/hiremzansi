@@ -23,6 +23,7 @@ import CVDetailsPage from "@/pages/CVDetailsPage";
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import ReferralPage from "@/pages/ReferralPage";
+import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
 import NotFound from "@/pages/not-found";
 
@@ -50,6 +51,7 @@ function App() {
                 <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                 <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
+                <ProtectedRoute path="/subscription" component={SubscriptionPage} />
                 <Route component={NotFound} />
               </Switch>
             </Layout>
