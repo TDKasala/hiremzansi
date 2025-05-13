@@ -2,8 +2,8 @@
 // Run with: node server/test-openai.js
 // This helps verify that your API key is valid and has sufficient quota
 
-require('dotenv').config();
-const OpenAI = require('openai');
+import 'dotenv/config';
+import OpenAI from 'openai';
 
 async function testOpenAI() {
   // Check if API key is set
@@ -80,4 +80,5 @@ async function testOpenAI() {
   }
 }
 
-testOpenAI();
+// Use top-level await to run the function
+await testOpenAI();
