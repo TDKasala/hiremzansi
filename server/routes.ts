@@ -428,7 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         if (plan) {
           // Only check scan limits for plans that have them
-          if (plan.scanLimit > 0) {
+          if (plan.scanLimit && plan.scanLimit > 0) {
             // This plan has a scan limit, check if it's reached
             scanInfo = await storage.recordScanUsage(req.user!.id);
             

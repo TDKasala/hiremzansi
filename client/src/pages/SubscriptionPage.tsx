@@ -117,7 +117,7 @@ export default function SubscriptionPage() {
           description: `You are now on the ${plan.name} plan.`,
         });
         
-        navigate('/dashboard');
+        setLocation('/dashboard');
         return;
       }
 
