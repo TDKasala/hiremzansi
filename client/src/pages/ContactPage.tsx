@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ const formSchema = z.object({
 type ContactFormValues = z.infer<typeof formSchema>;
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,7 +52,7 @@ export default function ContactPage() {
       form.reset();
       toast({
         title: "Message sent!",
-        description: "Thank you for contacting us. We'll get back to you soon.",
+        description: t('contact.successMessage'),
       });
     }, 1500);
   }
@@ -58,7 +60,7 @@ export default function ContactPage() {
   return (
     <>
       <Helmet>
-        <title>Contact Us | ATSBoost - South African Resume Optimization</title>
+        <title>{t('contact.pageTitle')} | ATSBoost - South African Resume Optimization</title>
         <meta name="description" content="Get in touch with the ATSBoost team. We're here to help with any questions about our CV optimization services for South African job seekers." />
         <meta property="og:title" content="Contact ATSBoost - We're Here to Help" />
         <meta property="og:description" content="Have questions about our CV optimization services? Contact our team for support and information." />
