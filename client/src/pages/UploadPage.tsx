@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from "react-helmet";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
 import { getQueryFn } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,6 +36,7 @@ import FileUpload from "@/components/FileUpload";
 import { CV, ATSScore } from "@shared/schema";
 
 export default function UploadPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [jobDescription, setJobDescription] = useState("");
