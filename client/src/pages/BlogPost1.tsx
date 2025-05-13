@@ -226,7 +226,7 @@ export default function BlogPost1() {
             </Button>
             <Button variant="outline" className="flex items-center">
               <Share2 className="mr-2 h-4 w-4" />
-              Share This Article
+              {t('blog.shareArticle')}
             </Button>
           </div>
         </article>

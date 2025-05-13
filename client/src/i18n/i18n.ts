@@ -51,6 +51,8 @@ const enTranslations = {
     relatedPosts: 'Related Posts',
     viewAll: 'View All Posts',
     backToBlog: 'Back to Blog',
+    shareArticle: 'Share This Article',
+    getFreeAtsScore: 'Get Your Free ATS Score Now',
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
