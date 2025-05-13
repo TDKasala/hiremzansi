@@ -443,7 +443,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!requiresPayment && deepAnalysis.status === 'pending') {
         try {
           // Use OpenAI for deep analysis
-          const analysisResult = await performDeepAnalysis(cv.content, cv.jobDescription || undefined);
+          // Pass CV ID for caching the deep analysis
+          const analysisResult = await performDeepAnalysis(cv.content, cv.jobDescription || undefined, cv.id);
           
           // Update the analysis with AI-generated insights
           deepAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {

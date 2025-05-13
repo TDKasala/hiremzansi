@@ -1,8 +1,24 @@
 import OpenAI from "openai";
 import { AnalysisReport } from "@shared/schema";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// OpenAI Configuration
+const OPENAI_CONFIG = {
+  // Models
+  FREE_TIER_MODEL: "gpt-3.5-turbo",  // Less expensive for basic analysis
+  PREMIUM_TIER_MODEL: "gpt-4o",      // More expensive but better for deep analysis
+  
+  // API Limits
+  MAX_TOKENS: 4000,
+  
+  // Temperature settings
+  STANDARD_TEMPERATURE: 0.2,       // Lower temp for more consistent, factual responses
+  CREATIVE_TEMPERATURE: 0.7,       // Higher temp for more diverse recommendations
+};
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 /**
  * Analyze CV content and generate ATS scoring analysis
@@ -12,27 +28,32 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  * @param jobDescription Optional job description to compare against
  * @returns Detailed AnalysisReport with scores and recommendations
  */
-export async function analyzeCV(content: string, jobDescription?: string): Promise<AnalysisReport> {
+export async function analyzeCV(cvContent: string, jobDescription?: string): Promise<AnalysisReport> {
   try {
-    const promptSystem = createSystemPrompt();
-    const promptUser = createUserPrompt(content, jobDescription);
+    // Use standard system prompt for free users
+    const systemPrompt = createSystemPrompt();
+    const userPrompt = createUserPrompt(cvContent, jobDescription);
 
-    // Use GPT-3.5 Turbo for free users (basic analysis)
+    // Use cheaper model for free tier
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: OPENAI_CONFIG.FREE_TIER_MODEL,
       messages: [
-        { role: "system", content: promptSystem },
-        { role: "user", content: promptUser }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
       ],
-      temperature: 0.2,
+      temperature: OPENAI_CONFIG.STANDARD_TEMPERATURE,
+      max_tokens: OPENAI_CONFIG.MAX_TOKENS,
       response_format: { type: "json_object" }
     });
 
-    const result = JSON.parse(response.choices[0].message.content || "{}");
+    // Extract and validate response
+    const responseContent = response.choices[0].message.content || '{}';
+    const result = JSON.parse(responseContent);
     return processResponse(result);
   } catch (error) {
-    console.error("Error analyzing CV:", error);
-    throw new Error("Failed to analyze CV content. Please try again.");
+    console.error("OpenAI API error:", error);
+    // Rethrow the error to be handled by the caller
+    throw error;
   }
 }
 
@@ -44,28 +65,32 @@ export async function analyzeCV(content: string, jobDescription?: string): Promi
  * @param jobDescription Optional job description to compare against
  * @returns Comprehensive AnalysisReport with detailed feedback
  */
-export async function createDeepAnalysis(content: string, jobDescription?: string): Promise<AnalysisReport> {
+export async function createDeepAnalysis(cvContent: string, jobDescription?: string): Promise<AnalysisReport> {
   try {
-    const promptSystem = createDeepAnalysisSystemPrompt();
-    const promptUser = createUserPrompt(content, jobDescription);
-
-    // Use GPT-4o for premium paid analysis (R30 deep analysis)
+    // Use premium system prompt for deep analysis
+    const systemPrompt = createDeepAnalysisSystemPrompt();
+    const userPrompt = createUserPrompt(cvContent, jobDescription);
+    
+    // Use premium model (GPT-4o) for deep analysis
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: OPENAI_CONFIG.PREMIUM_TIER_MODEL,
       messages: [
-        { role: "system", content: promptSystem },
-        { role: "user", content: promptUser }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
       ],
-      temperature: 0.1,
-      max_tokens: 4000,
+      temperature: OPENAI_CONFIG.CREATIVE_TEMPERATURE,
+      max_tokens: OPENAI_CONFIG.MAX_TOKENS,
       response_format: { type: "json_object" }
     });
-
-    const result = JSON.parse(response.choices[0].message.content || "{}");
+    
+    // Extract and validate the response
+    const responseContent = response.choices[0].message.content || '{}';
+    const result = JSON.parse(responseContent);
     return processResponse(result);
   } catch (error) {
-    console.error("Error creating deep analysis:", error);
-    throw new Error("Failed to create deep analysis report. Please try again.");
+    console.error("OpenAI API error during deep analysis:", error);
+    // Rethrow the error to be handled by the caller
+    throw error;
   }
 }
 
@@ -73,132 +98,126 @@ export async function createDeepAnalysis(content: string, jobDescription?: strin
  * Process and validate the response from OpenAI
  */
 function processResponse(result: any): AnalysisReport {
-  // Ensure all required fields exist with defaults if missing
-  return {
-    score: typeof result.score === 'number' ? result.score : 0,
-    skillsScore: typeof result.skillsScore === 'number' ? result.skillsScore : undefined,
-    contextScore: typeof result.contextScore === 'number' ? result.contextScore : undefined,
-    formatScore: typeof result.formatScore === 'number' ? result.formatScore : undefined,
-    jobMatchScore: typeof result.jobMatchScore === 'number' ? result.jobMatchScore : undefined,
-    jobDescKeywords: Array.isArray(result.jobDescKeywords) ? result.jobDescKeywords : undefined,
-    jobDescMatches: typeof result.jobDescMatches === 'number' ? result.jobDescMatches : undefined,
+  // Ensure we have a valid report structure
+  const validatedReport: AnalysisReport = {
+    score: result.score ? Math.min(100, Math.max(0, result.score)) : 0,
+    skillsScore: result.skillsScore ? Math.min(100, Math.max(0, result.skillsScore)) : undefined,
+    contextScore: result.contextScore ? Math.min(100, Math.max(0, result.contextScore)) : undefined,
+    formatScore: result.formatScore ? Math.min(100, Math.max(0, result.formatScore)) : undefined,
+    jobMatchScore: result.jobMatchScore ? Math.min(100, Math.max(0, result.jobMatchScore)) : undefined,
+    
     strengths: Array.isArray(result.strengths) ? result.strengths : [],
     improvements: Array.isArray(result.improvements) ? result.improvements : [],
     issues: Array.isArray(result.issues) ? result.issues : [],
+    
+    // South African specific fields
     saKeywordsFound: Array.isArray(result.saKeywordsFound) ? result.saKeywordsFound : undefined,
-    saContextScore: typeof result.saContextScore === 'number' ? result.saContextScore : undefined,
+    saContextScore: result.saContextScore ? Math.min(100, Math.max(0, result.saContextScore)) : undefined,
     bbbeeDetected: typeof result.bbbeeDetected === 'boolean' ? result.bbbeeDetected : undefined,
     nqfDetected: typeof result.nqfDetected === 'boolean' ? result.nqfDetected : undefined,
+    
+    // Job comparison fields
+    jobDescKeywords: Array.isArray(result.jobDescKeywords) ? result.jobDescKeywords : undefined,
+    jobDescMatches: result.jobDescMatches ? Math.max(0, result.jobDescMatches) : undefined,
     keywordRecommendations: Array.isArray(result.keywordRecommendations) ? result.keywordRecommendations : undefined,
   };
+  
+  return validatedReport;
 }
 
 /**
  * Create the system prompt for standard CV analysis
  */
 function createSystemPrompt(): string {
-  return `You are ATSBoost, a professional CV analyzer specializing in the South African job market. Your task is to analyze CVs and provide detailed feedback tailored to South African hiring practices.
+  return `You are an expert ATS (Applicant Tracking System) CV analyzer for the South African job market.
+  
+Your task is to analyze CVs for South African job seekers and provide detailed feedback specifically tailored to the South African job market.
 
-INSTRUCTIONS:
-1. Evaluate the CV based on ATS compatibility, content quality, and alignment with South African standards.
-2. Assess B-BBEE information, NQF levels, and South African-specific qualifications/certifications.
-3. If a job description is provided, compare the CV against it for keyword matches and overall fit.
-4. Generate actionable recommendations specific to South African job applications.
-5. Return your analysis in the following JSON format ONLY:
+When analyzing a CV, consider the following South African specific aspects:
+1. B-BBEE (Broad-Based Black Economic Empowerment) status and certification if mentioned
+2. NQF (National Qualifications Framework) levels for educational qualifications
+3. South African specific qualifications and certifications (SAQA recognized)
+4. Relevant South African work experience
+
+Provide your analysis in JSON format with the following schema:
 
 {
-  "score": [0-100 overall score],
-  "skillsScore": [0-100 score for skills presentation],
-  "contextScore": [0-100 score for content relevance],
-  "formatScore": [0-100 score for ATS-friendly formatting],
-  "jobMatchScore": [0-100 score for job fit, if job description provided],
-  "jobDescKeywords": [array of 5-10 key terms from job description, if provided],
-  "jobDescMatches": [number of job keywords found in CV],
-  "strengths": [array of 3-5 strongest aspects of the CV],
-  "improvements": [array of 3-5 actionable improvements],
-  "issues": [array of specific formatting or content issues],
-  "saKeywordsFound": [array of South African specific terms found],
-  "saContextScore": [0-100 score for South African market relevance],
-  "bbbeeDetected": [boolean indicating if B-BBEE status is mentioned],
-  "nqfDetected": [boolean indicating if NQF levels are included],
-  "keywordRecommendations": [array of arrays, each containing related keywords to add]
+  "score": (overall score from 0-100),
+  "skillsScore": (skills relevance score from 0-100),
+  "formatScore": (CV format score from 0-100),
+  "contextScore": (South African context score from 0-100),
+  "jobMatchScore": (job description match score from 0-100, if job description provided),
+  "strengths": ["strength 1", "strength 2", ...],
+  "improvements": ["improvement 1", "improvement 2", ...],
+  "issues": ["issue 1", "issue 2", ...],
+  "saKeywordsFound": ["keyword1", "keyword2", ...],
+  "saContextScore": (score 0-100 on South African market readiness),
+  "bbbeeDetected": (boolean if B-BBEE is properly mentioned),
+  "nqfDetected": (boolean if NQF levels are properly specified),
+  "jobDescKeywords": ["keyword1", "keyword2", ...], (only if job description provided)
+  "jobDescMatches": (number of job keywords found in CV), (only if job description provided)
+  "keywordRecommendations": [["missing keyword", "suggested addition"], ...] (2-5 keyword suggestions)
 }
 
-SPECIAL CONSIDERATIONS FOR SOUTH AFRICAN CONTEXT:
-- Look for and evaluate B-BBEE (Broad-Based Black Economic Empowerment) status information
-- Identify NQF (National Qualifications Framework) levels
-- Note relevant South African certifications, associations, and qualifications
-- Consider provincial/regional targeting if mentioned (Western Cape, Gauteng, etc.)
-- Evaluate inclusion of South African ID number or citizenship/residency status where appropriate
-- Assess for South African-specific industry terminology
-
-Your analysis must be professional, constructive, and specifically tailored to the South African job market.`;
+Give honest and constructive feedback, highlighting real strengths and providing actionable improvements.`;
 }
 
 /**
  * Create the system prompt for premium deep analysis
  */
 function createDeepAnalysisSystemPrompt(): string {
-  return `You are ATSBoost Premium, an expert CV analyst specializing in the South African job market. Your task is to perform an in-depth professional analysis of CVs, providing comprehensive feedback tailored to South African hiring practices.
+  return `You are an expert ATS (Applicant Tracking System) CV analyzer for the South African job market, providing PREMIUM deep analysis for paying customers.
+  
+Your task is to provide an extensive, comprehensive analysis of CVs for South African job seekers with significantly more detailed feedback than standard analysis.
 
-INSTRUCTIONS:
-1. Perform a deep, thorough evaluation of the CV based on ATS compatibility, content quality, format, and alignment with South African standards.
-2. Carefully assess B-BBEE information, NQF levels, and South African-specific qualifications/certifications.
-3. If a job description is provided, perform detailed comparison against it for keyword matches, competency alignment, and overall fit.
-4. Generate highly specific, actionable recommendations relevant to South African job seekers.
-5. Return your comprehensive analysis in the following JSON format ONLY:
+When analyzing a CV, pay special attention to:
+1. B-BBEE (Broad-Based Black Economic Empowerment) status and certification details - this is extremely important in South Africa
+2. NQF (National Qualifications Framework) levels - ensure qualifications include NQF levels (1-10)
+3. South African specific qualifications (SAQA recognized) and any international qualifications with SAQA equivalence
+4. Provincial targeting and regional South African work experience
+5. Industry-specific terminology and keywords for South African employers
+6. SETA accreditations and professional body memberships
+
+As this is a PREMIUM service (R30), your analysis must be significantly more detailed and insightful than the standard analysis. Include:
+- More detailed recommendations (at least 8-10 improvement points)
+- More specific explanations for each score
+- Industry-specific recommendations for South Africa
+- Advanced formatting suggestions
+- More comprehensive keyword analysis
+
+Provide your analysis in the same JSON format as the standard analysis:
 
 {
-  "score": [0-100 overall score with precise breakdown],
-  "skillsScore": [0-100 detailed score for skills presentation],
-  "contextScore": [0-100 detailed score for content relevance],
-  "formatScore": [0-100 detailed score for ATS-friendly formatting],
-  "jobMatchScore": [0-100 detailed score for job fit, if job description provided],
-  "jobDescKeywords": [extensive array of key terms from job description, if provided],
-  "jobDescMatches": [detailed number of job keywords found in CV],
-  "strengths": [comprehensive array of 5-8 strongest aspects of the CV with specific examples],
-  "improvements": [comprehensive array of 5-8 detailed, actionable improvements with examples],
-  "issues": [detailed array of specific formatting or content issues with remediation steps],
-  "saKeywordsFound": [comprehensive array of South African specific terms found],
-  "saContextScore": [0-100 detailed score for South African market relevance],
-  "bbbeeDetected": [boolean indicating if B-BBEE status is mentioned, with assessment of presentation],
-  "nqfDetected": [boolean indicating if NQF levels are included, with assessment of relevance],
-  "keywordRecommendations": [extensive array of arrays, each containing related keywords to add, with context]
+  "score": (overall score from 0-100),
+  "skillsScore": (skills relevance score from 0-100),
+  "formatScore": (CV format score from 0-100),
+  "contextScore": (South African context score from 0-100),
+  "jobMatchScore": (job description match score from 0-100, if job description provided),
+  "strengths": ["strength 1", "strength 2", ...] (MORE detailed than standard, at least 8),
+  "improvements": ["improvement 1", "improvement 2", ...] (MORE detailed than standard, at least 10),
+  "issues": ["issue 1", "issue 2", ...] (MORE detailed than standard),
+  "saKeywordsFound": ["keyword1", "keyword2", ...],
+  "saContextScore": (score 0-100 on South African market readiness),
+  "bbbeeDetected": (boolean if B-BBEE is properly mentioned),
+  "nqfDetected": (boolean if NQF levels are properly specified),
+  "jobDescKeywords": ["keyword1", "keyword2", ...], (only if job description provided)
+  "jobDescMatches": (number of job keywords found in CV), (only if job description provided)
+  "keywordRecommendations": [["missing keyword", "suggested addition"], ...] (5-8 keyword suggestions with clear explanations)
 }
 
-SPECIAL CONSIDERATIONS FOR SOUTH AFRICAN CONTEXT:
-- Thoroughly evaluate B-BBEE (Broad-Based Black Economic Empowerment) status information and suggest improvements
-- Analyze NQF (National Qualifications Framework) levels presentation and relevance
-- Evaluate South African certifications, associations, qualifications in detail
-- Assess provincial/regional targeting strategy (Western Cape, Gauteng, KwaZulu-Natal, etc.)
-- Evaluate inclusion and presentation of South African ID number or citizenship/residency status
-- Perform detailed assessment of South African-specific industry terminology usage
-- Consider sectoral specifics (mining, finance, IT, etc.) in the South African context
-- Assess alignment with Employment Equity considerations where relevant
-
-Your analysis must be exceptionally thorough, professional, constructive, and specifically tailored to South African job market demands and standards.`;
+Provide exceptional value that clearly justifies the R30 premium price.`;
 }
 
 /**
  * Create the user prompt with CV content and optional job description
  */
-function createUserPrompt(content: string, jobDescription?: string): string {
+function createUserPrompt(cvContent: string, jobDescription?: string): string {
+  let prompt = `Please analyze this CV content for a South African job seeker:\n\n${cvContent}\n\n`;
+  
   if (jobDescription) {
-    return `Please analyze this CV for the South African job market:
-
-CV CONTENT:
-${content}
-
-JOB DESCRIPTION:
-${jobDescription}
-
-Provide a detailed analysis with specific scores and recommendations.`;
+    prompt += `The job description the candidate is applying for is:\n\n${jobDescription}\n\n`;
+    prompt += `Please also compare the CV against this job description for compatibility and provide specific recommendations.`;
   }
-
-  return `Please analyze this CV for the South African job market:
-
-CV CONTENT:
-${content}
-
-Provide a detailed analysis with specific scores and recommendations.`;
+  
+  return prompt;
 }
