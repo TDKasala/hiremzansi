@@ -120,7 +120,7 @@ export async function analyzeCV(content: string, jobDescription?: string): Promi
     } catch (error) {
       console.error("OpenAI analysis failed, falling back to rule-based system:", error);
       // Log the specific error type for monitoring
-      if (error.code === 'insufficient_quota') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'insufficient_quota') {
         console.warn("OpenAI API quota exceeded - using rule-based analysis as fallback");
       }
       // Fall back to rule-based system if OpenAI fails
@@ -378,7 +378,7 @@ export async function performDeepAnalysis(content: string, jobDescription?: stri
     console.error("Deep analysis with OpenAI failed:", error);
     
     // Log specific error for monitoring
-    if (error.code === 'insufficient_quota') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'insufficient_quota') {
       console.warn("OpenAI API quota exceeded for premium analysis - using fallback");
     }
     
