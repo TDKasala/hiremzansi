@@ -17,8 +17,9 @@ export async function analyzeCV(content: string, jobDescription?: string): Promi
     const promptSystem = createSystemPrompt();
     const promptUser = createUserPrompt(content, jobDescription);
 
+    // Use GPT-3.5 Turbo for free users (basic analysis)
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: promptSystem },
         { role: "user", content: promptUser }
@@ -48,6 +49,7 @@ export async function createDeepAnalysis(content: string, jobDescription?: strin
     const promptSystem = createDeepAnalysisSystemPrompt();
     const promptUser = createUserPrompt(content, jobDescription);
 
+    // Use GPT-4o for premium paid analysis (R30 deep analysis)
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
