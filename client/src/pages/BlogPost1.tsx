@@ -200,7 +200,7 @@ export default function BlogPost1() {
             </p>
             <Button asChild>
               <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
-                Get Your Free ATS Score Now
+                {t('blog.getFreeAtsScore')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
             </Button>
@@ -232,7 +232,7 @@ export default function BlogPost1() {
         </article>
         
         <div className="mt-10 border-t pt-10">
-          <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
+          <h3 className="text-2xl font-bold mb-6">{t('blog.relatedPosts')}</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardContent className="pt-6">
