@@ -5,7 +5,7 @@ import multer from "multer";
 import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
-import { analyzeCV } from "./services/atsScoring";
+import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
 import { insertUserSchema, insertCvSchema, insertAtsScoreSchema, insertDeepAnalysisReportSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
@@ -155,7 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Begin background analysis of the CV
       // Pass job description if available for better analysis
-      const analysis = analyzeCV(content, jobDescription);
+      const analysis = await analyzeCV(content, jobDescription);
       
       // Store the analysis results
       const atsScore = await storage.createATSScore({
@@ -330,7 +330,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!atsScore) {
         // If not, analyze the CV
-        const analysis = analyzeCV(cv.content);
+        const analysis = await analyzeCV(cv.content);
         
         // Store the analysis results
         atsScore = await storage.createATSScore({
