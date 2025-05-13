@@ -35,24 +35,24 @@ export function CVAnalysisButton({
       const response = await apiRequest('POST', '/api/deep-analysis', { cvId });
       
       // Check if scan limit was reached
-      const { scanLimitReached, data, response: limitResponse } = await handleAPIResponse(response);
+      const result = await handleAPIResponse(response);
       
-      if (scanLimitReached) {
+      if (result.scanLimitReached) {
         // The modal will be shown by the hook
         setIsLoading(false);
         return;
       }
       
       // If not scan limited, process the response normally
-      const result = limitResponse ? await limitResponse.json() : data;
+      const responseData = result.response ? await result.response.json() : result.data;
       
       toast({
         title: t('Analysis Started'),
         description: t('Your CV is being analyzed. This may take a moment.'),
       });
       
-      if (result.id && onAnalysisComplete) {
-        onAnalysisComplete(result.id);
+      if (responseData && responseData.id && onAnalysisComplete) {
+        onAnalysisComplete(responseData.id);
       }
     } catch (error) {
       console.error('Analysis error:', error);

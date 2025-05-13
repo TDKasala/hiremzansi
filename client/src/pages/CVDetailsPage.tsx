@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { Helmet } from 'react-helmet';
@@ -19,7 +19,8 @@ import {
   Award, 
   Puzzle, 
   Layout, 
-  ArrowLeft
+  ArrowLeft,
+  FileSearch
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -28,6 +29,7 @@ import {
   TabsList, 
   TabsTrigger 
 } from '@/components/ui/tabs';
+import { CVAnalysisButton } from '@/components/CVAnalysisButton';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
@@ -42,6 +44,7 @@ export default function CVDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const numericId = parseInt(id);
 
   // Fetch the combined data
@@ -407,6 +410,62 @@ export default function CVDetailsPage() {
                       ? "Strong South African context. Your CV is well-aligned with local requirements."
                       : "Consider enhancing South African context by mentioning relevant industries, companies, or regulations."}
                   </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Premium Analysis Card */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileSearch className="h-5 w-5 text-primary" />
+                Premium Deep Analysis
+              </CardTitle>
+              <CardDescription>
+                Get a comprehensive AI-powered analysis of your CV with detailed feedback and improvement suggestions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h3 className="font-medium">Premium Analysis includes:</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      <span>AI-powered feedback from our premium GPT-4o model</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      <span>Industry-specific recommendations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      <span>Detailed content optimization suggestions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      <span>South African context awareness</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex flex-col justify-center items-center md:border-l md:pl-6 space-y-4">
+                  <p className="text-center text-muted-foreground">
+                    Unlock detailed insights and get personalized recommendations to make your CV stand out.
+                  </p>
+                  <CVAnalysisButton 
+                    cvId={cv.id} 
+                    size="lg"
+                    text="Run Deep Analysis" 
+                    onAnalysisComplete={(reportId) => {
+                      // Refresh the data when the analysis is complete
+                      queryClient.invalidateQueries({
+                        queryKey: [`/api/cv/${id}`, `/api/ats-score/${id}`]
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </CardContent>
