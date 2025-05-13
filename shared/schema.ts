@@ -201,6 +201,8 @@ export const plans = pgTable("plans", {
   interval: varchar("interval", { length: 20 }).default("month").notNull(), // month, year
   features: text("features").array(),
   isActive: boolean("is_active").default(true).notNull(),
+  isPopular: boolean("is_popular").default(false), // Flag for most popular plan
+  scanLimit: integer("scan_limit").default(0), // Monthly scan limit (0 = unlimited)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -219,6 +221,8 @@ export const subscriptions = pgTable("subscriptions", {
   currentPeriodEnd: timestamp("current_period_end").notNull(),
   cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
   paymentMethod: text("payment_method"),
+  scansUsed: integer("scans_used").default(0), // Track how many scans have been used in current period
+  lastScanReset: timestamp("last_scan_reset"), // Date when the scan count was last reset
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

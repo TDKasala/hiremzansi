@@ -416,13 +416,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "You don't have permission to analyze this CV" });
       }
 
-      // Check if user has an active subscription or if they need to pay
+      // Check if user has an active subscription and available scans
       const subscription = await storage.getActiveSubscription(req.user!.id);
       let requiresPayment = true;
+      let scanLimitReached = false;
+      let scanInfo = { scansUsed: 0, scanLimit: 0 };
       
       if (subscription) {
-        // Check subscription tier and features
-        requiresPayment = false;
+        // Check subscription tier and available scans
+        const plan = await storage.getPlan(subscription.planId);
+        
+        if (plan) {
+          // Only check scan limits for plans that have them
+          if (plan.scanLimit > 0) {
+            // This plan has a scan limit, check if it's reached
+            scanInfo = await storage.recordScanUsage(req.user!.id);
+            
+            if (scanInfo.scanLimit > 0 && scanInfo.scansUsed > scanInfo.scanLimit) {
+              // Scan limit reached
+              scanLimitReached = true;
+              requiresPayment = true;
+            } else {
+              // User has available scans
+              requiresPayment = false;
+            }
+          } else {
+            // Unlimited scans
+            requiresPayment = false;
+          }
+        }
       }
 
       // Check if an analysis already exists
@@ -435,6 +457,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId: req.user!.id,
           status: 'pending',
           paidAmount: requiresPayment ? 3000 : 0 // ZAR 30.00 (stored in cents)
+        });
+      }
+      
+      // If scan limit is reached, return that information
+      if (scanLimitReached) {
+        return res.status(402).json({
+          error: "Monthly scan limit reached",
+          scanLimitReached: true,
+          scanInfo,
+          requiresUpgrade: true,
+          subscriptionOptions: [
+            {
+              id: 'premium-plus',
+              name: 'Premium Plus',
+              price: 20000, // ZAR 200.00 in cents
+              scanLimit: 100,
+              isRecommended: true
+            },
+            {
+              id: 'premium',
+              name: 'Premium',
+              price: 10000, // ZAR 100.00 in cents
+              scanLimit: 50,
+              isPopular: true
+            }
+          ]
         });
       }
 

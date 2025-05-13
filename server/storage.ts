@@ -67,6 +67,8 @@ export interface IStorage {
   getActiveSubscription(userId: number): Promise<Subscription | undefined>;
   createSubscription(subscription: any): Promise<Subscription>;
   updateSubscription(id: number, updates: Partial<Subscription>): Promise<Subscription>;
+  recordScanUsage(userId: number): Promise<{ scansUsed: number, scanLimit: number }>;
+  resetScanUsage(userId: number): Promise<boolean>;
   
   // Plan operations
   getPlan(id: number): Promise<Plan | undefined>;
@@ -303,6 +305,78 @@ export class DatabaseStorage implements IStorage {
       .where(eq(subscriptions.id, id))
       .returning();
     return subscription;
+  }
+
+  async recordScanUsage(userId: number): Promise<{ scansUsed: number, scanLimit: number }> {
+    // Get the user's active subscription
+    const subscription = await this.getActiveSubscription(userId);
+    if (!subscription) {
+      return { scansUsed: 0, scanLimit: 0 };
+    }
+    
+    // Get the plan to check scan limit
+    const plan = await this.getPlan(subscription.planId);
+    if (!plan) {
+      return { scansUsed: 0, scanLimit: 0 };
+    }
+    
+    // Check if we need to reset scan usage (new month)
+    const now = new Date();
+    if (subscription.lastScanReset) {
+      const lastReset = new Date(subscription.lastScanReset);
+      const monthDiff = 
+        (now.getFullYear() - lastReset.getFullYear()) * 12 + 
+        (now.getMonth() - lastReset.getMonth());
+      
+      if (monthDiff >= 1) {
+        // Reset scan count at the beginning of a new month
+        await this.resetScanUsage(userId);
+        return { scansUsed: 1, scanLimit: plan.scanLimit || 0 };
+      }
+    } else {
+      // If lastScanReset is null, initialize it
+      await db
+        .update(subscriptions)
+        .set({ 
+          lastScanReset: now,
+          updatedAt: now
+        })
+        .where(eq(subscriptions.id, subscription.id));
+    }
+    
+    // Increment scan usage
+    const scansUsed = (subscription.scansUsed || 0) + 1;
+    const [updatedSubscription] = await db
+      .update(subscriptions)
+      .set({ 
+        scansUsed,
+        updatedAt: new Date()
+      })
+      .where(eq(subscriptions.id, subscription.id))
+      .returning();
+    
+    return { 
+      scansUsed: updatedSubscription.scansUsed || 0,
+      scanLimit: plan.scanLimit || 0
+    };
+  }
+  
+  async resetScanUsage(userId: number): Promise<boolean> {
+    const subscription = await this.getActiveSubscription(userId);
+    if (!subscription) {
+      return false;
+    }
+    
+    await db
+      .update(subscriptions)
+      .set({ 
+        scansUsed: 0,
+        lastScanReset: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(subscriptions.id, subscription.id));
+    
+    return true;
   }
 
   // Plan operations
