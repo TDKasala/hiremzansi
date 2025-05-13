@@ -440,40 +440,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // In a real implementation, this would trigger a background job
       // For now, simulate the analysis completing immediately if payment not required
       if (!requiresPayment && deepAnalysis.status === 'pending') {
-        // Upgrade the analysis with mock data
-        deepAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {
-          status: 'completed',
-          detailedAnalysis: {
-            summary: "Your CV has been thoroughly analyzed.",
-            keyFindings: [
-              "Strong emphasis on technical skills",
-              "Lacks quantifiable achievements",
-              "Education section well formatted",
-              "Consider adding more South African context"
-            ],
-            sectionScores: {
-              professional: 85,
-              education: 90,
-              skills: 75,
-              achievements: 60
+        try {
+          // Use OpenAI for deep analysis
+          const analysisResult = await performDeepAnalysis(cv.content, cv.jobDescription || undefined);
+          
+          // Update the analysis with AI-generated insights
+          deepAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {
+            status: 'completed',
+            detailedAnalysis: {
+              summary: "Your CV has been thoroughly analyzed with South African context in mind.",
+              keyFindings: analysisResult.improvements.slice(0, 5),
+              sectionScores: {
+                professional: analysisResult.score,
+                education: analysisResult.formatScore || 75,
+                skills: analysisResult.skillsScore || 70,
+                achievements: analysisResult.contextScore || 65
+              }
+            },
+            industryComparison: {
+              industry: cv.targetIndustry || "South African Job Market",
+              averageScore: Math.max(50, Math.floor(analysisResult.score * 0.9)),
+              yourScore: analysisResult.score,
+              keyDifferences: [
+                ...(analysisResult.strengths.slice(0, 2) || []),
+                ...(analysisResult.improvements.slice(0, 2) || [])
+              ]
+            },
+            regionalRecommendations: {
+              region: "South Africa",
+              keywords: analysisResult.saKeywordsFound || ["B-BBEE", "NQF Level"],
+              certifications: ["SETA", "Microsoft Certified", "CompTIA"],
+              marketTrends: analysisResult.bbbeeDetected 
+                ? "You've correctly included B-BBEE status which is important for South African employers" 
+                : "Consider adding B-BBEE status which is critical for South African recruitment"
             }
-          },
-          industryComparison: {
-            industry: cv.targetIndustry || "Technology",
-            averageScore: 72,
-            yourScore: 81,
-            keyDifferences: [
-              "You have more technical certifications than average",
-              "Industry values project management experience"
-            ]
-          },
-          regionalRecommendations: {
-            region: "South Africa",
-            keywords: ["B-BBEE", "NQF Level", "Johannesburg", "Cape Town"],
-            certifications: ["SETA", "Microsoft Certified", "CompTIA"],
-            marketTrends: "Growing demand for data science and cloud skills"
-          }
-        });
+          });
+        } catch (error) {
+          console.error("Error performing deep analysis:", error);
+          
+          // Fallback to basic analysis if AI fails
+          deepAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {
+            status: 'completed',
+            detailedAnalysis: {
+              summary: "Your CV has been analyzed with South African context in mind.",
+              keyFindings: [
+                "Please consider adding more South African context",
+                "Make sure to include B-BBEE status if applicable",
+                "Add NQF levels to all qualifications",
+                "Include more quantifiable achievements"
+              ],
+              sectionScores: {
+                professional: 70,
+                education: 75,
+                skills: 65,
+                achievements: 60
+              }
+            },
+            industryComparison: {
+              industry: cv.targetIndustry || "South African Job Market",
+              averageScore: 60,
+              yourScore: 70,
+              keyDifferences: [
+                "Include B-BBEE status for better employment equity alignment",
+                "Add NQF levels to all qualifications"
+              ]
+            },
+            regionalRecommendations: {
+              region: "South Africa",
+              keywords: ["B-BBEE", "NQF Level", "Employment Equity", "SETA"],
+              certifications: ["SETA", "Microsoft Certified", "CompTIA"],
+              marketTrends: "Add B-BBEE status which is critical for South African recruitment"
+            }
+          });
+        }
       }
 
       res.json({
