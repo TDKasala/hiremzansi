@@ -154,8 +154,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cv = await storage.createCV(cvData);
 
       // Begin background analysis of the CV
-      // Pass job description if available for better analysis
-      const analysis = await analyzeCV(content, jobDescription);
+      // Pass job description and CV ID for better analysis and caching
+      const analysis = await analyzeCV(content, jobDescription, cv.id);
       
       // Store the analysis results
       const atsScore = await storage.createATSScore({
@@ -330,7 +330,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!atsScore) {
         // If not, analyze the CV
-        const analysis = await analyzeCV(cv.content);
+        // Pass the CV ID for caching and job description if available
+        const analysis = await analyzeCV(cv.content, cv.jobDescription || undefined, cvId);
         
         // Store the analysis results
         atsScore = await storage.createATSScore({

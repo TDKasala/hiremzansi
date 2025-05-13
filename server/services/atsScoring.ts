@@ -1,8 +1,21 @@
 import { AnalysisReport } from "@shared/schema";
 import { analyzeCV as openAIAnalyzeCV, createDeepAnalysis } from "./openaiService";
+import { analysisCache } from "./analysisCache";
 
-// Flag to control whether to use OpenAI or the rule-based system
-const USE_OPENAI = true;
+// Configuration for ATS scoring analysis
+const CONFIG = {
+  // Whether to use OpenAI at all - can be set to false to disable all API calls
+  USE_OPENAI: true,
+  
+  // Default to rule-based for free users, not OpenAI (cost saving measure)
+  DEFAULT_TO_RULE_BASED: true,
+  
+  // Always use OpenAI for premium deep analysis if available
+  ALWAYS_USE_OPENAI_FOR_PREMIUM: true,
+  
+  // Use caching to avoid redundant API calls
+  USE_CACHING: true
+};
 
 // Keyword categories for South African job market
 const skillsKeywords = [
@@ -112,11 +125,30 @@ const provincialKeywords: Record<string, string[]> = {
  * @param jobDescription Optional job description to compare CV against
  * @returns A detailed analysis report with scores, strengths, improvements and issues
  */
-export async function analyzeCV(content: string, jobDescription?: string): Promise<AnalysisReport> {
-  // Use OpenAI for analysis if enabled and OpenAI API key has sufficient quota
-  if (USE_OPENAI) {
+export async function analyzeCV(content: string, jobDescription?: string, cvId?: number, forceAI: boolean = false): Promise<AnalysisReport> {
+  // Check cache first if caching is enabled and cvId is provided
+  if (CONFIG.USE_CACHING && cvId) {
+    const cachedAnalysis = analysisCache.get(cvId, content);
+    if (cachedAnalysis) {
+      console.log(`Using cached analysis for CV ID: ${cvId}`);
+      return cachedAnalysis;
+    }
+  }
+  
+  // For free users, default to rule-based unless forceAI is true
+  const useRuleBasedByDefault = CONFIG.DEFAULT_TO_RULE_BASED && !forceAI;
+  
+  // Use OpenAI for analysis if enabled and we're not defaulting to rule-based
+  if (CONFIG.USE_OPENAI && (!useRuleBasedByDefault || forceAI)) {
     try {
-      return await openAIAnalyzeCV(content, jobDescription);
+      const aiAnalysis = await openAIAnalyzeCV(content, jobDescription);
+      
+      // Cache the result if caching is enabled and cvId is provided
+      if (CONFIG.USE_CACHING && cvId) {
+        analysisCache.set(cvId, content, aiAnalysis);
+      }
+      
+      return aiAnalysis;
     } catch (error) {
       console.error("OpenAI analysis failed, falling back to rule-based system:", error);
       // Log the specific error type for monitoring
@@ -370,37 +402,68 @@ export async function analyzeCV(content: string, jobDescription?: string): Promi
  * @param jobDescription Optional job description to compare CV against
  * @returns A detailed premium analysis report with comprehensive insights
  */
-export async function performDeepAnalysis(content: string, jobDescription?: string): Promise<AnalysisReport> {
-  // Always use OpenAI for premium deep analysis when possible
-  try {
-    return await createDeepAnalysis(content, jobDescription);
-  } catch (error) {
-    console.error("Deep analysis with OpenAI failed:", error);
-    
-    // Log specific error for monitoring
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'insufficient_quota') {
-      console.warn("OpenAI API quota exceeded for premium analysis - using fallback");
+export async function performDeepAnalysis(content: string, jobDescription?: string, cvId?: number): Promise<AnalysisReport> {
+  // Check cache first if caching is enabled and cvId is provided
+  if (CONFIG.USE_CACHING && cvId) {
+    // We use a special prefix for deep analysis cache to differentiate from regular analysis
+    const deepAnalysisCacheId = cvId + 1000000; // Adding a large offset 
+    const cachedAnalysis = analysisCache.get(deepAnalysisCacheId, content);
+    if (cachedAnalysis) {
+      console.log(`Using cached deep analysis for CV ID: ${cvId}`);
+      return cachedAnalysis;
     }
-    
-    // Enhanced analysis object with additional premium-like fields
-    const basicAnalysis = await analyzeCV(content, jobDescription);
-    
-    // Add premium-specific enhancements to the basic analysis
-    return {
-      ...basicAnalysis,
-      // Enhance the scores slightly to reflect the premium nature
-      score: Math.min(100, Math.round(basicAnalysis.score * 1.05)),
-      skillsScore: basicAnalysis.skillsScore ? Math.min(100, Math.round(basicAnalysis.skillsScore * 1.05)) : undefined,
-      formatScore: basicAnalysis.formatScore ? Math.min(100, Math.round(basicAnalysis.formatScore * 1.05)) : undefined,
-      // Provide more detailed strengths and improvements for premium users
-      strengths: [
-        ...basicAnalysis.strengths,
-        "Premium analysis includes more detailed recommendations"
-      ],
-      improvements: [
-        ...basicAnalysis.improvements,
-        "We've provided enhanced suggestions based on South African hiring practices"
-      ],
-    };
   }
+  
+  // Always use OpenAI for premium deep analysis when possible and enabled
+  if (CONFIG.USE_OPENAI && CONFIG.ALWAYS_USE_OPENAI_FOR_PREMIUM) {
+    try {
+      const deepAnalysis = await createDeepAnalysis(content, jobDescription);
+      
+      // Cache the result if caching is enabled and cvId is provided
+      if (CONFIG.USE_CACHING && cvId) {
+        const deepAnalysisCacheId = cvId + 1000000;
+        analysisCache.set(deepAnalysisCacheId, content, deepAnalysis);
+      }
+      
+      return deepAnalysis;
+    } catch (error) {
+      console.error("Deep analysis with OpenAI failed:", error);
+      
+      // Log specific error for monitoring
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'insufficient_quota') {
+        console.warn("OpenAI API quota exceeded for premium analysis - using fallback");
+      }
+    }
+  }
+  
+  // Enhanced analysis using rule-based system with premium features
+  // Force using AI for the basic analysis if we can
+  const forceAI = CONFIG.USE_OPENAI && !CONFIG.DEFAULT_TO_RULE_BASED;
+  const basicAnalysis = await analyzeCV(content, jobDescription, cvId, forceAI);
+  
+  // Add premium-specific enhancements to the basic analysis
+  const enhancedAnalysis = {
+    ...basicAnalysis,
+    // Enhance the scores slightly to reflect the premium nature
+    score: Math.min(100, Math.round(basicAnalysis.score * 1.05)),
+    skillsScore: basicAnalysis.skillsScore ? Math.min(100, Math.round(basicAnalysis.skillsScore * 1.05)) : undefined,
+    formatScore: basicAnalysis.formatScore ? Math.min(100, Math.round(basicAnalysis.formatScore * 1.05)) : undefined,
+    // Provide more detailed strengths and improvements for premium users
+    strengths: [
+      ...basicAnalysis.strengths,
+      "Premium analysis includes more detailed recommendations"
+    ],
+    improvements: [
+      ...basicAnalysis.improvements,
+      "We've provided enhanced suggestions based on South African hiring practices"
+    ],
+  };
+  
+  // Cache the enhanced analysis
+  if (CONFIG.USE_CACHING && cvId) {
+    const deepAnalysisCacheId = cvId + 1000000;
+    analysisCache.set(deepAnalysisCacheId, content, enhancedAnalysis);
+  }
+  
+  return enhancedAnalysis;
 }
