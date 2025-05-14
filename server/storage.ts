@@ -86,7 +86,10 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new PostgresSessionStore({ 
       pool, 
       createTableIfMissing: true,
-      tableName: 'sessions' 
+      tableName: 'sessions',
+      // Prevent the session store from closing the pool when the application terminates
+      // This caused the "Cannot use a pool after calling end on the pool" error
+      pruneSessionInterval: false
     });
   }
 
