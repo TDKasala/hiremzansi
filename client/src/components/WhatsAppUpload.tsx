@@ -65,10 +65,11 @@ export function WhatsAppUpload() {
         const error = await response.json();
         throw new Error(error.message || 'Failed to send verification code');
       }
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('Could not send verification code. Please try again.');
       toast({
         title: t('Verification Failed'),
-        description: error.message || t('Could not send verification code. Please try again.'),
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -112,9 +113,10 @@ export function WhatsAppUpload() {
         throw new Error(error.message || 'Verification failed');
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : t('Could not verify code. Please try again.');
       toast({
         title: t('Verification Failed'),
-        description: error.message || t('Could not verify code. Please try again.'),
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
