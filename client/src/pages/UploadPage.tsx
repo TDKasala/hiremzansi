@@ -123,19 +123,19 @@ export default function UploadPage() {
           </p>
         </header>
         
-        <div className="grid gap-8">
+        <div className="grid gap-4 sm:gap-6 md:gap-8">
           {/* Job Description Input - Required for CV analysis */}
           <Card className="border-primary/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-primary" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 Job Description
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 Add the job description for targeted CV analysis (required)
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               <Textarea
                 placeholder="Paste the job description here to get tailored ATS scoring and recommendations"
                 className="min-h-[120px]"
@@ -151,13 +151,13 @@ export default function UploadPage() {
           
           {/* Upload Methods - CV File Upload and WhatsApp */}
           <Tabs defaultValue="file">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="file" className="flex items-center justify-center gap-2">
-                <Upload className="h-4 w-4" />
+            <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+              <TabsTrigger value="file" className="flex items-center justify-center gap-1 sm:gap-2 py-2 text-xs sm:text-sm">
+                <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
                 File Upload
               </TabsTrigger>
-              <TabsTrigger value="whatsapp" className="flex items-center justify-center gap-2">
-                <Smartphone className="h-4 w-4" />
+              <TabsTrigger value="whatsapp" className="flex items-center justify-center gap-1 sm:gap-2 py-2 text-xs sm:text-sm">
+                <Smartphone className="h-3 w-3 sm:h-4 sm:w-4" />
                 WhatsApp Upload
               </TabsTrigger>
             </TabsList>
@@ -165,13 +165,13 @@ export default function UploadPage() {
             {/* File Upload Tab */}
             <TabsContent value="file">
               <Card>
-                <CardHeader>
-                  <CardTitle>Upload Your CV</CardTitle>
-                  <CardDescription>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">Upload Your CV</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     Upload your CV in PDF or DOCX format for analysis
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6">
                   <FileUpload 
                     onUploadComplete={handleUploadComplete}
                     title="Upload your CV"
@@ -185,13 +185,13 @@ export default function UploadPage() {
             {/* WhatsApp Upload Tab */}
             <TabsContent value="whatsapp">
               <Card>
-                <CardHeader>
-                  <CardTitle>WhatsApp Upload</CardTitle>
-                  <CardDescription>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-base sm:text-lg">WhatsApp Upload</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
                     Upload your CV through WhatsApp for convenience
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6">
                   <WhatsAppUpload />
                 </CardContent>
               </Card>

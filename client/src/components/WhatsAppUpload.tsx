@@ -132,17 +132,17 @@ export function WhatsAppUpload() {
   
   return (
     <Card className="border-primary/20">
-      <CardHeader className="bg-primary/5">
-        <CardTitle className="flex items-center">
-          <MessageSquare className="h-5 w-5 mr-2 text-primary" />
+      <CardHeader className="bg-primary/5 p-4 sm:p-6">
+        <CardTitle className="flex items-center text-base sm:text-lg">
+          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
           {t('WhatsApp CV Upload')}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           {t('Send your CV via WhatsApp for easy scanning')}
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="pt-6">
+      <CardContent className="p-4 sm:p-6">
         {verificationStep === 'input' && (
           <form onSubmit={handleSubmitPhone} className="space-y-4">
             <div className="space-y-2">
@@ -164,7 +164,7 @@ export function WhatsAppUpload() {
             
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full text-xs sm:text-sm py-1.5 sm:py-2" 
               disabled={isLoading || !phoneNumber}
             >
               {isLoading ? (
@@ -268,7 +268,7 @@ export function WhatsAppUpload() {
         )}
       </CardContent>
       
-      <CardFooter className="bg-primary/5 flex flex-col space-y-2 text-sm text-muted-foreground">
+      <CardFooter className="bg-primary/5 p-4 sm:p-6 flex flex-col space-y-2 text-xs sm:text-sm text-muted-foreground">
         <p className="text-xs">{t('By registering, you agree to receive occasional job-related notifications via WhatsApp.')}</p>
       </CardFooter>
     </Card>

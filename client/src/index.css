@@ -149,6 +149,37 @@
   background: white;
 }
 
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  /* Smaller card paddings on mobile */
+  .card-header {
+    @apply p-4;
+  }
+  
+  .card-content {
+    @apply p-4;
+  }
+  
+  .card-footer {
+    @apply p-4;
+  }
+  
+  /* Smaller buttons on mobile */
+  .btn-mobile-compact {
+    @apply py-1.5 px-3 text-sm;
+  }
+  
+  /* Improved tabs on mobile */
+  .tabs-mobile-friendly {
+    @apply text-sm;
+  }
+  
+  /* Smaller grid gaps */
+  .grid-mobile-compact {
+    @apply gap-3;
+  }
+}
+
 .ats-score-text {
   position: relative;
   z-index: 1;
