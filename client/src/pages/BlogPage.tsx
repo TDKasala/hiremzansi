@@ -1,188 +1,192 @@
-import { Helmet } from "react-helmet";
-import { Link } from "wouter";
-import { Calendar, ArrowRight } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { Helmet } from 'react-helmet';
+import { Link } from 'wouter';
 
-// Blog post type
-type BlogPost = {
+interface BlogPost {
   id: number;
-  title: string;
   slug: string;
+  title: string;
+  excerpt: string;
   date: string;
-  summary: string;
-  category: string;
+  author: string;
   image: string;
-};
+  category: string;
+}
 
-export default function BlogPage() {
-  const { t } = useTranslation();
-  // Blog posts
-  const blogPosts: BlogPost[] = [
-    {
-      id: 1,
-      title: "7 ATS-Friendly CV Tips for South African Job Seekers",
-      slug: "7-ats-friendly-cv-tips-for-south-african-job-seekers",
-      date: "May 10, 2023",
-      summary: "Learn how to create an ATS-compliant CV that stands out in the South African job market with our expert tips covering B-BBEE, NQF levels, and local language proficiencies.",
-      category: "CV Tips",
-      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=400&h=250&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      title: "What is an ATS and Why It Matters for SA Job Seekers",
-      slug: "ats-explained",
-      date: "June 15, 2023",
-      summary: "Learn how Applicant Tracking Systems work and why optimizing your CV for them is crucial in the South African job market.",
-      category: "ATS Basics",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    },
-    {
-      id: 3,
-      title: "Top 10 Keywords for South African CVs in 2023",
-      slug: "top-keywords",
-      date: "June 8, 2023",
-      summary: "Discover the most impactful keywords to include in your CV based on analysis of thousands of South African job listings.",
-      category: "Keywords",
-      image: "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    },
-    {
-      id: 4,
-      title: "How to Address Employment Gaps in Your CV",
-      slug: "employment-gaps",
-      date: "June 1, 2023",
-      summary: "Practical advice for explaining gaps in your employment history in a way that won't trigger ATS red flags.",
-      category: "CV Tips",
-      image: "https://images.unsplash.com/photo-1560264280-88b68371db39?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    },
-    {
-      id: 5,
-      title: "B-BBEE and Your CV: What You Need to Know",
-      slug: "bbbee-and-cv",
-      date: "May 25, 2023",
-      summary: "Understanding how to properly include B-BBEE status in your CV to improve visibility with South African employers.",
-      category: "South African Context",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    },
-    {
-      id: 6,
-      title: "NQF Levels Explained: Showcasing Qualifications Correctly",
-      slug: "nqf-levels-explained",
-      date: "May 18, 2023",
-      summary: "How to properly format your educational qualifications using the National Qualifications Framework levels for ATS recognition.",
-      category: "South African Context",
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    },
-    {
-      id: 7,
-      title: "The Impact of Formatting on ATS Scanning",
-      slug: "formatting-impact",
-      date: "May 11, 2023",
-      summary: "Why the way your CV looks matters to ATS systems and how to format it for maximum compatibility.",
-      category: "CV Tips",
-      image: "https://images.unsplash.com/photo-1569144157591-c60f3f82f137?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250"
-    }
-  ];
+const blogPosts: BlogPost[] = [
+  {
+    id: 1,
+    slug: "b-bbee-impact-sa-resumes",
+    title: "How B-BBEE Status Impacts Your South African Resume",
+    excerpt: "B-BBEE status has become an important factor in the South African job market. Learn how to properly highlight your B-BBEE information on your CV.",
+    date: "May 12, 2025",
+    author: "Thabo Mabena",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=B-BBEE+Impact",
+    category: "South African Job Market"
+  },
+  {
+    id: 2,
+    slug: "nqf-levels-explained",
+    title: "NQF Levels Explained: What South African Employers Look For",
+    excerpt: "Understanding the National Qualifications Framework (NQF) is essential when applying for jobs in South Africa. Learn how to correctly present your qualifications.",
+    date: "May 8, 2025",
+    author: "Sarah Johnson",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=NQF+Levels",
+    category: "Education & Qualifications"
+  },
+  {
+    id: 3,
+    slug: "ats-survival-guide-2025",
+    title: "2025 ATS Survival Guide for South African Job Seekers",
+    excerpt: "With 90% of large companies using Applicant Tracking Systems, understanding how to optimize your resume for ATS is more crucial than ever.",
+    date: "April 30, 2025",
+    author: "Lerato Moloi",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=ATS+Guide",
+    category: "Resume Optimization"
+  },
+  {
+    id: 4,
+    slug: "remote-work-opportunities-sa",
+    title: "Finding Remote Work Opportunities in South Africa",
+    excerpt: "Remote work has transformed the job landscape in South Africa. Discover how to position your CV for remote positions.",
+    date: "April 25, 2025",
+    author: "William Pretorius",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Remote+Work",
+    category: "Job Search Strategy"
+  },
+  {
+    id: 5,
+    slug: "industry-specific-cv-tips",
+    title: "Industry-Specific CV Tips for South Africa's Growth Sectors",
+    excerpt: "Different industries require different CV approaches. Learn how to tailor your resume for South Africa's growing industries like tech, renewable energy, and healthcare.",
+    date: "April 18, 2025",
+    author: "Nomsa Dlamini",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Industry+Tips",
+    category: "Industry Insights"
+  },
+  {
+    id: 6,
+    slug: "language-proficiency-cv",
+    title: "The Importance of Language Proficiency on Your South African CV",
+    excerpt: "In a country with 11 official languages, how you present your language skills can significantly impact your job prospects.",
+    date: "April 10, 2025",
+    author: "Daniel van der Merwe",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Language+Skills",
+    category: "Resume Essentials"
+  },
+  {
+    id: 7,
+    slug: "linkedin-optimization-sa-professionals",
+    title: "LinkedIn Optimization Tips for South African Professionals",
+    excerpt: "Your LinkedIn profile works alongside your CV. Learn how to optimize both for maximum impact in the South African job market.",
+    date: "April 3, 2025",
+    author: "Priya Naidoo",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=LinkedIn+Tips",
+    category: "Social Media Presence"
+  },
+  {
+    id: 8,
+    slug: "graduate-cv-templates",
+    title: "CV Templates for South African Graduates With No Experience",
+    excerpt: "New to the job market? Learn how to create an impressive CV even with limited work experience in the competitive South African job market.",
+    date: "March 28, 2025",
+    author: "Blessing Mokoena",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Graduate+CV",
+    category: "Entry-Level Strategies"
+  },
+  {
+    id: 9,
+    slug: "personal-branding-job-search",
+    title: "Personal Branding: The Secret Weapon in Your Job Search",
+    excerpt: "Discover how to develop a personal brand that makes your CV stand out to South African employers and ATS systems.",
+    date: "March 20, 2025",
+    author: "Jessica Adams",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Personal+Branding",
+    category: "Career Development"
+  },
+  {
+    id: 10,
+    slug: "ai-tools-resume-optimization",
+    title: "AI Tools That Can Transform Your South African Resume",
+    excerpt: "Artificial intelligence is changing how resumes are created and optimized. Explore the best AI tools for South African job seekers.",
+    date: "March 15, 2025",
+    author: "Mandla Nkosi",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=AI+Tools",
+    category: "Technology & Innovation"
+  }
+];
 
-  // Categories
-  const categories = [...new Set(blogPosts.map(post => post.category))];
-
+const BlogPage: React.FC = () => {
   return (
-    <>
+    <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>Blog | ATSBoost - CV Optimization Tips & Insights</title>
-        <meta name="description" content="CV optimization tips, ATS insights, and job seeking advice for the South African market. Learn how to improve your CV and land more interviews." />
-        <meta property="og:title" content="ATSBoost Blog - CV Optimization Tips" />
-        <meta property="og:description" content="Practical advice for South African job seekers on optimizing CVs for ATS systems." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/blog" />
+        <title>Career Insights Blog | ATSBoost South Africa</title>
+        <meta 
+          name="description" 
+          content="Expert advice on CV optimization, ATS strategies, and job search tips for the South African market from ATSBoost.co.za" 
+        />
       </Helmet>
       
-      <div className="bg-secondary py-16 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('blog.pageTitle')}</h1>
-          <p className="text-xl max-w-2xl mx-auto">
-            {t('blog.pageSubtitle')}
-          </p>
-        </div>
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">ATSBoost Career Insights</h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Expert advice on resume optimization, ATS strategies, and job search tips tailored for the South African job market
+        </p>
       </div>
       
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <div className="sticky top-24">
-                <h2 className="text-xl font-bold mb-4">{t('blog.categories')}</h2>
-                <ul className="space-y-2">
-                  <li>
-                    <Link href="/blog">
-                      <a className="text-primary font-medium">{t('blog.allPosts')}</a>
-                    </Link>
-                  </li>
-                  {categories.map((category, index) => (
-                    <li key={index}>
-                      <Link href={`/blog/category/${category.toLowerCase().replace(/\s+/g, '-')}`}>
-                        <a className="text-neutral-700 hover:text-primary">{category}</a>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {blogPosts.map((post) => (
+          <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md transition-all hover:shadow-xl">
+            <Link href={`/blog/${post.slug}`}>
+              <a className="block">
+                <img 
+                  src={post.image} 
+                  alt={post.title} 
+                  className="w-full h-48 object-cover"
+                />
                 
-                <Separator className="my-6" />
-                
-                <h2 className="text-xl font-bold mb-4">Recent Posts</h2>
-                <ul className="space-y-4">
-                  {blogPosts.slice(0, 3).map((post) => (
-                    <li key={post.id}>
-                      <Link href={`/blog/${post.slug}`}>
-                        <a className="text-sm text-neutral-700 hover:text-primary font-medium">
-                          {post.title}
-                        </a>
-                      </Link>
-                      <div className="text-xs text-neutral-500 mt-1 flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {post.date}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            
-            <div className="md:col-span-3">
-              <div className="grid md:grid-cols-2 gap-8">
-                {blogPosts.map((post) => (
-                  <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img 
-                      src={post.image} 
-                      alt={post.title} 
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-6">
-                      <div className="flex items-center text-sm text-neutral-500 mb-2">
-                        <span className="bg-neutral-100 px-2 py-1 rounded text-xs mr-2">
-                          {t('blog.category')}: {post.category}
-                        </span>
-                        <Calendar className="h-4 w-4 mr-1" />
-                        {t('blog.publishedOn')} {post.date}
-                      </div>
-                      <h2 className="text-xl font-semibold mb-2">
-                        <Link href={`/blog/${post.slug}`} className="text-secondary hover:text-primary">
-                          {post.title}
-                        </Link>
-                      </h2>
-                      <p className="text-neutral-600 mb-4 line-clamp-3">{post.summary}</p>
-                      <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary font-medium hover:underline">
-                        {t('blog.readMore')} <ArrowRight className="ml-1 h-4 w-4" />
-                      </Link>
-                    </div>
+                <div className="p-6">
+                  <span className="text-xs font-semibold text-green-600 uppercase tracking-wider">
+                    {post.category}
+                  </span>
+                  
+                  <h2 className="text-xl font-bold mt-2 mb-3 hover:text-green-600 transition-colors">
+                    {post.title}
+                  </h2>
+                  
+                  <p className="text-gray-600 mb-4">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">
+                      {post.date} • {post.author}
+                    </span>
+                    
+                    <span className="text-green-600 font-semibold text-sm hover:underline">
+                      Read More →
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              </a>
+            </Link>
           </div>
-        </div>
-      </section>
-    </>
+        ))}
+      </div>
+      
+      <div className="text-center mt-16">
+        <Link href="/contact">
+          <a className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors">
+            Request CV Review
+          </a>
+        </Link>
+        
+        <p className="mt-4 text-sm text-gray-500">
+          Get personalized CV optimization advice from our team of experts at <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>
+        </p>
+      </div>
+    </div>
   );
-}
+};
+
+export default BlogPage;
