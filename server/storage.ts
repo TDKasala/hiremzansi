@@ -21,7 +21,7 @@ import {
   type Subscription
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, count } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -196,7 +196,7 @@ export class DatabaseStorage implements IStorage {
 
   async getCVsCount(userId: number): Promise<number> {
     const result = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(cvs)
       .where(eq(cvs.userId, userId));
     return Number(result[0].count);
@@ -240,11 +240,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createATSScore(insertATSScore: InsertATSScore): Promise<ATSScore> {
-    // Insert without explicitly setting timestamps since they have default values
-    const [score] = await db.insert(atsScores).values({
-      ...insertATSScore
-    }).returning();
-    return score;
+    // Use SQL query directly to avoid typing issues
+    const result = await db.execute(sql`
+      INSERT INTO ats_scores (
+        cv_id, score, skills_score, context_score, format_score, 
+        strengths, improvements, issues, 
+        sa_keywords_found, sa_context_score, 
+        bbbee_detected, nqf_detected, 
+        keyword_recommendations,
+        created_at, updated_at
+      ) VALUES (
+        ${insertATSScore.cvId}, 
+        ${insertATSScore.score}, 
+        ${insertATSScore.skillsScore}, 
+        ${insertATSScore.contextScore}, 
+        ${insertATSScore.formatScore},
+        ${insertATSScore.strengths ? JSON.stringify(insertATSScore.strengths) : '[]'},
+        ${insertATSScore.improvements ? JSON.stringify(insertATSScore.improvements) : '[]'},
+        ${insertATSScore.issues ? JSON.stringify(insertATSScore.issues) : '[]'},
+        ${insertATSScore.saKeywordsFound ? JSON.stringify(insertATSScore.saKeywordsFound) : '[]'},
+        ${insertATSScore.saContextScore || null},
+        ${insertATSScore.bbbeeDetected || false},
+        ${insertATSScore.nqfDetected || false},
+        ${insertATSScore.keywordRecommendations ? JSON.stringify(insertATSScore.keywordRecommendations) : 'null'},
+        NOW(), NOW()
+      ) RETURNING *
+    `);
+    
+    return result.rows[0] as ATSScore;
   }
 
   // Deep analysis operations
