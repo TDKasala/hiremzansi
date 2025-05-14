@@ -184,17 +184,7 @@ export default function UploadPage() {
             
             {/* WhatsApp Upload Tab */}
             <TabsContent value="whatsapp">
-              <Card>
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-base sm:text-lg">WhatsApp Upload</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
-                    Upload your CV through WhatsApp for convenience
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6">
-                  <WhatsAppUpload />
-                </CardContent>
-              </Card>
+              <WhatsAppUpload />
             </TabsContent>
           </Tabs>
           

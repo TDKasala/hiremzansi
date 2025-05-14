@@ -21,6 +21,13 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+// Forgot password schema
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+
 // Registration form schema
 const registerSchema = insertUserSchema.extend({
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -35,6 +42,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   
   // Create form for login
   const loginForm = useForm<LoginFormValues>({
@@ -85,9 +93,10 @@ export default function AuthPage() {
           <div className="w-full md:w-1/2">
             <Card className="w-full">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="register">Register</TabsTrigger>
+                  <TabsTrigger value="forgot-password">Reset Password</TabsTrigger>
                 </TabsList>
                 
                 {/* Login Form */}
@@ -128,6 +137,17 @@ export default function AuthPage() {
                             </FormItem>
                           )}
                         />
+                        
+                        <div className="flex justify-end mb-2">
+                          <Button 
+                            type="button" 
+                            variant="link" 
+                            className="px-0 h-auto text-xs"
+                            onClick={() => setActiveTab("forgot-password")}
+                          >
+                            Forgot password?
+                          </Button>
+                        </div>
                         
                         <Button 
                           type="submit" 
