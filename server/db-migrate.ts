@@ -196,11 +196,16 @@ if (import.meta.url.endsWith('db-migrate.ts')) {
         process.exit(1);
       }
       
-      // Close the database connection
-      await pool.end();
+      // Only close the pool if running directly - not when imported
+      if (process.argv[1]?.endsWith('db-migrate.ts')) {
+        await pool.end();
+      }
     } catch (error) {
       console.error('Migration command failed:', error);
-      await pool.end();
+      // Only close the pool if running directly - not when imported
+      if (process.argv[1]?.endsWith('db-migrate.ts')) {
+        await pool.end();
+      }
       process.exit(1);
     }
   })();

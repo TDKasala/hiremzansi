@@ -141,16 +141,21 @@ async function createDefaultPlans() {
 }
 
 // If this script is run directly, perform initialization
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
-if (isMainModule) {
+if (import.meta.url.endsWith('db-init.ts')) {
   initializeDatabase()
     .then(() => {
       console.log('Database initialization completed');
-      pool.end();
+      // Only close pool if executed directly
+      if (process.argv[1]?.endsWith('db-init.ts')) {
+        pool.end();
+      }
     })
     .catch((err) => {
       console.error('Database initialization failed:', err);
-      pool.end();
+      // Only close pool if executed directly
+      if (process.argv[1]?.endsWith('db-init.ts')) {
+        pool.end();
+      }
       process.exit(1);
     });
 }

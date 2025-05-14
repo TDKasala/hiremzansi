@@ -23,12 +23,18 @@ export async function runMigrations() {
 if (import.meta.url.endsWith('migration.ts')) {
   runMigrations()
     .then(() => {
-      console.log('Migration script completed.');
-      pool.end();
+      log('Migration script completed.', 'drizzle');
+      // Only close pool if this file is executed directly via command line
+      if (process.argv[1]?.endsWith('migration.ts')) {
+        pool.end();
+      }
     })
     .catch((err) => {
-      console.error('Migration script failed:', err);
-      pool.end();
+      log(`Migration script failed: ${err}`, 'drizzle');
+      // Only close pool if this file is executed directly via command line
+      if (process.argv[1]?.endsWith('migration.ts')) {
+        pool.end();
+      }
       process.exit(1);
     });
 }
