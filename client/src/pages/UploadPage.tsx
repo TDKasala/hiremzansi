@@ -110,16 +110,16 @@ export default function UploadPage() {
         <meta name="description" content="Upload your CV to get AI-powered analysis and improve your chances of getting past ATS systems used by South African employers." />
       </Helmet>
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto py-5 sm:py-8 max-w-4xl">
         <MotivationalBanner
           location="upload"
           cvCount={cvs?.length || 0}
         />
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2">CV Analysis Tool</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Upload your CV to see how it performs against Applicant Tracking Systems (ATS)
-            used by South African employers. Get tailored recommendations to improve your CV.
+        <header className="mb-5 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">CV Analysis Tool</h1>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
+            Upload your CV to see how it performs against ATS systems
+            used by South African employers.
           </p>
         </header>
         
