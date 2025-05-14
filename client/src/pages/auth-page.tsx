@@ -399,30 +399,57 @@ export default function AuthPage() {
           
           {/* Right side - Hero section */}
           <div className="w-full md:w-1/2 flex flex-col justify-center">
-            <div className="space-y-4">
-              <h1 className="text-3xl font-bold">Optimize your CV for South African employers</h1>
-              <p className="text-muted-foreground">
-                ATSBoost helps job seekers in South Africa navigate the competitive job market by providing
-                AI-powered CV analysis, targeted optimization, and specific recommendations for the South
-                African job market.
-              </p>
-              
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary text-primary-foreground rounded-full flex items-center justify-center w-6 h-6 shrink-0">✓</div>
-                  <p>ATS score with South African market alignment</p>
+            <div className="bg-gradient-to-br from-secondary/90 to-secondary p-8 rounded-2xl shadow-lg text-white">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold leading-tight animate-countup">Optimize your CV for South African employers</h1>
+                  <p className="text-gray-100 animate-countup-delay-1">
+                    ATSBoost helps job seekers in South Africa navigate the competitive job market with AI-powered CV analysis and targeted recommendations.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary text-primary-foreground rounded-full flex items-center justify-center w-6 h-6 shrink-0">✓</div>
-                  <p>B-BBEE and NQF level optimization</p>
+                
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-start gap-3 animate-countup-delay-1">
+                    <div className="bg-white text-secondary rounded-full flex items-center justify-center w-7 h-7 shrink-0 mt-0.5">✓</div>
+                    <div>
+                      <p className="font-medium">ATS score with South African market alignment</p>
+                      <p className="text-sm text-gray-200">Get a score specific to South African recruitment systems</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 animate-countup-delay-1">
+                    <div className="bg-white text-secondary rounded-full flex items-center justify-center w-7 h-7 shrink-0 mt-0.5">✓</div>
+                    <div>
+                      <p className="font-medium">B-BBEE and NQF level optimization</p>
+                      <p className="text-sm text-gray-200">Properly showcase your qualifications in the South African context</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 animate-countup-delay-2">
+                    <div className="bg-white text-secondary rounded-full flex items-center justify-center w-7 h-7 shrink-0 mt-0.5">✓</div>
+                    <div>
+                      <p className="font-medium">Provincial job market targeting</p>
+                      <p className="text-sm text-gray-200">Target your CV to specific provinces and industries</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 animate-countup-delay-2">
+                    <div className="bg-white text-secondary rounded-full flex items-center justify-center w-7 h-7 shrink-0 mt-0.5">✓</div>
+                    <div>
+                      <p className="font-medium">WhatsApp notifications for job matches</p>
+                      <p className="text-sm text-gray-200">Get real-time alerts when your CV matches a new job opening</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary text-primary-foreground rounded-full flex items-center justify-center w-6 h-6 shrink-0">✓</div>
-                  <p>Provincial job market targeting</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="bg-primary text-primary-foreground rounded-full flex items-center justify-center w-6 h-6 shrink-0">✓</div>
-                  <p>WhatsApp notifications for job matches</p>
+                
+                <div className="pt-2 animate-countup-delay-2">
+                  <div className="text-sm bg-white/10 p-3 rounded-lg border border-white/20">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="bg-yellow-300 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded">NEW</div>
+                      <p className="font-medium">Premium Feature</p>
+                    </div>
+                    <p>Our new deep analysis report (R30) provides comprehensive insights on how to boost your job search success by 3x!</p>
+                  </div>
                 </div>
               </div>
             </div>
