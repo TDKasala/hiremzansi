@@ -186,47 +186,13 @@ export default function UploadPage() {
             <TabsContent value="whatsapp">
               <Card>
                 <CardHeader>
-                  <CardTitle>Send via WhatsApp</CardTitle>
+                  <CardTitle>WhatsApp Upload</CardTitle>
                   <CardDescription>
                     Upload your CV through WhatsApp for convenience
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      We'll send instructions to your WhatsApp number on how to upload your CV directly from your phone
-                    </p>
-                    
-                    <div className="flex gap-3">
-                      <Input
-                        placeholder="Enter your WhatsApp number"
-                        value={whatsappNumber}
-                        onChange={(e) => setWhatsappNumber(e.target.value)}
-                        type="tel"
-                      />
-                      <Button 
-                        onClick={handleWhatsappUpload} 
-                        disabled={!whatsappNumber || isWhatsappUploading}
-                        className="whitespace-nowrap"
-                      >
-                        {isWhatsappUploading ? (
-                          <>
-                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="mr-2 h-4 w-4" />
-                            Send Instructions
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    
-                    <p className="text-xs text-muted-foreground">
-                      Example: +27823456789 (include country code)
-                    </p>
-                  </div>
+                  <WhatsAppUpload />
                 </CardContent>
               </Card>
             </TabsContent>

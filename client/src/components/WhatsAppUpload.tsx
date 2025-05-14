@@ -65,7 +65,7 @@ export function WhatsAppUpload() {
         const error = await response.json();
         throw new Error(error.message || 'Failed to send verification code');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: t('Verification Failed'),
         description: error.message || t('Could not send verification code. Please try again.'),
