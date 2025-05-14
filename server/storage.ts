@@ -196,7 +196,7 @@ export class DatabaseStorage implements IStorage {
 
   async getCVsCount(userId: number): Promise<number> {
     const result = await db
-      .select({ count: db.sql`count(*)` })
+      .select({ count: count() })
       .from(cvs)
       .where(eq(cvs.userId, userId));
     return Number(result[0].count);
