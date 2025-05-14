@@ -14,6 +14,8 @@ export const users = pgTable("users", {
   role: text("role").default("user").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   lastLogin: timestamp("last_login"),
+  resetToken: text("reset_token"),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

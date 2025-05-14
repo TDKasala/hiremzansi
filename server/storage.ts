@@ -108,13 +108,12 @@ export class DatabaseStorage implements IStorage {
   
   async getUserByResetToken(token: string): Promise<User | undefined> {
     try {
-      // Since resetToken is not part of our schema, we'll use a direct query
-      // This is a simplified implementation for demo purposes
-      console.log("Looking for user with reset token:", token);
+      // Now that resetToken is part of our schema, we can use it directly
+      const [user] = await db.select()
+        .from(users)
+        .where(eq(users.resetToken, token));
       
-      // In a real implementation, we would execute a direct SQL query or have resetToken as part of the schema
-      // For the demo, we'll simulate this by returning a "not found" result
-      return undefined;
+      return user;
     } catch (error) {
       console.error("Error getting user by reset token:", error);
       return undefined;
