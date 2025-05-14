@@ -35,6 +35,31 @@
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+@keyframes countUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-countup {
+  animation: countUp 1s ease-out forwards;
+}
+
+.animate-countup-delay-1 {
+  animation: countUp 1s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-countup-delay-2 {
+  animation: countUp 1s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 20 14.3% 4.1%;

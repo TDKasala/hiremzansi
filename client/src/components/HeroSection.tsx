@@ -53,7 +53,9 @@ export default function HeroSection() {
             <div className="grid grid-cols-3 gap-4 mb-6">
               {stats.map((stat, index) => (
                 <div key={index} className="bg-white/20 p-3 rounded-lg text-center">
-                  <div className="text-xl md:text-2xl font-bold text-primary">{stat.value}</div>
+                  <div className={`text-xl md:text-2xl font-bold text-primary ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : 'animate-countup-delay-2' : ''}`}>
+                    {stat.value}
+                  </div>
                   <div className="text-xs text-white font-medium">{stat.label}</div>
                 </div>
               ))}
@@ -65,7 +67,7 @@ export default function HeroSection() {
                   {t('home.getFreeAtsScore')}
                 </Button>
               </Link>
-              <Link href="#pricing">
+              <Link href="/pricing">
                 <Button size="lg" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-base md:text-lg">
                   {t('home.viewPremiumFeatures')}
                 </Button>
@@ -145,16 +147,16 @@ export default function HeroSection() {
                     className={`flex items-center justify-center h-12 w-12 rounded-full bg-green-100 text-green-600 font-bold text-lg
                     ${isAnimated ? 'animate-pulse' : ''}`}
                   >
-                    92%
+                    <span className={isAnimated ? 'animate-countup-delay-2' : ''}>92%</span>
                   </div>
                 </div>
                 
                 {/* Little ATS checks */}
-                <div className="mt-2 flex items-center text-xs text-green-600">
+                <div className={`mt-2 flex items-center text-xs text-green-600 ${isAnimated ? 'animate-countup-delay-1' : ''}`}>
                   <CheckCircle className="h-3 w-3 mr-1" />
                   <span>{t('home.bbbeeIncluded')}</span>
                 </div>
-                <div className="mt-1 flex items-center text-xs text-green-600">
+                <div className={`mt-1 flex items-center text-xs text-green-600 ${isAnimated ? 'animate-countup-delay-2' : ''}`}>
                   <CheckCircle className="h-3 w-3 mr-1" />
                   <span>{t('home.nqfSpecified')}</span>
                 </div>
