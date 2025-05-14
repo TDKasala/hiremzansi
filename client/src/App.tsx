@@ -28,6 +28,18 @@ import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
 import NotFound from "@/pages/not-found";
 
+// Import new blog posts
+import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
+import NQFLevelsExplained from "@/pages/blog/NQFLevelsExplained";
+import ATSSurvivalGuide2025 from "@/pages/blog/ATSSurvivalGuide2025";
+import RemoteWorkOpportunitiesSA from "@/pages/blog/RemoteWorkOpportunitiesSA";
+import IndustrySpecificCVTips from "@/pages/blog/IndustrySpecificCVTips";
+import LanguageProficiencyCV from "@/pages/blog/LanguageProficiencyCV";
+import LinkedInOptimizationSAProfessionals from "@/pages/blog/LinkedInOptimizationSAProfessionals";
+import GraduateCVTemplates from "@/pages/blog/GraduateCVTemplates";
+import PersonalBrandingJobSearch from "@/pages/blog/PersonalBrandingJobSearch";
+import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -48,7 +60,23 @@ function App() {
                   <Route path="/auth" component={AuthPage} />
                   <Route path="/realtime-ats" component={RealtimeATSPage} />
                   <Route path="/refer" component={ReferralPage} />
+                  
+                  {/* Original blog post */}
                   <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
+                  
+                  {/* New SEO-optimized blog posts */}
+                  <Route path="/blog/b-bbee-impact-sa-resumes" component={BBBEEImpactSAResumes} />
+                  <Route path="/blog/nqf-levels-explained" component={NQFLevelsExplained} />
+                  <Route path="/blog/ats-survival-guide-2025" component={ATSSurvivalGuide2025} />
+                  <Route path="/blog/remote-work-opportunities-sa" component={RemoteWorkOpportunitiesSA} />
+                  <Route path="/blog/industry-specific-cv-tips" component={IndustrySpecificCVTips} />
+                  <Route path="/blog/language-proficiency-cv" component={LanguageProficiencyCV} />
+                  <Route path="/blog/linkedin-optimization-sa-professionals" component={LinkedInOptimizationSAProfessionals} />
+                  <Route path="/blog/graduate-cv-templates" component={GraduateCVTemplates} />
+                  <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
+                  <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
+                  
+                  {/* Protected routes requiring authentication */}
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />
                   <ProtectedRoute path="/upload" component={UploadPage} />
                   <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
