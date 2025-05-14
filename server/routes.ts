@@ -36,6 +36,14 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   res.status(401).json({ error: "Authentication required" });
 };
 
+// Check if user is an admin
+const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (req.isAuthenticated() && req.user.role === 'admin') {
+    return next();
+  }
+  res.status(403).json({ error: "Admin access required" });
+};
+
 // Check if user has active subscription
 const hasActiveSubscription = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.isAuthenticated()) {
@@ -57,13 +65,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes and middleware
   setupAuth(app);
 
-  // Health check endpoint
-  app.get("/api/health", (_req: Request, res: Response) => {
-    res.json({ 
-      status: "ok",
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV
-    });
+  // Health check endpoint with database verification
+  app.get("/api/health", async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Import the database health check
+      const { checkDatabaseHealth } = await import('./db-utils');
+      
+      // Run a basic health check on all connected services
+      const dbHealth = await checkDatabaseHealth();
+      
+      res.json({ 
+        status: "ok",
+        database: dbHealth ? "connected" : "error",
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   // Get pricing plans
@@ -1221,6 +1240,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json(updatedSubscription);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Admin database management endpoint
+  app.get("/api/admin/database", isAdmin, async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Import the database utilities
+      const { generateSchemaDocs, checkDatabaseHealth } = await import('./db-utils');
+      
+      // Run health check
+      const dbHealth = await checkDatabaseHealth();
+      
+      // Generate schema documentation if database is healthy
+      let schemaFile = null;
+      if (dbHealth) {
+        schemaFile = await generateSchemaDocs();
+      }
+      
+      res.json({
+        status: dbHealth ? "healthy" : "error",
+        message: dbHealth ? "Database is healthy and documentation generated" : "Database health check failed",
+        schemaDocumentation: schemaFile,
+        timestamp: new Date().toISOString()
+      });
     } catch (error) {
       next(error);
     }
