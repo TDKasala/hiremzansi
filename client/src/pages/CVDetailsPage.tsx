@@ -133,6 +133,10 @@ export default function CVDetailsPage() {
       </Helmet>
 
       <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <MotivationalBanner 
+          location="cv-details"
+          cvScore={data.atsScore?.score}
+        />
         <div className="mb-6">
           <Button variant="outline" asChild className="mb-4">
             <Link href="/dashboard" className="flex items-center">

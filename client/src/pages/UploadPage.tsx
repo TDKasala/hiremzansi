@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { MotivationalBanner } from "@/components/MotivationalBanner";
 import { 
   AlertCircle, 
   CheckCircle, 
@@ -109,6 +110,10 @@ export default function UploadPage() {
       </Helmet>
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <MotivationalBanner
+          location="upload"
+          cvCount={cvs?.length || 0}
+        />
         <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2">CV Analysis Tool</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
