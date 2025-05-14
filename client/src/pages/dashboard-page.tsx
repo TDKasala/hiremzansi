@@ -5,6 +5,7 @@ import { useWhatsApp } from "@/hooks/use-whatsapp";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { MotivationalBanner } from "@/components/MotivationalBanner";
 import {
   Card,
   CardContent,
@@ -99,6 +100,10 @@ export default function DashboardPage() {
       </Helmet>
       
       <div className="container max-w-6xl mx-auto px-4 py-8">
+        <MotivationalBanner 
+          location="dashboard"
+          cvCount={userCVs?.length || 0}
+        />
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>

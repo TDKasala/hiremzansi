@@ -30,6 +30,7 @@ import {
   TabsTrigger 
 } from '@/components/ui/tabs';
 import { CVAnalysisButton } from '@/components/CVAnalysisButton';
+import { MotivationalBanner } from '@/components/MotivationalBanner';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
