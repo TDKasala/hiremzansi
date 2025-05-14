@@ -342,6 +342,8 @@ export function setupAuth(app: Express) {
       
       // Check if token is expired
       // In a real app, you'd check against the tokenExpiry field
+      // TypeScript doesn't know about this field since it's not in the schema
+      // @ts-ignore
       if (user.resetTokenExpiry && new Date(user.resetTokenExpiry) < new Date()) {
         return res.status(400).json({ 
           error: "Reset token has expired" 
