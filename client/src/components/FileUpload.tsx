@@ -80,7 +80,14 @@ export default function FileUpload({
         });
       }, 500);
 
-      const res = await apiRequest("POST", "/api/upload", formData);
+      // We can't use apiRequest directly for file uploads because it sets JSON content-type
+      // Let's use fetch directly
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - browser will set it with the correct boundary for multipart/form-data
+        credentials: 'same-origin'
+      });
 
       if (progressInterval) {
         clearInterval(progressInterval);

@@ -100,7 +100,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // File upload and analysis endpoint
   app.post("/api/upload", isAuthenticated, upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("Upload request received", { 
+        body: Object.keys(req.body),
+        file: req.file ? "File present" : "No file",
+        fileSize: req.file?.size
+      });
+      
       if (!req.file) {
+        console.error("No file in request");
         return res.status(400).json({ error: "No file uploaded" });
       }
 
