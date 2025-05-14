@@ -34,6 +34,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   
@@ -103,6 +104,19 @@ export class DatabaseStorage implements IStorage {
   async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
+  }
+  
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    try {
+      // Using SQL.raw for resetToken which is not part of the schema definition
+      const [user] = await db.select()
+        .from(users)
+        .where(sql`reset_token = ${token}`);
+      return user;
+    } catch (error) {
+      console.error("Error getting user by reset token:", error);
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {

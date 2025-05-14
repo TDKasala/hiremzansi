@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Helmet } from "react-helmet";
+import { useToast } from "@/hooks/use-toast";
 
 // Login form schema
 const loginSchema = z.object({
@@ -43,6 +44,8 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("login");
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [isSubmittingReset, setIsSubmittingReset] = useState(false);
+  const { toast } = useToast();
   
   // Create form for login
   const loginForm = useForm<LoginFormValues>({
@@ -73,6 +76,47 @@ export default function AuthPage() {
   // Handle registration form submission
   function onRegisterSubmit(values: RegisterFormValues) {
     registerMutation.mutate(values);
+  }
+  
+  // Create form for forgot password
+  const forgotPasswordForm = useForm<ForgotPasswordValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: ""
+    },
+  });
+  
+  // Handle forgot password form submission
+  async function onForgotPasswordSubmit(values: ForgotPasswordValues) {
+    setIsSubmittingReset(true);
+    try {
+      const response = await fetch('/api/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send reset email');
+      }
+      
+      setResetEmailSent(true);
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Please check your email for instructions to reset your password.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to Send Reset Email",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingReset(false);
+    }
   }
   
   // If the user is already logged in, redirect to dashboard
@@ -163,6 +207,84 @@ export default function AuthPage() {
                         </Button>
                       </form>
                     </Form>
+                  </CardContent>
+                </TabsContent>
+                
+                {/* Forgot Password Form */}
+                <TabsContent value="forgot-password">
+                  <CardHeader>
+                    <CardTitle>Reset Your Password</CardTitle>
+                    <CardDescription>
+                      Enter your email address and we'll send you instructions to reset your password
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {resetEmailSent ? (
+                      <div className="space-y-4 text-center">
+                        <div className="rounded-full bg-green-100 text-green-800 p-2 w-12 h-12 mx-auto flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-medium">Email Sent!</h3>
+                        <p className="text-muted-foreground">
+                          Check your email for a link to reset your password. If it doesn't appear within a few minutes, check your spam folder.
+                        </p>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="mt-4"
+                          onClick={() => {
+                            setResetEmailSent(false);
+                            setActiveTab("login");
+                          }}
+                        >
+                          Return to Login
+                        </Button>
+                      </div>
+                    ) : (
+                      <Form {...forgotPasswordForm}>
+                        <form onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)} className="space-y-4">
+                          <FormField
+                            control={forgotPasswordForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                  <Input type="email" placeholder="your.email@example.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <Button 
+                            type="submit" 
+                            className="w-full"
+                            disabled={isSubmittingReset}
+                          >
+                            {isSubmittingReset ? (
+                              <>
+                                <span className="mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                                Sending Reset Link...
+                              </>
+                            ) : "Send Reset Link"}
+                          </Button>
+                          
+                          <div className="text-center">
+                            <Button
+                              type="button"
+                              variant="link"
+                              onClick={() => setActiveTab("login")}
+                              className="text-xs"
+                            >
+                              Remember your password? Login
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    )}
                   </CardContent>
                 </TabsContent>
                 

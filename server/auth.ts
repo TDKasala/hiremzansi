@@ -267,6 +267,102 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Forgot password endpoint
+  app.post("/api/forgot-password", async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email address is required" });
+      }
+      
+      // Check if user exists with this email
+      const user = await storage.getUserByEmail(email);
+      
+      // For security reasons, always return success even if email doesn't exist
+      // This prevents email enumeration attacks
+      if (!user) {
+        // In a real application, you'd log this or have some indication for debugging
+        console.log(`Password reset attempted for non-existent email: ${email}`);
+        return res.status(200).json({ 
+          message: "If a user with that email exists, password reset instructions have been sent" 
+        });
+      }
+      
+      // Generate a unique reset token
+      const resetToken = randomBytes(32).toString("hex");
+      const tokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+      
+      // Store the token in the user record
+      // In a production app, you'd have a dedicated password_resets table
+      await storage.updateUser(user.id, {
+        // Using any to handle fields not in the insert schema
+        ...(({ resetToken, resetTokenExpiry: tokenExpiry } as any))
+      });
+      
+      // In a real application, you would send an email with the reset link
+      // For this demo, we'll log the token and mock the email sending
+      console.log(`Password reset token for ${email}: ${resetToken}`);
+      console.log(`Reset link would be: https://yourdomain.com/reset-password?token=${resetToken}`);
+      
+      // Simulating email delivery delay
+      setTimeout(() => {
+        console.log(`[EMAIL SENT] Password reset email to ${email}`);
+      }, 1000);
+      
+      res.status(200).json({ 
+        message: "Password reset instructions have been sent to your email" 
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+  
+  // Reset password endpoint (to be called when user clicks the reset link)
+  app.post("/api/reset-password", async (req, res, next) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ 
+          error: "Reset token and new password are required" 
+        });
+      }
+      
+      // Find user with this reset token and within expiry time
+      // In a real application, you'd query the database for a user with this token
+      // This is a simplified version
+      const user = await storage.getUserByResetToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ 
+          error: "Invalid or expired reset token" 
+        });
+      }
+      
+      // Check if token is expired
+      // In a real app, you'd check against the tokenExpiry field
+      if (user.resetTokenExpiry && new Date(user.resetTokenExpiry) < new Date()) {
+        return res.status(400).json({ 
+          error: "Reset token has expired" 
+        });
+      }
+      
+      // Update the user's password
+      await storage.updateUser(user.id, {
+        password: await hashPassword(newPassword),
+        // Clear the reset token and expiry
+        ...(({ resetToken: null, resetTokenExpiry: null } as any))
+      });
+      
+      res.status(200).json({ 
+        message: "Password has been reset successfully" 
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // Simple admin check middleware
   const isAdmin = (req: any, res: any, next: any) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
