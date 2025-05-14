@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
+import { MotivationProvider } from "@/hooks/use-motivation";
 import { ProtectedRoute } from "@/lib/protected-route";
 
 import Layout from "@/components/Layout";
@@ -33,29 +34,31 @@ function App() {
       <ThemeProvider attribute="class">
         <TooltipProvider>
           <AuthProvider>
-            <Layout>
-              <Switch>
-                <Route path="/" component={HomePage} />
-                <Route path="/how-it-works" component={HowItWorksPage} />
-                <Route path="/pricing" component={PricingPage} />
-                <Route path="/blog" component={BlogPage} />
-                <Route path="/about" component={AboutPage} />
-                <Route path="/privacy" component={PrivacyPage} />
-                <Route path="/terms" component={TermsPage} />
-                <Route path="/contact" component={ContactPage} />
-                <Route path="/auth" component={AuthPage} />
-                <Route path="/realtime-ats" component={RealtimeATSPage} />
-                <Route path="/refer" component={ReferralPage} />
-                <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
-                <ProtectedRoute path="/dashboard" component={DashboardPage} />
-                <ProtectedRoute path="/upload" component={UploadPage} />
-                <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
-                <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
-                <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-                <Route component={NotFound} />
-              </Switch>
-            </Layout>
-            <Toaster />
+            <MotivationProvider>
+              <Layout>
+                <Switch>
+                  <Route path="/" component={HomePage} />
+                  <Route path="/how-it-works" component={HowItWorksPage} />
+                  <Route path="/pricing" component={PricingPage} />
+                  <Route path="/blog" component={BlogPage} />
+                  <Route path="/about" component={AboutPage} />
+                  <Route path="/privacy" component={PrivacyPage} />
+                  <Route path="/terms" component={TermsPage} />
+                  <Route path="/contact" component={ContactPage} />
+                  <Route path="/auth" component={AuthPage} />
+                  <Route path="/realtime-ats" component={RealtimeATSPage} />
+                  <Route path="/refer" component={ReferralPage} />
+                  <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
+                  <ProtectedRoute path="/dashboard" component={DashboardPage} />
+                  <ProtectedRoute path="/upload" component={UploadPage} />
+                  <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
+                  <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
+                  <ProtectedRoute path="/subscription" component={SubscriptionPage} />
+                  <Route component={NotFound} />
+                </Switch>
+                <Toaster />
+              </Layout>
+            </MotivationProvider>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

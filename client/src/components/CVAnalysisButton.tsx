@@ -44,7 +44,9 @@ export function CVAnalysisButton({
       }
       
       // If not scan limited, process the response normally
-      const responseData = result.response ? await result.response.json() : result.data;
+      // TypeScript trick: we know at this point that result is the non-scan-limited response
+      const nonLimitedResult = result as { scanLimitReached: false; response: Response };
+      const responseData = await nonLimitedResult.response.json();
       
       toast({
         title: t('Analysis Started'),

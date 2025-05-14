@@ -47,20 +47,25 @@ export function useScanLimits() {
     setIsLimitModalOpen(false);
   };
 
-  const handleAPIResponse = (response: Response) => {
+  type APIResponseResult = 
+    | { scanLimitReached: true; data: any }
+    | { scanLimitReached: false; response: Response };
+
+  const handleAPIResponse = async (response: Response): Promise<APIResponseResult> => {
     // Check if the response status indicates a scan limit issue (402 Payment Required)
     if (response.status === 402) {
-      return response.json().then(data => {
-        if (data.scanLimitReached) {
-          // Open scan limit modal with data from the API
-          openLimitModal(
-            data.scanInfo || { scansUsed: 0, scanLimit: 0 },
-            data.subscriptionOptions || undefined
-          );
-          return { scanLimitReached: true, data };
-        }
-        return { scanLimitReached: false, data };
-      });
+      const data = await response.json();
+      
+      if (data.scanLimitReached) {
+        // Open scan limit modal with data from the API
+        openLimitModal(
+          data.scanInfo || { scansUsed: 0, scanLimit: 0 },
+          data.subscriptionOptions || undefined
+        );
+        return { scanLimitReached: true, data };
+      }
+      
+      return { scanLimitReached: false, response };
     }
     
     // For other responses, just return the response for normal processing
