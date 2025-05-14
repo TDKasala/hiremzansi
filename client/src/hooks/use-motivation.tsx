@@ -11,6 +11,7 @@ interface MotivationState {
   seenMotivations: Record<string, boolean>;
   activityStreak: number;
   lastActivityDate: string | null;
+  activeAchievement: string | null;
 }
 
 interface MotivationContextType {
@@ -18,6 +19,8 @@ interface MotivationContextType {
   triggerMotivation: (type: MotivationType, trigger?: string | number) => void;
   dismissMotivation: (type: MotivationType, trigger?: string | number) => void;
   shouldShowMotivation: (type: MotivationType, trigger?: string | number) => boolean;
+  triggerAchievement: (achievementId: string) => void;
+  dismissAchievement: () => void;
 }
 
 // Create the context
@@ -30,6 +33,7 @@ const initialState: MotivationState = {
   seenMotivations: {},
   activityStreak: 0,
   lastActivityDate: null,
+  activeAchievement: null,
 };
 
 // Key for local storage
