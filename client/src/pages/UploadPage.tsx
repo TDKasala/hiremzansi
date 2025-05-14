@@ -34,6 +34,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Link, useLocation } from "wouter";
 import FileUpload from "@/components/FileUpload";
+import { WhatsAppUpload } from "@/components/WhatsAppUpload";
 import { CV, ATSScore } from "@shared/schema";
 
 export default function UploadPage() {

@@ -203,7 +203,9 @@ export function MotivationProvider({ children }: { children: ReactNode }) {
         motivationState,
         triggerMotivation,
         dismissMotivation,
-        shouldShowMotivation
+        shouldShowMotivation,
+        triggerAchievement,
+        dismissAchievement
       }}
     >
       {children}
