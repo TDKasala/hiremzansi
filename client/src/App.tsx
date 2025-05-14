@@ -31,7 +31,7 @@ import NotFound from "@/pages/not-found";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class">
+      <ThemeProvider attribute="class" defaultTheme="light">
         <TooltipProvider>
           <AuthProvider>
             <MotivationProvider>

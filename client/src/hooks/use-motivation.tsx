@@ -180,6 +180,22 @@ export function MotivationProvider({ children }: { children: ReactNode }) {
     // For other types, check if this specific motivation has been seen
     return !motivationState.seenMotivations[motivationKey];
   };
+  
+  // Function to trigger an achievement popup
+  const triggerAchievement = (achievementId: string) => {
+    setMotivationState(prev => ({
+      ...prev,
+      activeAchievement: achievementId
+    }));
+  };
+  
+  // Function to dismiss the achievement popup
+  const dismissAchievement = () => {
+    setMotivationState(prev => ({
+      ...prev,
+      activeAchievement: null
+    }));
+  };
 
   return (
     <MotivationContext.Provider
