@@ -1189,7 +1189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscription: subscription,
         details: {
           planName: plan.name,
-          price: `ZAR ${plan.priceInCents / 100}`,
+          price: `ZAR ${plan.price}`,
           status: 'active',
           startDate: now.toISOString(),
           endDate: endDate.toISOString(),
@@ -1407,7 +1407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: employer.id,
           companyName: employer.companyName,
           industry: employer.industry,
-          verified: employer.verified
+          isVerified: employer.isVerified
         } : null
       });
     } catch (error) {

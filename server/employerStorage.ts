@@ -84,7 +84,7 @@ export async function getJobPostings(query?: {
   title?: string;
   location?: string;
   industry?: string;
-  jobType?: string;
+  employmentType?: string;
   limit?: number;
 }): Promise<JobPosting[]> {
   let baseQuery = db.select().from(jobPostings);
@@ -97,8 +97,11 @@ export async function getJobPostings(query?: {
     if (query.location) {
       baseQuery = baseQuery.where(eq(jobPostings.location, query.location));
     }
-    if (query.jobType) {
-      baseQuery = baseQuery.where(eq(jobPostings.jobType, query.jobType));
+    if (query.employmentType) {
+      baseQuery = baseQuery.where(eq(jobPostings.employmentType, query.employmentType));
+    }
+    if (query.industry) {
+      baseQuery = baseQuery.where(eq(jobPostings.industry, query.industry));
     }
     if (query.limit) {
       baseQuery = baseQuery.limit(query.limit);
@@ -153,7 +156,7 @@ export async function getJobMatchesForJob(jobId: number): Promise<JobMatch[]> {
     .select()
     .from(jobMatches)
     .where(eq(jobMatches.jobId, jobId))
-    .orderBy(desc(jobMatches.score));
+    .orderBy(desc(jobMatches.matchScore));
   return result;
 }
 
@@ -162,7 +165,7 @@ export async function getJobMatchesForCV(cvId: number): Promise<JobMatch[]> {
     .select()
     .from(jobMatches)
     .where(eq(jobMatches.cvId, cvId))
-    .orderBy(desc(jobMatches.score));
+    .orderBy(desc(jobMatches.matchScore));
   return result;
 }
 
