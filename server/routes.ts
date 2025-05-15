@@ -10,6 +10,9 @@ import { insertUserSchema, insertCvSchema, insertAtsScoreSchema, insertDeepAnaly
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
+import { jobBoardService } from "./services/jobBoardService";
+import { interviewSimulationService } from "./services/interviewSimulationService";
+import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 
 // File upload configuration
 const upload = multer({
@@ -1789,15 +1792,183 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Skill name, current level, and target level are required" });
       }
       
-      const { getLearningResources } = await import('./services/skillGapAnalyzerService');
-      
-      const resources = await getLearningResources(
+      const resources = await skillGapAnalyzerService.findLearningResources(
         skillName.toString(),
-        currentLevel.toString() as any,
-        targetLevel.toString() as any
+        currentLevel.toString(),
+        targetLevel.toString()
       );
       
       res.json(resources);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // JOB SEARCH API ENDPOINTS
+  
+  // Search for jobs
+  app.get("/api/job-search", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const params = {
+        keywords: req.query.keywords as string,
+        location: req.query.location as string,
+        industry: req.query.industry as string,
+        jobType: req.query.jobType as string,
+        experienceLevel: req.query.experienceLevel as string,
+        page: req.query.page ? parseInt(req.query.page as string) : 1,
+        pageSize: req.query.pageSize ? parseInt(req.query.pageSize as string) : 10,
+        sortBy: req.query.sortBy as string,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc'
+      };
+      
+      const results = await jobBoardService.searchJobs(params);
+      
+      res.json(results);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get job details
+  app.get("/api/job-details/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = req.params.id;
+      
+      if (!jobId) {
+        return res.status(400).json({ error: "Job ID is required" });
+      }
+      
+      const job = await jobBoardService.getJobById(jobId);
+      
+      if (!job) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+      
+      // Enhance the job posting with AI
+      const enhancedJob = await jobBoardService.enhanceJobPosting(job);
+      
+      res.json(enhancedJob);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // INTERVIEW SIMULATION API ENDPOINTS
+  
+  // Create a new interview session
+  app.post("/api/interview/create-session", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { jobDescription, cvContent, jobTitle, type, questionCount, difficulty } = req.body;
+      
+      if (!jobDescription || !cvContent) {
+        return res.status(400).json({ error: "Job description and CV content are required" });
+      }
+      
+      const session = await interviewSimulationService.createSession(
+        req.user!.id,
+        {
+          jobTitle,
+          jobDescription,
+          cvContent,
+          type,
+          questionCount: questionCount ? parseInt(questionCount) : undefined,
+          difficulty
+        }
+      );
+      
+      res.json(session);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Submit an answer to a question
+  app.post("/api/interview/answer-question", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { session, questionId, answer } = req.body;
+      
+      if (!session || !questionId || !answer) {
+        return res.status(400).json({ error: "Session, question ID, and answer are required" });
+      }
+      
+      // Validate that the session belongs to the user
+      if (session.userId !== req.user!.id) {
+        return res.status(403).json({ error: "You don't have permission to access this session" });
+      }
+      
+      const updatedSession = await interviewSimulationService.submitAnswer(
+        session,
+        questionId,
+        answer
+      );
+      
+      res.json(updatedSession);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Complete an interview session
+  app.post("/api/interview/complete-session", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { session } = req.body;
+      
+      if (!session) {
+        return res.status(400).json({ error: "Session is required" });
+      }
+      
+      // Validate that the session belongs to the user
+      if (session.userId !== req.user!.id) {
+        return res.status(403).json({ error: "You don't have permission to access this session" });
+      }
+      
+      const completedSession = await interviewSimulationService.completeSession(session);
+      
+      res.json(completedSession);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // SKILL GAP ANALYZER API ENDPOINTS
+  
+  // Extract skills from CV
+  app.post("/api/skills/extract-from-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { cvContent } = req.body;
+      
+      if (!cvContent) {
+        return res.status(400).json({ error: "CV content is required" });
+      }
+      
+      const skills = await skillGapAnalyzerService.extractSkillsFromCV(cvContent);
+      
+      res.json(skills);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Analyze skill gaps
+  app.post("/api/skills/analyze-gaps", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { currentSkills, targetRole, targetIndustry, cvContent } = req.body;
+      
+      if (!currentSkills || !targetRole) {
+        return res.status(400).json({ error: "Current skills and target role are required" });
+      }
+      
+      const analysis = await skillGapAnalyzerService.createAnalysis(
+        req.user!.id,
+        {
+          currentSkills,
+          targetRole,
+          targetIndustry,
+          cvContent
+        }
+      );
+      
+      res.json(analysis);
     } catch (error) {
       next(error);
     }

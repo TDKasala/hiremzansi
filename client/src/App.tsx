@@ -32,6 +32,11 @@ import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
 import NotFound from "@/pages/not-found";
 
+// Import job search pages
+import JobsPage from "@/pages/JobsPage";
+import JobDetailsPage from "@/pages/JobDetailsPage";
+import InterviewPracticePage from "@/pages/InterviewPracticePage";
+
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
 import CVTemplatesPage from "@/pages/tools/CVTemplatesPage";
@@ -90,6 +95,12 @@ function App() {
                   {/* Tool pages */}
                   <Route path="/tools/cover-letter" component={CoverLetterPage} />
                   <Route path="/tools/cv-templates" component={CVTemplatesPage} />
+                  
+                  {/* Job search and career advancement pages */}
+                  <Route path="/jobs" component={JobsPage} />
+                  <Route path="/job/:id" component={JobDetailsPage} />
+                  <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
+                  <ProtectedRoute path="/skills/analyze" component={PremiumToolsPage} />
                   
                   {/* Protected routes requiring authentication */}
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />
