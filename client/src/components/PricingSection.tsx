@@ -50,7 +50,7 @@ export default function PricingSection() {
       ],
       buttonText: "Purchase Analysis",
       buttonLink: "/signup",
-      highlighted: true,
+      buttonVariant: "outline",
     },
     {
       name: "Premium",
@@ -66,7 +66,7 @@ export default function PricingSection() {
       ],
       buttonText: "Subscribe",
       buttonLink: "/signup",
-      buttonVariant: "secondary",
+      highlighted: true,
     },
   ];
 
@@ -121,11 +121,11 @@ export default function PricingSection() {
                 <Link href={plan.buttonLink}>
                   <Button 
                     className={`w-full ${
-                      plan.buttonVariant === "outline" 
+                      plan.highlighted
+                        ? "bg-primary text-white hover:bg-opacity-90 font-semibold"
+                        : plan.buttonVariant === "outline" 
                         ? "bg-neutral-200 text-neutral-700 hover:bg-neutral-300"
-                        : plan.buttonVariant === "secondary"
-                        ? "bg-secondary text-white hover:bg-opacity-90"
-                        : "bg-primary text-white hover:bg-opacity-90"
+                        : "bg-secondary text-white hover:bg-opacity-90"
                     }`}
                   >
                     {plan.buttonText}
