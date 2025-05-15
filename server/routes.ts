@@ -1277,7 +1277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: employer.id,
         companyName: employer.companyName,
         industry: employer.industry,
-        verified: employer.verified
+        isVerified: employer.isVerified
       });
     } catch (error) {
       next(error);
@@ -1305,12 +1305,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: employer.id,
         companyName: employer.companyName,
         industry: employer.industry,
-        size: employer.size,
-        location: employer.location,
+        companySize: employer.companySize,
         description: employer.description,
-        websiteUrl: employer.websiteUrl,
-        bbbeeLevel: employer.bbbeeLevel,
-        verified: employer.verified
+        website: employer.website,
+        isVerified: employer.isVerified
       });
     } catch (error) {
       next(error);
