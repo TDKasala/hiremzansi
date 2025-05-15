@@ -8,8 +8,11 @@
  */
 
 import { checkDatabaseHealth } from '../db-utils';
-import { pool, executeWithRetry } from '../db-pool';
+import { getPool, executeWithRetry } from '../db-pool';
 import { log } from '../vite';
+
+// Get the database pool
+const pool = getPool();
 
 async function monitorDatabase() {
   console.log('===== ATSBoost Database Monitor =====');
@@ -52,7 +55,7 @@ async function monitorDatabase() {
     
     const slowQueriesResult = await executeWithRetry(() => pool.query(slowQueriesQuery));
     
-    if (slowQueriesResult.rows.length === 0) {
+    if (!slowQueriesResult.rows || slowQueriesResult.rows.length === 0) {
       console.log('No slow queries currently running.');
     } else {
       console.log('Top 5 longest running queries:');
@@ -73,7 +76,11 @@ async function monitorDatabase() {
     `;
     
     const sizeResult = await executeWithRetry(() => pool.query(sizeQuery));
-    console.log(`Database size: ${sizeResult.rows[0].size}`);
+    if (sizeResult.rows && sizeResult.rows.length > 0 && 'size' in sizeResult.rows[0]) {
+      console.log(`Database size: ${sizeResult.rows[0].size}`);
+    } else {
+      console.log('Database size information not available');
+    }
     
     // Table size information
     console.log('\n----- Table Sizes -----');
@@ -92,8 +99,19 @@ async function monitorDatabase() {
     console.log('Top 10 tables by size:');
     console.log('| Table Name | Total Size | Table Size | Index Size |');
     console.log('|------------|------------|------------|------------|');
-    for (const table of tableSizeResult.rows) {
-      console.log(`| ${table.table_name.padEnd(10)} | ${table.total_size.padEnd(10)} | ${table.table_size.padEnd(10)} | ${table.index_size.padEnd(10)} |`);
+    
+    if (tableSizeResult.rows && tableSizeResult.rows.length > 0) {
+      for (const table of tableSizeResult.rows) {
+        // Safely access properties with type checking
+        const tableName = typeof table.table_name === 'string' ? table.table_name : 'unknown';
+        const totalSize = typeof table.total_size === 'string' ? table.total_size : 'unknown';
+        const tableSize = typeof table.table_size === 'string' ? table.table_size : 'unknown';
+        const indexSize = typeof table.index_size === 'string' ? table.index_size : 'unknown';
+        
+        console.log(`| ${tableName.padEnd(10)} | ${totalSize.padEnd(10)} | ${tableSize.padEnd(10)} | ${indexSize.padEnd(10)} |`);
+      }
+    } else {
+      console.log('| No table information available |');
     }
 
     // Connection information
