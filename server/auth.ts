@@ -6,6 +6,12 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { 
+  sendPasswordResetEmail, 
+  sendVerificationEmail,
+  sendWelcomeEmail,
+  isEmailServiceEnabled 
+} from "./services/emailService";
 
 declare global {
   namespace Express {
