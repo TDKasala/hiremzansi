@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MotivationalBanner } from "@/components/MotivationalBanner";
+import { ConsentDialog } from "@/components/ConsentDialog";
 import { 
   AlertCircle, 
   CheckCircle, 
@@ -88,6 +89,17 @@ export default function UploadPage() {
     }
     
     setAnalysisResult(result);
+    
+    // Show a dialog for consent to use the data
+    if (window.confirm(
+      "Thank you for uploading your CV. We've analyzed it and found some insights!\n\n" +
+      "By continuing, you confirm that you consent to our use of your CV data for analysis purposes. " +
+      "We'll redirect you to the detailed analysis page now.\n\n" +
+      "Click OK to view your CV analysis results."
+    )) {
+      // Redirect to the CV details page
+      navigate(`/cv/${data.cv.id}`);
+    }
   };
   
   const handleWhatsappUpload = async () => {

@@ -112,12 +112,9 @@ export default function FileUpload({
       if (onUploadComplete) {
         onUploadComplete(data);
       }
-
-      // Reset state after successful upload
-      setTimeout(() => {
-        setSelectedFile(null);
-        setProgress(0);
-      }, 1500);
+      
+      // Don't reset the state yet, as we'll be redirecting to the analysis page
+      // The state will be reset naturally when the component unmounts
     } catch (err: any) {
       if (progressInterval) {
         clearInterval(progressInterval);
