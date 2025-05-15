@@ -47,6 +47,10 @@ export default function UploadPage() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isWhatsappUploading, setIsWhatsappUploading] = useState(false);
   const [referralCode, setReferralCode] = useState("");
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
+  const [uploadedScore, setUploadedScore] = useState<number>(0);
+  
   // Define guest analysis interface
   interface GuestAnalysis {
     limitedStrengths?: string[];
@@ -90,16 +94,24 @@ export default function UploadPage() {
     
     setAnalysisResult(result);
     
-    // Show a dialog for consent to use the data
-    if (window.confirm(
-      "Thank you for uploading your CV. We've analyzed it and found some insights!\n\n" +
-      "By continuing, you confirm that you consent to our use of your CV data for analysis purposes. " +
-      "We'll redirect you to the detailed analysis page now.\n\n" +
-      "Click OK to view your CV analysis results."
-    )) {
-      // Redirect to the CV details page
-      navigate(`/cv/${data.cv.id}`);
+    // Show the consent dialog with CV ID and score
+    setUploadedCvId(data.cv.id);
+    setUploadedScore(data.score);
+    setShowConsentDialog(true);
+  };
+  
+  // Handle consent dialog confirm action
+  const handleConsentConfirm = () => {
+    if (uploadedCvId) {
+      // Close the dialog and redirect to the analysis page
+      setShowConsentDialog(false);
+      navigate(`/cv/${uploadedCvId}`);
     }
+  };
+  
+  // Handle consent dialog close action
+  const handleConsentClose = () => {
+    setShowConsentDialog(false);
   };
   
   const handleWhatsappUpload = async () => {
@@ -126,6 +138,15 @@ export default function UploadPage() {
 
   return (
     <>
+      {/* Consent Dialog */}
+      <ConsentDialog 
+        isOpen={showConsentDialog}
+        onClose={handleConsentClose}
+        onConfirm={handleConsentConfirm}
+        cvId={uploadedCvId || 0}
+        score={uploadedScore}
+      />
+      
       <Helmet>
         <title>Upload and Analyze Your CV | ATSBoost</title>
         <meta name="description" content="Upload your CV to get AI-powered analysis and improve your chances of getting past ATS systems used by South African employers." />
