@@ -52,7 +52,7 @@ export default function HeroSection() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {stats.map((stat, index) => (
                 <div key={index} className="bg-white/10 p-3 rounded-lg text-center">
-                  <div className={`text-2xl md:text-3xl font-bold text-blue-600 ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
+                  <div className={`text-2xl md:text-3xl font-bold text-[#FFCA28] ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
                     {stat.value}
                   </div>
                   <div className="text-xs text-white font-medium">{stat.label}</div>
