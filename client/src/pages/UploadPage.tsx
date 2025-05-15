@@ -271,19 +271,71 @@ export default function UploadPage() {
                     </div>
                     
                     <div className="mt-6">
-                      <Alert variant="default">
-                        <Info className="h-4 w-4" />
-                        <AlertTitle>Next Steps</AlertTitle>
-                        <AlertDescription>
-                          View detailed analysis and South African specific recommendations for your CV.
-                        </AlertDescription>
-                      </Alert>
-                      
-                      <div className="mt-4 flex justify-center">
-                        <Button onClick={() => navigate(`/cv/${analysisResult.cv.id}`)}>
-                          View Full Analysis
-                        </Button>
-                      </div>
+                      {analysisResult.isGuest ? (
+                        <>
+                          <Alert variant="default" className="mb-4 bg-primary/10 border-primary/20">
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Guest Analysis</AlertTitle>
+                            <AlertDescription>
+                              <div className="space-y-3 pt-2">
+                                {analysisResult.guestAnalysis?.limitedStrengths?.length > 0 && (
+                                  <div>
+                                    <h4 className="font-medium text-sm flex items-center">
+                                      <CheckCircle className="h-4 w-4 text-green-500 mr-1.5" />
+                                      Strengths:
+                                    </h4>
+                                    <ul className="mt-1 pl-6 text-sm list-disc">
+                                      {analysisResult.guestAnalysis.limitedStrengths.map((strength, i) => (
+                                        <li key={i}>{strength}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                
+                                {analysisResult.guestAnalysis?.limitedImprovements?.length > 0 && (
+                                  <div>
+                                    <h4 className="font-medium text-sm flex items-center">
+                                      <AlertTriangle className="h-4 w-4 text-yellow-500 mr-1.5" />
+                                      Improvement Area:
+                                    </h4>
+                                    <ul className="mt-1 pl-6 text-sm list-disc">
+                                      {analysisResult.guestAnalysis.limitedImprovements.map((improvement, i) => (
+                                        <li key={i}>{improvement}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                
+                                <div className="pt-2">
+                                  <p className="text-sm text-muted-foreground">{analysisResult.guestAnalysis?.upgradeSuggestion}</p>
+                                </div>
+                              </div>
+                            </AlertDescription>
+                          </Alert>
+                          
+                          <div className="flex justify-center">
+                            <Button asChild>
+                              <Link href="/auth">Create Free Account</Link>
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <Alert variant="default">
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Next Steps</AlertTitle>
+                            <AlertDescription>
+                              View detailed analysis and South African specific recommendations for your CV.
+                            </AlertDescription>
+                          </Alert>
+                          
+                          <div className="mt-4 flex justify-center">
+                            <Button onClick={() => navigate(`/cv/${analysisResult.cv.id}`)}>
+                              View Full Analysis
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

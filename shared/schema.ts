@@ -80,7 +80,7 @@ export const insertSaProfileSchema = createInsertSchema(saProfiles).pick({
 // CV schema
 export const cvs = pgTable("cvs", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").references(() => users.id), // Made nullable for guest uploads
   fileName: text("file_name").notNull(),
   fileType: text("file_type").notNull(),
   fileSize: integer("file_size").notNull(),
@@ -91,6 +91,7 @@ export const cvs = pgTable("cvs", {
   targetPosition: text("target_position"),
   targetIndustry: text("target_industry"),
   jobDescription: text("job_description"),
+  isGuest: boolean("is_guest").default(false), // Flag for guest uploads
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -115,6 +116,7 @@ export const insertCvSchema = createInsertSchema(cvs).pick({
   targetPosition: true,
   targetIndustry: true,
   jobDescription: true,
+  isGuest: true,
 });
 
 // ATS Score schema with enhanced South African context
