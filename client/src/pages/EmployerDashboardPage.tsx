@@ -352,7 +352,7 @@ export default function EmployerDashboardPage() {
                               {job.employmentType}
                             </Badge>
                           )}
-                          <Badge variant={job.isActive ? "success" : "outline"} className="font-normal">
+                          <Badge variant={job.isActive ? "default" : "outline"} className={`font-normal ${job.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}`}>
                             {job.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
@@ -439,7 +439,7 @@ export default function EmployerDashboardPage() {
                               {job.employmentType}
                             </Badge>
                           )}
-                          <Badge variant={job.isActive ? "success" : "outline"} className="font-normal">
+                          <Badge variant={job.isActive ? "default" : "outline"} className={`font-normal ${job.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}`}>
                             {job.isActive ? "Active" : "Inactive"}
                           </Badge>
                         </div>
