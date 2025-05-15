@@ -1,33 +1,169 @@
 import { db, pool } from './db';
 import { users, plans } from '@shared/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+
+/**
+ * Database initialization options
+ */
+interface InitOptions {
+  skipAdminUser?: boolean;     // Skip creating admin user
+  skipPlans?: boolean;         // Skip creating default plans
+  retryOnFailure?: boolean;    // Retry initialization if it fails
+  maxRetries?: number;         // Maximum number of retries
+}
+
+// Default initialization options
+const DEFAULT_INIT_OPTIONS: InitOptions = {
+  skipAdminUser: false,
+  skipPlans: false,
+  retryOnFailure: true,
+  maxRetries: 3
+};
 
 /**
  * Initializes the database with essential data if not already present.
  * This ensures that when the application starts in production, the database
  * will have the necessary data to function properly.
+ * 
+ * @param options Initialization options
+ * @returns Promise resolving to true if initialization succeeded, false otherwise
  */
-export async function initializeDatabase() {
+export async function initializeDatabase(options?: InitOptions): Promise<boolean> {
+  const opts = { ...DEFAULT_INIT_OPTIONS, ...options };
   console.log('Initializing database...');
   
+  let attempt = 0;
+  let lastError: Error | null = null;
+  
+  // Retry loop for database initialization
+  while (attempt <= opts.maxRetries!) {
+    if (attempt > 0) {
+      console.log(`Retrying database initialization (attempt ${attempt}/${opts.maxRetries})...`);
+      // Wait before retrying with exponential backoff
+      await new Promise(resolve => setTimeout(resolve, Math.min(100 * Math.pow(2, attempt), 3000)));
+    }
+    
+    attempt++;
+    
+    try {
+      // Verify basic database connectivity first
+      try {
+        await pool.query('SELECT 1');
+      } catch (connErr) {
+        console.error('Database connection failed during initialization:', connErr);
+        if (attempt >= opts.maxRetries!) {
+          throw new Error('Could not connect to database after multiple attempts');
+        }
+        continue; // Skip to next retry attempt
+      }
+      
+      // Initialize admin user if needed
+      if (!opts.skipAdminUser) {
+        const adminExists = await checkAdminUser();
+        if (!adminExists) {
+          await createAdminUser();
+        }
+      }
+      
+      // Initialize subscription plans if needed
+      if (!opts.skipPlans) {
+        const plansExist = await checkPlans();
+        if (!plansExist) {
+          await createDefaultPlans();
+        }
+      }
+      
+      // Additional environment-specific initializations
+      if (process.env.NODE_ENV === 'production') {
+        // Enable production-specific performance optimizations
+        await optimizeForProduction();
+      }
+      
+      console.log('Database initialization completed successfully');
+      return true;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(`Database initialization attempt ${attempt} failed:`, lastError);
+      
+      // If retries are disabled or we've reached max retries, stop trying
+      if (!opts.retryOnFailure || attempt >= opts.maxRetries!) {
+        break;
+      }
+    }
+  }
+  
+  // If we got here, all attempts failed
+  console.error('Database initialization failed after multiple attempts:', lastError);
+  return false;
+}
+
+/**
+ * Apply production-specific database optimizations
+ */
+async function optimizeForProduction(): Promise<void> {
   try {
-    // Check if admin user exists
-    const adminExists = await checkAdminUser();
-    if (!adminExists) {
-      await createAdminUser();
+    console.log('Applying production database optimizations...');
+    
+    // Create indexes for common queries if they don't exist
+    // Don't use schema.tableName here as we're executing raw SQL
+    const indexes = [
+      // User lookup indexes
+      { 
+        table: 'users', 
+        name: 'idx_users_email',
+        column: 'email',
+        condition: 'WHERE is_active = true'
+      },
+      // CV lookup indexes
+      {
+        table: 'cvs',
+        name: 'idx_cvs_user_id',
+        column: 'user_id'
+      },
+      // ATS score indexes
+      {
+        table: 'ats_scores',
+        name: 'idx_ats_scores_cv_id',
+        column: 'cv_id'
+      },
+      // Subscription indexes
+      {
+        table: 'subscriptions',
+        name: 'idx_subscriptions_user_id',
+        column: 'user_id'
+      },
+      {
+        table: 'subscriptions',
+        name: 'idx_subscriptions_active',
+        column: 'is_active',
+        condition: 'WHERE is_active = true'
+      }
+    ];
+    
+    for (const index of indexes) {
+      // Check if index exists
+      const indexExists = await db.execute(sql`
+        SELECT 1 FROM pg_indexes 
+        WHERE indexname = ${index.name} 
+        AND tablename = ${index.table}
+      `);
+      
+      if (indexExists.rows.length === 0) {
+        // Create the index if it doesn't exist
+        const condition = index.condition || '';
+        await db.execute(sql.raw(`
+          CREATE INDEX IF NOT EXISTS ${index.name} 
+          ON ${index.table} (${index.column}) 
+          ${condition}
+        `));
+        console.log(`Created index ${index.name} on ${index.table}`);
+      }
     }
     
-    // Check if subscription plans exist
-    const plansExist = await checkPlans();
-    if (!plansExist) {
-      await createDefaultPlans();
-    }
-    
-    console.log('Database initialization completed successfully');
-    return true;
+    console.log('Production database optimizations complete');
   } catch (error) {
-    console.error('Database initialization failed:', error);
-    return false;
+    // Just log the error, don't fail initialization
+    console.error('Error applying production optimizations:', error);
   }
 }
 

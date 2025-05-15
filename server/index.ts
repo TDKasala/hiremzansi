@@ -114,7 +114,7 @@ function setupGracefulShutdown(server: any) {
         // Close HTTP server first (stop accepting new connections)
         log('Closing HTTP server...', 'server');
         await new Promise((resolve, reject) => {
-          server.close(err => {
+          server.close((err: Error | undefined) => {
             if (err) {
               log(`Error closing HTTP server: ${err.message}`, 'server');
               reject(err);

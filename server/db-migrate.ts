@@ -117,19 +117,44 @@ async function applyMigration(migration: string): Promise<void> {
   }
 }
 
+/**
+ * Migration options interface
+ */
+interface MigrationOptions {
+  dryRun?: boolean;     // Just check which migrations would be applied, but don't run them
+  force?: boolean;      // Force migration even in production (normally requires confirmation)
+  silent?: boolean;     // Reduce logging output
+  timeout?: number;     // Timeout in ms for each migration (default 30s)
+}
+
+// Default migration options
+const DEFAULT_MIGRATION_OPTIONS: MigrationOptions = {
+  dryRun: false,
+  force: false,
+  silent: false,
+  timeout: 30000 // 30 seconds
+};
+
 // Run all pending migrations
-export async function runMigrations(): Promise<string[]> {
+export async function runMigrations(options?: MigrationOptions): Promise<string[]> {
+  // Merge provided options with defaults
+  const opts = { ...DEFAULT_MIGRATION_OPTIONS, ...options };
+  
   try {
     // Ensure migrations table exists
     await ensureMigrationsTable();
     
     // Get applied migrations
     const appliedMigrations = await getAppliedMigrations();
-    log(`Found ${appliedMigrations.length} previously applied migrations`, 'migrations');
+    if (!opts.silent) {
+      log(`Found ${appliedMigrations.length} previously applied migrations`, 'migrations');
+    }
     
     // Get all migration files
     const migrationFiles = getMigrationFiles();
-    log(`Found ${migrationFiles.length} migration files`, 'migrations');
+    if (!opts.silent) {
+      log(`Found ${migrationFiles.length} migration files`, 'migrations');
+    }
     
     // Determine pending migrations
     const pendingMigrations = migrationFiles.filter(
@@ -137,21 +162,57 @@ export async function runMigrations(): Promise<string[]> {
     );
     
     if (pendingMigrations.length === 0) {
-      log('No pending migrations to apply', 'migrations');
+      if (!opts.silent) {
+        log('No pending migrations to apply', 'migrations');
+      }
       return [];
+    }
+    
+    // In production, we should be extra careful about running migrations
+    if (process.env.NODE_ENV === 'production' && !opts.force && !opts.dryRun) {
+      log('⚠️ Production environment detected', 'migrations');
+      log('Running migrations in production without force flag is not recommended', 'migrations');
+      log('Set options.force=true to override this warning', 'migrations');
+      
+      // In an automated environment, we might want to abort here
+      // and require manual intervention
+      if (process.env.MIGRATION_REQUIRE_FORCE === 'true') {
+        throw new Error('Migrations in production require force flag');
+      }
+    }
+    
+    // If this is a dry run, just return what would be migrated
+    if (opts.dryRun) {
+      log(`Dry run: would apply ${pendingMigrations.length} migrations`, 'migrations');
+      return pendingMigrations;
     }
     
     log(`Applying ${pendingMigrations.length} migrations...`, 'migrations');
     
-    // Apply each pending migration
+    // Apply each pending migration with timeout handling
     for (const migration of pendingMigrations) {
-      await applyMigration(migration);
+      const migrationPromise = applyMigration(migration);
+      
+      // Set up timeout if specified
+      if (opts.timeout) {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`Migration timed out after ${opts.timeout}ms: ${migration}`));
+          }, opts.timeout);
+        });
+        
+        // Race between migration and timeout
+        await Promise.race([migrationPromise, timeoutPromise]);
+      } else {
+        await migrationPromise;
+      }
     }
     
     log('All migrations applied successfully', 'migrations');
     return pendingMigrations;
   } catch (error) {
-    console.error('Migration failed:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Migration failed: ${errorMessage}`);
     throw error;
   }
 }
