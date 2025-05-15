@@ -116,12 +116,56 @@ export function setupAuth(app: Express) {
       if (existingUserByEmail) {
         return res.status(400).json({ error: "Email already exists" });
       }
-
-      // Create user with hashed password
-      const user = await storage.createUser({
+      
+      // Generate email verification token if email service is enabled
+      const verificationToken = isEmailServiceEnabled() ? randomBytes(32).toString("hex") : null;
+      const verificationTokenExpiry = verificationToken ? new Date(Date.now() + 86400000) : null; // 24 hours
+      
+      // Create the user record with verification details if available
+      let userData = {
         ...req.body,
         password: await hashPassword(req.body.password),
-      });
+      };
+
+      // Create user with hashed password
+      const user = await storage.createUser(userData);
+      
+      // If we have a verification token, update the user record
+      // We do this as a separate step to work around schema validation
+      if (verificationToken) {
+        try {
+          // This uses fields that aren't in the insert schema, so use type assertion
+          await storage.updateUser(user.id, 
+            { ...(({
+                emailVerified: false,
+                verificationToken,
+                verificationTokenExpiry
+              } as any))
+            });
+          
+          // Send verification email
+          const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+          const userName = req.body.name || req.body.username;
+          
+          // Attempt to send the email
+          const emailSent = await sendVerificationEmail(
+            req.body.email,
+            userName,
+            verificationToken,
+            baseUrl
+          );
+          
+          if (emailSent) {
+            console.log(`Verification email sent to ${req.body.email}`);
+          } else {
+            console.warn(`Failed to send verification email to ${req.body.email}. Email service may be disabled.`);
+            console.log(`Verification token for ${req.body.email}: ${verificationToken}`);
+            console.log(`Verification link would be: ${baseUrl}/verify-email?token=${verificationToken}`);
+          }
+        } catch (updateError) {
+          console.error("Failed to update user with verification token:", updateError);
+        }
+      }
 
       // Create default South African profile
       await storage.createSaProfile({
@@ -136,7 +180,13 @@ export function setupAuth(app: Express) {
       // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(user);
+        
+        // Don't send the password back to the client
+        const { password, ...userWithoutPassword } = user;
+        res.status(201).json({
+          ...userWithoutPassword,
+          emailVerificationSent: !!verificationToken
+        });
       });
     } catch (err) {
       next(err);
@@ -168,6 +218,54 @@ export function setupAuth(app: Express) {
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
+  });
+  
+  // Email verification endpoint
+  app.post("/api/verify-email", async (req, res, next) => {
+    try {
+      const { token } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Verification token is required" });
+      }
+      
+      // Find user with this verification token
+      const user = await storage.getUserByVerificationToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ error: "Invalid or expired verification token" });
+      }
+      
+      // Check if token is expired
+      if (user.verificationTokenExpiry && new Date(user.verificationTokenExpiry) < new Date()) {
+        return res.status(400).json({ error: "Verification token has expired" });
+      }
+      
+      // Mark email as verified and clear token
+      await storage.updateUser(user.id, {
+        emailVerified: true,
+        verificationToken: null,
+        verificationTokenExpiry: null
+      });
+      
+      // Send welcome email now that the user is verified
+      if (isEmailServiceEnabled()) {
+        const userName = user.name || user.username;
+        await sendWelcomeEmail(user.email, userName);
+      }
+      
+      res.status(200).json({ 
+        message: "Email verified successfully",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          emailVerified: true
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 
   // Get user profile (with South African specific details)
