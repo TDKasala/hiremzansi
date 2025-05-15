@@ -45,8 +45,8 @@ export default function Header() {
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
           <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-12 md:h-14 mr-2" />
           <span className="hidden sm:inline">
-            <span className="text-[#6bc04b] text-2xl md:text-3xl font-bold">ATS</span><span className="text-[#1a5fa0] text-2xl md:text-3xl font-bold">BOOST</span>
-            <span className="text-[#ffca28] ml-1 text-2xl md:text-3xl">•</span>
+            <span className="text-[#FFCA28] text-2xl md:text-3xl font-bold">ATS</span><span className="text-[#0D6EFD] text-2xl md:text-3xl font-bold">BOOST</span>
+            <span className="text-[#FFCA28] ml-1 text-2xl md:text-3xl">•</span>
           </span>
         </Link>
 

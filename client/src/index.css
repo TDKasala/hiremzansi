@@ -61,7 +61,7 @@
 }
 
 :root {
-  /* Theme with #FFCA28 amber/yellow as primary */
+  /* Theme with #FFCA28 amber/yellow as primary and blue accents */
   --background: 0 0% 100%;  /* White background */
   --foreground: 20 14.3% 4.1%;
   --muted: 0 0% 96%;
@@ -74,10 +74,10 @@
   --input: 0 0% 90%;
   --primary: 42 100% 57%;  /* #FFCA28 amber/yellow */
   --primary-foreground: 0 0% 10%;  /* Dark text on amber background */
-  --secondary: 42 100% 95%; /* Very light amber */
-  --secondary-foreground: 42 100% 25%; /* Dark amber */
-  --accent: 42 100% 90%;  /* Light amber */
-  --accent-foreground: 42 100% 25%;
+  --secondary: 210 100% 50%;  /* Bright blue */
+  --secondary-foreground: 0 0% 100%; /* White text on blue */
+  --accent: 210 100% 95%;  /* Light blue */
+  --accent-foreground: 210 100% 30%; /* Dark blue */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
   --ring: 42 100% 57%;  /* Match primary */
@@ -86,35 +86,13 @@
   --success: 142 71% 45%;
   --error: 0 84.2% 60.2%;
   --chart-1: 42 100% 57%;  /* Primary amber */
-  --chart-2: 42 80% 40%;  /* Darker amber */
-  --chart-3: 42 80% 25%;  /* Very dark amber */
-  --chart-4: 42 100% 80%;  /* Light amber */
+  --chart-2: 210 100% 50%;  /* Blue */
+  --chart-3: 42 80% 25%;  /* Dark amber */
+  --chart-4: 210 80% 70%;  /* Light blue */
   --chart-5: 42 80% 65%;  /* Medium amber */
 }
 
-.dark {
-  /* ATSBoost dark theme - amber/yellow based (#FFCA28) */
-  --background: 42 30% 12%;
-  --foreground: 0 0% 98%;
-  --muted: 42 30% 20%;
-  --muted-foreground: 240 5% 75%;
-  --popover: 42 30% 12%;
-  --popover-foreground: 0 0% 98%;
-  --card: 42 30% 16%;
-  --card-foreground: 0 0% 98%;
-  --border: 42 30% 25%;
-  --input: 42 30% 25%;
-  --primary: 42 100% 57%;  /* #FFCA28 amber/yellow */
-  --primary-foreground: 0 0% 10%;
-  --secondary: 42 80% 35%; /* Darker amber */
-  --secondary-foreground: 0 0% 100%;
-  --accent: 42 30% 30%;  /* Muted amber */
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 50%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 42 100% 57%;
-  --radius: 0.5rem;
-}
+/* Dark theme removed as requested */
 
 @layer base {
   * {
