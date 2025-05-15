@@ -119,8 +119,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload and analysis endpoint
-  app.post("/api/upload", isAuthenticated, upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
+  // File upload and analysis endpoint - supports both authenticated and guest users
+  app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
       console.log("Upload request received", { 
         body: Object.keys(req.body),
@@ -129,14 +129,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: req.isAuthenticated() ? `User ID: ${req.user!.id}` : "Not authenticated"
       });
       
-      // Double-check authentication - should be handled by middleware but adding extra logging for debug
-      if (!req.isAuthenticated()) {
-        console.error("User not authenticated despite middleware check");
-        return res.status(401).json({ 
-          error: "Authentication required", 
-          message: "You must be logged in to upload a CV" 
-        });
-      }
+      // Check if user is authenticated - we will handle both authenticated and guest users
+      const isGuest = !req.isAuthenticated();
       
       if (!req.file) {
         console.error("No file in request");
@@ -188,12 +182,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Get user id from authenticated user
-      const userId = req.user!.id;
+      // Handle both authenticated and guest users
+      const userId = isGuest ? null : req.user!.id;
       // Use title from request or filename (without extension)
       let title = req.body.title || file.originalname.replace(/\.[^/.]+$/, "");
       
-      console.log("Creating CV for user ID:", userId);
+      console.log(isGuest ? "Creating CV for guest user" : `Creating CV for user ID: ${userId}`);
       
       // Get job description if provided
       const jobDescription = req.body.jobDescription || "";

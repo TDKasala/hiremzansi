@@ -83,25 +83,8 @@ export default function UploadPage() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <Alert variant="destructive" className="mb-8">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Authentication Required</AlertTitle>
-          <AlertDescription>
-            You need to be logged in to upload and analyze CVs.
-          </AlertDescription>
-        </Alert>
-        
-        <div className="flex justify-center mt-8">
-          <Button asChild>
-            <Link href="/auth">Login or Register</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // For non-logged-in users, we'll still show the upload component
+  // but with a limited features message
 
   return (
     <>
@@ -111,10 +94,41 @@ export default function UploadPage() {
       </Helmet>
       
       <div className="container mx-auto py-5 sm:py-8 max-w-4xl">
-        <MotivationalBanner
-          location="upload"
-          cvCount={cvs?.length || 0}
-        />
+        {!user ? (
+          <div className="mb-6 bg-primary/10 border border-primary/20 rounded-lg p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-primary mb-1">Guest Upload Mode</h3>
+                <p className="text-sm text-muted-foreground">
+                  You're using ATSBoost without an account. You can upload 1 CV for a basic analysis, 
+                  but creating a free account gives you access to:
+                </p>
+                <ul className="mt-2 text-sm grid gap-1">
+                  <li className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                    <span>Multiple CV uploads and comparison</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                    <span>Detailed ATS scoring and recommendations</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-primary mr-2" />
+                    <span>South African B-BBEE and NQF optimization</span>
+                  </li>
+                </ul>
+              </div>
+              <Button asChild className="shrink-0">
+                <Link href="/auth">Create Free Account</Link>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <MotivationalBanner
+            location="upload"
+            cvCount={cvs?.length || 0}
+          />
+        )}
         <header className="mb-5 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">CV Analysis Tool</h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
