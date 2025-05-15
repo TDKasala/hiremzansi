@@ -5,13 +5,13 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
 import { 
-  sendPasswordResetEmail, 
-  sendVerificationEmail,
+  sendVerificationEmail, 
   sendWelcomeEmail,
-  isEmailServiceEnabled 
+  isEmailServiceEnabled,
+  sendPasswordResetEmail
 } from "./services/emailService";
+import { User as SelectUser } from "@shared/schema";
 
 declare global {
   namespace Express {
@@ -246,7 +246,7 @@ export function setupAuth(app: Express) {
         emailVerified: true,
         verificationToken: null,
         verificationTokenExpiry: null
-      });
+      } as any);
       
       // Send welcome email now that the user is verified
       if (isEmailServiceEnabled()) {

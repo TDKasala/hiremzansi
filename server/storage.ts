@@ -56,6 +56,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByResetToken(token: string): Promise<User | undefined>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User>;
   
@@ -143,6 +144,26 @@ export class DatabaseStorage implements IStorage {
       return undefined;
     }
   }
+  
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    try {
+      // Use raw SQL to query the verification token since it's not in the TypeScript schema
+      const result = await db.execute(sql`
+        SELECT * FROM users 
+        WHERE verification_token = ${token}
+        AND verification_token_expiry > NOW()
+      `);
+      
+      if (result.rows.length > 0) {
+        return result.rows[0] as User;
+      }
+      
+      return undefined;
+    } catch (error) {
+      console.error("Error getting user by verification token:", error);
+      return undefined;
+    }
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const now = new Date();
@@ -154,13 +175,54 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User> {
+  async updateUser(id: number, updates: any): Promise<User> {
+    // Use a type cast to handle fields that aren't in the InsertUser type
+    const updatesWithTimestamp = {
+      ...updates,
+      updatedAt: new Date()
+    };
+    
+    // Use SQL for maximum flexibility with schema changes
+    try {
+      // First check if we have verification or reset fields that need special handling
+      const hasEmailVerification = 'emailVerified' in updates 
+        || 'verificationToken' in updates 
+        || 'verificationTokenExpiry' in updates;
+        
+      const hasResetToken = 'resetToken' in updates || 'resetTokenExpiry' in updates;
+      
+      if (hasEmailVerification || hasResetToken) {
+        // Replace all undefined parameters with appropriate values
+        const result = await db.execute(sql`
+          UPDATE users 
+          SET 
+            ${updates.emailVerified !== undefined ? sql`email_verified = ${updates.emailVerified},` : sql``}
+            ${updates.verificationToken !== undefined ? sql`verification_token = ${updates.verificationToken},` : sql``}
+            ${updates.verificationTokenExpiry !== undefined ? sql`verification_token_expiry = ${updates.verificationTokenExpiry},` : sql``}
+            ${updates.resetToken !== undefined ? sql`reset_token = ${updates.resetToken},` : sql``}
+            ${updates.resetTokenExpiry !== undefined ? sql`reset_token_expiry = ${updates.resetTokenExpiry},` : sql``}
+            ${updates.username !== undefined ? sql`username = ${updates.username},` : sql``}
+            ${updates.password !== undefined ? sql`password = ${updates.password},` : sql``}
+            ${updates.email !== undefined ? sql`email = ${updates.email},` : sql``}
+            ${updates.name !== undefined ? sql`name = ${updates.name},` : sql``}
+            ${updates.profilePicture !== undefined ? sql`profile_picture = ${updates.profilePicture},` : sql``}
+            updated_at = NOW()
+          WHERE id = ${id}
+          RETURNING *
+        `);
+        
+        if (result.rows.length > 0) {
+          return result.rows[0] as User;
+        }
+      }
+    } catch (error) {
+      console.error("Error updating user with special fields:", error);
+    }
+    
+    // Fall back to the standard update if no special fields or if the special update failed
     const [user] = await db
       .update(users)
-      .set({
-        ...updates,
-        updatedAt: new Date()
-      })
+      .set(updatesWithTimestamp)
       .where(eq(users.id, id))
       .returning();
     return user;
