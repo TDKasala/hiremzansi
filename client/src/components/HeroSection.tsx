@@ -10,9 +10,10 @@ export default function HeroSection() {
   
   // Stats for South African context
   const stats = [
-    { label: t('home.statsAtsSuccess'), value: "85%" },
-    { label: t('home.statsInterviewCallback'), value: "3.2x" },
-    { label: t('home.statsSaCompanies'), value: "400+" }
+    { label: "SA Unemployment Rate", value: "33.5%" },
+    { label: "SA Employers Use ATS", value: "75%" },
+    { label: "Applicants Per Job", value: "200+" },
+    { label: "To Make First Impression", value: "8s" }
   ];
   
   // Animation states for CV elements
@@ -40,20 +41,18 @@ export default function HeroSection() {
               <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary">
                 {t('home.southAfricanFocused')}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4" 
-                dangerouslySetInnerHTML={{ 
-                  __html: t('home.heroTitle').replace('<span>', '<span class="text-primary">').replace('</span>', '</span>') 
-                }} 
-              />
+              <h1 className="text-3xl md:text-5xl font-bold mb-4">
+                The South African Job Market Reality 
+              </h1>
             </div>
             <p className="text-lg md:text-xl mb-6 text-white">
-              {t('home.heroSubtitle')}
+              In today's competitive environment, your CV needs to stand out and pass through automated systems before it ever reaches human recruiters.
             </p>
             
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-white/20 p-3 rounded-lg text-center">
-                  <div className={`text-xl md:text-2xl font-bold text-primary ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : 'animate-countup-delay-2' : ''}`}>
+                <div key={index} className="bg-white/10 p-3 rounded-lg text-center">
+                  <div className={`text-2xl md:text-3xl font-bold text-blue-600 ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
                     {stat.value}
                   </div>
                   <div className="text-xs text-white font-medium">{stat.label}</div>
