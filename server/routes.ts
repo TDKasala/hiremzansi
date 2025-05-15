@@ -1263,12 +1263,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.user!.id,
         companyName: req.body.companyName,
         industry: req.body.industry,
-        size: req.body.size,
-        location: req.body.location,
+        companySize: req.body.companySize,
         description: req.body.description,
-        websiteUrl: req.body.websiteUrl,
-        bbbeeLevel: req.body.bbbeeLevel,
-        verified: false // Default to false, verification process can be added later
+        website: req.body.website,
+        contactEmail: req.body.contactEmail,
+        contactPhone: req.body.contactPhone,
+        isVerified: false // Default to false, verification process can be added later
       };
       
       const employer = await createEmployer(employerData);
