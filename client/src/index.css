@@ -61,58 +61,58 @@
 }
 
 :root {
-  /* ATSBoost colors - blue primary, green secondary based on the logo */
-  --background: 0 0% 100%;
+  /* White and light orange color scheme */
+  --background: 0 0% 100%;  /* White background */
   --foreground: 20 14.3% 4.1%;
-  --muted: 210 20% 95%;
+  --muted: 30 10% 95%;
   --muted-foreground: 25 5.3% 44.7%;
   --popover: 0 0% 100%;
   --popover-foreground: 20 14.3% 4.1%;
   --card: 0 0% 100%;
   --card-foreground: 20 14.3% 4.1%;
-  --border: 210 20% 90%;
-  --input: 210 20% 90%;
-  --primary: 211 65% 37%;  /* #1a5fa0 - Blue from ATSBoost logo */
+  --border: 30 10% 90%;
+  --input: 30 10% 90%;
+  --primary: 28 100% 60%;  /* Light orange - #FF9F43 */
   --primary-foreground: 0 0% 100%;
-  --secondary: 107 45% 52%; /* #6bc04b - Green from ATSBoost logo */
+  --secondary: 28 100% 50%; /* Darker orange - #FF8C00 */
   --secondary-foreground: 0 0% 100%;
-  --accent: 45 100% 50%;  /* #ffca28 - Yellow dot from ATSBoost logo */
-  --accent-foreground: 24 9.8% 10%;
+  --accent: 28 100% 95%;  /* Very light orange */
+  --accent-foreground: 28 100% 25%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 211 65% 37%;
+  --ring: 28 100% 60%;
   --radius: 0.5rem;
-  --warning: 45 100% 50%;
-  --success: 107 45% 52%;
+  --warning: 38 100% 50%;
+  --success: 142 71% 45%;
   --error: 0 84.2% 60.2%;
-  --chart-1: 211 65% 37%;  /* Blue */
-  --chart-2: 107 45% 52%;  /* Green */
+  --chart-1: 28 100% 60%;  /* Light orange */
+  --chart-2: 28 100% 50%;  /* Darker orange */
   --chart-3: 45 100% 50%;  /* Yellow */
   --chart-4: 0 84.2% 60.2%; /* Red */
   --chart-5: 262 83% 58%;   /* Purple */
 }
 
 .dark {
-  /* ATSBoost dark theme - blue and green based on the logo */
-  --background: 220 25% 10%;
+  /* ATSBoost dark theme - orange based */
+  --background: 20 14% 12%;
   --foreground: 0 0% 98%;
-  --muted: 210 25% 18%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 220 25% 10%;
+  --muted: 28 30% 20%;
+  --muted-foreground: 240 5% 75%;
+  --popover: 20 14% 12%;
   --popover-foreground: 0 0% 98%;
-  --card: 220 25% 12%;
+  --card: 20 14% 16%;
   --card-foreground: 0 0% 98%;
-  --border: 210 25% 20%;
-  --input: 210 25% 20%;
-  --primary: 210 70% 45%;  /* Brighter Blue for dark theme */
+  --border: 28 30% 25%;
+  --input: 28 30% 25%;
+  --primary: 28 90% 55%;  /* Brighter orange for dark theme */
   --primary-foreground: 0 0% 100%;
-  --secondary: 120 45% 50%; /* Brighter Green for dark theme */
+  --secondary: 28 90% 40%; /* Darker orange for dark theme */
   --secondary-foreground: 0 0% 100%;
-  --accent: 50 90% 60%;  /* Yellow for dark theme */
+  --accent: 28 30% 30%;  /* Muted orange for dark theme */
   --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 50%;
   --destructive-foreground: 0 0% 98%;
-  --ring: 210 70% 45%;
+  --ring: 28 90% 55%;
   --radius: 0.5rem;
 }
 
