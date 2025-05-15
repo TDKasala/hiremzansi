@@ -132,17 +132,6 @@ export default function UploadSection() {
               </div>
             ) : null}
             
-            <div className="bg-neutral-100 p-4 rounded-md mb-6">
-              <h4 className="font-semibold mb-2 flex items-center">
-                <Lightbulb className="text-warning mr-2 h-5 w-5" />
-                South African CV Tip
-              </h4>
-              <p className="text-neutral-600">
-                Include your B-BBEE status and NQF level qualifications prominently in your CV 
-                to increase visibility with South African employers.
-              </p>
-            </div>
-            
             <div className="flex flex-col sm:flex-row sm:justify-between items-center">
               <div className="mb-4 sm:mb-0 w-full sm:w-auto">
                 <div className="flex items-center space-x-2">
