@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json, real, doublePrecision } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -260,6 +260,160 @@ export type Plan = typeof plans.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 
 // Analysis Report - used for responses
+export const employers = pgTable("employers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  companyName: text("company_name").notNull(),
+  industry: text("industry"),
+  companySize: text("company_size"),
+  website: text("website"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  logo: text("logo"),
+  description: text("description"),
+  isVerified: boolean("is_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const employersRelations = relations(employers, ({ one }) => ({
+  user: one(users, {
+    fields: [employers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const jobPostings = pgTable("job_postings", {
+  id: serial("id").primaryKey(),
+  employerId: integer("employer_id").references(() => employers.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  location: text("location"),
+  employmentType: text("employment_type"), // Full-time, Part-time, Contract, etc.
+  experienceLevel: text("experience_level"),
+  salaryRange: text("salary_range"),
+  requiredSkills: text("required_skills").array(),
+  preferredSkills: text("preferred_skills").array(),
+  industry: text("industry"),
+  deadline: timestamp("deadline"),
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  views: integer("views").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobPostingsRelations = relations(jobPostings, ({ one, many }) => ({
+  employer: one(employers, {
+    fields: [jobPostings.employerId],
+    references: [employers.id],
+  }),
+  matches: many(jobMatches),
+}));
+
+export const jobMatches = pgTable("job_matches", {
+  id: serial("id").primaryKey(),
+  jobId: integer("job_id").references(() => jobPostings.id).notNull(),
+  cvId: integer("cv_id").references(() => cvs.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  matchScore: integer("match_score").notNull(),
+  skillsMatched: text("skills_matched").array(),
+  isPaid: boolean("is_paid_by_jobseeker").default(false),
+  isViewedByEmployer: boolean("is_viewed_by_employer").default(false),
+  isEmployerPaid: boolean("is_paid_by_employer").default(false),
+  isShortlisted: boolean("is_shortlisted").default(false),
+  isRejected: boolean("is_rejected").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobMatchesRelations = relations(jobMatches, ({ one }) => ({
+  jobPosting: one(jobPostings, {
+    fields: [jobMatches.jobId],
+    references: [jobPostings.id],
+  }),
+  cv: one(cvs, {
+    fields: [jobMatches.cvId],
+    references: [cvs.id],
+  }),
+  user: one(users, {
+    fields: [jobMatches.userId],
+    references: [users.id],
+  }),
+}));
+
+export const skills = pgTable("skills", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  category: text("category"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const userSkills = pgTable("user_skills", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  skillId: integer("skill_id").references(() => skills.id).notNull(),
+  proficiency: integer("proficiency").notNull(), // 1-10 scale
+  yearsExperience: integer("years_experience"),
+  isVerified: boolean("is_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const userSkillsRelations = relations(userSkills, ({ one }) => ({
+  user: one(users, {
+    fields: [userSkills.userId],
+    references: [users.id],
+  }),
+  skill: one(skills, {
+    fields: [userSkills.skillId],
+    references: [skills.id],
+  }),
+}));
+
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  amount: real("amount").notNull(),
+  currency: text("currency").default("ZAR").notNull(),
+  paymentType: text("payment_type").notNull(), // subscription, job-match, feature-post
+  status: text("status").notNull(), // pending, completed, failed, refunded
+  paymentProvider: text("payment_provider").notNull(), // PayFast, etc.
+  transactionId: text("transaction_id"),
+  relatedEntityId: integer("related_entity_id"), // ID of job, match, etc.
+  relatedEntityType: text("related_entity_type"), // job, match, etc.
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  user: one(users, {
+    fields: [payments.userId],
+    references: [users.id],
+  }),
+}));
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull(), // job-match, payment, system, etc.
+  isRead: boolean("is_read").default(false),
+  relatedEntityId: integer("related_entity_id"), 
+  relatedEntityType: text("related_entity_type"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
+
 export type AnalysisReport = {
   score: number;
   skillsScore?: number;
@@ -277,3 +431,96 @@ export type AnalysisReport = {
   nqfDetected?: boolean;
   keywordRecommendations?: string[][];
 };
+
+export const insertEmployerSchema = createInsertSchema(employers).pick({
+  userId: true,
+  companyName: true,
+  industry: true,
+  companySize: true,
+  website: true,
+  contactEmail: true,
+  contactPhone: true,
+  logo: true,
+  description: true,
+});
+
+export const insertJobPostingSchema = createInsertSchema(jobPostings).pick({
+  employerId: true,
+  title: true,
+  description: true,
+  location: true,
+  employmentType: true,
+  experienceLevel: true,
+  salaryRange: true,
+  requiredSkills: true,
+  preferredSkills: true,
+  industry: true,
+  deadline: true,
+  isFeatured: true,
+});
+
+export const insertJobMatchSchema = createInsertSchema(jobMatches).pick({
+  jobId: true,
+  cvId: true,
+  userId: true,
+  matchScore: true,
+  skillsMatched: true,
+});
+
+export const insertSkillSchema = createInsertSchema(skills).pick({
+  name: true,
+  category: true,
+});
+
+export const insertUserSkillSchema = createInsertSchema(userSkills).pick({
+  userId: true,
+  skillId: true,
+  proficiency: true,
+  yearsExperience: true,
+});
+
+export const insertPaymentSchema = createInsertSchema(payments, {
+  status: z.enum(['pending', 'completed', 'failed', 'refunded']),
+  paymentType: z.enum(['subscription', 'job-match', 'feature-post']),
+}).pick({
+  userId: true,
+  amount: true,
+  currency: true,
+  paymentType: true,
+  status: true,
+  paymentProvider: true,
+  transactionId: true,
+  relatedEntityId: true,
+  relatedEntityType: true,
+  metadata: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  userId: true,
+  title: true,
+  message: true,
+  type: true,
+  relatedEntityId: true,
+  relatedEntityType: true,
+});
+
+export type Employer = typeof employers.$inferSelect;
+export type InsertEmployer = z.infer<typeof insertEmployerSchema>;
+
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type InsertJobPosting = z.infer<typeof insertJobPostingSchema>;
+
+export type JobMatch = typeof jobMatches.$inferSelect;
+export type InsertJobMatch = z.infer<typeof insertJobMatchSchema>;
+
+export type Skill = typeof skills.$inferSelect;
+export type InsertSkill = z.infer<typeof insertSkillSchema>;
+
+export type UserSkill = typeof userSkills.$inferSelect;
+export type InsertUserSkill = z.infer<typeof insertUserSkillSchema>;
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
