@@ -17,6 +17,7 @@ interface PreUploadConsentDialogProps {
 }
 
 export function PreUploadConsentDialog({ isOpen, onClose, onConfirm, cvFile }: PreUploadConsentDialogProps) {
+  console.log("PreUploadConsentDialog props:", { isOpen, cvFile });
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">

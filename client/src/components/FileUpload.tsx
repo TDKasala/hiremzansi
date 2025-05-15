@@ -99,18 +99,23 @@ export default function FileUpload({
       
       setProgress(100);
       
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || errorData.error || "Failed to upload file");
-      }
-
+      // Parse the response JSON once
       const data = await res.json();
       
+      if (!res.ok) {
+        throw new Error(data.message || data.error || "Failed to upload file");
+      }
+      
       // Store the uploaded CV ID from the response
+      console.log("Upload response:", data);
       if (data.cv && data.cv.id) {
+        console.log("Setting CV ID:", data.cv.id);
         setUploadedCvId(data.cv.id);
         // Show the consent dialog after successful upload
+        console.log("Showing consent dialog...");
         setShowConsentDialog(true);
+      } else {
+        console.log("No CV ID found in response");
       }
       
       toast({
