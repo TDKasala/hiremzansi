@@ -72,22 +72,22 @@
   --card-foreground: 20 14.3% 4.1%;
   --border: 210 20% 90%;
   --input: 210 20% 90%;
-  --primary: 210 80% 30%;  /* Blue from logo */
+  --primary: 211 65% 37%;  /* #1a5fa0 - Blue from ATSBoost logo */
   --primary-foreground: 0 0% 100%;
-  --secondary: 120 50% 45%; /* Green from logo */
+  --secondary: 107 45% 52%; /* #6bc04b - Green from ATSBoost logo */
   --secondary-foreground: 0 0% 100%;
-  --accent: 50 100% 60%;  /* Yellow dot from logo */
+  --accent: 45 100% 50%;  /* #ffca28 - Yellow dot from ATSBoost logo */
   --accent-foreground: 24 9.8% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 210 80% 30%;
+  --ring: 211 65% 37%;
   --radius: 0.5rem;
-  --warning: 48 96% 53%;
-  --success: 120 50% 45%;
+  --warning: 45 100% 50%;
+  --success: 107 45% 52%;
   --error: 0 84.2% 60.2%;
-  --chart-1: 210 80% 30%;  /* Blue */
-  --chart-2: 120 50% 45%;  /* Green */
-  --chart-3: 50 100% 60%;  /* Yellow */
+  --chart-1: 211 65% 37%;  /* Blue */
+  --chart-2: 107 45% 52%;  /* Green */
+  --chart-3: 45 100% 50%;  /* Yellow */
   --chart-4: 0 84.2% 60.2%; /* Red */
   --chart-5: 262 83% 58%;   /* Purple */
 }

@@ -43,9 +43,10 @@ export default function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
-          <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-10 mr-2" />
+          <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-12 md:h-14 mr-2" />
           <span className="hidden sm:inline">
-            <span className="text-[#6bc04b]">ATS</span><span className="text-[#1a5fa0]">BOOST</span>
+            <span className="text-[#6bc04b] text-2xl md:text-3xl font-bold">ATS</span><span className="text-[#1a5fa0] text-2xl md:text-3xl font-bold">BOOST</span>
+            <span className="text-[#ffca28] ml-1 text-2xl md:text-3xl">•</span>
           </span>
         </Link>
 
