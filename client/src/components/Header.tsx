@@ -32,6 +32,7 @@ export default function Header() {
     { href: "/", label: t('common.home') },
     { href: "/how-it-works", label: t('common.howItWorks') },
     { href: "/realtime-ats", label: t('common.atsScanner') },
+    { href: "/jobs", label: "Jobs" },
     { href: "/pricing", label: t('common.pricing') },
     { href: "/refer", label: t('common.refer') },
     { href: "/blog", label: t('common.blog') },
@@ -92,6 +93,16 @@ export default function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/premium-tools">Premium Tools</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/jobs">Find Jobs</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/interview/practice">Interview Practice</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/skills/analyze">Skill Gap Analysis</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -171,6 +182,20 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Premium Tools
+                </Link>
+                <Link 
+                  href="/interview/practice"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Interview Practice
+                </Link>
+                <Link 
+                  href="/skills/analyze"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Skill Gap Analysis
                 </Link>
                 <button
                   onClick={() => {

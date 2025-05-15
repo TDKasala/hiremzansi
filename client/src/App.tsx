@@ -36,6 +36,7 @@ import NotFound from "@/pages/not-found";
 import JobsPage from "@/pages/JobsPage";
 import JobDetailsPage from "@/pages/JobDetailsPage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
+import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
 
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
@@ -100,7 +101,7 @@ function App() {
                   <Route path="/jobs" component={JobsPage} />
                   <Route path="/job/:id" component={JobDetailsPage} />
                   <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
-                  <ProtectedRoute path="/skills/analyze" component={PremiumToolsPage} />
+                  <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
                   
                   {/* Protected routes requiring authentication */}
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />
