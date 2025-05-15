@@ -125,39 +125,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Upload request received", { 
         body: Object.keys(req.body),
         file: req.file ? "File present" : "No file",
-        fileSize: req.file?.size
+        fileSize: req.file?.size,
+        user: req.isAuthenticated() ? `User ID: ${req.user!.id}` : "Not authenticated"
       });
+      
+      // Double-check authentication - should be handled by middleware but adding extra logging for debug
+      if (!req.isAuthenticated()) {
+        console.error("User not authenticated despite middleware check");
+        return res.status(401).json({ 
+          error: "Authentication required", 
+          message: "You must be logged in to upload a CV" 
+        });
+      }
       
       if (!req.file) {
         console.error("No file in request");
-        return res.status(400).json({ error: "No file uploaded" });
+        return res.status(400).json({ 
+          error: "No file uploaded", 
+          message: "No file was provided in the upload request. Please select a file to upload." 
+        });
       }
 
       const file = req.file;
       let content = "";
+      
+      // Validate file size (additional check beyond multer settings)
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        return res.status(400).json({ 
+          error: "File too large", 
+          message: "The uploaded file exceeds the maximum size of 5MB. Please reduce the file size and try again." 
+        });
+      }
 
-      console.log("Processing file upload:", file.originalname, "mimetype:", file.mimetype);
+      console.log("Processing file upload:", file.originalname, "mimetype:", file.mimetype, "size:", Math.round(file.size/1024), "KB");
 
       // Extract text from file based on mimetype
-      if (file.mimetype === "application/pdf") {
-        console.log("Extracting text from PDF");
-        content = await extractTextFromPDF(file.buffer);
-      } else if (file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-        console.log("Extracting text from DOCX");
-        content = await extractTextFromDOCX(file.buffer);
-      } else {
+      try {
+        if (file.mimetype === "application/pdf") {
+          console.log("Extracting text from PDF");
+          content = await extractTextFromPDF(file.buffer);
+        } else if (file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+          console.log("Extracting text from DOCX");
+          content = await extractTextFromDOCX(file.buffer);
+        } else {
+          return res.status(400).json({ 
+            error: "Unsupported file type", 
+            message: "Please upload a PDF or DOCX file. Other file formats are not supported." 
+          });
+        }
+      } catch (extractionError) {
+        console.error("Text extraction error:", extractionError);
         return res.status(400).json({ 
-          error: "Unsupported file type", 
-          message: "Please upload a PDF or DOCX file" 
+          error: "Content extraction failed", 
+          message: "Unable to extract text content from the uploaded file. Please ensure the document contains proper text content and is not corrupted." 
         });
       }
 
       if (!content) {
-        return res.status(400).json({ error: "Could not extract content from file" });
+        return res.status(400).json({ 
+          error: "Empty content", 
+          message: "Could not extract any text content from the file. Please ensure the document contains text and not just images." 
+        });
       }
 
-      // Get user id from authenticated user - we know it exists because of isAuthenticated middleware
+      // Get user id from authenticated user
       const userId = req.user!.id;
+      // Use title from request or filename (without extension)
       let title = req.body.title || file.originalname.replace(/\.[^/.]+$/, "");
       
       console.log("Creating CV for user ID:", userId);
@@ -165,59 +198,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get job description if provided
       const jobDescription = req.body.jobDescription || "";
       
-      // Store the CV
-      const cvData = {
-        userId,
-        fileName: file.originalname,
-        fileType: file.mimetype,
-        fileSize: file.size,
-        content,
-        title,
-        targetPosition: req.body.targetPosition,
-        targetIndustry: req.body.targetIndustry,
-        description: req.body.description,
-        isDefault: req.body.isDefault === "true",
-        jobDescription: jobDescription
-      };
-
-      const cv = await storage.createCV(cvData);
-
-      // Begin background analysis of the CV
-      // Pass job description and CV ID for better analysis and caching
-      const analysis = await analyzeCV(content, jobDescription, cv.id);
-      
-      // Store the analysis results
-      const atsScore = await storage.createATSScore({
-        cvId: cv.id,
-        score: analysis.score,
-        skillsScore: analysis.skillsScore || 0,
-        contextScore: analysis.contextScore || 0,
-        formatScore: analysis.formatScore || 0,
-        strengths: analysis.strengths,
-        improvements: analysis.improvements,
-        issues: analysis.issues,
-        saKeywordsFound: analysis.saKeywordsFound || [],
-        saContextScore: analysis.saContextScore,
-        bbbeeDetected: analysis.bbbeeDetected,
-        nqfDetected: analysis.nqfDetected,
-        keywordRecommendations: analysis.keywordRecommendations
-      });
-
-      res.json({ 
-        success: true, 
-        message: "File uploaded and analyzed successfully",
-        cv: {
-          id: cv.id,
-          fileName: cv.fileName,
-          fileType: cv.fileType,
-          fileSize: cv.fileSize,
-          title: cv.title
-        },
-        score: atsScore.score
-      });
+      try {
+        // Store the CV
+        const cvData = {
+          userId,
+          fileName: file.originalname,
+          fileType: file.mimetype,
+          fileSize: file.size,
+          content,
+          title,
+          targetPosition: req.body.targetPosition,
+          targetIndustry: req.body.targetIndustry,
+          description: req.body.description,
+          isDefault: req.body.isDefault === "true",
+          jobDescription: jobDescription
+        };
+        
+        const cv = await storage.createCV(cvData);
+        console.log("CV created successfully with ID:", cv.id);
+        
+        try {
+          // Begin background analysis of the CV
+          // Pass job description and CV ID for better analysis and caching
+          console.log("Starting CV analysis");
+          const analysis = await analyzeCV(content, jobDescription, cv.id);
+          
+          // Store the analysis results
+          const atsScore = await storage.createATSScore({
+            cvId: cv.id,
+            score: analysis.score,
+            skillsScore: analysis.skillsScore || 0,
+            contextScore: analysis.contextScore || 0,
+            formatScore: analysis.formatScore || 0,
+            strengths: analysis.strengths,
+            improvements: analysis.improvements,
+            issues: analysis.issues,
+            saKeywordsFound: analysis.saKeywordsFound || [],
+            saContextScore: analysis.saContextScore,
+            bbbeeDetected: analysis.bbbeeDetected,
+            nqfDetected: analysis.nqfDetected,
+            keywordRecommendations: analysis.keywordRecommendations
+          });
+          
+          console.log("CV analysis completed with score:", atsScore.score);
+          
+          res.json({ 
+            success: true, 
+            message: "File uploaded and analyzed successfully",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            score: atsScore.score
+          });
+        } catch (analysisError) {
+          console.error("Analysis error:", analysisError);
+          
+          // Even if analysis fails, we've saved the CV, so return partial success
+          res.status(207).json({
+            success: true,
+            partial: true,
+            message: "File uploaded successfully, but analysis encountered an error",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            analysisError: analysisError.message || "Unknown analysis error"
+          });
+        }
+      } catch (storageError) {
+        console.error("CV storage error:", storageError);
+        return res.status(500).json({ 
+          error: "Storage error", 
+          message: "An error occurred while saving your CV to the database. Please try again." 
+        });
+      }
     } catch (error) {
       console.error("Upload error:", error);
-      next(error);
+      res.status(500).json({ 
+        error: "Upload failed", 
+        message: error instanceof Error ? error.message : "An unexpected error occurred during the upload process" 
+      });
     }
   });
 

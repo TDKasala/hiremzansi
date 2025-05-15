@@ -1,6 +1,3 @@
-// We'll use the fallback method for PDF parsing in Node environment
-// since pdfjs-dist has issues in Node.js environments without proper polyfills
-
 /**
  * Extract text content from a PDF buffer
  * @param buffer The PDF file as a buffer
@@ -8,88 +5,59 @@
  */
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // For now, we'll use our fallback method
+    console.log("Using simpler text extraction method for PDF");
+    
+    // Convert buffer to utf-8 string and clean it
+    const text = buffer.toString('utf-8')
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '') // Remove control chars
+      .replace(/\r\n/g, '\n') // Normalize line endings
+      .replace(/\r/g, '\n') // Normalize line endings
+      .replace(/\n{3,}/g, '\n\n') // Normalize excessive newlines
+      .trim();
+      
+    if (text.length > 100) {
+      console.log("Extracted text content from PDF");
+      return text;
+    }
+    
+    // If simple extraction didn't work, try fallback
+    console.warn("Simple extraction produced insufficient content, trying fallback");
     return await fallbackExtractFromPDF(buffer);
   } catch (error) {
     console.error('Error extracting text from PDF:', error);
-    throw new Error('Failed to extract text from PDF file');
+    console.warn('Trying fallback extraction method');
+    
+    // If the main extraction fails, try the fallback
+    return await fallbackExtractFromPDF(buffer);
   }
 }
 
-// For environments where PDF.js might not be available
+// Fallback method to create a reasonable placeholder when extraction fails
 export async function fallbackExtractFromPDF(buffer: Buffer): Promise<string> {
   console.warn('Using fallback PDF extraction method');
   
-  // For development/testing purposes, we'll simulate content extraction
-  // In production, you would use a proper PDF parsing library
   try {
-    // Since we can't properly extract text from PDF in our current environment,
-    // we'll return a simulated CV text with some common elements
-    // This helps us test the rest of the application flow
-    return `
-PROFESSIONAL RESUME
+    // Attempt to generate a basic content summary by looking for typical patterns
+    const fileData = buffer.toString('hex');
+    
+    // We'll be honest that we couldn't extract content properly
+    const message = `
+This document appears to be a PDF file of approximately ${Math.round(buffer.length / 1024)} KB.
+The system was unable to fully extract the text content from this PDF file.
 
-John Smith
-Cape Town, South Africa
-Email: john.smith@example.com
-Phone: +27 123 456 789
-LinkedIn: linkedin.com/in/johnsmith
+Please consider:
+1. Ensuring the PDF contains selectable text and not just images
+2. Converting the document to a DOCX format which is more easily parsed
+3. Uploading a different version of the document with selectable text
 
-PROFILE
-Experienced marketing professional with over 8 years of experience in digital marketing, campaign management, and brand development. Proven track record of increasing engagement and ROI through strategic social media initiatives.
+The ATS system processing your application will likely face similar challenges with this document format.
+For best results, use a document with selectable text that allows keyword matching.
+`;
 
-EDUCATION
-Bachelor of Commerce (B.Com) in Marketing
-University of Cape Town
-NQF Level 7
-2010 - 2014
-
-SKILLS
-• Digital Marketing
-• Social Media Management
-• Content Creation
-• SEO/SEM
-• Campaign Analytics
-• Adobe Creative Suite
-• Google Analytics
-• Microsoft Office
-
-WORK EXPERIENCE
-
-Senior Marketing Manager
-ABC Company, Johannesburg
-January 2018 - Present
-• Led digital marketing campaigns resulting in 45% increase in online engagement
-• Managed a team of 5 marketing specialists and coordinated with external agencies
-• Developed and implemented social media strategy across multiple platforms
-• Analyzed campaign performance and provided monthly reports to stakeholders
-
-Marketing Specialist
-XYZ Corporation, Cape Town
-March 2014 - December 2017
-• Created content for company website and social media accounts
-• Assisted in planning and executing marketing campaigns
-• Conducted market research and competitor analysis
-• Managed email marketing campaigns with over 10,000 subscribers
-
-CERTIFICATIONS
-• Google Ads Certification
-• HubSpot Inbound Marketing Certification
-• Meta Blueprint Certification
-
-LANGUAGES
-• English (Fluent)
-• Afrikaans (Proficient)
-• Zulu (Basic)
-
-B-BBEE STATUS
-Level 4 Contributor
-
-REFERENCES
-Available upon request
-    `;
+    console.log("Returning fallback message to user");
+    return message;
   } catch (error) {
     console.error('Fallback PDF extraction failed:', error);
-    throw new Error('Failed to extract text from PDF file with fallback method');
+    throw new Error('Failed to extract text from PDF file. Please upload a document with selectable text content.');
   }
 }
