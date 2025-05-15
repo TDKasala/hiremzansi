@@ -1520,6 +1520,289 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // =================================================
+  // JOB BOARD API ROUTES
+  // =================================================
+  
+  app.get("/api/job-search", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { 
+        keywords, location, industry, jobType, experienceLevel, 
+        educationLevel, skills, page = 1, pageSize = 10 
+      } = req.query;
+      
+      const { jobBoardService } = await import('./services/jobBoardService');
+      
+      const searchParams: any = {
+        keywords: typeof keywords === 'string' ? [keywords] : (Array.isArray(keywords) ? keywords : undefined),
+        location: typeof location === 'string' ? location : undefined,
+        industry: typeof industry === 'string' ? [industry] : (Array.isArray(industry) ? industry : undefined),
+        jobType: typeof jobType === 'string' ? [jobType] : (Array.isArray(jobType) ? jobType : undefined),
+        experienceLevel: typeof experienceLevel === 'string' ? [experienceLevel] : (Array.isArray(experienceLevel) ? experienceLevel : undefined),
+        educationLevel: typeof educationLevel === 'string' ? [educationLevel] : (Array.isArray(educationLevel) ? educationLevel : undefined),
+        skills: typeof skills === 'string' ? [skills] : (Array.isArray(skills) ? skills : undefined),
+        page: parseInt(page.toString()),
+        pageSize: Math.min(parseInt(pageSize.toString()), 20) // Limit to 20 max
+      };
+      
+      const results = await jobBoardService.searchJobsAggregated(searchParams);
+      res.json(results);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/job-details/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const { provider } = req.query;
+      
+      const { jobBoardService } = await import('./services/jobBoardService');
+      
+      const jobDetails = await jobBoardService.getJobDetails(
+        id, 
+        typeof provider === 'string' ? provider : undefined
+      );
+      
+      if (!jobDetails) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      res.json(jobDetails);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // =================================================
+  // INTERVIEW SIMULATION API ROUTES
+  // =================================================
+  
+  app.post("/api/interview/generate-questions", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { jobDescription, cvContent, type, count, difficulty, industry, role } = req.body;
+      
+      if (!jobDescription || !cvContent) {
+        return res.status(400).json({ error: "Job description and CV content are required" });
+      }
+      
+      const { generateInterviewQuestions } = await import('./services/interviewSimulationService');
+      
+      const questions = await generateInterviewQuestions(
+        jobDescription,
+        cvContent,
+        {
+          type,
+          count: count || 5,
+          difficulty: difficulty || 'mixed',
+          industry,
+          role
+        }
+      );
+      
+      res.json(questions);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/interview/create-session", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { jobDescription, cvContent, jobTitle, type, questionCount, difficulty, industry, role } = req.body;
+      
+      if (!jobDescription || !cvContent) {
+        return res.status(400).json({ error: "Job description and CV content are required" });
+      }
+      
+      const { createInterviewSession } = await import('./services/interviewSimulationService');
+      
+      const session = await createInterviewSession(
+        jobDescription,
+        cvContent,
+        {
+          jobTitle,
+          type,
+          questionCount,
+          difficulty,
+          industry,
+          role
+        }
+      );
+      
+      res.status(201).json(session);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/interview/evaluate-answer", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { question, answer, jobDescription } = req.body;
+      
+      if (!question || !answer) {
+        return res.status(400).json({ error: "Question and answer are required" });
+      }
+      
+      const { evaluateAnswer } = await import('./services/interviewSimulationService');
+      
+      const evaluation = await evaluateAnswer(
+        question,
+        answer,
+        jobDescription
+      );
+      
+      res.json(evaluation);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/interview/answer-question", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { session, questionId, answer } = req.body;
+      
+      if (!session || !questionId || !answer) {
+        return res.status(400).json({ error: "Session, question ID, and answer are required" });
+      }
+      
+      const { answerQuestion } = await import('./services/interviewSimulationService');
+      
+      const updatedSession = await answerQuestion(session, questionId, answer);
+      
+      res.json(updatedSession);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/interview/complete-session", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { session } = req.body;
+      
+      if (!session) {
+        return res.status(400).json({ error: "Session is required" });
+      }
+      
+      const { completeSession } = await import('./services/interviewSimulationService');
+      
+      const completedSession = await completeSession(session);
+      
+      res.json(completedSession);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // =================================================
+  // SKILL GAP ANALYSIS API ROUTES
+  // =================================================
+  
+  app.post("/api/skills/extract-from-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { cvContent } = req.body;
+      
+      if (!cvContent) {
+        return res.status(400).json({ error: "CV content is required" });
+      }
+      
+      const { extractSkillsFromCV } = await import('./services/skillGapAnalyzerService');
+      
+      const skills = await extractSkillsFromCV(cvContent);
+      
+      res.json(skills);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/skills/analyze-gaps", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { currentSkills, targetRole, targetIndustry, additionalContext } = req.body;
+      
+      if (!currentSkills || !targetRole) {
+        return res.status(400).json({ error: "Current skills and target role are required" });
+      }
+      
+      const { analyzeSkillGaps } = await import('./services/skillGapAnalyzerService');
+      
+      const analysis = await analyzeSkillGaps(
+        currentSkills,
+        targetRole,
+        targetIndustry,
+        additionalContext
+      );
+      
+      res.json(analysis);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/skills/analyze-from-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { cvContent, targetRole, targetIndustry } = req.body;
+      
+      if (!cvContent || !targetRole) {
+        return res.status(400).json({ error: "CV content and target role are required" });
+      }
+      
+      const { analyzeCareerFromCV } = await import('./services/skillGapAnalyzerService');
+      
+      const analysis = await analyzeCareerFromCV(
+        cvContent,
+        targetRole,
+        targetIndustry
+      );
+      
+      res.json(analysis);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.post("/api/skills/compare-to-job", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { cvContent, jobPosting } = req.body;
+      
+      if (!cvContent || !jobPosting) {
+        return res.status(400).json({ error: "CV content and job posting are required" });
+      }
+      
+      const { compareToJobPosting } = await import('./services/skillGapAnalyzerService');
+      
+      const analysis = await compareToJobPosting(
+        cvContent,
+        jobPosting
+      );
+      
+      res.json(analysis);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/skills/learning-resources", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { skillName, currentLevel, targetLevel } = req.query;
+      
+      if (!skillName || !currentLevel || !targetLevel) {
+        return res.status(400).json({ error: "Skill name, current level, and target level are required" });
+      }
+      
+      const { getLearningResources } = await import('./services/skillGapAnalyzerService');
+      
+      const resources = await getLearningResources(
+        skillName.toString(),
+        currentLevel.toString() as any,
+        targetLevel.toString() as any
+      );
+      
+      res.json(resources);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Create HTTP server
   const httpServer = createServer(app);
   return httpServer;
