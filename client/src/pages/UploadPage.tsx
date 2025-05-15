@@ -26,7 +26,8 @@ import {
   FileText,
   Book,
   FileQuestion,
-  LayoutGrid
+  LayoutGrid,
+  AlertTriangle
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -45,10 +46,22 @@ export default function UploadPage() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isWhatsappUploading, setIsWhatsappUploading] = useState(false);
   const [referralCode, setReferralCode] = useState("");
-  const [analysisResult, setAnalysisResult] = useState<{
+  // Define guest analysis interface
+  interface GuestAnalysis {
+    limitedStrengths?: string[];
+    limitedImprovements?: string[];
+    upgradeSuggestion?: string;
+  }
+  
+  // Define upload result interface with guest support
+  interface AnalysisResult {
     cv: CV;
     score: number;
-  } | null>(null);
+    isGuest?: boolean;
+    guestAnalysis?: GuestAnalysis;
+  }
+  
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   // If you want to fetch existing CVs
   const { data: cvs, isLoading: isCVsLoading } = useQuery<CV[]>({
@@ -58,10 +71,23 @@ export default function UploadPage() {
   });
 
   const handleUploadComplete = (data: any) => {
-    setAnalysisResult({
+    // Create analysis result with support for guest mode
+    const result: AnalysisResult = {
       cv: data.cv,
-      score: data.score
-    });
+      score: data.score,
+    };
+    
+    // Add guest properties if present
+    if (data.isGuest) {
+      result.isGuest = true;
+      result.guestAnalysis = {
+        limitedStrengths: data.guestAnalysis?.limitedStrengths || [],
+        limitedImprovements: data.guestAnalysis?.limitedImprovements || [],
+        upgradeSuggestion: data.guestAnalysis?.upgradeSuggestion || "Create an account for more features."
+      };
+    }
+    
+    setAnalysisResult(result);
   };
   
   const handleWhatsappUpload = async () => {
@@ -278,28 +304,28 @@ export default function UploadPage() {
                             <AlertTitle>Guest Analysis</AlertTitle>
                             <AlertDescription>
                               <div className="space-y-3 pt-2">
-                                {analysisResult.guestAnalysis?.limitedStrengths?.length > 0 && (
+                                {analysisResult.guestAnalysis && analysisResult.guestAnalysis.limitedStrengths && analysisResult.guestAnalysis.limitedStrengths.length > 0 && (
                                   <div>
                                     <h4 className="font-medium text-sm flex items-center">
                                       <CheckCircle className="h-4 w-4 text-green-500 mr-1.5" />
                                       Strengths:
                                     </h4>
                                     <ul className="mt-1 pl-6 text-sm list-disc">
-                                      {analysisResult.guestAnalysis.limitedStrengths.map((strength, i) => (
+                                      {analysisResult.guestAnalysis.limitedStrengths.map((strength: string, i: number) => (
                                         <li key={i}>{strength}</li>
                                       ))}
                                     </ul>
                                   </div>
                                 )}
                                 
-                                {analysisResult.guestAnalysis?.limitedImprovements?.length > 0 && (
+                                {analysisResult.guestAnalysis && analysisResult.guestAnalysis.limitedImprovements && analysisResult.guestAnalysis.limitedImprovements.length > 0 && (
                                   <div>
                                     <h4 className="font-medium text-sm flex items-center">
                                       <AlertTriangle className="h-4 w-4 text-yellow-500 mr-1.5" />
                                       Improvement Area:
                                     </h4>
                                     <ul className="mt-1 pl-6 text-sm list-disc">
-                                      {analysisResult.guestAnalysis.limitedImprovements.map((improvement, i) => (
+                                      {analysisResult.guestAnalysis.limitedImprovements.map((improvement: string, i: number) => (
                                         <li key={i}>{improvement}</li>
                                       ))}
                                     </ul>
