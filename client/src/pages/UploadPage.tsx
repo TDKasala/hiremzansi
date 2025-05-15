@@ -46,7 +46,6 @@ export default function UploadPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isWhatsappUploading, setIsWhatsappUploading] = useState(false);
-  const [referralCode, setReferralCode] = useState("");
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
   const [uploadedScore, setUploadedScore] = useState<number>(0);
@@ -260,37 +259,6 @@ export default function UploadPage() {
               <WhatsAppUpload />
             </TabsContent>
           </Tabs>
-          
-          {/* Referral Program */}
-          <Card className="bg-primary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Gift className="h-5 w-5 text-primary mr-2" />
-                Refer Friends & Earn
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="flex-1">
-                  <p className="text-sm mb-2">
-                    Share ATSBoost with friends and get <span className="font-semibold">free CV scans</span> after 3 referrals
-                  </p>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      placeholder="Your referral code (optional)"
-                      value={referralCode}
-                      onChange={(e) => setReferralCode(e.target.value)}
-                    />
-                    <Button variant="outline" size="sm">Apply</Button>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 bg-primary/10 p-2 rounded-lg">
-                  <Users className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">3 referrals = 1 free scan</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
           
           {/* ATS Analysis Results */}
           <Card>

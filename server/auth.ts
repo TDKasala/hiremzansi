@@ -30,10 +30,35 @@ async function hashPassword(password: string) {
 
 // Securely compare password with stored hash
 async function comparePasswords(supplied: string, stored: string) {
-  const [hashed, salt] = stored.split(".");
-  const hashedBuf = Buffer.from(hashed, "hex");
-  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-  return timingSafeEqual(hashedBuf, suppliedBuf);
+  try {
+    // Make sure stored password is properly formatted
+    if (!stored || !stored.includes(".")) {
+      console.error("Invalid stored password format");
+      return false;
+    }
+
+    const [hashed, salt] = stored.split(".");
+    
+    // Check if hashed part or salt is missing
+    if (!hashed || !salt) {
+      console.error("Missing hash or salt component in stored password");
+      return false;
+    }
+    
+    const hashedBuf = Buffer.from(hashed, "hex");
+    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+    
+    // Make sure both buffers have the same length before comparing
+    if (hashedBuf.length !== suppliedBuf.length) {
+      console.error(`Buffer length mismatch: ${hashedBuf.length} vs ${suppliedBuf.length}`);
+      return false;
+    }
+    
+    return timingSafeEqual(hashedBuf, suppliedBuf);
+  } catch (error) {
+    console.error("Error comparing passwords:", error);
+    return false;
+  }
 }
 
 export function setupAuth(app: Express) {
