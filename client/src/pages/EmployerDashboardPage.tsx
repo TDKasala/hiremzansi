@@ -61,6 +61,11 @@ export default function EmployerDashboardPage() {
     enabled: !!employer, // Only run if employer exists
   });
   
+  // Function to handle employer profile creation submission
+  const createEmployerProfile = (data: any) => {
+    createEmployerMutation.mutate(data);
+  };
+  
   // Create employer profile mutation
   const createEmployerMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -188,6 +193,35 @@ export default function EmployerDashboardPage() {
     );
   }
   
+  // If employer doesn't exist, show create employer form
+  if (!employer && !isLoadingEmployer) {
+    return (
+      <div className="container mx-auto py-8 max-w-6xl">
+        <Helmet>
+          <title>Create Employer Profile | ATSBoost</title>
+          <meta name="description" content="Create your employer profile on ATSBoost to start posting jobs." />
+        </Helmet>
+        
+        <h1 className="text-3xl font-bold mb-8">Create Employer Profile</h1>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Company Information</CardTitle>
+            <CardDescription>
+              Complete your employer profile to start posting jobs and finding candidates
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CreateEmployerProfileForm 
+              onSubmit={createEmployerProfile}
+              isSubmitting={createEmployerMutation.isPending}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8 max-w-6xl">
       <Helmet>
@@ -489,20 +523,20 @@ export default function EmployerDashboardPage() {
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-line">
-                  {employer.description || "No company description available."}
+                  {employer?.description || "No company description available."}
                 </p>
                 
                 <div className="mt-6 space-y-4">
-                  {employer.websiteUrl && (
+                  {employer?.websiteUrl && (
                     <div className="flex items-center">
                       <span className="text-sm font-medium w-24">Website:</span>
                       <a 
-                        href={employer.websiteUrl} 
+                        href={employer?.websiteUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                       >
-                        {employer.websiteUrl}
+                        {employer?.websiteUrl}
                       </a>
                     </div>
                   )}
