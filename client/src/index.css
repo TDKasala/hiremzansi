@@ -61,56 +61,58 @@
 }
 
 :root {
+  /* ATSBoost colors - blue primary, green secondary based on the logo */
   --background: 0 0% 100%;
   --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
+  --muted: 210 20% 95%;
   --muted-foreground: 25 5.3% 44.7%;
   --popover: 0 0% 100%;
   --popover-foreground: 20 14.3% 4.1%;
   --card: 0 0% 100%;
   --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 142 69% 41%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 210 57% 24%;
+  --border: 210 20% 90%;
+  --input: 210 20% 90%;
+  --primary: 210 80% 30%;  /* Blue from logo */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 120 50% 45%; /* Green from logo */
   --secondary-foreground: 0 0% 100%;
-  --accent: 60 4.8% 95.9%;
+  --accent: 50 100% 60%;  /* Yellow dot from logo */
   --accent-foreground: 24 9.8% 10%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 20 14.3% 4.1%;
+  --ring: 210 80% 30%;
   --radius: 0.5rem;
   --warning: 48 96% 53%;
-  --success: 142 69% 41%;
+  --success: 120 50% 45%;
   --error: 0 84.2% 60.2%;
-  --chart-1: 142 69% 41%;
-  --chart-2: 210 57% 24%;
-  --chart-3: 48 96% 53%;
-  --chart-4: 0 84.2% 60.2%;
-  --chart-5: 262 83% 58%;
+  --chart-1: 210 80% 30%;  /* Blue */
+  --chart-2: 120 50% 45%;  /* Green */
+  --chart-3: 50 100% 60%;  /* Yellow */
+  --chart-4: 0 84.2% 60.2%; /* Red */
+  --chart-5: 262 83% 58%;   /* Purple */
 }
 
 .dark {
-  --background: 240 10% 3.9%;
+  /* ATSBoost dark theme - blue and green based on the logo */
+  --background: 220 25% 10%;
   --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
+  --muted: 210 25% 18%;
   --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
+  --popover: 220 25% 10%;
   --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
+  --card: 220 25% 12%;
   --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 142 69% 41%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 210 57% 24%;
+  --border: 210 25% 20%;
+  --input: 210 25% 20%;
+  --primary: 210 70% 45%;  /* Brighter Blue for dark theme */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 120 45% 50%; /* Brighter Green for dark theme */
   --secondary-foreground: 0 0% 100%;
-  --accent: 240 3.7% 15.9%;
+  --accent: 50 90% 60%;  /* Yellow for dark theme */
   --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
+  --destructive: 0 62.8% 50%;
   --destructive-foreground: 0 0% 98%;
-  --ring: 240 4.9% 83.9%;
+  --ring: 210 70% 45%;
   --radius: 0.5rem;
 }
 

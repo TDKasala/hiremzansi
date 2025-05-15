@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
-import { ChartLine, Menu, User, LogOut } from "lucide-react";
+import { Menu, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "./LanguageSelector";
+import atsBoostLogo from "@/assets/atsboost-logo.png";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,9 +41,11 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link href="/" className="text-secondary font-bold text-xl md:text-2xl flex items-center">
-          <ChartLine className="text-primary mr-2" />
-          <span>ATSBoost</span>
+        <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
+          <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-10 mr-2" />
+          <span className="hidden sm:inline">
+            <span className="text-[#6bc04b]">ATS</span><span className="text-[#1a5fa0]">BOOST</span>
+          </span>
         </Link>
 
         <div className="hidden md:flex space-x-1">
