@@ -243,34 +243,67 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createATSScore(insertATSScore: InsertATSScore): Promise<ATSScore> {
-    // Use SQL query directly to avoid typing issues
-    const result = await db.execute(sql`
-      INSERT INTO ats_scores (
-        cv_id, score, skills_score, context_score, format_score, 
-        strengths, improvements, issues, 
-        sa_keywords_found, sa_context_score, 
-        bbbee_detected, nqf_detected, 
-        keyword_recommendations,
-        created_at, updated_at
-      ) VALUES (
-        ${insertATSScore.cvId}, 
-        ${insertATSScore.score}, 
-        ${insertATSScore.skillsScore}, 
-        ${insertATSScore.contextScore}, 
-        ${insertATSScore.formatScore},
-        ${insertATSScore.strengths ? JSON.stringify(insertATSScore.strengths) : '[]'},
-        ${insertATSScore.improvements ? JSON.stringify(insertATSScore.improvements) : '[]'},
-        ${insertATSScore.issues ? JSON.stringify(insertATSScore.issues) : '[]'},
-        ${insertATSScore.saKeywordsFound ? JSON.stringify(insertATSScore.saKeywordsFound) : '[]'},
-        ${insertATSScore.saContextScore || null},
-        ${insertATSScore.bbbeeDetected || false},
-        ${insertATSScore.nqfDetected || false},
-        ${insertATSScore.keywordRecommendations ? JSON.stringify(insertATSScore.keywordRecommendations) : 'null'},
-        NOW(), NOW()
-      ) RETURNING *
-    `);
-    
-    return result.rows[0] as ATSScore;
+    try {
+      // First ensure all arrays are properly formatted
+      const strengths = Array.isArray(insertATSScore.strengths) ? insertATSScore.strengths : [];
+      const improvements = Array.isArray(insertATSScore.improvements) ? insertATSScore.improvements : [];
+      const issues = Array.isArray(insertATSScore.issues) ? insertATSScore.issues : [];
+      const saKeywordsFound = Array.isArray(insertATSScore.saKeywordsFound) ? insertATSScore.saKeywordsFound : [];
+      
+      // Use direct insert with the drizzle ORM
+      const [atsScore] = await db.insert(atsScores).values({
+        cvId: insertATSScore.cvId,
+        score: insertATSScore.score,
+        skillsScore: insertATSScore.skillsScore || 0,
+        contextScore: insertATSScore.contextScore || 0,
+        formatScore: insertATSScore.formatScore || 0,
+        strengths: strengths,
+        improvements: improvements,
+        issues: issues,
+        saKeywordsFound: saKeywordsFound,
+        saContextScore: insertATSScore.saContextScore || null,
+        bbbeeDetected: insertATSScore.bbbeeDetected || false,
+        nqfDetected: insertATSScore.nqfDetected || false,
+        keywordRecommendations: insertATSScore.keywordRecommendations || null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      
+      return atsScore;
+    } catch (error) {
+      console.error("Error creating ATS score:", error);
+      // Fallback method if the direct insertion fails
+      console.log("Trying fallback method for ATS score creation");
+      
+      // Use SQL query with explicit casting to avoid JSON parsing issues
+      const result = await db.execute(sql`
+        INSERT INTO ats_scores (
+          cv_id, score, skills_score, context_score, format_score, 
+          strengths, improvements, issues, 
+          sa_keywords_found, sa_context_score, 
+          bbbee_detected, nqf_detected, 
+          keyword_recommendations,
+          created_at, updated_at
+        ) VALUES (
+          ${insertATSScore.cvId}, 
+          ${insertATSScore.score}, 
+          ${insertATSScore.skillsScore || 0}, 
+          ${insertATSScore.contextScore || 0}, 
+          ${insertATSScore.formatScore || 0},
+          ${sql.array(Array.isArray(insertATSScore.strengths) ? insertATSScore.strengths : [])},
+          ${sql.array(Array.isArray(insertATSScore.improvements) ? insertATSScore.improvements : [])},
+          ${sql.array(Array.isArray(insertATSScore.issues) ? insertATSScore.issues : [])},
+          ${sql.array(Array.isArray(insertATSScore.saKeywordsFound) ? insertATSScore.saKeywordsFound : [])},
+          ${insertATSScore.saContextScore || null},
+          ${insertATSScore.bbbeeDetected || false},
+          ${insertATSScore.nqfDetected || false},
+          ${insertATSScore.keywordRecommendations ? sql.json(insertATSScore.keywordRecommendations) : null},
+          NOW(), NOW()
+        ) RETURNING *
+      `);
+      
+      return result.rows[0] as ATSScore;
+    }
   }
 
   // Deep analysis operations
