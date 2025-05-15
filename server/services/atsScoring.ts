@@ -5,14 +5,14 @@ import { analysisCache } from "./analysisCache";
 // Configuration for ATS scoring analysis
 const CONFIG = {
   // Whether to use OpenAI at all - can be set to false to disable all API calls
-  // Setting to true because we need to use the OpenAI API for scoring
-  USE_OPENAI: true,
+  // Setting to false temporarily due to quota issues with OpenAI API
+  USE_OPENAI: false,
   
-  // Default to OpenAI for all users (better accuracy)
-  DEFAULT_TO_RULE_BASED: false,
+  // Default to rule-based analysis instead of OpenAI due to quota limitations
+  DEFAULT_TO_RULE_BASED: true,
   
-  // Always use OpenAI for premium deep analysis
-  ALWAYS_USE_OPENAI_FOR_PREMIUM: true,
+  // Disable OpenAI for premium deep analysis temporarily
+  ALWAYS_USE_OPENAI_FOR_PREMIUM: false,
   
   // Use caching to avoid redundant API calls
   USE_CACHING: true
