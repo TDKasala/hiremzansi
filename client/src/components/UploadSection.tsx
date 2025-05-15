@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useDropzone } from "react-dropzone";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useAtsScore } from "@/hooks/useAtsScore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import { 
   CloudUpload, 
   CheckCircle, 
@@ -16,13 +17,49 @@ import {
 
 export default function UploadSection() {
   const [consent, setConsent] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
   const { uploadFile, isUploading } = useFileUpload();
-  const { score, analysis, isLoading } = useAtsScore();
+  const { score, analysis, isLoading, analyzeCv } = useAtsScore();
+  const { toast } = useToast();
+  const [_, setLocation] = useLocation();
+  
+  // Function to handle analyzing the CV
+  const handleAnalyzeClick = async () => {
+    if (!uploadedCvId || !consent) return;
+    
+    try {
+      // Call the analyze CV endpoint
+      await analyzeCv(uploadedCvId);
+      
+      toast({
+        title: "CV Analysis Complete",
+        description: "Your CV has been analyzed successfully.",
+      });
+      
+      // Redirect to CV details page
+      setLocation(`/cv/${uploadedCvId}`);
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "There was an error analyzing your CV. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const onDrop = async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
-      await uploadFile(file);
+      setCvFile(file);
+      try {
+        const response = await uploadFile(file);
+        if (response && response.cv && response.cv.id) {
+          setUploadedCvId(response.cv.id);
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+      }
     }
   };
 
@@ -148,14 +185,13 @@ export default function UploadSection() {
                   </label>
                 </div>
               </div>
-              <Link href="/deep-analysis">
-                <Button 
-                  disabled={!consent || !score} 
-                  className="w-full sm:w-auto bg-secondary text-white hover:bg-opacity-90"
-                >
-                  Get Deep Analysis Report <span className="text-sm ml-1">(ZAR 55.50)</span>
-                </Button>
-              </Link>
+              <Button 
+                onClick={handleAnalyzeClick}
+                disabled={!consent || !cvFile} 
+                className="w-full sm:w-auto bg-primary text-white hover:bg-opacity-90"
+              >
+                Analyze CV
+              </Button>
             </div>
           </CardContent>
         </Card>

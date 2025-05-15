@@ -75,6 +75,36 @@ export function useAtsScore() {
     queryClient.invalidateQueries({ queryKey: ['/api/ats-score', newCvId] });
   };
 
+  // Function to analyze a CV after upload
+  const analyzeCv = async (cvId: number) => {
+    try {
+      const response = await fetch(`/api/analyze-cv/${cvId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to analyze CV');
+      }
+      
+      const data = await response.json();
+      
+      // Update the query cache with the new results
+      queryClient.setQueryData(['/api/ats-score', cvId], data);
+      
+      // Set the CV ID to trigger the query
+      updateCvId(cvId);
+      
+      return data;
+    } catch (error) {
+      console.error('Error analyzing CV:', error);
+      throw error;
+    }
+  };
+
   return {
     score: analysis?.score || null,
     analysis,
@@ -83,5 +113,6 @@ export function useAtsScore() {
     error,
     refetch,
     updateCvId,
+    analyzeCv,
   };
 }
