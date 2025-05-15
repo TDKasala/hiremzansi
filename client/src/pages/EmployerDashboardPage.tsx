@@ -365,7 +365,7 @@ export default function EmployerDashboardPage() {
                           <Button 
                             variant={job.isActive ? "outline" : "default"}
                             size="sm"
-                            onClick={() => handleToggleJobActivation(job.id, job.isActive)}
+                            onClick={() => handleToggleJobActivation(job.id, job.isActive ?? false)}
                             disabled={toggleJobActivationMutation.isPending}
                           >
                             {job.isActive ? (
@@ -420,7 +420,7 @@ export default function EmployerDashboardPage() {
                     <Button 
                       variant={job.isActive ? "outline" : "default"}
                       size="sm"
-                      onClick={() => handleToggleJobActivation(job.id, job.isActive)}
+                      onClick={() => handleToggleJobActivation(job.id, job.isActive ?? false)}
                       disabled={toggleJobActivationMutation.isPending}
                     >
                       {job.isActive ? "Deactivate" : "Activate"}
@@ -485,7 +485,7 @@ export default function EmployerDashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>About {employer.companyName}</CardTitle>
+                <CardTitle>About {employer?.companyName}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-line">
