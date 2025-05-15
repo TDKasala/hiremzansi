@@ -692,9 +692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update the analysis status
       const updatedAnalysis = await storage.updateDeepAnalysisReport(deepAnalysis.id, {
         status: 'completed',
-        paymentDate: new Date().toISOString(),
-        paymentMethod: paymentMethod || 'yoco',
-        paymentReference: `yoco-payment-${Date.now()}`,
+        paidAmount: 199,
         // Add the same mock data as in the deep-analysis endpoint
         detailedAnalysis: {
           summary: "Your CV has been thoroughly analyzed with South African context in mind.",
@@ -714,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         },
         industryComparison: {
-          industry: deepAnalysis.cv?.targetIndustry || "Technology",
+          industry: "Technology", // Use a default value
           averageScore: 72,
           yourScore: 81,
           keyDifferences: [
