@@ -22,7 +22,6 @@ import {
   Send,
   Smartphone,
   Gift,
-  Users,
   ListChecks,
   FileText,
   Book,
