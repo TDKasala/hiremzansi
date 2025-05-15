@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { MotivationProvider } from "@/hooks/use-motivation";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { ScrollToTop } from "@/lib/scroll-to-top";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
@@ -53,6 +54,7 @@ function App() {
           <AuthProvider>
             <MotivationProvider>
               <Layout>
+                <ScrollToTop />
                 <Switch>
                   <Route path="/" component={HomePage} />
                   <Route path="/how-it-works" component={HowItWorksPage} />
