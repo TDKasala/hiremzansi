@@ -1432,9 +1432,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.user!.id,
         companyName: req.body.companyName,
         industry: req.body.industry,
-        companySize: req.body.companySize,
+        size: req.body.size,
+        location: req.body.location,
         description: req.body.description,
-        website: req.body.website,
+        websiteUrl: req.body.websiteUrl,
+        bbbeeLevel: req.body.bbbeeLevel,
         contactEmail: req.body.contactEmail,
         contactPhone: req.body.contactPhone,
         isVerified: false // Default to false, verification process can be added later
@@ -1474,9 +1476,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: employer.id,
         companyName: employer.companyName,
         industry: employer.industry,
-        companySize: employer.companySize,
+        size: employer.size,
         description: employer.description,
-        website: employer.website,
+        websiteUrl: employer.websiteUrl,
         isVerified: employer.isVerified
       });
     } catch (error) {
@@ -1505,16 +1507,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: req.body.title,
         description: req.body.description,
         location: req.body.location,
-        salary: req.body.salary,
+        employmentType: req.body.employmentType,
+        experienceLevel: req.body.experienceLevel,
         salaryRange: req.body.salaryRange,
-        jobType: req.body.jobType,
         requiredSkills: req.body.requiredSkills || [],
         preferredSkills: req.body.preferredSkills || [],
-        education: req.body.education,
-        experience: req.body.experience,
-        bbbeePreference: req.body.bbbeePreference,
+        industry: req.body.industry,
+        deadline: req.body.deadline ? new Date(req.body.deadline) : null,
         isActive: true,
-        applicationDeadline: req.body.applicationDeadline ? new Date(req.body.applicationDeadline) : null
+        isFeatured: req.body.isFeatured || false
       };
       
       const job = await createJobPosting(jobData);
