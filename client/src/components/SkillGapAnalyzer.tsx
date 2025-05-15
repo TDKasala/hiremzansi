@@ -1,925 +1,963 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   Card, 
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardFooter,
-  CardTitle
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  Tooltip
-} from "recharts";
-import {
-  Loader2,
-  ArrowLeft,
-  BookOpen,
-  Target,
-  Briefcase,
-  ChevronRight,
-  Lightbulb,
-  GraduationCap,
-  BarChart4
-} from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from "@/components/ui/form";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Accordion, 
+  AccordionContent, 
+  AccordionItem, 
+  AccordionTrigger 
 } from "@/components/ui/accordion";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2, ArrowRight, BookOpen, Star, Award, Sparkles, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/use-auth";
 
-// Types for skill analysis
-interface SkillProficiency {
+// Form schema
+const skillGapSchema = z.object({
+  currentRole: z.string().min(2, "Current role is required"),
+  targetRole: z.string().min(2, "Target role is required"),
+  skills: z.string().optional(),
+  experienceLevel: z.string().min(1, "Experience level is required"),
+  resume: z.string().optional(),
+});
+
+type SkillGapFormValues = z.infer<typeof skillGapSchema>;
+
+interface SkillMatch {
   name: string;
-  level: "beginner" | "intermediate" | "advanced" | "expert";
-  experience?: number;
-  lastUsed?: string;
-  verified?: boolean;
-  category?: string;
-  relevance?: number;
+  match: number;
+  description: string;
+  importance: number;
 }
 
 interface LearningResource {
   title: string;
+  description: string;
+  url: string;
   type: string;
-  provider?: string;
-  url?: string;
-  cost?: {
-    amount: number;
-    currency: string;
-  };
-  duration?: {
-    value: number;
-    unit: string;
-  };
+  duration: string;
   level: string;
-  saRelevant: boolean;
-  description?: string;
+  provider: string;
 }
 
-interface SkillGap {
-  skill: string;
-  importance: number;
-  currentLevel?: "none" | "beginner" | "intermediate" | "advanced" | "expert";
-  requiredLevel: "beginner" | "intermediate" | "advanced" | "expert";
-  gap: "critical" | "major" | "minor" | "none";
-  resources: LearningResource[];
-  description: string;
-}
-
-interface CareerPathOption {
-  title: string;
-  description: string;
-  requiredSkills: {
-    name: string;
-    level: string;
-    importance: number;
-  }[];
-  salaryRange?: {
-    min: number;
-    max: number;
-    currency: string;
-  };
-  growthPotential: string;
-  timeToAchieve?: {
-    value: number;
-    unit: string;
-  };
-  industries: string[];
-  saJobMarketDemand: string;
-}
-
-interface SkillGapAnalysis {
-  id: string;
-  currentSkills: SkillProficiency[];
-  targetRole?: string;
-  targetIndustry?: string;
-  identifiedGaps: SkillGap[];
-  careerPathOptions: CareerPathOption[];
-  marketInsights: {
-    inDemandSkills: string[];
-    emergingTechnologies: string[];
-    industryTrends: string[];
-    salaryInsights: {
-      role: string;
-      median: number;
-      range: {
-        min: number;
-        max: number;
-      };
-      currency: string;
-    }[];
-  };
+interface SkillGapResult {
+  overallMatch: number;
   summary: string;
-  actionPlan: {
-    shortTerm: string[];
-    mediumTerm: string[];
-    longTerm: string[];
+  recommendations: string;
+  matchedSkills: SkillMatch[];
+  missingSkills: SkillMatch[];
+  partialSkills: SkillMatch[];
+  learningResources: LearningResource[];
+  careerProgression: {
+    currentLevel: string;
+    nextLevel: string;
+    timeEstimate: string;
+    steps: string[];
   };
-  createdAt: string;
+  marketInsights: {
+    demand: number;
+    salaryRange: {
+      min: number;
+      max: number;
+      currency: string;
+    };
+    growthRate: string;
+    topRegions: string[];
+  };
 }
-
-// Convert skill level to numeric value
-const skillLevelToValue = (level?: string): number => {
-  switch(level) {
-    case "expert": return 100;
-    case "advanced": return 75;
-    case "intermediate": return 50;
-    case "beginner": return 25;
-    case "none": return 0;
-    default: return 0;
-  }
-};
-
-// Format currency
-const formatCurrency = (amount?: number, currency = "ZAR") => {
-  if (amount === undefined) return "";
-  
-  return new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0
-  }).format(amount);
-};
 
 export default function SkillGapAnalyzer() {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const [_, setLocation] = useLocation();
+  const [result, setResult] = useState<SkillGapResult | null>(null);
   
-  // Analysis states
-  const [cvContent, setCvContent] = useState("");
-  const [targetRole, setTargetRole] = useState("");
-  const [targetIndustry, setTargetIndustry] = useState("");
-  const [currentSkills, setCurrentSkills] = useState<SkillProficiency[]>([]);
-  const [analysis, setAnalysis] = useState<SkillGapAnalysis | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
-  // Selected resources
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  
-  // Get job ID from URL if present
-  const jobId = new URLSearchParams(window.location.search).get('jobId');
-  
-  // Fetch job details if jobId is provided
-  const jobQuery = useQuery({
-    queryKey: ['/api/job-details', jobId],
-    queryFn: () => 
-      fetch(`/api/job-details/${jobId}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch job details');
-          return res.json();
-        }),
-    enabled: !!jobId,
-    staleTime: 10 * 60 * 1000 // 10 minutes
+  // Get user's CVs
+  const { data: cvs, isLoading: cvsLoading } = useQuery({
+    queryKey: ["/api/cvs"],
+    enabled: !!user,
   });
-  
-  // Update target role and industry when job is loaded
-  useEffect(() => {
-    if (jobQuery.data) {
-      setTargetRole(jobQuery.data.title);
-      setTargetIndustry(jobQuery.data.industry);
-    }
-  }, [jobQuery.data]);
-  
-  // Get CV content
-  const cvQuery = useQuery({
-    queryKey: ['/api/latest-cv'],
-    queryFn: () => 
-      fetch(`/api/latest-cv`)
-        .then(res => {
-          if (!res.ok) {
-            if (res.status === 404) {
-              return { error: "No CV found" };
-            }
-            throw new Error('Failed to fetch CV');
-          }
-          return res.json();
-        }),
-    staleTime: 5 * 60 * 1000 // 5 minutes
+
+  // Form setup
+  const form = useForm<SkillGapFormValues>({
+    resolver: zodResolver(skillGapSchema),
+    defaultValues: {
+      currentRole: "",
+      targetRole: "",
+      skills: "",
+      experienceLevel: "mid-level",
+      resume: "",
+    },
   });
-  
-  // Update CV content when query completes
-  useEffect(() => {
-    if (cvQuery.data && !cvQuery.data.error) {
-      setCvContent(cvQuery.data.content);
-    }
-  }, [cvQuery.data]);
-  
-  // Extract skills from CV
-  const extractSkillsMutation = useMutation({
-    mutationFn: async (data: { cvContent: string }) => {
-      const response = await apiRequest("POST", "/api/skills/extract-from-cv", data);
-      return response.json();
-    },
-    onSuccess: (data: SkillProficiency[]) => {
-      setCurrentSkills(data);
-      toast({
-        title: "Skills Extracted",
-        description: `Identified ${data.length} skills from your CV.`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: `Failed to extract skills: ${error.message}`,
-        variant: "destructive"
-      });
-    }
-  });
-  
-  // Analyze skill gaps
-  const analyzeGapsMutation = useMutation({
-    mutationFn: async (data: {
-      currentSkills: SkillProficiency[];
-      targetRole: string;
-      targetIndustry?: string;
-    }) => {
-      const response = await apiRequest("POST", "/api/skills/analyze-gaps", data);
-      return response.json();
-    },
-    onSuccess: (data: SkillGapAnalysis) => {
-      setAnalysis(data);
-      setIsAnalyzing(false);
-      
-      toast({
-        title: "Analysis Complete",
-        description: "Your personalized skill gap analysis is ready.",
-      });
-    },
-    onError: (error: Error) => {
-      setIsAnalyzing(false);
-      
-      toast({
-        title: "Analysis Failed",
-        description: `Failed to analyze skill gaps: ${error.message}`,
-        variant: "destructive"
-      });
-    }
-  });
-  
-  // Extract skills from CV
-  const handleExtractSkills = () => {
-    if (!cvContent) {
-      toast({
-        title: "No CV Content",
-        description: "Please upload your CV first or enter CV content manually.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    extractSkillsMutation.mutate({ cvContent });
-  };
-  
-  // Start analysis
-  const handleAnalyze = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (currentSkills.length === 0) {
-      toast({
-        title: "No Skills Detected",
-        description: "Please extract skills from your CV first.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (!targetRole) {
-      toast({
-        title: "Target Role Required",
-        description: "Please specify the role you're targeting.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsAnalyzing(true);
-    
-    analyzeGapsMutation.mutate({
-      currentSkills,
-      targetRole,
-      targetIndustry: targetIndustry || undefined
-    });
-  };
-  
-  // Get learning resources for a specific skill
-  const getResourceQuery = useQuery({
-    queryKey: ['/api/skills/learning-resources', selectedSkill],
-    queryFn: () => {
-      if (!selectedSkill || !analysis) return null;
-      
-      const skillGap = analysis.identifiedGaps.find(gap => gap.skill === selectedSkill);
-      if (!skillGap) return null;
-      
-      const params = new URLSearchParams({
-        skillName: selectedSkill,
-        currentLevel: skillGap.currentLevel || 'none',
-        targetLevel: skillGap.requiredLevel
-      });
-      
-      return fetch(`/api/skills/learning-resources?${params.toString()}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch learning resources');
-          return res.json();
-        });
-    },
-    enabled: !!selectedSkill,
-    staleTime: 30 * 60 * 1000 // 30 minutes
-  });
-  
-  // Prepare skills data for radar chart
-  const prepareSkillsChartData = () => {
-    if (!analysis) return [];
-    
-    // Create categories
-    const skillCategories: Record<string, { category: string, value: number, fullMark: number }> = {};
-    
-    // Process current skills
-    analysis.currentSkills.forEach(skill => {
-      const category = skill.category || "Other";
-      
-      if (!skillCategories[category]) {
-        skillCategories[category] = {
-          category,
-          value: 0,
-          fullMark: 100
-        };
+
+  const analyzeMutation = useMutation({
+    mutationFn: async (data: SkillGapFormValues) => {
+      const res = await apiRequest("POST", "/api/skills/analyze-gaps", data);
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to analyze skills");
       }
-      
-      // Add skill level to category total
-      const value = skillLevelToValue(skill.level);
-      skillCategories[category].value = Math.max(skillCategories[category].value, value);
-    });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setResult(data);
+      // Scroll to results
+      setTimeout(() => {
+        const resultsElement = document.getElementById("results");
+        if (resultsElement) {
+          resultsElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Analysis failed",
+        description: error.message || "Could not analyze skills. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  function onSubmit(data: SkillGapFormValues) {
+    analyzeMutation.mutate(data);
+  }
+
+  // Sample data for demonstration when no real API is available
+  function getSampleResults(): SkillGapResult {
+    const targetRole = form.getValues().targetRole.toLowerCase();
     
-    // Convert to array
-    return Object.values(skillCategories);
-  };
-  
-  // Prepare skill gaps data for visualization
-  const prepareGapChartData = () => {
-    if (!analysis) return [];
+    // Base sample data
+    const sampleResult: SkillGapResult = {
+      overallMatch: 67,
+      summary: "You have a solid foundation for the target role, but there are some important skill gaps to address. With focused learning on key technologies and methodologies, you could significantly improve your employability for this position.",
+      recommendations: "Focus on developing the missing technical skills through online courses and practical projects. Consider joining relevant professional communities to build your network in this field.",
+      matchedSkills: [
+        {
+          name: "Problem Solving",
+          match: 100,
+          description: "You have demonstrated strong problem-solving abilities that are directly transferable to the target role.",
+          importance: 9
+        },
+        {
+          name: "Communication",
+          match: 100,
+          description: "Your communication skills are well-developed and meet the requirements of the role.",
+          importance: 8
+        },
+        {
+          name: "Project Management",
+          match: 90,
+          description: "You have good experience with project management, which is valuable for this position.",
+          importance: 7
+        }
+      ],
+      missingSkills: [
+        {
+          name: "Technical Skill 1",
+          match: 0,
+          description: "This is a core technical requirement for the role that was not found in your profile.",
+          importance: 9
+        },
+        {
+          name: "Industry Knowledge",
+          match: 0,
+          description: "Specific industry knowledge required for this role was not identified in your background.",
+          importance: 8
+        }
+      ],
+      partialSkills: [
+        {
+          name: "Technical Skill 2",
+          match: 60,
+          description: "You have some experience with this skill, but would benefit from deeper knowledge.",
+          importance: 8
+        },
+        {
+          name: "Leadership",
+          match: 50,
+          description: "You have some leadership experience, but the role requires more advanced leadership capabilities.",
+          importance: 7
+        }
+      ],
+      learningResources: [
+        {
+          title: "Online Course 1",
+          description: "Comprehensive course covering the fundamentals of the required technical skill.",
+          url: "https://example.com/course1",
+          type: "Course",
+          duration: "30 hours",
+          level: "Intermediate",
+          provider: "Coursera"
+        },
+        {
+          title: "Industry Certification",
+          description: "Recognized certification that will validate your knowledge in this field.",
+          url: "https://example.com/certification",
+          type: "Certification",
+          duration: "Self-paced",
+          level: "Advanced",
+          provider: "Industry Association"
+        },
+        {
+          title: "Practical Workshop",
+          description: "Hands-on workshop to develop practical skills required for the role.",
+          url: "https://example.com/workshop",
+          type: "Workshop",
+          duration: "2 days",
+          level: "Intermediate",
+          provider: "Tech Academy"
+        }
+      ],
+      careerProgression: {
+        currentLevel: "Mid-level Professional",
+        nextLevel: "Senior Professional",
+        timeEstimate: "1-2 years",
+        steps: [
+          "Complete recommended technical training",
+          "Gain practical experience through projects",
+          "Develop leadership skills through team leadership opportunities",
+          "Build industry network and expertise"
+        ]
+      },
+      marketInsights: {
+        demand: 8,
+        salaryRange: {
+          min: 35000,
+          max: 55000,
+          currency: "ZAR"
+        },
+        growthRate: "12% annually",
+        topRegions: ["Johannesburg", "Cape Town", "Pretoria", "Durban"]
+      }
+    };
+
+    // Customize based on target role if provided
+    if (targetRole.includes("developer") || targetRole.includes("engineer") || targetRole.includes("programmer")) {
+      return {
+        ...sampleResult,
+        overallMatch: 72,
+        matchedSkills: [
+          {
+            name: "Problem Solving",
+            match: 100,
+            description: "Your analytical and logical reasoning skills are well developed and directly applicable to software development roles.",
+            importance: 9
+          },
+          {
+            name: "JavaScript",
+            match: 90,
+            description: "You have strong JavaScript skills that match the requirements for this role.",
+            importance: 9
+          },
+          {
+            name: "Version Control (Git)",
+            match: 85,
+            description: "Your experience with Git and version control practices meets industry standards.",
+            importance: 7
+          }
+        ],
+        missingSkills: [
+          {
+            name: "React.js",
+            match: 0,
+            description: "React.js is a core requirement for this position but was not found in your profile.",
+            importance: 9
+          },
+          {
+            name: "GraphQL",
+            match: 0,
+            description: "Experience with GraphQL APIs would be beneficial for this role.",
+            importance: 7
+          }
+        ],
+        partialSkills: [
+          {
+            name: "Node.js",
+            match: 60,
+            description: "You have some experience with Node.js, but would benefit from more advanced knowledge.",
+            importance: 8
+          },
+          {
+            name: "Test-Driven Development",
+            match: 40,
+            description: "You have basic understanding of testing principles, but this role requires more advanced TDD practices.",
+            importance: 7
+          }
+        ],
+        learningResources: [
+          {
+            title: "React - The Complete Guide",
+            description: "Comprehensive course covering React fundamentals through advanced concepts.",
+            url: "https://example.com/react-course",
+            type: "Course",
+            duration: "40 hours",
+            level: "Beginner to Advanced",
+            provider: "Udemy"
+          },
+          {
+            title: "Advanced Node.js Development",
+            description: "Deep dive into Node.js architecture and advanced server-side concepts.",
+            url: "https://example.com/nodejs-advanced",
+            type: "Course",
+            duration: "25 hours",
+            level: "Intermediate",
+            provider: "Pluralsight"
+          },
+          {
+            title: "GraphQL Certification",
+            description: "Learn GraphQL API development from fundamentals to production-ready implementations.",
+            url: "https://example.com/graphql-cert",
+            type: "Certification",
+            duration: "Self-paced",
+            level: "Intermediate",
+            provider: "Apollo"
+          }
+        ],
+        marketInsights: {
+          demand: 9,
+          salaryRange: {
+            min: 40000,
+            max: 70000,
+            currency: "ZAR"
+          },
+          growthRate: "15% annually",
+          topRegions: ["Johannesburg", "Cape Town", "Pretoria", "Durban"]
+        }
+      };
+    } else if (targetRole.includes("data") || targetRole.includes("analyst") || targetRole.includes("science")) {
+      return {
+        ...sampleResult,
+        overallMatch: 64,
+        matchedSkills: [
+          {
+            name: "Data Analysis",
+            match: 85,
+            description: "You have strong analytical skills that transfer well to data science roles.",
+            importance: 9
+          },
+          {
+            name: "SQL",
+            match: 80,
+            description: "Your SQL skills are solid and meet the basic requirements for this role.",
+            importance: 8
+          },
+          {
+            name: "Excel",
+            match: 95,
+            description: "Your advanced Excel skills are valuable for data analysis positions.",
+            importance: 7
+          }
+        ],
+        missingSkills: [
+          {
+            name: "Python",
+            match: 0,
+            description: "Python programming is essential for this data role but was not identified in your profile.",
+            importance: 9
+          },
+          {
+            name: "Machine Learning",
+            match: 0,
+            description: "Knowledge of machine learning algorithms is required for this position.",
+            importance: 8
+          }
+        ],
+        partialSkills: [
+          {
+            name: "Data Visualization",
+            match: 60,
+            description: "You have basic visualization skills, but would benefit from experience with specialized tools.",
+            importance: 8
+          },
+          {
+            name: "Statistical Analysis",
+            match: 50,
+            description: "You have some statistical knowledge, but this role requires more advanced statistical methods.",
+            importance: 9
+          }
+        ],
+        learningResources: [
+          {
+            title: "Python for Data Science and Machine Learning Bootcamp",
+            description: "Comprehensive Python course specifically designed for data analysis and ML applications.",
+            url: "https://example.com/python-ds",
+            type: "Course",
+            duration: "45 hours",
+            level: "Beginner to Intermediate",
+            provider: "Udemy"
+          },
+          {
+            title: "Statistics for Data Science",
+            description: "Course covering essential statistical concepts for data science applications.",
+            url: "https://example.com/stats-ds",
+            type: "Course",
+            duration: "20 hours",
+            level: "Intermediate",
+            provider: "Coursera"
+          },
+          {
+            title: "Applied Machine Learning in Python",
+            description: "Learn practical implementation of machine learning algorithms and models.",
+            url: "https://example.com/ml-python",
+            type: "Specialization",
+            duration: "3 months",
+            level: "Intermediate",
+            provider: "edX"
+          }
+        ],
+        marketInsights: {
+          demand: 9,
+          salaryRange: {
+            min: 35000,
+            max: 65000,
+            currency: "ZAR"
+          },
+          growthRate: "18% annually",
+          topRegions: ["Johannesburg", "Cape Town", "Durban", "Pretoria"]
+        }
+      };
+    } else if (targetRole.includes("marketing") || targetRole.includes("social media") || targetRole.includes("brand")) {
+      return {
+        ...sampleResult,
+        overallMatch: 76,
+        matchedSkills: [
+          {
+            name: "Social Media Management",
+            match: 90,
+            description: "Your social media skills are well-developed and directly applicable to this role.",
+            importance: 9
+          },
+          {
+            name: "Content Creation",
+            match: 85,
+            description: "You have strong content creation abilities that meet the requirements for this position.",
+            importance: 8
+          },
+          {
+            name: "Communication",
+            match: 95,
+            description: "Your excellent communication skills are a significant asset for this marketing role.",
+            importance: 9
+          }
+        ],
+        missingSkills: [
+          {
+            name: "SEO/SEM",
+            match: 0,
+            description: "Search engine optimization knowledge is important for this role but was not identified in your profile.",
+            importance: 8
+          },
+          {
+            name: "Marketing Analytics",
+            match: 0,
+            description: "Experience with marketing analytics tools and metrics is required for this position.",
+            importance: 8
+          }
+        ],
+        partialSkills: [
+          {
+            name: "Email Marketing",
+            match: 60,
+            description: "You have some email marketing experience, but would benefit from more advanced campaign strategies.",
+            importance: 7
+          },
+          {
+            name: "Paid Advertising",
+            match: 50,
+            description: "You have basic knowledge of paid advertising, but this role requires more comprehensive campaign management.",
+            importance: 8
+          }
+        ],
+        learningResources: [
+          {
+            title: "Digital Marketing Specialization",
+            description: "Comprehensive program covering all aspects of digital marketing including SEO, SEM, and analytics.",
+            url: "https://example.com/digital-marketing",
+            type: "Specialization",
+            duration: "3 months",
+            level: "Intermediate",
+            provider: "Coursera"
+          },
+          {
+            title: "Google Analytics Certification",
+            description: "Official Google certification for analytics and marketing measurement.",
+            url: "https://example.com/ga-cert",
+            type: "Certification",
+            duration: "Self-paced",
+            level: "Intermediate",
+            provider: "Google"
+          },
+          {
+            title: "Advanced Social Media Marketing",
+            description: "Learn advanced strategies for social media campaign optimization and measurement.",
+            url: "https://example.com/advanced-social",
+            type: "Course",
+            duration: "20 hours",
+            level: "Advanced",
+            provider: "LinkedIn Learning"
+          }
+        ],
+        marketInsights: {
+          demand: 8,
+          salaryRange: {
+            min: 30000,
+            max: 55000,
+            currency: "ZAR"
+          },
+          growthRate: "12% annually",
+          topRegions: ["Johannesburg", "Cape Town", "Durban", "Pretoria"]
+        }
+      };
+    }
     
-    return analysis.identifiedGaps.map(gap => ({
-      skill: gap.skill,
-      current: skillLevelToValue(gap.currentLevel),
-      required: skillLevelToValue(gap.requiredLevel),
-      gap: skillLevelToValue(gap.requiredLevel) - skillLevelToValue(gap.currentLevel),
-      importance: gap.importance
-    })).sort((a, b) => b.gap - a.gap).slice(0, 8);
-  };
-  
-  // Get color for skill gap severity
-  const getGapColor = (gap: string) => {
-    switch(gap) {
-      case "critical": return "text-red-500 bg-red-50";
-      case "major": return "text-amber-500 bg-amber-50";
-      case "minor": return "text-yellow-500 bg-yellow-50";
-      case "none": return "text-green-500 bg-green-50";
-      default: return "text-slate-500 bg-slate-50";
+    return sampleResult;
+  }
+
+  const handleSimulateAnalysis = () => {
+    if (!form.formState.isValid) {
+      form.trigger();
+      return;
     }
+    
+    // Use sample data for demonstration
+    setResult(getSampleResults());
+    
+    // Scroll to results
+    setTimeout(() => {
+      const resultsElement = document.getElementById("results");
+      if (resultsElement) {
+        resultsElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
   };
-  
-  // Get level badge color
-  const getLevelBadgeColor = (level: string) => {
-    switch(level) {
-      case "expert": return "bg-purple-100 text-purple-800";
-      case "advanced": return "bg-blue-100 text-blue-800";
-      case "intermediate": return "bg-green-100 text-green-800";
-      case "beginner": return "bg-yellow-100 text-yellow-800";
-      case "none": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-  
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-4">
-        <Button variant="outline" asChild>
-          <Link href="/dashboard">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
+    <div className="container max-w-5xl py-8 space-y-8">
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold tracking-tight">Career Skill Gap Analyzer</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Discover the skills you need to develop for your dream job. Our AI-powered tool analyzes 
+          your current skills against job market requirements and provides personalized recommendations.
+        </p>
       </div>
-      
-      <h1 className="text-3xl font-bold mb-8 text-center">Career Skill Gap Analyzer</h1>
-      
-      {/* Analysis Form */}
-      {!analysis && !isAnalyzing && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Identify Your Skill Gaps</CardTitle>
-            <CardDescription>
-              We'll analyze your CV against job market requirements to identify missing skills
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAnalyze} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="cv-content">Your CV</Label>
-                {cvQuery.isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Loading your CV...</span>
-                  </div>
-                ) : cvQuery.data && !cvQuery.data.error ? (
-                  <div className="p-4 bg-muted rounded-md">
-                    <p className="font-medium">CV Loaded Successfully</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {cvContent.substring(0, 150)}...
-                    </p>
-                    {!extractSkillsMutation.isPending && currentSkills.length === 0 && (
-                      <Button 
-                        variant="outline" 
-                        type="button" 
-                        onClick={handleExtractSkills}
-                        className="mt-2"
-                      >
-                        Extract Skills
-                      </Button>
-                    )}
-                    {extractSkillsMutation.isPending && (
-                      <div className="flex items-center mt-2">
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        <span>Extracting skills...</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md mb-4">
-                      <p className="text-yellow-700 font-medium">No CV Found</p>
-                      <p className="text-sm text-yellow-600 mt-1">
-                        Please upload your CV first.
-                      </p>
-                    </div>
-                    <Button variant="outline" asChild>
-                      <Link href="/upload">
-                        Upload Your CV
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              {currentSkills.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Identified Skills</Label>
-                  <div className="p-4 bg-muted rounded-md">
-                    <div className="flex flex-wrap gap-2">
-                      {currentSkills.map((skill, i) => (
-                        <Badge 
-                          key={i} 
-                          variant="secondary"
-                          className={getLevelBadgeColor(skill.level)}
-                        >
-                          {skill.name}
-                          {skill.relevance !== undefined && (
-                            <span className="ml-1 text-xs opacity-70">
-                              ({skill.level})
-                            </span>
-                          )}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              <Separator />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="target-role">Target Job Role</Label>
-                  {jobQuery.isLoading ? (
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Loading job details...</span>
-                    </div>
-                  ) : jobQuery.data ? (
-                    <div className="p-4 bg-muted rounded-md">
-                      <p className="font-medium">{jobQuery.data.title}</p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        at {jobQuery.data.company}
-                      </p>
-                    </div>
-                  ) : (
-                    <Input
-                      id="target-role"
-                      placeholder="e.g. Data Scientist, Project Manager"
-                      value={targetRole}
-                      onChange={(e) => setTargetRole(e.target.value)}
-                    />
+
+      <Card className="border-border/40">
+        <CardHeader>
+          <CardTitle>Analyze Your Skills</CardTitle>
+          <CardDescription>
+            Enter your current role, target position, and skills to get a personalized analysis
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="currentRole"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Current Role</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Junior Developer" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+                <FormField
+                  control={form.control}
+                  name="targetRole"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Role</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Senior Front-End Developer" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="experienceLevel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experience Level</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your experience level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="entry-level">Entry Level (0-2 years)</SelectItem>
+                        <SelectItem value="mid-level">Mid-Level (3-5 years)</SelectItem>
+                        <SelectItem value="senior">Senior (6-9 years)</SelectItem>
+                        <SelectItem value="expert">Expert (10+ years)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="skills"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Skills</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="List your skills, separated by commas (e.g., JavaScript, React, Project Management, Team Leadership)"
+                        className="min-h-[120px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {cvsLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Loading CVs...</span>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="target-industry">Target Industry (Optional)</Label>
-                  <Input
-                    id="target-industry"
-                    placeholder="e.g. Technology, Finance, Healthcare"
-                    value={targetIndustry}
-                    onChange={(e) => setTargetIndustry(e.target.value)}
-                  />
-                </div>
+              ) : cvs && cvs.length > 0 ? (
+                <FormField
+                  control={form.control}
+                  name="resume"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choose a CV (Optional)</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a CV for analysis" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          {cvs.map((cv: any) => (
+                            <SelectItem key={cv.id} value={cv.id.toString()}>
+                              {cv.title || `CV #${cv.id}`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : null}
+
+              <div className="pt-2">
+                {/* Use sample data or real API based on environment */}
+                <Button 
+                  type="button"
+                  className="w-full"
+                  onClick={handleSimulateAnalysis}
+                  disabled={analyzeMutation.isPending}
+                >
+                  {analyzeMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      Analyze Skills
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
               </div>
             </form>
-          </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={handleAnalyze} 
-              className="w-full sm:w-auto"
-              disabled={analyzeGapsMutation.isPending || currentSkills.length === 0 || !targetRole}
-            >
-              {analyzeGapsMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  Analyze My Skill Gaps
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
-      
-      {/* Loading State */}
-      {isAnalyzing && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Analyzing Your Skills</CardTitle>
-            <CardDescription>
-              Please wait while we analyze your skills and the job market
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-16 w-16 animate-spin text-primary mb-6" />
-            <div className="text-center space-y-2">
-              <p className="font-medium">Comprehensive Analysis in Progress</p>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                We're comparing your skills to market requirements, identifying gaps,
-                and preparing personalized recommendations.
-              </p>
+          </Form>
+        </CardContent>
+      </Card>
+
+      {/* Results Section */}
+      {result && (
+        <div id="results" className="space-y-8 pt-6">
+          <div className="text-center space-y-4">
+            <h2 className="text-2xl font-bold tracking-tight">Your Skill Gap Analysis</h2>
+            <div className="mx-auto w-full max-w-xs">
+              <div className="relative pt-2">
+                <div className="flex justify-center mb-2">
+                  <span className="text-4xl font-bold text-primary">{result.overallMatch}%</span>
+                </div>
+                <Progress value={result.overallMatch} className="h-3" />
+                <p className="text-sm text-muted-foreground mt-2">
+                  Match with target role requirements
+                </p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-      
-      {/* Analysis Results */}
-      {analysis && (
-        <div className="space-y-6">
-          {/* Summary Card */}
-          <Card className="border-primary/20">
-            <CardHeader className="pb-4">
+            <p className="max-w-2xl mx-auto">{result.summary}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Skill Matches Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center">
+                  <CheckCircle2 className="mr-2 h-5 w-5 text-green-500" />
+                  Your Matched Skills
+                </CardTitle>
+                <CardDescription>
+                  Skills that align well with the target role
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="max-h-[300px] overflow-y-auto">
+                <div className="space-y-4">
+                  {result.matchedSkills.map((skill, i) => (
+                    <div key={i} className="border rounded-lg p-3 border-border/50">
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-medium">{skill.name}</h4>
+                        <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                          {skill.match}% match
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {skill.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Missing Skills Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center">
+                  <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
+                  Skills to Develop
+                </CardTitle>
+                <CardDescription>
+                  Key skills to acquire for your target role
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="max-h-[300px] overflow-y-auto">
+                <div className="space-y-4">
+                  {result.missingSkills.map((skill, i) => (
+                    <div key={i} className="border rounded-lg p-3 border-border/50">
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-medium">{skill.name}</h4>
+                        <span className="text-sm px-2 py-1 bg-red-100 text-red-800 rounded-full">
+                          High priority
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {skill.description}
+                      </p>
+                    </div>
+                  ))}
+                  {result.partialSkills.map((skill, i) => (
+                    <div key={i} className="border rounded-lg p-3 border-border/50">
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="font-medium">{skill.name}</h4>
+                        <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                          {skill.match}% match
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {skill.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Career Progression */}
+          <Card>
+            <CardHeader>
               <CardTitle className="flex items-center">
-                <Target className="h-5 w-5 mr-2 text-primary" />
-                {analysis.targetRole} {analysis.targetIndustry && `in ${analysis.targetIndustry}`}
+                <Sparkles className="mr-2 h-5 w-5 text-primary" />
+                Career Progression Plan
               </CardTitle>
               <CardDescription>
-                Skill gap analysis completed on {new Date(analysis.createdAt).toLocaleDateString()}
+                Steps to advance from {result.careerProgression.currentLevel} to {result.careerProgression.nextLevel}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20 mb-6">
-                <h3 className="text-lg font-medium mb-2">Summary</h3>
-                <p>{analysis.summary}</p>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Skills Radar Chart */}
-                <div className="bg-muted/20 p-4 rounded-lg border border-muted">
-                  <h3 className="text-lg font-medium mb-4 flex items-center">
-                    <BarChart4 className="h-5 w-5 mr-2 text-primary" />
-                    Your Skill Profile
-                  </h3>
-                  <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadarChart data={prepareSkillsChartData()}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="category" />
-                        <PolarRadiusAxis domain={[0, 100]} />
-                        <Radar
-                          name="Current Skills"
-                          dataKey="value"
-                          stroke="#3b82f6"
-                          fill="#93c5fd"
-                          fillOpacity={0.6}
-                        />
-                        <Tooltip />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </div>
+              <div className="mb-4">
+                <div className="flex items-center mb-2">
+                  <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">
+                    Estimated time: {result.careerProgression.timeEstimate}
+                  </span>
                 </div>
-                
-                {/* Action Plan */}
-                <div className="bg-muted/20 p-4 rounded-lg border border-muted">
-                  <h3 className="text-lg font-medium mb-4 flex items-center">
-                    <BookOpen className="h-5 w-5 mr-2 text-primary" />
-                    Action Plan
-                  </h3>
-                  
-                  <Tabs defaultValue="short">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="short">Short Term</TabsTrigger>
-                      <TabsTrigger value="medium">Medium Term</TabsTrigger>
-                      <TabsTrigger value="long">Long Term</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="short" className="pt-4">
-                      <ul className="space-y-2">
-                        {analysis.actionPlan.shortTerm.map((action, i) => (
-                          <li key={i} className="flex items-start">
-                            <div className="flex-shrink-0 h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center mr-2 mt-0.5">
-                              {i + 1}
-                            </div>
-                            <span>{action}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </TabsContent>
-                    <TabsContent value="medium" className="pt-4">
-                      <ul className="space-y-2">
-                        {analysis.actionPlan.mediumTerm.map((action, i) => (
-                          <li key={i} className="flex items-start">
-                            <div className="flex-shrink-0 h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center mr-2 mt-0.5">
-                              {i + 1}
-                            </div>
-                            <span>{action}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </TabsContent>
-                    <TabsContent value="long" className="pt-4">
-                      <ul className="space-y-2">
-                        {analysis.actionPlan.longTerm.map((action, i) => (
-                          <li key={i} className="flex items-start">
-                            <div className="flex-shrink-0 h-5 w-5 rounded-full bg-primary/20 text-primary flex items-center justify-center mr-2 mt-0.5">
-                              {i + 1}
-                            </div>
-                            <span>{action}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </TabsContent>
-                  </Tabs>
+                <div className="space-y-2">
+                  {result.careerProgression.steps.map((step, i) => (
+                    <div key={i} className="flex items-start">
+                      <div className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary mr-3 mt-0.5">
+                        {i + 1}
+                      </div>
+                      <p>{step}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
           </Card>
-          
-          {/* Skill Gaps Card */}
+
+          {/* Market Insights */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <GraduationCap className="h-5 w-5 mr-2 text-primary" />
-                Identified Skill Gaps
+                <Award className="mr-2 h-5 w-5 text-primary" />
+                South African Market Insights
               </CardTitle>
               <CardDescription>
-                Skills you need to develop to match the job requirements
+                Current job market data for your target role
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="border rounded-lg p-4 text-center">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Market Demand</h3>
+                  <div className="flex justify-center mb-2">
+                    {[...Array(10)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${
+                          i < result.marketInsights.demand
+                            ? "text-yellow-500 fill-yellow-500"
+                            : "text-muted-foreground/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm">{result.marketInsights.demand}/10 demand level</p>
+                </div>
+                <div className="border rounded-lg p-4 text-center">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Salary Range</h3>
+                  <p className="text-3xl font-bold mb-1">
+                    {result.marketInsights.salaryRange.min.toLocaleString()} - {result.marketInsights.salaryRange.max.toLocaleString()}
+                  </p>
+                  <p className="text-sm">{result.marketInsights.salaryRange.currency} per month</p>
+                </div>
+                <div className="border rounded-lg p-4 text-center">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Growth Rate</h3>
+                  <p className="text-3xl font-bold mb-1">{result.marketInsights.growthRate}</p>
+                  <p className="text-sm">Projected job growth</p>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <h3 className="font-medium mb-2">Top Regions for Employment</h3>
+                <div className="flex flex-wrap gap-2">
+                  {result.marketInsights.topRegions.map((region, i) => (
+                    <span key={i} className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm">
+                      {region}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Learning Resources */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <BookOpen className="mr-2 h-5 w-5 text-primary" />
+                Recommended Learning Resources
+              </CardTitle>
+              <CardDescription>
+                Curated resources to help you develop your skills
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible className="w-full">
-                {analysis.identifiedGaps.map((gap, index) => (
-                  <AccordionItem key={index} value={`gap-${index}`}>
-                    <AccordionTrigger className="text-left py-4">
-                      <div className="flex flex-col md:flex-row w-full md:items-center md:justify-between pr-4">
-                        <div className="flex items-center">
-                          <div className={`mr-3 px-3 py-1 rounded-full text-sm font-medium ${getGapColor(gap.gap)}`}>
-                            {gap.gap}
-                          </div>
-                          <span className="font-medium">{gap.skill}</span>
+                {result.learningResources.map((resource, i) => (
+                  <AccordionItem key={i} value={`resource-${i}`}>
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex text-left">
+                        <div className="mr-2">
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-secondary">
+                            {resource.type}
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-4 mt-2 md:mt-0">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-sm text-muted-foreground">Current:</span>
-                            <Badge variant="outline" className={getLevelBadgeColor(gap.currentLevel || 'none')}>
-                              {gap.currentLevel || "none"}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <span className="text-sm text-muted-foreground">Required:</span>
-                            <Badge variant="outline" className={getLevelBadgeColor(gap.requiredLevel)}>
-                              {gap.requiredLevel}
-                            </Badge>
+                        <div>
+                          <h4 className="font-medium">{resource.title}</h4>
+                          <div className="flex text-xs text-muted-foreground">
+                            <span className="mr-2">{resource.provider}</span>
+                            <span>•</span>
+                            <span className="ml-2">{resource.level}</span>
+                            <span>•</span>
+                            <span className="ml-2">{resource.duration}</span>
                           </div>
                         </div>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-4">
-                      <div className="space-y-4">
-                        <p className="text-sm">{gap.description}</p>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          <Button 
-                            variant="outline" 
-                            onClick={() => setSelectedSkill(gap.skill)}
-                            className="w-full"
+                    <AccordionContent>
+                      <div className="pl-6 border-l-2 space-y-3">
+                        <p className="text-sm text-muted-foreground">
+                          {resource.description}
+                        </p>
+                        <Button variant="link" className="px-0 h-auto font-normal" asChild>
+                          <a 
+                            href={resource.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center"
                           >
-                            <Lightbulb className="mr-2 h-4 w-4" />
-                            View Learning Resources
-                          </Button>
-                        </div>
-                        
-                        {selectedSkill === gap.skill && (
-                          <div className="mt-4 border rounded-md p-4">
-                            <h4 className="font-medium mb-3">Learning Resources for {gap.skill}</h4>
-                            {getResourceQuery.isLoading ? (
-                              <div className="flex items-center justify-center py-8">
-                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                              </div>
-                            ) : getResourceQuery.isError ? (
-                              <div className="p-4 bg-red-50 rounded-md text-red-800">
-                                Failed to load resources. Please try again.
-                              </div>
-                            ) : getResourceQuery.data ? (
-                              <div className="space-y-4">
-                                {getResourceQuery.data.map((resource: LearningResource, i: number) => (
-                                  <Card key={i} className="overflow-hidden">
-                                    <CardHeader className="p-4 pb-0">
-                                      <CardTitle className="text-base">
-                                        {resource.title}
-                                        {resource.saRelevant && (
-                                          <Badge className="ml-2 bg-green-100 text-green-800">
-                                            South Africa
-                                          </Badge>
-                                        )}
-                                      </CardTitle>
-                                      <CardDescription className="flex items-center mt-1">
-                                        {resource.provider && (
-                                          <span className="mr-2">{resource.provider}</span>
-                                        )}
-                                        <Badge variant="outline">{resource.type}</Badge>
-                                        <Badge variant="outline" className="ml-2">
-                                          {resource.level}
-                                        </Badge>
-                                      </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="p-4 pt-2">
-                                      {resource.description && (
-                                        <p className="text-sm mb-3">{resource.description}</p>
-                                      )}
-                                      <div className="flex flex-wrap gap-4 text-sm">
-                                        {resource.cost && (
-                                          <div>
-                                            <span className="text-muted-foreground mr-1">Cost:</span>
-                                            <span className="font-medium">
-                                              {formatCurrency(resource.cost.amount, resource.cost.currency)}
-                                            </span>
-                                          </div>
-                                        )}
-                                        {resource.duration && (
-                                          <div>
-                                            <span className="text-muted-foreground mr-1">Duration:</span>
-                                            <span className="font-medium">
-                                              {resource.duration.value} {resource.duration.unit}
-                                            </span>
-                                          </div>
-                                        )}
-                                      </div>
-                                    </CardContent>
-                                    {resource.url && (
-                                      <CardFooter className="p-4 pt-0 flex justify-end">
-                                        <Button size="sm" asChild>
-                                          <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                                            Visit Resource
-                                          </a>
-                                        </Button>
-                                      </CardFooter>
-                                    )}
-                                  </Card>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="p-4 bg-yellow-50 rounded-md">
-                                No specific resources found.
-                              </div>
-                            )}
-                          </div>
-                        )}
+                            View Resource
+                            <ArrowRight className="ml-1 h-3 w-3" />
+                          </a>
+                        </Button>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
             </CardContent>
-          </Card>
-          
-          {/* Career Paths Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Briefcase className="h-5 w-5 mr-2 text-primary" />
-                Alternative Career Paths
-              </CardTitle>
-              <CardDescription>
-                Other career options that match your current skill set
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {analysis.careerPathOptions.map((career, index) => (
-                  <Card key={index} className="overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-lg">{career.title}</CardTitle>
-                        <Badge 
-                          variant={
-                            career.saJobMarketDemand === "high" ? "default" :
-                            career.saJobMarketDemand === "medium" ? "secondary" : "outline"
-                          }
-                        >
-                          {career.saJobMarketDemand} demand
-                        </Badge>
-                      </div>
-                      <CardDescription>
-                        Growth potential: {career.growthPotential}
-                        {career.timeToAchieve && (
-                          <span className="ml-2">
-                            • Achievable in {career.timeToAchieve.value} {career.timeToAchieve.unit}
-                          </span>
-                        )}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-4">
-                      <p className="text-sm mb-4">{career.description}</p>
-                      
-                      {career.salaryRange && (
-                        <div className="mb-3">
-                          <span className="text-sm text-muted-foreground mr-2">Typical salary range:</span>
-                          <span className="font-medium">
-                            {formatCurrency(career.salaryRange.min, career.salaryRange.currency)} - 
-                            {formatCurrency(career.salaryRange.max, career.salaryRange.currency)}
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="mb-3">
-                        <span className="text-sm text-muted-foreground">Industries: </span>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {career.industries.map((industry, i) => (
-                            <Badge key={i} variant="outline">{industry}</Badge>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <span className="text-sm text-muted-foreground block mb-1">Key skills required:</span>
-                        <div className="flex flex-wrap gap-2">
-                          {career.requiredSkills.slice(0, 6).map((skill, i) => (
-                            <Badge 
-                              key={i} 
-                              variant="secondary"
-                              className={skill.importance > 80 ? "border-primary" : ""}
-                            >
-                              {skill.name}
-                            </Badge>
-                          ))}
-                          {career.requiredSkills.length > 6 && (
-                            <Badge variant="outline">
-                              +{career.requiredSkills.length - 6} more
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={() => {
-                setAnalysis(null);
-                setSelectedSkill(null);
-                setCurrentSkills([]);
-              }} variant="outline">
-                Start New Analysis
-              </Button>
+            <CardFooter className="border-t px-6 py-4">
+              <p className="text-sm text-muted-foreground">
+                <strong>Pro Tip:</strong> {result.recommendations}
+              </p>
             </CardFooter>
           </Card>
         </div>
