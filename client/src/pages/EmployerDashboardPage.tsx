@@ -198,19 +198,19 @@ export default function EmployerDashboardPage() {
       {/* Header with employer info */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">{employer.companyName}</h1>
+          <h1 className="text-3xl font-bold">{employer?.companyName}</h1>
           <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3">
             <span className="flex items-center">
               <Building2 className="h-4 w-4 mr-1" />
-              {employer.industry ? employer.industry.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) : 'Unspecified Industry'}
+              {employer?.industry ? employer.industry.replace('_', ' ').replace(/\b\w/g, (char: string) => char.toUpperCase()) : 'Unspecified Industry'}
             </span>
             <span className="flex items-center">
               <Users className="h-4 w-4 mr-1" />
-              {employer.size ? employer.size : 'Unspecified Size'}
+              {employer?.size ? employer.size : 'Unspecified Size'}
             </span>
             <span className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />
-              Member since {new Date(employer.createdAt).toLocaleDateString()}
+              Member since {employer?.createdAt ? new Date(employer.createdAt).toLocaleDateString() : 'Unknown'}
             </span>
           </p>
         </div>

@@ -6,7 +6,14 @@ import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
-import { insertUserSchema, insertCvSchema, insertAtsScoreSchema, insertDeepAnalysisReportSchema } from "@shared/schema";
+import { 
+  insertUserSchema, 
+  insertCvSchema, 
+  insertAtsScoreSchema, 
+  insertDeepAnalysisReportSchema,
+  insertEmployerSchema,
+  insertJobPostingSchema
+} from "@shared/schema";
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";

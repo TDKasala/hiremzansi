@@ -34,8 +34,9 @@ export async function getEmployerByUserId(userId: number): Promise<Employer | un
 
 export async function getEmployers(query?: {
   industry?: string;
-  companySize?: string; // Changed from location to companySize
-  isVerified?: boolean; // Changed from verified to isVerified
+  size?: string;
+  location?: string;
+  isVerified?: boolean;
   limit?: number;
 }): Promise<Employer[]> {
   let baseQuery = db.select().from(employers);
@@ -45,8 +46,11 @@ export async function getEmployers(query?: {
     if (query.industry) {
       baseQuery = baseQuery.where(eq(employers.industry, query.industry));
     }
-    if (query.companySize) {
-      baseQuery = baseQuery.where(eq(employers.companySize, query.companySize));
+    if (query.size) {
+      baseQuery = baseQuery.where(eq(employers.size, query.size));
+    }
+    if (query.location) {
+      baseQuery = baseQuery.where(eq(employers.location, query.location));
     }
     if (query.isVerified !== undefined) {
       baseQuery = baseQuery.where(eq(employers.isVerified, query.isVerified));
