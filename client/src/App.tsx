@@ -39,6 +39,7 @@ import LinkedInOptimizationSAProfessionals from "@/pages/blog/LinkedInOptimizati
 import GraduateCVTemplates from "@/pages/blog/GraduateCVTemplates";
 import PersonalBrandingJobSearch from "@/pages/blog/PersonalBrandingJobSearch";
 import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
+import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
 
 function App() {
   return (
@@ -75,6 +76,7 @@ function App() {
                   <Route path="/blog/graduate-cv-templates" component={GraduateCVTemplates} />
                   <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
                   <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
+                  <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
                   
                   {/* Protected routes requiring authentication */}
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />

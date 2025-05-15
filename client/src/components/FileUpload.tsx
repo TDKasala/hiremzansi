@@ -145,27 +145,7 @@ export default function FileUpload({
 
   return (
     <div className="w-full space-y-4">
-      {/* Job Description Section */}
-      {withJobDescription && (
-        <div className="mb-4 border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <Label htmlFor="jobDescription" className="font-medium">
-              Job Description (Optional)
-            </Label>
-          </div>
-          <p className="text-sm text-muted-foreground mb-3">
-            Paste the job description to match your CV against specific requirements and get better analysis results.
-          </p>
-          <Textarea
-            id="jobDescription"
-            placeholder="Paste job description here..."
-            className="min-h-[120px]"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-          />
-        </div>
-      )}
+      {/* Job Description Section removed to avoid duplication */}
       
       {!selectedFile ? (
         <div
