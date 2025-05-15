@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
 import { checkDatabaseHealth } from "./db-utils";
 import { runMigrations } from "./db-migrate";
+import { closeDbConnection } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -81,8 +82,76 @@ app.use((req, res, next) => {
     }, () => {
       log(`serving on port ${port}`);
     });
+    
+    // Set up graceful shutdown
+    setupGracefulShutdown(server);
   } catch (error) {
     console.error('Failed to start server:', error);
+    await closeDbConnection().catch(e => console.error('Error closing DB during startup failure:', e));
     process.exit(1);
   }
 })();
+
+/**
+ * Set up graceful shutdown handling
+ * This ensures database connections are properly closed before the server exits
+ */
+function setupGracefulShutdown(server: any) {
+  // Handle process termination signals
+  const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
+  
+  signals.forEach(signal => {
+    process.on(signal, async () => {
+      log(`${signal} received, shutting down gracefully...`, 'server');
+      
+      // Set a timeout for shutdown in case something hangs
+      const forceExitTimeout = setTimeout(() => {
+        log('Forcing server shutdown after timeout', 'server');
+        process.exit(1);
+      }, 15000); // 15 seconds timeout
+      
+      try {
+        // Close HTTP server first (stop accepting new connections)
+        log('Closing HTTP server...', 'server');
+        await new Promise((resolve, reject) => {
+          server.close(err => {
+            if (err) {
+              log(`Error closing HTTP server: ${err.message}`, 'server');
+              reject(err);
+            } else {
+              log('HTTP server closed successfully', 'server');
+              resolve(true);
+            }
+          });
+        });
+        
+        // Close database connections
+        log('Closing database connections...', 'server');
+        await closeDbConnection();
+        log('Database connections closed successfully', 'server');
+        
+        // Clear the force exit timeout since we've completed gracefully
+        clearTimeout(forceExitTimeout);
+        log('Graceful shutdown completed', 'server');
+        
+        // Exit with success code
+        process.exit(0);
+      } catch (error) {
+        log(`Error during graceful shutdown: ${error}`, 'server');
+        clearTimeout(forceExitTimeout);
+        process.exit(1);
+      }
+    });
+  });
+  
+  // For nodemon restarts or unexpected exits
+  process.on('exit', () => {
+    log('Process exiting...', 'server');
+  });
+  
+  // Handle unhandled promise rejections
+  process.on('unhandledRejection', (reason, promise) => {
+    log(`Unhandled Promise Rejection: ${reason}`, 'server');
+    // Don't exit the process, just log it
+  });
+};

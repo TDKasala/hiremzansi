@@ -153,45 +153,163 @@ export async function generateSchemaDocs() {
   }
 }
 
+interface HealthStatus {
+  isHealthy: boolean;
+  connectionOk: boolean;
+  version: string | null;
+  size: { formatted: string; bytes: number } | null;
+  connectionCount: number | null;
+  connectionUsage: number | null;
+  tableStats: Record<string, number>;
+  slowQueries: Array<{
+    pid: number;
+    duration: string;
+    state: string;
+    queryPreview: string;
+  }>;
+  issues: string[];
+}
+
 // Check database health and connection status
-export async function checkDatabaseHealth() {
+export async function checkDatabaseHealth(detailed = true): Promise<HealthStatus> {
   try {
     console.log('Checking database health...');
+    const healthStatus: HealthStatus = {
+      isHealthy: false,
+      connectionOk: false,
+      version: null,
+      size: null,
+      connectionCount: null,
+      connectionUsage: null,
+      tableStats: {},
+      slowQueries: [],
+      issues: [],
+    };
     
     // Basic connectivity test
     const result = await pool.query('SELECT 1 as connection_test');
     
     if (result.rows[0].connection_test === 1) {
       console.log('✓ Database connection is healthy');
+      healthStatus.connectionOk = true;
+    } else {
+      healthStatus.issues.push('Failed basic connection test');
     }
     
-    // Check PostgreSQL version
-    const versionResult = await pool.query('SELECT version()');
-    console.log(`✓ PostgreSQL version: ${versionResult.rows[0].version}`);
+    // Skip further checks if connection failed
+    if (!healthStatus.connectionOk) {
+      return healthStatus;
+    }
     
-    // Get database size
-    const sizeQuery = `
-      SELECT pg_size_pretty(pg_database_size(current_database())) as db_size;
-    `;
-    const sizeResult = await pool.query(sizeQuery);
-    console.log(`✓ Current database size: ${sizeResult.rows[0].db_size}`);
-    
-    // Count records in main tables
-    const tables = ['users', 'cvs', 'ats_scores', 'sa_profiles'];
-    
-    for (const table of tables) {
-      try {
-        const countResult = await pool.query(`SELECT COUNT(*) as count FROM ${table}`);
-        console.log(`✓ Table ${table}: ${countResult.rows[0].count} records`);
-      } catch (err) {
-        console.log(`✗ Table ${table}: Error getting count`);
+    try {
+      // Check PostgreSQL version
+      const versionResult = await pool.query('SELECT version()');
+      const version = versionResult.rows[0].version;
+      console.log(`✓ PostgreSQL version: ${version}`);
+      healthStatus.version = version;
+      
+      // Get database size
+      const sizeQuery = `
+        SELECT pg_size_pretty(pg_database_size(current_database())) as db_size,
+               pg_database_size(current_database()) as db_size_bytes;
+      `;
+      const sizeResult = await pool.query(sizeQuery);
+      console.log(`✓ Current database size: ${sizeResult.rows[0].db_size}`);
+      healthStatus.size = {
+        formatted: sizeResult.rows[0].db_size,
+        bytes: parseInt(sizeResult.rows[0].db_size_bytes, 10)
+      };
+      
+      // Additional detailed checks for production environments
+      if (detailed && process.env.NODE_ENV === 'production') {
+        // Check active connections
+        const connectionsQuery = `
+          SELECT count(*) as active_connections,
+                (SELECT setting::integer FROM pg_settings WHERE name = 'max_connections') as max_connections
+          FROM pg_stat_activity 
+          WHERE datname = current_database();
+        `;
+        const connectionsResult = await pool.query(connectionsQuery);
+        const activeConnections = parseInt(connectionsResult.rows[0].active_connections, 10);
+        const maxConnections = parseInt(connectionsResult.rows[0].max_connections, 10);
+        const connectionPercent = Math.round((activeConnections / maxConnections) * 100);
+        
+        console.log(`✓ Database connections: ${activeConnections}/${maxConnections} (${connectionPercent}%)`);
+        healthStatus.connectionCount = activeConnections;
+        healthStatus.connectionUsage = connectionPercent;
+        
+        // Warning if connection usage is high
+        if (connectionPercent > 80) {
+          console.log(`⚠️ High connection usage: ${connectionPercent}%`);
+          healthStatus.issues.push(`High connection usage: ${connectionPercent}%`);
+        }
+        
+        // Check for long-running queries (potential issues)
+        const longQueriesQuery = `
+          SELECT pid, 
+                 now() - query_start as duration, 
+                 state, 
+                 substring(query, 1, 100) as query_preview
+          FROM pg_stat_activity 
+          WHERE state != 'idle' 
+            AND query_start < now() - interval '30 seconds'
+            AND datname = current_database()
+          ORDER BY duration DESC;
+        `;
+        const longQueriesResult = await pool.query(longQueriesQuery);
+        
+        if (longQueriesResult.rows.length > 0) {
+          console.log(`⚠️ Found ${longQueriesResult.rows.length} long-running queries`);
+          healthStatus.slowQueries = longQueriesResult.rows.map(q => ({
+            pid: q.pid,
+            duration: q.duration,
+            state: q.state,
+            queryPreview: q.query_preview
+          }));
+          
+          healthStatus.issues.push(`${longQueriesResult.rows.length} long-running queries detected`);
+        }
       }
+      
+      // Count records in main tables
+      const tables = ['users', 'cvs', 'ats_scores', 'sa_profiles'];
+      healthStatus.tableStats = {};
+      
+      for (const table of tables) {
+        try {
+          const countResult = await pool.query(`SELECT COUNT(*) as count FROM ${table}`);
+          const count = parseInt(countResult.rows[0].count, 10);
+          console.log(`✓ Table ${table}: ${count} records`);
+          healthStatus.tableStats[table] = count;
+        } catch (err) {
+          console.log(`✗ Table ${table}: Error getting count`);
+          healthStatus.issues.push(`Could not query table ${table}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error during detailed health checks:', err);
+      healthStatus.issues.push('Failed during detailed health checks');
     }
     
-    return true;
+    // Overall health assessment
+    healthStatus.isHealthy = healthStatus.connectionOk && healthStatus.issues.length === 0;
+    
+    return healthStatus;
   } catch (error) {
     console.error('Database health check failed:', error);
-    return false;
+    // Create empty health status with error information
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { 
+      isHealthy: false, 
+      connectionOk: false,
+      version: null,
+      size: null,
+      connectionCount: null,
+      connectionUsage: null,
+      tableStats: {},
+      slowQueries: [],
+      issues: ['Database health check failed with error: ' + errorMessage]
+    };
   }
 }
 
