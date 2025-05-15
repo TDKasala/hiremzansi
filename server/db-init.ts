@@ -114,17 +114,32 @@ async function optimizeForProduction(): Promise<void> {
         column: 'email',
         condition: 'WHERE is_active = true'
       },
+      {
+        table: 'users',
+        name: 'idx_users_username',
+        column: 'username'
+      },
       // CV lookup indexes
       {
         table: 'cvs',
         name: 'idx_cvs_user_id',
         column: 'user_id'
       },
+      {
+        table: 'cvs',
+        name: 'idx_cvs_created_at',
+        column: 'created_at DESC'
+      },
       // ATS score indexes
       {
         table: 'ats_scores',
         name: 'idx_ats_scores_cv_id',
         column: 'cv_id'
+      },
+      {
+        table: 'ats_scores',
+        name: 'idx_ats_scores_score',
+        column: 'score DESC'
       },
       // Subscription indexes
       {
@@ -137,6 +152,34 @@ async function optimizeForProduction(): Promise<void> {
         name: 'idx_subscriptions_active',
         column: 'is_active',
         condition: 'WHERE is_active = true'
+      },
+      // Job-related indexes
+      {
+        table: 'job_postings',
+        name: 'idx_job_postings_employer_id',
+        column: 'employer_id'
+      },
+      {
+        table: 'job_postings',
+        name: 'idx_job_postings_status',
+        column: 'status',
+        condition: 'WHERE status = \'active\''
+      },
+      {
+        table: 'job_matches',
+        name: 'idx_job_matches_score',
+        column: 'match_score DESC'
+      },
+      // Skill-related indexes
+      {
+        table: 'skills',
+        name: 'idx_skills_name',
+        column: 'name'
+      },
+      {
+        table: 'user_skills',
+        name: 'idx_user_skills_user_id',
+        column: 'user_id'
       }
     ];
     
@@ -149,15 +192,58 @@ async function optimizeForProduction(): Promise<void> {
       `);
       
       if (indexExists.rows.length === 0) {
-        // Create the index if it doesn't exist
-        const condition = index.condition || '';
-        await db.execute(sql.raw(`
-          CREATE INDEX IF NOT EXISTS ${index.name} 
-          ON ${index.table} (${index.column}) 
-          ${condition}
-        `));
-        console.log(`Created index ${index.name} on ${index.table}`);
+        try {
+          // Create the index if it doesn't exist
+          const condition = index.condition || '';
+          await db.execute(sql.raw(`
+            CREATE INDEX IF NOT EXISTS ${index.name} 
+            ON ${index.table} (${index.column}) 
+            ${condition}
+          `));
+          console.log(`Created index ${index.name} on ${index.table}`);
+        } catch (err: any) {
+          // Don't fail if a single index creation fails (table might not exist yet)
+          console.warn(`Failed to create index ${index.name}: ${err.message}`);
+        }
       }
+    }
+    
+    // Set up database maintenance tasks
+    const vacuumSettings = await db.execute(sql`
+      SELECT name, setting 
+      FROM pg_settings 
+      WHERE name IN ('autovacuum', 'autovacuum_vacuum_scale_factor')
+    `);
+    
+    // Check if autovacuum is enabled
+    const autovacuumEnabled = vacuumSettings.rows.find(r => 
+      r.name === 'autovacuum' && r.setting === 'on'
+    );
+    
+    if (!autovacuumEnabled) {
+      console.log('Autovacuum is not enabled. Recommend enabling it for production.');
+    } else {
+      console.log('Autovacuum is properly configured for production.');
+    }
+    
+    // Apply table-specific settings for high-traffic tables
+    try {
+      // Set storage parameters for frequently updated tables
+      const highTrafficTables = [
+        'cvs', 'ats_scores', 'job_matches', 'notifications'
+      ];
+      
+      for (const table of highTrafficTables) {
+        await db.execute(sql.raw(`
+          ALTER TABLE ${table} SET (
+            autovacuum_vacuum_scale_factor = 0.05,
+            autovacuum_analyze_scale_factor = 0.02
+          )
+        `));
+        console.log(`Applied optimized vacuum settings for table: ${table}`);
+      }
+    } catch (err) {
+      console.warn('Could not apply table-specific vacuum settings:', err.message);
     }
     
     console.log('Production database optimizations complete');

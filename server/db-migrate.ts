@@ -121,18 +121,28 @@ async function applyMigration(migration: string): Promise<void> {
  * Migration options interface
  */
 interface MigrationOptions {
-  dryRun?: boolean;     // Just check which migrations would be applied, but don't run them
-  force?: boolean;      // Force migration even in production (normally requires confirmation)
-  silent?: boolean;     // Reduce logging output
-  timeout?: number;     // Timeout in ms for each migration (default 30s)
+  dryRun?: boolean;       // Just check which migrations would be applied, but don't run them
+  force?: boolean;        // Force migration even in production (normally requires confirmation)
+  silent?: boolean;       // Reduce logging output
+  timeout?: number;       // Timeout in ms for each migration (default 30s)
+  backupBefore?: boolean; // Create database backup before migration (production only)
+  lockTable?: boolean;    // Lock migration table during migration process
+  maxLockTime?: number;   // Maximum time to wait for lock acquisition (ms)
+  failFast?: boolean;     // Fail immediately on first error instead of rolling back
+  validateOnly?: boolean; // Only validate SQL syntax without executing (if supported by DB)
 }
 
-// Default migration options
+// Default migration options for different environments
 const DEFAULT_MIGRATION_OPTIONS: MigrationOptions = {
   dryRun: false,
   force: false,
   silent: false,
-  timeout: 30000 // 30 seconds
+  timeout: process.env.NODE_ENV === 'production' ? 60000 : 30000, // 60s in prod, 30s in dev
+  backupBefore: process.env.NODE_ENV === 'production',
+  lockTable: true,
+  maxLockTime: 10000, // 10 seconds
+  failFast: false,
+  validateOnly: false
 };
 
 // Run all pending migrations
