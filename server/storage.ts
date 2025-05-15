@@ -95,6 +95,50 @@ export interface IStorage {
   // Plan operations
   getPlan(id: number): Promise<Plan | undefined>;
   getActivePlans(): Promise<Plan[]>;
+
+  // Employer operations
+  getEmployer(id: number): Promise<Employer | undefined>;
+  getEmployerByUserId(userId: number): Promise<Employer | undefined>;
+  getEmployers(query?: {
+    industry?: string;
+    location?: string;
+    verified?: boolean;
+    limit?: number;
+  }): Promise<Employer[]>;
+  createEmployer(employer: InsertEmployer): Promise<Employer>;
+  updateEmployer(id: number, updates: Partial<InsertEmployer>): Promise<Employer>;
+
+  // Job posting operations
+  getJobPosting(id: number): Promise<JobPosting | undefined>;
+  getJobPostings(query?: {
+    title?: string;
+    location?: string;
+    industry?: string;
+    jobType?: string;
+    limit?: number;
+  }): Promise<JobPosting[]>;
+  getJobPostingsByEmployer(employerId: number): Promise<JobPosting[]>;
+  createJobPosting(job: InsertJobPosting): Promise<JobPosting>;
+  updateJobPosting(id: number, updates: Partial<InsertJobPosting>): Promise<JobPosting>;
+  deleteJobPosting(id: number): Promise<void>;
+
+  // Job matching operations
+  createJobMatch(match: InsertJobMatch): Promise<JobMatch>;
+  getJobMatchesForJob(jobId: number): Promise<JobMatch[]>;
+  getJobMatchesForCV(cvId: number): Promise<JobMatch[]>;
+
+  // Skills operations
+  getSkill(id: number): Promise<Skill | undefined>;
+  getSkillByName(name: string): Promise<Skill | undefined>;
+  createSkill(skill: InsertSkill): Promise<Skill>;
+  getUserSkills(userId: number): Promise<UserSkill[]>;
+  addUserSkill(userSkill: InsertUserSkill): Promise<UserSkill>;
+  removeUserSkill(userId: number, skillId: number): Promise<void>;
+
+  // Notification operations
+  getNotificationsForUser(userId: number, limit?: number): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: number): Promise<Notification>;
   
   // Session store
   sessionStore: session.Store;
@@ -482,5 +526,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Create and export database storage instance
 export const storage = new DatabaseStorage();

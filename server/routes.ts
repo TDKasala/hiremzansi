@@ -1249,8 +1249,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Employer management routes
   app.post("/api/employers", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Import employer storage functions
+      const { getEmployerByUserId, createEmployer } = await import('./employerStorage');
+      
       // Check if user already has an employer profile
-      const existingEmployer = await storage.getEmployerByUserId(req.user!.id);
+      const existingEmployer = await getEmployerByUserId(req.user!.id);
       if (existingEmployer) {
         return res.status(400).json({ error: "You already have an employer profile" });
       }
@@ -1268,7 +1271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verified: false // Default to false, verification process can be added later
       };
       
-      const employer = await storage.createEmployer(employerData);
+      const employer = await createEmployer(employerData);
       
       res.status(201).json({
         id: employer.id,
@@ -1283,13 +1286,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/employers/:id", async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { getEmployer } = await import('./employerStorage');
+      
       const employerId = Number(req.params.id);
       
       if (isNaN(employerId)) {
         return res.status(400).json({ error: "Invalid employer ID" });
       }
       
-      const employer = await storage.getEmployer(employerId);
+      const employer = await getEmployer(employerId);
       
       if (!employer) {
         return res.status(404).json({ error: "Employer not found" });
@@ -1315,8 +1320,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Job posting routes
   app.post("/api/job-postings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { getEmployerByUserId, createJobPosting } = await import('./employerStorage');
+      
       // Check if user is an employer
-      const employer = await storage.getEmployerByUserId(req.user!.id);
+      const employer = await getEmployerByUserId(req.user!.id);
       
       if (!employer) {
         return res.status(403).json({ 
@@ -1343,7 +1350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         applicationDeadline: req.body.applicationDeadline ? new Date(req.body.applicationDeadline) : null
       };
       
-      const job = await storage.createJobPosting(jobData);
+      const job = await createJobPosting(jobData);
       
       res.status(201).json({
         id: job.id,
@@ -1359,6 +1366,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/job-postings", async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { getJobPostings } = await import('./employerStorage');
+      
       const query = {
         location: req.query.location as string,
         title: req.query.title as string,
@@ -1367,7 +1376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         limit: Math.min(Number(req.query.limit) || 20, 100) // Cap at 100 results
       };
       
-      const jobs = await storage.getJobPostings(query);
+      const jobs = await getJobPostings(query);
       
       res.json(jobs);
     } catch (error) {
@@ -1377,20 +1386,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/job-postings/:id", async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { getJobPosting, getEmployer } = await import('./employerStorage');
+      
       const jobId = Number(req.params.id);
       
       if (isNaN(jobId)) {
         return res.status(400).json({ error: "Invalid job posting ID" });
       }
       
-      const job = await storage.getJobPosting(jobId);
+      const job = await getJobPosting(jobId);
       
       if (!job) {
         return res.status(404).json({ error: "Job posting not found" });
       }
       
       // Get employer info for the job
-      const employer = await storage.getEmployer(job.employerId);
+      const employer = await getEmployer(job.employerId);
       
       res.json({
         ...job,
