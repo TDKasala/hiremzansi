@@ -1,4 +1,5 @@
 import { MailService } from '@sendgrid/mail';
+import type { MailDataRequired } from '@sendgrid/mail';
 
 // Initialize SendGrid mail service
 const mailService = new MailService();
@@ -324,7 +325,7 @@ The ATSBoost Team
 interface EmailOptions {
   to: string;
   from?: string;
-  subject?: string;
+  subject: string;  // Changed from optional to required
   text?: string;
   html?: string;
 }
@@ -338,19 +339,23 @@ interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   if (!emailServiceEnabled) {
     console.warn('Email service is disabled. Would have sent email to:', options.to);
+    console.log('Subject:', options.subject);
     return false;
   }
   
   try {
     const fromAddress = options.from || 'notifications@atsboost.co.za';
     
-    await mailService.send({
+    // Create email data with proper SendGrid types
+    const emailData: MailDataRequired = {
       to: options.to,
       from: fromAddress,
       subject: options.subject,
-      text: options.text,
-      html: options.html
-    });
+      text: options.text || '',
+      html: options.html || ''
+    };
+    
+    await mailService.send(emailData);
     
     console.log(`Email sent successfully to ${options.to}`);
     return true;

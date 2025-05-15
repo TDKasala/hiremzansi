@@ -306,15 +306,27 @@ export function setupAuth(app: Express) {
         ...(({ resetToken, resetTokenExpiry: tokenExpiry } as any))
       });
       
-      // In a real application, you would send an email with the reset link
-      // For this demo, we'll log the token and mock the email sending
-      console.log(`Password reset token for ${email}: ${resetToken}`);
-      console.log(`Reset link would be: https://yourdomain.com/reset-password?token=${resetToken}`);
+      // Send the actual password reset email
+      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const userName = user.name || user.username;
       
-      // Simulating email delivery delay
-      setTimeout(() => {
-        console.log(`[EMAIL SENT] Password reset email to ${email}`);
-      }, 1000);
+      // Attempt to send the email
+      const emailSent = await sendPasswordResetEmail(
+        email,
+        userName,
+        resetToken,
+        baseUrl
+      );
+      
+      if (emailSent) {
+        console.log(`Password reset email sent to ${email}`);
+      } else {
+        console.warn(`Failed to send password reset email to ${email}. Email service may be disabled.`);
+        
+        // Log the token for testing purposes when email service is disabled
+        console.log(`Password reset token for ${email}: ${resetToken}`);
+        console.log(`Reset link would be: ${baseUrl}/reset-password?token=${resetToken}`);
+      }
       
       res.status(200).json({ 
         message: "Password reset instructions have been sent to your email" 
