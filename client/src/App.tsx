@@ -38,6 +38,11 @@ import JobDetailsPage from "@/pages/JobDetailsPage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
 import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
 
+// Import employer dashboard pages
+import EmployerDashboardPage from "@/pages/EmployerDashboardPage";
+import CreateJobPage from "@/pages/employer/CreateJobPage";
+import EmployerJobDetailsPage from "@/pages/employer/JobDetailsPage";
+
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
 import CVTemplatesPage from "@/pages/tools/CVTemplatesPage";
@@ -112,6 +117,12 @@ function App() {
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />
+                  
+                  {/* Employer dashboard routes */}
+                  <ProtectedRoute path="/employer/dashboard" component={EmployerDashboardPage} />
+                  <ProtectedRoute path="/employer/jobs/new" component={CreateJobPage} />
+                  <ProtectedRoute path="/employer/jobs/:id" component={EmployerJobDetailsPage} />
+                  
                   <Route component={NotFound} />
                 </Switch>
                 <Toaster />

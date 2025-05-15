@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,6 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Loader2, Plus, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,50 +25,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-// Create a schema for job posting form
+// Define form schema for job postings
 const jobPostingSchema = z.object({
-  title: z.string().min(5, {
-    message: "Job title must be at least 5 characters.",
-  }),
-  description: z.string().min(100, {
-    message: "Job description must be at least 100 characters.",
-  }),
-  location: z.string().min(1, {
-    message: "Please enter a location.",
-  }),
-  employmentType: z.string().min(1, {
-    message: "Please select an employment type.",
-  }),
-  experienceLevel: z.string().min(1, {
-    message: "Please select an experience level.",
-  }),
-  salaryRange: z.string().optional(),
-  requiredSkills: z.string().min(1, {
-    message: "Please enter required skills, separated by commas.",
-  }),
-  preferredSkills: z.string().optional(),
-  industry: z.string().min(1, {
-    message: "Please select an industry.",
-  }),
-  deadline: z.date().optional(),
-  isFeatured: z.boolean().default(false),
+  title: z.string().min(1, "Job title is required"),
+  description: z.string().min(20, "Description should be at least 20 characters"),
+  location: z.string().min(1, "Location is required"),
+  employmentType: z.string().min(1, "Employment type is required"),
+  experienceLevel: z.string().min(1, "Experience level is required"),
+  industry: z.string().min(1, "Industry is required"),
   isActive: z.boolean().default(true),
+  isFeatured: z.boolean().default(false),
+  salaryRange: z.string().optional(),
+  requiredSkills: z.array(z.string()).optional(),
+  preferredSkills: z.array(z.string()).optional(),
+  bbbeeLevel: z.string().optional(),
+  educationLevel: z.string().optional(),
+  applicationEmail: z.string().email("Must be a valid email address").optional(),
+  applicationUrl: z.string().url("Must be a valid URL").optional(),
 });
 
 type JobPostingFormValues = z.infer<typeof jobPostingSchema>;
 
 interface CreateJobPostingFormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: JobPostingFormValues & { deadline?: string }) => void;
   isSubmitting: boolean;
   defaultValues?: Partial<JobPostingFormValues>;
 }
 
-export function CreateJobPostingForm({ 
-  onSubmit, 
+export function CreateJobPostingForm({
+  onSubmit,
   isSubmitting,
   defaultValues = {
     title: "",
@@ -73,87 +63,75 @@ export function CreateJobPostingForm({
     location: "",
     employmentType: "",
     experienceLevel: "",
-    salaryRange: "",
-    requiredSkills: "",
-    preferredSkills: "",
     industry: "",
-    isFeatured: false,
     isActive: true,
-  } 
+    isFeatured: false,
+    salaryRange: "",
+    requiredSkills: [],
+    preferredSkills: [],
+    bbbeeLevel: "",
+    educationLevel: "",
+    applicationEmail: "",
+    applicationUrl: "",
+  },
 }: CreateJobPostingFormProps) {
-  // Initialize the form with default values
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
+  const [requiredSkillInput, setRequiredSkillInput] = useState("");
+  const [preferredSkillInput, setPreferredSkillInput] = useState("");
+
+  // Initialize form
   const form = useForm<JobPostingFormValues>({
     resolver: zodResolver(jobPostingSchema),
     defaultValues,
   });
 
-  const handleSubmit = (data: JobPostingFormValues) => {
-    // Process the skills into arrays
-    const processedData = {
-      ...data,
-      requiredSkills: data.requiredSkills.split(',').map(skill => skill.trim()),
-      preferredSkills: data.preferredSkills ? data.preferredSkills.split(',').map(skill => skill.trim()) : [],
-    };
-
-    onSubmit(processedData);
+  // Handle form submission
+  const handleSubmit = (values: JobPostingFormValues) => {
+    onSubmit({
+      ...values,
+      deadline: deadline ? deadline.toISOString() : undefined,
+    });
   };
 
-  // Industry options for South Africa
-  const industries = [
-    "Agriculture, Forestry & Fishing",
-    "Mining & Quarrying",
-    "Manufacturing",
-    "Electricity, Gas & Water",
-    "Construction",
-    "Wholesale & Retail Trade",
-    "Transport & Communication",
-    "Financial & Business Services",
-    "Community & Social Services",
-    "Government Services",
-    "Information Technology",
-    "Healthcare & Pharmaceuticals",
-    "Education",
-    "Tourism & Hospitality",
-    "Media & Entertainment",
-    "Legal Services",
-    "Telecommunications",
-    "Real Estate",
-    "Consulting",
-    "Non-profit & NGO",
-    "Other"
-  ];
+  // Add required skill
+  const addRequiredSkill = () => {
+    if (!requiredSkillInput.trim()) return;
+    
+    const currentSkills = form.getValues("requiredSkills") || [];
+    if (!currentSkills.includes(requiredSkillInput.trim())) {
+      form.setValue("requiredSkills", [...currentSkills, requiredSkillInput.trim()]);
+    }
+    setRequiredSkillInput("");
+  };
 
-  // Employment type options
-  const employmentTypes = [
-    "Full-time",
-    "Part-time",
-    "Contract",
-    "Temporary",
-    "Internship",
-    "Volunteer",
-    "Remote"
-  ];
+  // Remove required skill
+  const removeRequiredSkill = (skill: string) => {
+    const currentSkills = form.getValues("requiredSkills") || [];
+    form.setValue(
+      "requiredSkills",
+      currentSkills.filter((s) => s !== skill)
+    );
+  };
 
-  // Experience level options
-  const experienceLevels = [
-    "Entry Level",
-    "Junior",
-    "Mid Level",
-    "Senior",
-    "Executive",
-    "Student"
-  ];
+  // Add preferred skill
+  const addPreferredSkill = () => {
+    if (!preferredSkillInput.trim()) return;
+    
+    const currentSkills = form.getValues("preferredSkills") || [];
+    if (!currentSkills.includes(preferredSkillInput.trim())) {
+      form.setValue("preferredSkills", [...currentSkills, preferredSkillInput.trim()]);
+    }
+    setPreferredSkillInput("");
+  };
 
-  // Salary range options
-  const salaryRanges = [
-    "R0 - R10,000 per month",
-    "R10,000 - R20,000 per month",
-    "R20,000 - R30,000 per month",
-    "R30,000 - R40,000 per month",
-    "R40,000 - R50,000 per month",
-    "R50,000+ per month",
-    "Negotiable"
-  ];
+  // Remove preferred skill
+  const removePreferredSkill = (skill: string) => {
+    const currentSkills = form.getValues("preferredSkills") || [];
+    form.setValue(
+      "preferredSkills",
+      currentSkills.filter((s) => s !== skill)
+    );
+  };
 
   return (
     <Form {...form}>
@@ -164,36 +142,32 @@ export function CreateJobPostingForm({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Job Title <span className="text-red-500">*</span></FormLabel>
+              <FormLabel>Job Title *</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Software Developer, Marketing Manager" {...field} />
+                <Input placeholder="e.g. Senior Software Engineer" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Industry */}
+        {/* Description */}
         <FormField
           control={form.control}
-          name="industry"
+          name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Industry <span className="text-red-500">*</span></FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an industry" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {industries.map((industry) => (
-                    <SelectItem key={industry} value={industry}>
-                      {industry}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Job Description *</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe the responsibilities, requirements, and benefits of the position"
+                  className="min-h-[200px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Use clear, specific details about the role and your company.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -206,10 +180,31 @@ export function CreateJobPostingForm({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location <span className="text-red-500">*</span></FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. Cape Town, Johannesburg, Remote" {...field} />
-                </FormControl>
+                <FormLabel>Location *</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="gauteng">Gauteng</SelectItem>
+                    <SelectItem value="western_cape">Western Cape</SelectItem>
+                    <SelectItem value="kwazulu_natal">KwaZulu-Natal</SelectItem>
+                    <SelectItem value="eastern_cape">Eastern Cape</SelectItem>
+                    <SelectItem value="free_state">Free State</SelectItem>
+                    <SelectItem value="north_west">North West</SelectItem>
+                    <SelectItem value="mpumalanga">Mpumalanga</SelectItem>
+                    <SelectItem value="limpopo">Limpopo</SelectItem>
+                    <SelectItem value="northern_cape">Northern Cape</SelectItem>
+                    <SelectItem value="multiple">Multiple Locations</SelectItem>
+                    <SelectItem value="remote">Remote (South Africa)</SelectItem>
+                    <SelectItem value="international">International</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -221,19 +216,24 @@ export function CreateJobPostingForm({
             name="employmentType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Employment Type <span className="text-red-500">*</span></FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormLabel>Employment Type *</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select employment type" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {employmentTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="full_time">Full-time</SelectItem>
+                    <SelectItem value="part_time">Part-time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="temporary">Temporary</SelectItem>
+                    <SelectItem value="internship">Internship</SelectItem>
+                    <SelectItem value="volunteer">Volunteer</SelectItem>
+                    <SelectItem value="freelance">Freelance</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -249,19 +249,23 @@ export function CreateJobPostingForm({
             name="experienceLevel"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Experience Level <span className="text-red-500">*</span></FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormLabel>Experience Level *</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select experience level" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {experienceLevels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="entry_level">Entry Level</SelectItem>
+                    <SelectItem value="junior">Junior (1-3 years)</SelectItem>
+                    <SelectItem value="mid_level">Mid-Level (3-5 years)</SelectItem>
+                    <SelectItem value="senior">Senior (5-8 years)</SelectItem>
+                    <SelectItem value="expert">Expert (8+ years)</SelectItem>
+                    <SelectItem value="executive">Executive</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -269,6 +273,49 @@ export function CreateJobPostingForm({
             )}
           />
 
+          {/* Industry */}
+          <FormField
+            control={form.control}
+            name="industry"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Industry *</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select industry" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="information_technology">Information Technology</SelectItem>
+                    <SelectItem value="finance">Finance & Banking</SelectItem>
+                    <SelectItem value="healthcare">Healthcare</SelectItem>
+                    <SelectItem value="education">Education</SelectItem>
+                    <SelectItem value="retail">Retail</SelectItem>
+                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                    <SelectItem value="hospitality">Hospitality & Tourism</SelectItem>
+                    <SelectItem value="construction">Construction</SelectItem>
+                    <SelectItem value="agriculture">Agriculture</SelectItem>
+                    <SelectItem value="mining">Mining</SelectItem>
+                    <SelectItem value="media">Media & Communications</SelectItem>
+                    <SelectItem value="transport">Transportation & Logistics</SelectItem>
+                    <SelectItem value="energy">Energy & Utilities</SelectItem>
+                    <SelectItem value="government">Government</SelectItem>
+                    <SelectItem value="nonprofit">Non-profit</SelectItem>
+                    <SelectItem value="legal">Legal</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Salary Range */}
           <FormField
             control={form.control}
@@ -276,18 +323,43 @@ export function CreateJobPostingForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Salary Range</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <Input placeholder="e.g. R30,000 - R45,000 per month" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Optional but recommended for better candidate matching
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Education Level */}
+          <FormField
+            control={form.control}
+            name="educationLevel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Education Level</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select salary range" />
+                      <SelectValue placeholder="Select education level (optional)" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {salaryRanges.map((range) => (
-                      <SelectItem key={range} value={range}>
-                        {range}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="high_school">High School/Matric</SelectItem>
+                    <SelectItem value="certificate">Certificate (NQF 2-4)</SelectItem>
+                    <SelectItem value="diploma">Diploma (NQF 5-6)</SelectItem>
+                    <SelectItem value="bachelor">Bachelor's Degree (NQF 7)</SelectItem>
+                    <SelectItem value="honours">Honours Degree (NQF 8)</SelectItem>
+                    <SelectItem value="masters">Master's Degree (NQF 9)</SelectItem>
+                    <SelectItem value="doctorate">Doctorate (NQF 10)</SelectItem>
+                    <SelectItem value="professional">Professional Qualification</SelectItem>
+                    <SelectItem value="not_required">Not Required</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -296,67 +368,158 @@ export function CreateJobPostingForm({
           />
         </div>
 
-        {/* Job Description */}
+        {/* B-BBEE Level */}
         <FormField
           control={form.control}
-          name="description"
+          name="bbbeeLevel"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Job Description <span className="text-red-500">*</span></FormLabel>
-              <FormControl>
-                <Textarea 
-                  placeholder="Enter a detailed job description including responsibilities, requirements, benefits, etc." 
-                  className="min-h-[200px]"
-                  {...field} 
-                />
-              </FormControl>
+              <FormLabel>B-BBEE Requirements</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select B-BBEE requirements (optional)" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="level_1">Level 1 Required</SelectItem>
+                  <SelectItem value="level_2">Level 2 or better</SelectItem>
+                  <SelectItem value="level_3">Level 3 or better</SelectItem>
+                  <SelectItem value="level_4">Level 4 or better</SelectItem>
+                  <SelectItem value="any_level">Any Level</SelectItem>
+                  <SelectItem value="eepolicy">EE Policy Applies</SelectItem>
+                  <SelectItem value="not_applicable">Not Applicable</SelectItem>
+                </SelectContent>
+              </Select>
               <FormDescription>
-                {field.value?.length || 0}/5000 characters (minimum 100)
+                Any B-BBEE requirements for applicants
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Deadline */}
+        <div className="space-y-2">
+          <FormLabel>Application Deadline</FormLabel>
+          <DatePicker date={deadline} setDate={setDeadline} />
+          <FormDescription>
+            Leave blank if there's no specific deadline
+          </FormDescription>
+        </div>
+
+        {/* Required Skills */}
+        <div className="space-y-2">
+          <FormLabel>Required Skills</FormLabel>
+          <div className="flex gap-2">
+            <Input
+              value={requiredSkillInput}
+              onChange={(e) => setRequiredSkillInput(e.target.value)}
+              placeholder="Add a required skill"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addRequiredSkill();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addRequiredSkill}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {form.watch("requiredSkills")?.map((skill) => (
+              <Badge key={skill} variant="secondary" className="flex items-center gap-1">
+                {skill}
+                <X
+                  className="h-3 w-3 cursor-pointer"
+                  onClick={() => removeRequiredSkill(skill)}
+                />
+              </Badge>
+            ))}
+            {(!form.watch("requiredSkills") || form.watch("requiredSkills").length === 0) && (
+              <span className="text-sm text-muted-foreground">No required skills added yet</span>
+            )}
+          </div>
+        </div>
+
+        {/* Preferred Skills */}
+        <div className="space-y-2">
+          <FormLabel>Preferred Skills</FormLabel>
+          <div className="flex gap-2">
+            <Input
+              value={preferredSkillInput}
+              onChange={(e) => setPreferredSkillInput(e.target.value)}
+              placeholder="Add a preferred skill"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addPreferredSkill();
+                }
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addPreferredSkill}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {form.watch("preferredSkills")?.map((skill) => (
+              <Badge key={skill} variant="outline" className="flex items-center gap-1">
+                {skill}
+                <X
+                  className="h-3 w-3 cursor-pointer"
+                  onClick={() => removePreferredSkill(skill)}
+                />
+              </Badge>
+            ))}
+            {(!form.watch("preferredSkills") || form.watch("preferredSkills").length === 0) && (
+              <span className="text-sm text-muted-foreground">No preferred skills added yet</span>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Required Skills */}
+          {/* Application Email */}
           <FormField
             control={form.control}
-            name="requiredSkills"
+            name="applicationEmail"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Required Skills <span className="text-red-500">*</span></FormLabel>
+                <FormLabel>Application Email</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    placeholder="e.g. JavaScript, React, Node.js" 
-                    className="min-h-[100px]"
-                    {...field} 
-                  />
+                  <Input placeholder="recruiting@example.com" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Separate skills with commas
+                  Email where applications will be sent
                 </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Preferred Skills */}
+          {/* Application URL */}
           <FormField
             control={form.control}
-            name="preferredSkills"
+            name="applicationUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preferred Skills</FormLabel>
+                <FormLabel>External Application URL</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    placeholder="e.g. TypeScript, AWS, Docker" 
-                    className="min-h-[100px]"
-                    {...field} 
-                  />
+                  <Input placeholder="https://careers.example.com/apply" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Separate skills with commas
+                  External website for applications
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -364,79 +527,67 @@ export function CreateJobPostingForm({
           />
         </div>
 
-        {/* Application Deadline */}
-        <FormField
-          control={form.control}
-          name="deadline"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Application Deadline</FormLabel>
-              <DatePicker 
-                date={field.value} 
-                setDate={(date) => field.onChange(date)}
-              />
-              <FormDescription>
-                Leave blank for no deadline
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4">
+          {/* Job Status */}
+          <FormField
+            control={form.control}
+            name="isActive"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>
+                    Active Job Posting
+                  </FormLabel>
+                  <FormDescription>
+                    Make this job visible to candidates immediately
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
 
-        {/* Featured Job */}
-        <FormField
-          control={form.control}
-          name="isFeatured"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>
-                  Feature this job posting
-                </FormLabel>
-                <FormDescription>
-                  Featured job postings appear at the top of search results and receive more visibility.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        {/* Active Job */}
-        <FormField
-          control={form.control}
-          name="isActive"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>
-                  Set job as active
-                </FormLabel>
-                <FormDescription>
-                  Active jobs are visible to job seekers. Inactive jobs are only visible to you.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Post Job
-          </Button>
+          {/* Featured Job */}
+          <FormField
+            control={form.control}
+            name="isFeatured"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>
+                    Featured Job
+                  </FormLabel>
+                  <FormDescription>
+                    Highlight this job in search results and on the homepage
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
         </div>
+
+        {/* Submit Button */}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating Job Posting...
+            </>
+          ) : (
+            "Create Job Posting"
+          )}
+        </Button>
       </form>
     </Form>
   );
