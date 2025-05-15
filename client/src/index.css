@@ -61,35 +61,35 @@
 }
 
 :root {
-  /* White and green color scheme */
+  /* Pure white color scheme */
   --background: 0 0% 100%;  /* White background */
   --foreground: 20 14.3% 4.1%;
-  --muted: 142 30% 95%;
+  --muted: 0 0% 96%;
   --muted-foreground: 25 5.3% 44.7%;
   --popover: 0 0% 100%;
   --popover-foreground: 20 14.3% 4.1%;
   --card: 0 0% 100%;
   --card-foreground: 20 14.3% 4.1%;
-  --border: 142 20% 90%;
-  --input: 142 20% 90%;
-  --primary: 142 71% 45%;  /* Green - #2ED16E */
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --primary: 0 0% 9%;  /* Almost black */
   --primary-foreground: 0 0% 100%;
-  --secondary: 142 71% 35%; /* Darker green - #1EA553 */
-  --secondary-foreground: 0 0% 100%;
-  --accent: 142 71% 95%;  /* Very light green */
-  --accent-foreground: 142 71% 25%;
+  --secondary: 0 0% 96%; /* Light gray */
+  --secondary-foreground: 0 0% 9%;
+  --accent: 0 0% 96%;  /* Light gray */
+  --accent-foreground: 0 0% 9%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 142 71% 45%;
+  --ring: 0 0% 9%;
   --radius: 0.5rem;
   --warning: 38 100% 50%;
   --success: 142 71% 45%;
   --error: 0 84.2% 60.2%;
-  --chart-1: 142 71% 45%;  /* Green */
-  --chart-2: 142 71% 35%;  /* Darker green */
-  --chart-3: 45 100% 50%;  /* Yellow */
-  --chart-4: 0 84.2% 60.2%; /* Red */
-  --chart-5: 262 83% 58%;   /* Purple */
+  --chart-1: 0 0% 60%;  /* Gray */
+  --chart-2: 0 0% 40%;  /* Darker gray */
+  --chart-3: 0 0% 20%;  /* Very dark gray */
+  --chart-4: 0 0% 80%;  /* Light gray */
+  --chart-5: 0 0% 50%;  /* Medium gray */
 }
 
 .dark {
