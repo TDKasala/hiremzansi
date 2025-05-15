@@ -212,108 +212,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const cv = await storage.createCV(cvData);
         console.log("CV created successfully with ID:", cv.id);
         
-        try {
-          // Begin background analysis of the CV
-          // Pass job description and CV ID for better analysis and caching
-          console.log("Starting CV analysis");
-          const analysis = await analyzeCV(content, jobDescription, cv.id);
-          
-          // Store the analysis results
-          const atsScore = await storage.createATSScore({
-            cvId: cv.id,
-            score: analysis.score,
-            skillsScore: analysis.skillsScore || 0,
-            contextScore: analysis.contextScore || 0,
-            formatScore: analysis.formatScore || 0,
-            strengths: analysis.strengths,
-            improvements: analysis.improvements,
-            issues: analysis.issues,
-            saKeywordsFound: analysis.saKeywordsFound || [],
-            saContextScore: analysis.saContextScore,
-            bbbeeDetected: analysis.bbbeeDetected,
-            nqfDetected: analysis.nqfDetected,
-            keywordRecommendations: analysis.keywordRecommendations
-          });
-          
-          console.log("CV analysis completed with score:", atsScore.score);
-          
-          // For guest users, provide limited analysis results
-          if (isGuest) {
-            // Limit recommendations for guest users
-            const limitedStrengths = (atsScore.strengths || []).slice(0, 2); // Only first 2 strengths
-            const limitedImprovements = (atsScore.improvements || []).slice(0, 1); // Only first improvement
-
-            res.json({
-              success: true,
-              message: "File uploaded and analyzed successfully - Guest Mode",
-              cv: {
-                id: cv.id,
-                fileName: cv.fileName,
-                fileType: cv.fileType,
-                fileSize: cv.fileSize,
-                title: cv.title
-              },
-              score: atsScore.score,
-              isGuest: true,
-              guestAnalysis: {
-                limitedStrengths,
-                limitedImprovements,
-                upgradeSuggestion: "Create a free account to see all recommendations and improvements for your CV."
-              }
-            });
-          } else {
-            // Full response for authenticated users
-            res.json({ 
-              success: true, 
-              message: "File uploaded and analyzed successfully",
-              cv: {
-                id: cv.id,
-                fileName: cv.fileName,
-                fileType: cv.fileType,
-                fileSize: cv.fileSize,
-                title: cv.title
-              },
-              score: atsScore.score
-            });
-          }
-        } catch (analysisError) {
-          console.error("Analysis error:", analysisError);
-          
-          // Even if analysis fails, we've saved the CV, so return partial success
-          if (isGuest) {
-            res.status(207).json({
-              success: true,
-              partial: true,
-              message: "File uploaded successfully, but analysis encountered an error - Guest Mode",
-              cv: {
-                id: cv.id,
-                fileName: cv.fileName,
-                fileType: cv.fileType,
-                fileSize: cv.fileSize,
-                title: cv.title
-              },
-              isGuest: true,
-              guestAnalysis: {
-                upgradeSuggestion: "Create a free account for better CV analysis and more features."
-              },
-              analysisError: "Analysis unavailable in guest mode. Please try again."
-            });
-          } else {
-            res.status(207).json({
-              success: true,
-              partial: true,
-              message: "File uploaded successfully, but analysis encountered an error",
-              cv: {
-                id: cv.id,
-                fileName: cv.fileName,
-                fileType: cv.fileType,
-                fileSize: cv.fileSize,
-                title: cv.title
-              },
-              analysisError: analysisError.message || "Unknown analysis error"
-            });
-          }
-        }
+        // Return success response without analysis - analysis will be done after consent
+        res.json({
+          success: true,
+          message: "File uploaded successfully - waiting for analysis consent",
+          cv: {
+            id: cv.id,
+            fileName: cv.fileName,
+            fileType: cv.fileType,
+            fileSize: cv.fileSize,
+            title: cv.title
+          },
+          isGuest: isGuest
+        });
       } catch (storageError) {
         console.error("CV storage error:", storageError);
         return res.status(500).json({ 
@@ -327,6 +238,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Upload failed", 
         message: error instanceof Error ? error.message : "An unexpected error occurred during the upload process" 
       });
+    }
+  });
+  
+  // Analyze CV endpoint - called after consent is given
+  app.post("/api/analyze-cv/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cvId = parseInt(req.params.id);
+      
+      if (isNaN(cvId)) {
+        return res.status(400).json({ 
+          error: "Invalid CV ID", 
+          message: "Please provide a valid CV ID." 
+        });
+      }
+      
+      // Retrieve the CV from the database
+      const cv = await storage.getCV(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ 
+          error: "CV not found", 
+          message: "The CV with the specified ID was not found." 
+        });
+      }
+      
+      // Check if the CV belongs to the user (if authenticated)
+      const isGuest = !req.isAuthenticated();
+      
+      if (!isGuest && cv.userId && cv.userId !== req.user!.id) {
+        return res.status(403).json({ 
+          error: "Unauthorized", 
+          message: "You are not authorized to analyze this CV." 
+        });
+      }
+      
+      const jobDescription = cv.jobDescription || "";
+      
+      try {
+        // Analyze the CV
+        console.log("Starting CV analysis for ID:", cvId);
+        const analysis = await analyzeCV(cv.content, jobDescription, cvId);
+        
+        // Store the analysis results
+        const atsScore = await storage.createATSScore({
+          cvId: cv.id,
+          score: analysis.score,
+          skillsScore: analysis.skillsScore || 0,
+          contextScore: analysis.contextScore || 0,
+          formatScore: analysis.formatScore || 0,
+          strengths: analysis.strengths,
+          improvements: analysis.improvements,
+          issues: analysis.issues,
+          saKeywordsFound: analysis.saKeywordsFound || [],
+          saContextScore: analysis.saContextScore,
+          bbbeeDetected: analysis.bbbeeDetected,
+          nqfDetected: analysis.nqfDetected,
+          keywordRecommendations: analysis.keywordRecommendations
+        });
+        
+        console.log("CV analysis completed with score:", atsScore.score);
+        
+        // Special handling for guest users - limit what we return
+        if (isGuest || cv.isGuest) {
+          // Limit recommendations for guest users
+          const limitedStrengths = (atsScore.strengths || []).slice(0, 2); // Only first 2 strengths
+          const limitedImprovements = (atsScore.improvements || []).slice(0, 1); // Only first improvement
+
+          res.json({
+            success: true,
+            message: "CV analyzed successfully - Guest Mode",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            score: atsScore.score,
+            isGuest: true,
+            guestAnalysis: {
+              limitedStrengths,
+              limitedImprovements,
+              upgradeSuggestion: "Create a free account to see all recommendations and improvements for your CV."
+            }
+          });
+        } else {
+          // Full response for authenticated users
+          res.json({ 
+            success: true, 
+            message: "CV analyzed successfully",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            score: atsScore.score
+          });
+        }
+      } catch (analysisError) {
+        console.error("Analysis error:", analysisError);
+        
+        // Even if analysis fails, we've saved the CV, so return partial success
+        if (isGuest || cv.isGuest) {
+          res.status(207).json({
+            success: true,
+            partial: true,
+            message: "Analysis encountered an error - Guest Mode",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            isGuest: true,
+            guestAnalysis: {
+              upgradeSuggestion: "Create a free account for better CV analysis and more features."
+            },
+            analysisError: "Analysis unavailable in guest mode. Please try again."
+          });
+        } else {
+          res.status(207).json({
+            success: true,
+            partial: true,
+            message: "Analysis encountered an error",
+            cv: {
+              id: cv.id,
+              fileName: cv.fileName,
+              fileType: cv.fileType,
+              fileSize: cv.fileSize,
+              title: cv.title
+            },
+            analysisError: "Could not complete the analysis. Please try again later."
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Analysis error:", error);
+      next(error);
     }
   });
 
