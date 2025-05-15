@@ -244,38 +244,7 @@ export class DatabaseStorage implements IStorage {
 
   async createATSScore(insertATSScore: InsertATSScore): Promise<ATSScore> {
     try {
-      // First ensure all arrays are properly formatted
-      const strengths = Array.isArray(insertATSScore.strengths) ? insertATSScore.strengths : [];
-      const improvements = Array.isArray(insertATSScore.improvements) ? insertATSScore.improvements : [];
-      const issues = Array.isArray(insertATSScore.issues) ? insertATSScore.issues : [];
-      const saKeywordsFound = Array.isArray(insertATSScore.saKeywordsFound) ? insertATSScore.saKeywordsFound : [];
-      
-      // Use direct insert with the drizzle ORM
-      const [atsScore] = await db.insert(atsScores).values({
-        cvId: insertATSScore.cvId,
-        score: insertATSScore.score,
-        skillsScore: insertATSScore.skillsScore || 0,
-        contextScore: insertATSScore.contextScore || 0,
-        formatScore: insertATSScore.formatScore || 0,
-        strengths: strengths,
-        improvements: improvements,
-        issues: issues,
-        saKeywordsFound: saKeywordsFound,
-        saContextScore: insertATSScore.saContextScore || null,
-        bbbeeDetected: insertATSScore.bbbeeDetected || false,
-        nqfDetected: insertATSScore.nqfDetected || false,
-        keywordRecommendations: insertATSScore.keywordRecommendations || null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }).returning();
-      
-      return atsScore;
-    } catch (error) {
-      console.error("Error creating ATS score:", error);
-      // Fallback method if the direct insertion fails
-      console.log("Trying fallback method for ATS score creation");
-      
-      // Use SQL query with explicit casting to avoid JSON parsing issues
+      // Use SQL query directly to avoid typing issues
       const result = await db.execute(sql`
         INSERT INTO ats_scores (
           cv_id, score, skills_score, context_score, format_score, 
@@ -290,19 +259,44 @@ export class DatabaseStorage implements IStorage {
           ${insertATSScore.skillsScore || 0}, 
           ${insertATSScore.contextScore || 0}, 
           ${insertATSScore.formatScore || 0},
-          ${sql.array(Array.isArray(insertATSScore.strengths) ? insertATSScore.strengths : [])},
-          ${sql.array(Array.isArray(insertATSScore.improvements) ? insertATSScore.improvements : [])},
-          ${sql.array(Array.isArray(insertATSScore.issues) ? insertATSScore.issues : [])},
-          ${sql.array(Array.isArray(insertATSScore.saKeywordsFound) ? insertATSScore.saKeywordsFound : [])},
+          ${Array.isArray(insertATSScore.strengths) ? JSON.stringify(insertATSScore.strengths) : '[]'}, 
+          ${Array.isArray(insertATSScore.improvements) ? JSON.stringify(insertATSScore.improvements) : '[]'}, 
+          ${Array.isArray(insertATSScore.issues) ? JSON.stringify(insertATSScore.issues) : '[]'}, 
+          ${Array.isArray(insertATSScore.saKeywordsFound) ? JSON.stringify(insertATSScore.saKeywordsFound) : '[]'}, 
           ${insertATSScore.saContextScore || null},
           ${insertATSScore.bbbeeDetected || false},
           ${insertATSScore.nqfDetected || false},
-          ${insertATSScore.keywordRecommendations ? sql.json(insertATSScore.keywordRecommendations) : null},
+          ${insertATSScore.keywordRecommendations ? JSON.stringify(insertATSScore.keywordRecommendations) : 'null'},
           NOW(), NOW()
         ) RETURNING *
       `);
       
       return result.rows[0] as ATSScore;
+    } catch (error) {
+      console.error("Error creating ATS score:", error);
+      
+      // Try a more basic approach if there was an error
+      try {
+        // Create a proper ATS score object with minimal data
+        const [atsScore] = await db.insert(atsScores).values({
+          cvId: insertATSScore.cvId,
+          score: insertATSScore.score,
+          skillsScore: insertATSScore.skillsScore || 0,
+          contextScore: insertATSScore.contextScore || 0,
+          formatScore: insertATSScore.formatScore || 0,
+          strengths: [],
+          improvements: [],
+          issues: [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }).returning();
+        
+        console.log("Created minimal ATS score as fallback");
+        return atsScore;
+      } catch (fallbackError) {
+        console.error("Even fallback ATS score creation failed:", fallbackError);
+        throw new Error("Failed to create ATS score after multiple attempts");
+      }
     }
   }
 

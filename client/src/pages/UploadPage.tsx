@@ -438,12 +438,14 @@ export default function UploadPage() {
           <h2 className="text-xl font-semibold mb-4">South African CV Best Practices</h2>
           
           <Tabs defaultValue="essentials" className="mb-6">
-            <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="essentials">Key Elements</TabsTrigger>
-              <TabsTrigger value="format">Format Tips</TabsTrigger>
-              <TabsTrigger value="keywords">Industry Keywords</TabsTrigger>
-              <TabsTrigger value="regulations">SA Regulations</TabsTrigger>
-            </TabsList>
+            <div className="flex justify-center mb-4">
+              <TabsList>
+                <TabsTrigger value="essentials">Key Elements</TabsTrigger>
+                <TabsTrigger value="format">Format Tips</TabsTrigger>
+                <TabsTrigger value="keywords">Industry Keywords</TabsTrigger>
+                <TabsTrigger value="regulations">SA Regulations</TabsTrigger>
+              </TabsList>
+            </div>
             
             <TabsContent value="essentials">
               <div className="grid gap-4 md:grid-cols-3">
