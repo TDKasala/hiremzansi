@@ -6,6 +6,13 @@ import {
   deepAnalysisReports,
   plans,
   subscriptions,
+  employers,
+  jobPostings,
+  jobMatches,
+  skills,
+  userSkills,
+  payments,
+  notifications,
   type User, 
   type InsertUser, 
   type CV,
@@ -18,7 +25,21 @@ import {
   type InsertDeepAnalysisReport,
   type AnalysisReport,
   type Plan,
-  type Subscription
+  type Subscription,
+  type Employer,
+  type InsertEmployer,
+  type JobPosting,
+  type InsertJobPosting,
+  type JobMatch,
+  type InsertJobMatch,
+  type Skill,
+  type InsertSkill,
+  type UserSkill,
+  type InsertUserSkill,
+  type Payment,
+  type InsertPayment,
+  type Notification,
+  type InsertNotification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";

@@ -1246,6 +1246,245 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin database management endpoint
+  // Employer management routes
+  app.post("/api/employers", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check if user already has an employer profile
+      const existingEmployer = await storage.getEmployerByUserId(req.user!.id);
+      if (existingEmployer) {
+        return res.status(400).json({ error: "You already have an employer profile" });
+      }
+      
+      // Create a new employer profile
+      const employerData = {
+        userId: req.user!.id,
+        companyName: req.body.companyName,
+        industry: req.body.industry,
+        size: req.body.size,
+        location: req.body.location,
+        description: req.body.description,
+        websiteUrl: req.body.websiteUrl,
+        bbbeeLevel: req.body.bbbeeLevel,
+        verified: false // Default to false, verification process can be added later
+      };
+      
+      const employer = await storage.createEmployer(employerData);
+      
+      res.status(201).json({
+        id: employer.id,
+        companyName: employer.companyName,
+        industry: employer.industry,
+        verified: employer.verified
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/employers/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const employerId = Number(req.params.id);
+      
+      if (isNaN(employerId)) {
+        return res.status(400).json({ error: "Invalid employer ID" });
+      }
+      
+      const employer = await storage.getEmployer(employerId);
+      
+      if (!employer) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      // Return employer profile without sensitive information
+      res.json({
+        id: employer.id,
+        companyName: employer.companyName,
+        industry: employer.industry,
+        size: employer.size,
+        location: employer.location,
+        description: employer.description,
+        websiteUrl: employer.websiteUrl,
+        bbbeeLevel: employer.bbbeeLevel,
+        verified: employer.verified
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Job posting routes
+  app.post("/api/job-postings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check if user is an employer
+      const employer = await storage.getEmployerByUserId(req.user!.id);
+      
+      if (!employer) {
+        return res.status(403).json({ 
+          error: "You need to create an employer profile first",
+          createEmployerFirst: true
+        });
+      }
+      
+      // Create a new job posting
+      const jobData = {
+        employerId: employer.id,
+        title: req.body.title,
+        description: req.body.description,
+        location: req.body.location,
+        salary: req.body.salary,
+        salaryRange: req.body.salaryRange,
+        jobType: req.body.jobType,
+        requiredSkills: req.body.requiredSkills || [],
+        preferredSkills: req.body.preferredSkills || [],
+        education: req.body.education,
+        experience: req.body.experience,
+        bbbeePreference: req.body.bbbeePreference,
+        isActive: true,
+        applicationDeadline: req.body.applicationDeadline ? new Date(req.body.applicationDeadline) : null
+      };
+      
+      const job = await storage.createJobPosting(jobData);
+      
+      res.status(201).json({
+        id: job.id,
+        title: job.title,
+        location: job.location,
+        employerId: job.employerId,
+        createdAt: job.createdAt
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/job-postings", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const query = {
+        location: req.query.location as string,
+        title: req.query.title as string,
+        industry: req.query.industry as string,
+        jobType: req.query.jobType as string,
+        limit: Math.min(Number(req.query.limit) || 20, 100) // Cap at 100 results
+      };
+      
+      const jobs = await storage.getJobPostings(query);
+      
+      res.json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/job-postings/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = Number(req.params.id);
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      const job = await storage.getJobPosting(jobId);
+      
+      if (!job) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Get employer info for the job
+      const employer = await storage.getEmployer(job.employerId);
+      
+      res.json({
+        ...job,
+        employer: employer ? {
+          id: employer.id,
+          companyName: employer.companyName,
+          industry: employer.industry,
+          verified: employer.verified
+        } : null
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // AI Job Matching routes
+  app.get("/api/cv/:cvId/matching-jobs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cvId = Number(req.params.cvId);
+      
+      if (isNaN(cvId)) {
+        return res.status(400).json({ error: "Invalid CV ID" });
+      }
+      
+      const cv = await storage.getCV(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ error: "CV not found" });
+      }
+      
+      // Check if the CV belongs to the user
+      if (cv.userId !== req.user!.id) {
+        return res.status(403).json({ error: "You don't have permission to access this CV" });
+      }
+      
+      // Import the job matching service
+      const { findMatchingJobs } = await import('./services/jobMatching');
+      
+      // Find matching jobs
+      const limit = Math.min(Number(req.query.limit) || 10, 50); // Cap at 50 results
+      const matches = await findMatchingJobs(cvId, limit);
+      
+      res.json(matches);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  app.get("/api/job-postings/:jobId/matching-cvs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = Number(req.params.jobId);
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      const job = await storage.getJobPosting(jobId);
+      
+      if (!job) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Check if the job belongs to the user's employer profile
+      const employer = await storage.getEmployerByUserId(req.user!.id);
+      
+      if (!employer || employer.id !== job.employerId) {
+        return res.status(403).json({ error: "You don't have permission to access matches for this job" });
+      }
+      
+      // Import the job matching service
+      const { findMatchingCVs } = await import('./services/jobMatching');
+      
+      // Find matching CVs
+      const limit = Math.min(Number(req.query.limit) || 10, 50); // Cap at 50 results
+      const matches = await findMatchingCVs(jobId, limit);
+      
+      // Filter out sensitive information from matched CVs
+      const sanitizedMatches = matches.map(match => ({
+        cv: {
+          id: match.cv.id,
+          title: match.cv.title,
+          targetPosition: match.cv.targetPosition,
+          targetIndustry: match.cv.targetIndustry,
+        },
+        score: match.score,
+        matchedSkills: match.matchedSkills
+      }));
+      
+      res.json(sanitizedMatches);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/admin/database", isAdmin, async (_req: Request, res: Response, next: NextFunction) => {
     try {
       // Import the database utilities

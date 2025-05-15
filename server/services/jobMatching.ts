@@ -22,7 +22,8 @@ export async function extractSkillsFromCV(cvContent: string): Promise<string[]> 
       response_format: { type: "json_object" }
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content ?? "{}";
+    const result = JSON.parse(content);
     return result.skills || [];
   } catch (error) {
     console.error("Error extracting skills from CV:", error);
@@ -154,7 +155,8 @@ Provide your answer as a JSON object with the following structure:
       response_format: { type: "json_object" }
     });
 
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content ?? "{}";
+    const result = JSON.parse(content);
     return result.score || 0;
   } catch (error) {
     console.error("Error calculating AI match score:", error);
