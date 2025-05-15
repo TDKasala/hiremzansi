@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { PreUploadConsentDialog } from "@/components/PreUploadConsentDialog";
 
 interface FileUploadProps {
   onUploadComplete?: (data: any) => void;
@@ -30,6 +31,8 @@ export default function FileUpload({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
   const [jobDescription, setJobDescription] = useState("");
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -103,18 +106,20 @@ export default function FileUpload({
 
       const data = await res.json();
       
-      toast({
-        title: "File Uploaded Successfully",
-        description: `Your CV has been analyzed with a score of ${data.score}%`,
-      });
-
-      // Call the callback if provided
-      if (onUploadComplete) {
-        onUploadComplete(data);
+      // Store the uploaded CV ID from the response
+      if (data.cv && data.cv.id) {
+        setUploadedCvId(data.cv.id);
+        // Show the consent dialog after successful upload
+        setShowConsentDialog(true);
       }
       
-      // Don't reset the state yet, as we'll be redirecting to the analysis page
-      // The state will be reset naturally when the component unmounts
+      toast({
+        title: "File Uploaded Successfully",
+        description: "Please consent to analysis to continue",
+      });
+      
+      // We'll call onUploadComplete after analysis, not here
+      
     } catch (err: any) {
       if (progressInterval) {
         clearInterval(progressInterval);
@@ -133,6 +138,82 @@ export default function FileUpload({
       setIsUploading(false);
     }
   };
+  
+  // Handle consent dialog confirmation (analyze the CV)
+  const handleConsentConfirm = async () => {
+    if (!uploadedCvId) return;
+    
+    setShowConsentDialog(false);
+    
+    let progressInterval: NodeJS.Timeout | null = null;
+    
+    try {
+      setIsUploading(true);
+      setProgress(50); // Start analysis at 50%
+      
+      // Simulate progress during analysis
+      progressInterval = setInterval(() => {
+        setProgress(prev => {
+          const newProgress = prev + Math.random() * 5;
+          return newProgress > 90 ? 90 : newProgress;
+        });
+      }, 500);
+      
+      // Call the analyze endpoint
+      const res = await fetch(`/api/analyze-cv/${uploadedCvId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+      });
+      
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || errorData.error || "Failed to analyze CV");
+      }
+      
+      const data = await res.json();
+      setProgress(100);
+      
+      toast({
+        title: "CV Analysis Complete",
+        description: `Your CV has been analyzed with a score of ${data.score}%`,
+      });
+      
+      // Now call the callback after analysis is complete
+      if (onUploadComplete) {
+        onUploadComplete(data);
+      }
+      
+    } catch (err: any) {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+        progressInterval = null;
+      }
+      
+      setProgress(0);
+      setError(err.message || "An error occurred during analysis");
+      
+      toast({
+        title: "Analysis Failed",
+        description: err.message || "An error occurred during analysis",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
+  // Handle consent dialog close (cancel)
+  const handleConsentClose = () => {
+    setShowConsentDialog(false);
+  };
 
   const getFileSize = (size: number) => {
     if (size < 1024) return `${size} B`;
@@ -142,6 +223,14 @@ export default function FileUpload({
 
   return (
     <div className="w-full space-y-4">
+      {/* Consent Dialog */}
+      <PreUploadConsentDialog
+        isOpen={showConsentDialog}
+        onClose={handleConsentClose}
+        onConfirm={handleConsentConfirm}
+        cvFile={selectedFile}
+      />
+      
       {withJobDescription && (
         <div className="space-y-2">
           <Label htmlFor="job-description">Target Job Description</Label>
