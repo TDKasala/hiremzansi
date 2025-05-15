@@ -1452,20 +1452,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.get("/api/job-postings/:jobId/matching-cvs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { getJobPosting } = await import('./employerStorage');
+      const { getEmployerByUserId } = await import('./employerStorage');
+      
       const jobId = Number(req.params.jobId);
       
       if (isNaN(jobId)) {
         return res.status(400).json({ error: "Invalid job posting ID" });
       }
       
-      const job = await storage.getJobPosting(jobId);
+      const job = await getJobPosting(jobId);
       
       if (!job) {
         return res.status(404).json({ error: "Job posting not found" });
       }
       
       // Check if the job belongs to the user's employer profile
-      const employer = await storage.getEmployerByUserId(req.user!.id);
+      const employer = await getEmployerByUserId(req.user!.id);
       
       if (!employer || employer.id !== job.employerId) {
         return res.status(403).json({ error: "You don't have permission to access matches for this job" });
