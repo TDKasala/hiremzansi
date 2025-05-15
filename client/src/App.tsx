@@ -28,6 +28,10 @@ import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
 import NotFound from "@/pages/not-found";
 
+// Import tool pages
+import CoverLetterPage from "@/pages/tools/CoverLetterPage";
+import CVTemplatesPage from "@/pages/tools/CVTemplatesPage";
+
 // Import new blog posts
 import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
 import NQFLevelsExplained from "@/pages/blog/NQFLevelsExplained";
@@ -77,6 +81,10 @@ function App() {
                   <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
                   <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
                   <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
+                  
+                  {/* Tool pages */}
+                  <Route path="/tools/cover-letter" component={CoverLetterPage} />
+                  <Route path="/tools/cv-templates" component={CVTemplatesPage} />
                   
                   {/* Protected routes requiring authentication */}
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />
