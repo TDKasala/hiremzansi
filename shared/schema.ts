@@ -270,8 +270,10 @@ export const employers = pgTable("employers", {
   userId: integer("user_id").references(() => users.id).notNull(),
   companyName: text("company_name").notNull(),
   industry: text("industry"),
-  companySize: text("company_size"),
-  website: text("website"),
+  size: text("size"), // Company size (e.g., "1-10", "11-50")
+  location: text("location"), // Primary location (e.g., "gauteng", "western_cape")
+  websiteUrl: text("website_url"),
+  bbbeeLevel: text("bbbee_level"), // B-BBEE status level
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
   logo: text("logo"),

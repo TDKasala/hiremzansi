@@ -435,7 +435,7 @@ export function CreateJobPostingForm({
             </Button>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-            {form.watch("requiredSkills")?.map((skill) => (
+            {(form.watch("requiredSkills") || []).map((skill) => (
               <Badge key={skill} variant="secondary" className="flex items-center gap-1">
                 {skill}
                 <X
@@ -444,7 +444,7 @@ export function CreateJobPostingForm({
                 />
               </Badge>
             ))}
-            {(!form.watch("requiredSkills") || form.watch("requiredSkills").length === 0) && (
+            {(!(form.watch("requiredSkills")) || (form.watch("requiredSkills") || []).length === 0) && (
               <span className="text-sm text-muted-foreground">No required skills added yet</span>
             )}
           </div>
@@ -474,7 +474,7 @@ export function CreateJobPostingForm({
             </Button>
           </div>
           <div className="flex flex-wrap gap-2 mt-2">
-            {form.watch("preferredSkills")?.map((skill) => (
+            {(form.watch("preferredSkills") || []).map((skill) => (
               <Badge key={skill} variant="outline" className="flex items-center gap-1">
                 {skill}
                 <X
@@ -483,7 +483,7 @@ export function CreateJobPostingForm({
                 />
               </Badge>
             ))}
-            {(!form.watch("preferredSkills") || form.watch("preferredSkills").length === 0) && (
+            {(!(form.watch("preferredSkills")) || (form.watch("preferredSkills") || []).length === 0) && (
               <span className="text-sm text-muted-foreground">No preferred skills added yet</span>
             )}
           </div>
