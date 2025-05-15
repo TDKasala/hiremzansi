@@ -22,6 +22,9 @@ import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
+import LatestCVPage from "@/pages/LatestCVPage";
+import DeepAnalysisPage from "@/pages/DeepAnalysisPage";
+import ProfilePage from "@/pages/ProfilePage";
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import ReferralPage from "@/pages/ReferralPage";
@@ -92,6 +95,9 @@ function App() {
                   <ProtectedRoute path="/dashboard" component={DashboardPage} />
                   <ProtectedRoute path="/upload" component={UploadPage} />
                   <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
+                  <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
+                  <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
+                  <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />
                   <Route component={NotFound} />
