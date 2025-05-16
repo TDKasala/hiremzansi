@@ -32,6 +32,17 @@ import {
 
 import { type Employer, type JobPosting } from '@shared/schema';
 
+// Helper function to get initials from a name
+function getInitials(name: string): string {
+  if (!name) return 'CO';
+  return name
+    .split(' ')
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+}
+
 export default function EmployerDashboardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -559,7 +570,7 @@ export default function EmployerDashboardPage() {
                   {employer?.bbbeeLevel && (
                     <div className="flex items-center">
                       <span className="text-sm font-medium w-24">B-BBEE Level:</span>
-                      <span>{employer.bbbeeLevel.replace('level_', 'Level ').replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
+                      <span>{employer?.bbbeeLevel?.replace('level_', 'Level ').replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
                     </div>
                   )}
                 </div>
@@ -574,15 +585,15 @@ export default function EmployerDashboardPage() {
                 <div>
                   <div className="flex items-center mb-1">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={null} />
+                      <AvatarImage src={employer?.logoUrl || ""} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
-                        {getInitials(employer.companyName)}
+                        {employer?.companyName ? getInitials(employer.companyName) : 'CO'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="ml-4">
-                      <h3 className="font-medium">{employer.companyName}</h3>
+                      <h3 className="font-medium">{employer?.companyName}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {employer.size || 'Company'} • {employer.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'No location'}
+                        {employer?.size || 'Company'} • {employer?.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'No location'}
                       </p>
                     </div>
                   </div>
@@ -591,14 +602,14 @@ export default function EmployerDashboardPage() {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Contact Details</h4>
                   <div className="space-y-2">
-                    {employer.contactEmail && (
+                    {employer?.contactEmail && (
                       <div className="flex items-center text-sm">
                         <span className="w-16 text-muted-foreground">Email:</span>
                         <span>{employer.contactEmail}</span>
                       </div>
                     )}
                     
-                    {employer.contactPhone && (
+                    {employer?.contactPhone && (
                       <div className="flex items-center text-sm">
                         <span className="w-16 text-muted-foreground">Phone:</span>
                         <span>{employer.contactPhone}</span>
@@ -612,7 +623,7 @@ export default function EmployerDashboardPage() {
                   <div className="space-y-2">
                     <div className="flex items-center text-sm">
                       <span className="w-16 text-muted-foreground">Member:</span>
-                      <span>Since {new Date(employer.createdAt).toLocaleDateString()}</span>
+                      <span>Since {employer?.createdAt ? new Date(employer.createdAt).toLocaleDateString() : 'N/A'}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <span className="w-16 text-muted-foreground">Status:</span>
