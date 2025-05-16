@@ -42,6 +42,11 @@ import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
 import CVTemplatesPage from "@/pages/tools/CVTemplatesPage";
+import ATSKeywordsPage from "@/pages/tools/ATSKeywordsPage";
+import CoverLetterIdeasPage from "@/pages/tools/CoverLetterIdeasPage";
+import CVChecklistPage from "@/pages/tools/CVChecklistPage";
+import JobFitQuizPage from "@/pages/tools/JobFitQuizPage";
+import InterviewGuidePage from "@/pages/tools/InterviewGuidePage";
 
 // Import new blog posts
 import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
@@ -97,6 +102,11 @@ function App() {
                   {/* Tool pages */}
                   <Route path="/tools/cover-letter" component={CoverLetterPage} />
                   <Route path="/tools/cv-templates" component={CVTemplatesPage} />
+                  <Route path="/tools/ats-keywords" component={ATSKeywordsPage} />
+                  <Route path="/tools/cover-letter-ideas" component={CoverLetterIdeasPage} />
+                  <Route path="/tools/cv-checklist" component={CVChecklistPage} />
+                  <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
+                  <Route path="/tools/interview-guide" component={InterviewGuidePage} />
                   
                   {/* Job search and career advancement pages */}
                   <Route path="/jobs" component={JobsPage} />

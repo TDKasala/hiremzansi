@@ -362,7 +362,8 @@ const CVChecklistPage = () => {
         <CardHeader className="pb-2">
           <CardTitle className="flex justify-between items-center">
             <span>Overall Progress</span>
-            <Badge variant={calculateOverallProgress() === 100 ? "success" : "outline"}>
+            <Badge variant={calculateOverallProgress() === 100 ? "default" : "outline"}
+                   className={calculateOverallProgress() === 100 ? "bg-green-500 text-white" : ""}>
               {calculateOverallProgress()}% Complete
             </Badge>
           </CardTitle>
