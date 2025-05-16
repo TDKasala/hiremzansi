@@ -543,20 +543,20 @@ export default function EmployerDashboardPage() {
                   
                   <div className="flex items-center">
                     <span className="text-sm font-medium w-24">Location:</span>
-                    <span>{employer.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
+                    <span>{employer?.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
                   </div>
                   
                   <div className="flex items-center">
                     <span className="text-sm font-medium w-24">Industry:</span>
-                    <span>{employer.industry?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
+                    <span>{employer?.industry?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
                   </div>
                   
                   <div className="flex items-center">
                     <span className="text-sm font-medium w-24">Size:</span>
-                    <span>{employer.size || 'Not specified'}</span>
+                    <span>{employer?.size || 'Not specified'}</span>
                   </div>
                   
-                  {employer.bbbeeLevel && (
+                  {employer?.bbbeeLevel && (
                     <div className="flex items-center">
                       <span className="text-sm font-medium w-24">B-BBEE Level:</span>
                       <span>{employer.bbbeeLevel.replace('level_', 'Level ').replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase())}</span>
