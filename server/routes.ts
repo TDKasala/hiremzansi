@@ -20,6 +20,7 @@ import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
+import * as employerStorage from "./employerStorage";
 
 // File upload configuration
 const upload = multer({
@@ -1416,6 +1417,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin database management endpoint
   // Employer management routes
+  // Get current user's employer profile
+  app.get("/api/employers/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Import employer storage functions dynamically
+      const { getEmployerByUserId } = await import('./employerStorage');
+      
+      const employer = await getEmployerByUserId(req.user!.id);
+      
+      if (!employer) {
+        return res.status(404).json({ message: "Employer profile not found" });
+      }
+      
+      res.json(employer);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.post("/api/employers", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       // Import employer storage functions
