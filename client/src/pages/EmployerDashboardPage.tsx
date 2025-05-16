@@ -136,14 +136,7 @@ export default function EmployerDashboardPage() {
     });
   };
   
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  };
+  // getInitials function is already defined at the top level
   
   // Filter jobs based on search input
   const filteredJobs = jobs?.filter(job => 
@@ -585,7 +578,7 @@ export default function EmployerDashboardPage() {
                 <div>
                   <div className="flex items-center mb-1">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={employer?.logoUrl || ""} />
+                      <AvatarImage src="" alt={employer?.companyName || "Company"} />
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {employer?.companyName ? getInitials(employer.companyName) : 'CO'}
                       </AvatarFallback>
