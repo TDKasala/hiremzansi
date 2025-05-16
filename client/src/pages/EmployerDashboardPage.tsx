@@ -1,47 +1,31 @@
-import React, { useState } from 'react';
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
-import { useLocation } from 'wouter';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import { getQueryFn, apiRequest, queryClient } from '@/lib/queryClient';
+import { Building2, Users, Clock, User, MapPin, PlusCircle, Search, Briefcase, Settings, Trash2, Edit, Eye, BarChart, ArrowUpRight } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Employer, JobPosting } from "@/types/employer";
+import CreateEmployerProfileForm from "@/components/employer/CreateEmployerProfileForm";
+import { AlertCircle } from "lucide-react";
 
-import { CreateEmployerProfileForm } from '@/components/employer/CreateEmployerProfileForm';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-import {
-  PlusCircle,
-  Building2,
-  Briefcase,
-  Users,
-  Search,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Eye,
-  FileText,
-  Settings,
-  Loader2
-} from 'lucide-react';
-
-import { type Employer, type JobPosting } from '@shared/schema';
-
-// Helper function to get initials from a name
-function getInitials(name: string): string {
-  if (!name) return 'CO';
+// Helper function to get initials from a string
+const getInitials = (name: string): string => {
   return name
     .split(' ')
-    .map(part => part.charAt(0))
+    .map(word => word.charAt(0))
     .join('')
     .toUpperCase()
     .substring(0, 2);
-}
+};
 
 export default function EmployerDashboardPage() {
   const { user } = useAuth();
@@ -73,7 +57,7 @@ export default function EmployerDashboardPage() {
   });
   
   // Function to handle employer profile creation submission
-  const createEmployerProfile = (data: any) => {
+  const handleCreateEmployer = (data: any) => {
     createEmployerMutation.mutate(data);
   };
   
@@ -98,91 +82,23 @@ export default function EmployerDashboardPage() {
         description: error.message || "Failed to create employer profile",
         variant: "destructive",
       });
-    }
+    },
   });
   
-  // Toggle job activation status
-  const toggleJobActivationMutation = useMutation({
-    mutationFn: async ({ jobId, isActive }: { jobId: number, isActive: boolean }) => {
-      const res = await apiRequest("PATCH", `/api/job-postings/${jobId}`, { isActive });
-      return res.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Job status updated",
-        description: "The job posting status has been updated successfully.",
-      });
-      
-      // Refetch jobs data
-      queryClient.invalidateQueries({ queryKey: ['/api/job-postings/my'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update job status",
-        variant: "destructive",
-      });
-    }
-  });
-  
-  const handleCreateEmployer = (data: any) => {
-    createEmployerMutation.mutate(data);
-  };
-  
-  const handleToggleJobActivation = (jobId: number, currentStatus: boolean) => {
-    toggleJobActivationMutation.mutate({
-      jobId,
-      isActive: !currentStatus
-    });
-  };
-  
-  // getInitials function is already defined at the top level
-  
-  // Filter jobs based on search input
-  const filteredJobs = jobs?.filter(job => 
-    job.title.toLowerCase().includes(jobSearch.toLowerCase()) ||
-    job.description.toLowerCase().includes(jobSearch.toLowerCase())
-  );
-  
-  // If we don't have an employer profile yet, show the create form
-  if (!isLoadingEmployer && !employer) {
+  // Filter jobs based on search term
+  const filteredJobs = jobs?.filter(job => {
+    if (!jobSearch) return true;
     return (
-      <div className="container mx-auto py-8 max-w-3xl">
-        <Helmet>
-          <title>Create Employer Profile | ATSBoost</title>
-          <meta name="description" content="Create your employer profile on ATSBoost to start posting jobs and finding top talent." />
-        </Helmet>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">Create Your Employer Profile</h1>
-          <p className="text-muted-foreground mt-2">
-            Get started with ATSBoost's employer tools by setting up your company profile
-          </p>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Company Information</CardTitle>
-            <CardDescription>
-              Fill in your company details to create your employer profile. 
-              This information will be visible to job seekers.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CreateEmployerProfileForm 
-              onSubmit={handleCreateEmployer} 
-              isSubmitting={createEmployerMutation.isPending} 
-            />
-          </CardContent>
-        </Card>
-      </div>
+      job.title.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      job.description.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      job.location?.toLowerCase().includes(jobSearch.toLowerCase())
     );
-  }
+  });
   
-  // Loading state
+  // If we're still loading the employer profile, show a loading skeleton
   if (isLoadingEmployer) {
     return (
-      <div className="container mx-auto py-8 max-w-5xl">
+      <div className="container mx-auto py-8 max-w-6xl">
         <div className="animate-pulse space-y-6">
           <div className="h-12 w-1/3 bg-gray-200 rounded mb-4"></div>
           <div className="h-8 w-2/3 bg-gray-200 rounded mb-8"></div>
@@ -217,11 +133,26 @@ export default function EmployerDashboardPage() {
           </CardHeader>
           <CardContent>
             <CreateEmployerProfileForm 
-              onSubmit={createEmployerProfile}
+              onSubmit={handleCreateEmployer}
               isSubmitting={createEmployerMutation.isPending}
             />
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+  
+  // If there's an error fetching the employer profile
+  if (employerError) {
+    return (
+      <div className="container mx-auto py-8 max-w-6xl">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {employerError instanceof Error ? employerError.message : "Failed to load employer profile"}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -256,303 +187,183 @@ export default function EmployerDashboardPage() {
         <div className="mt-4 md:mt-0">
           <Button onClick={() => navigate("/employer/jobs/new")} className="bg-amber-500 hover:bg-amber-600">
             <PlusCircle className="mr-2 h-4 w-4" />
-            Post a New Job
+            Post New Job
           </Button>
         </div>
       </div>
       
-      {/* Stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center">
-              <Briefcase className="h-4 w-4 mr-2 text-primary" />
-              Active Jobs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {isLoadingJobs ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                jobs?.filter(job => job.isActive).length || 0
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Currently active job postings
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center">
-              <Eye className="h-4 w-4 mr-2 text-primary" />
-              Total Views
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {isLoadingJobs ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                jobs?.reduce((total, job) => total + (job.views || 0), 0)
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Combined views across all jobs
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center">
-              <FileText className="h-4 w-4 mr-2 text-primary" />
-              Applications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">
-              {isLoadingJobs ? (
-                <Skeleton className="h-8 w-16" />
-              ) : (
-                0 // Replace with actual applications count when available
-              )}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Total applications received
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Tabs for different sections */}
-      <Tabs defaultValue="jobs" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="jobs">Job Postings</TabsTrigger>
-          <TabsTrigger value="candidates">Candidates</TabsTrigger>
-          <TabsTrigger value="company">Company Profile</TabsTrigger>
+      {/* Dashboard tabs */}
+      <Tabs defaultValue="jobs" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="jobs" className="flex items-center">
+            <Briefcase className="h-4 w-4 mr-2" />
+            Job Postings
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex items-center">
+            <Building2 className="h-4 w-4 mr-2" />
+            Company Profile
+          </TabsTrigger>
         </TabsList>
         
-        {/* Jobs Tab */}
-        <TabsContent value="jobs" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Your Job Postings</h2>
-            <div className="flex gap-2">
-              <div className="relative w-64">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search jobs..."
-                  className="pl-8"
-                  value={jobSearch}
-                  onChange={(e) => setJobSearch(e.target.value)}
-                />
-              </div>
-              <Button onClick={() => navigate("/employer/jobs/new")}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Job
-              </Button>
+        {/* Job Postings Tab */}
+        <TabsContent value="jobs">
+          <div className="flex justify-between items-center mb-6">
+            <div className="relative w-full md:w-1/3">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search job postings..." 
+                className="pl-8" 
+                value={jobSearch}
+                onChange={e => setJobSearch(e.target.value)}
+              />
             </div>
           </div>
           
           {isLoadingJobs ? (
-            <div className="space-y-4">
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
+            <div className="animate-pulse space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+              ))}
             </div>
-          ) : filteredJobs && filteredJobs.length > 0 ? (
-            <div className="space-y-4">
-              {filteredJobs.map((job) => (
-                <Card key={job.id} className="overflow-hidden">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="p-6 flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-lg">{job.title}</h3>
-                            <Badge variant={job.isActive ? "default" : "outline"} className={`font-normal ${job.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : "text-muted-foreground"}`}>
-                              {job.isActive ? "Active" : "Inactive"}
+          ) : jobsError ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                Failed to load job postings. Please try again later.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <>
+              {filteredJobs && filteredJobs.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredJobs.map(job => (
+                    <Card key={job.id} className="hover:border-primary/50 transition-colors">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between">
+                          <div>
+                            <CardTitle className="text-xl">{job.title}</CardTitle>
+                            <CardDescription className="flex items-center mt-1">
+                              <MapPin className="h-3.5 w-3.5 mr-1" />
+                              {job.location || 'Remote/Unspecified'}
+                              {job.employmentType && (
+                                <>
+                                  <span className="mx-1">•</span>
+                                  {job.employmentType.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase())}
+                                </>
+                              )}
+                            </CardDescription>
+                          </div>
+                          <div className="flex items-start space-x-2">
+                            <Badge variant={job.isActive ? "default" : "outline"}>
+                              {job.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                             {job.isFeatured && (
-                              <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                              <Badge variant="secondary" className="bg-amber-100 text-amber-800">
                                 Featured
                               </Badge>
                             )}
                           </div>
-                          
-                          <div className="flex items-center mt-1 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4 mr-1" /> Posted {new Date(job.createdAt).toLocaleDateString()} 
-                            {job.deadline && (
-                              <span className="ml-3 flex items-center">
-                                • Deadline: {new Date(job.deadline).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
                         </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <p className="text-sm line-clamp-2">
+                          {job.description.length > 150 
+                            ? `${job.description.substring(0, 150)}...` 
+                            : job.description}
+                        </p>
                         
-                        <div className="hidden md:flex items-center space-x-2">
+                        <div className="flex flex-wrap gap-1 mt-3">
+                          {job.requiredSkills?.slice(0, 5).map((skill, i) => (
+                            <Badge key={i} variant="outline" className="bg-blue-50">
+                              {skill}
+                            </Badge>
+                          ))}
+                          {job.requiredSkills && job.requiredSkills.length > 5 && (
+                            <Badge variant="outline">+{job.requiredSkills.length - 5} more</Badge>
+                          )}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-between pt-2">
+                        <div className="flex text-sm text-muted-foreground">
+                          <div className="flex items-center mr-4">
+                            <Eye className="h-4 w-4 mr-1" />
+                            {job.views} views
+                          </div>
+                          {job.deadline && (
+                            <div className="flex items-center">
+                              <Clock className="h-4 w-4 mr-1" />
+                              Deadline: {new Date(job.deadline).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
                           <Button 
                             variant="outline" 
-                            size="sm"
+                            size="sm" 
+                            className="border-blue-500 text-blue-500 hover:text-blue-500"
                             onClick={() => navigate(`/employer/jobs/${job.id}`)}
                           >
+                            <Eye className="h-4 w-4 mr-1" />
                             View
                           </Button>
                           <Button 
-                            variant={job.isActive ? "outline" : "default"}
+                            variant="outline" 
                             size="sm"
-                            onClick={() => handleToggleJobActivation(job.id, job.isActive ?? false)}
-                            disabled={toggleJobActivationMutation.isPending}
+                            onClick={() => navigate(`/employer/jobs/${job.id}/edit`)}
                           >
-                            {job.isActive ? (
-                              <XCircle className="h-4 w-4 mr-1" />
-                            ) : (
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                            )}
-                            {job.isActive ? "Deactivate" : "Activate"}
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
                           </Button>
                         </div>
-                      </div>
-                      
-                      <p className="mt-2 text-sm line-clamp-2">
-                        {job.description}
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        <Badge variant="secondary" className="text-xs">
-                          {job.employmentType?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Unspecified Type'}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs">
-                          {job.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Unspecified Location'}
-                        </Badge>
-                        {job.experienceLevel && (
-                          <Badge variant="secondary" className="text-xs">
-                            {job.experienceLevel.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase())}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="border-t md:border-t-0 md:border-l border-gray-200 flex flex-row md:flex-col justify-around md:justify-center items-center p-4 gap-4 bg-gray-50">
-                      <div className="text-center">
-                        <div className="text-2xl font-semibold">{job.views || 0}</div>
-                        <div className="text-xs text-muted-foreground">Views</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-semibold">0</div>
-                        <div className="text-xs text-muted-foreground">Applications</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="md:hidden border-t border-gray-200 p-4 flex justify-end space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => navigate(`/employer/jobs/${job.id}`)}
-                    >
-                      View
-                    </Button>
-                    <Button 
-                      variant={job.isActive ? "outline" : "default"}
-                      size="sm"
-                      onClick={() => handleToggleJobActivation(job.id, job.isActive ?? false)}
-                      disabled={toggleJobActivationMutation.isPending}
-                    >
-                      {job.isActive ? "Deactivate" : "Activate"}
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border rounded-lg bg-gray-50">
-              <Briefcase className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-              {jobSearch ? (
-                <>
-                  <h3 className="font-medium mb-1">No jobs match your search</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Try a different search term or clear the search
-                  </p>
-                  <Button variant="outline" onClick={() => setJobSearch("")}>
-                    Clear Search
-                  </Button>
-                </>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
               ) : (
-                <>
-                  <h3 className="font-medium mb-1">No job postings yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Create your first job posting to start finding candidates
+                <div className="bg-muted/30 p-12 rounded-lg text-center space-y-4">
+                  <Briefcase className="h-12 w-12 mx-auto text-muted" />
+                  <h3 className="text-xl font-bold">No job postings found</h3>
+                  <p className="text-muted-foreground">
+                    {jobSearch 
+                      ? `No job postings match your search for "${jobSearch}"`
+                      : "You haven't created any job postings yet"}
                   </p>
-                  <Button onClick={() => navigate("/employer/jobs/new")}>
+                  <Button onClick={() => navigate("/employer/jobs/new")} className="bg-amber-500 hover:bg-amber-600">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Post a Job
+                    Post Your First Job
                   </Button>
-                </>
+                </div>
               )}
-            </div>
+            </>
           )}
         </TabsContent>
         
-        {/* Candidates Tab */}
-        <TabsContent value="candidates" className="space-y-6">
-          <div className="text-center py-12 border rounded-lg bg-gray-50">
-            <Users className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-            <h3 className="font-medium mb-1">No candidates yet</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Candidates who apply to your jobs will appear here
-            </p>
-            <Button onClick={() => setActiveTab("jobs")}>
-              Manage Job Postings
-            </Button>
-          </div>
-        </TabsContent>
-        
         {/* Company Profile Tab */}
-        <TabsContent value="company" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Company Profile</h2>
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
+        <TabsContent value="profile">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>About {employer?.companyName}</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Building2 className="h-5 w-5 mr-2" />
+                  Company Details
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-line">
-                  {employer?.description || "No company description available."}
-                </p>
-                
-                <div className="mt-6 space-y-4">
-                  {employer?.websiteUrl && (
-                    <div className="flex items-center">
-                      <span className="text-sm font-medium w-24">Website:</span>
-                      <a 
-                        href={employer?.websiteUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        {employer?.websiteUrl}
-                      </a>
-                    </div>
-                  )}
-                  
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
                   <div className="flex items-center">
-                    <span className="text-sm font-medium w-24">Location:</span>
-                    <span>{employer?.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
+                    <span className="text-sm font-medium w-24">Name:</span>
+                    <span>{employer?.companyName}</span>
                   </div>
                   
                   <div className="flex items-center">
                     <span className="text-sm font-medium w-24">Industry:</span>
                     <span>{employer?.industry?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium w-24">Location:</span>
+                    <span>{employer?.location?.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase()) || 'Not specified'}</span>
                   </div>
                   
                   <div className="flex items-center">
