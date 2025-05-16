@@ -93,7 +93,7 @@ export default function Header() {
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/employer/dashboard">Employer Dashboard</Link>
+                    <Link href="/job-sites">Job Listing Sites</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/premium-tools">Premium Tools</Link>
@@ -186,6 +186,13 @@ export default function Header() {
                   onClick={closeMobileMenu}
                 >
                   Premium Tools
+                </Link>
+                <Link 
+                  href="/job-sites"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Job Listing Sites
                 </Link>
                 <Link 
                   href="/interview/practice"
