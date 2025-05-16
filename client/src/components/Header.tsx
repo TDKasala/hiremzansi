@@ -93,6 +93,9 @@ export default function Header() {
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href="/employer/dashboard">Employer Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/premium-tools">Premium Tools</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
