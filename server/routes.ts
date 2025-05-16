@@ -1551,6 +1551,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get current user's job postings
+  app.get("/api/job-postings/my", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Import employer storage functions dynamically
+      const { getEmployerByUserId, getJobPostingsByEmployer } = await import('./employerStorage');
+      
+      // First, find the employer profile for this user
+      const employer = await getEmployerByUserId(req.user!.id);
+      
+      if (!employer) {
+        return res.status(404).json({ message: "Employer profile not found" });
+      }
+      
+      // Get job postings for this employer
+      const jobPostings = await getJobPostingsByEmployer(employer.id);
+      
+      res.json(jobPostings);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   app.get("/api/job-postings", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { getJobPostings } = await import('./employerStorage');
