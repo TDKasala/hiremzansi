@@ -35,13 +35,9 @@ import NotFound from "@/pages/not-found";
 // Import job search pages
 import JobsPage from "@/pages/JobsPage";
 import JobDetailsPage from "@/pages/JobDetailsPage";
+import JobSitesPage from "@/pages/JobSitesPage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
 import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
-
-// Import employer dashboard pages
-import EmployerDashboardPage from "@/pages/EmployerDashboardPage";
-import CreateJobPage from "@/pages/employer/CreateJobPage";
-import EmployerJobDetailsPage from "@/pages/employer/JobDetailsPage";
 
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
@@ -105,6 +101,7 @@ function App() {
                   {/* Job search and career advancement pages */}
                   <Route path="/jobs" component={JobsPage} />
                   <Route path="/job/:id" component={JobDetailsPage} />
+                  <Route path="/job-sites" component={JobSitesPage} />
                   <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
                   <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
                   
@@ -117,11 +114,6 @@ function App() {
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-                  
-                  {/* Employer dashboard routes */}
-                  <ProtectedRoute path="/employer/dashboard" component={EmployerDashboardPage} />
-                  <ProtectedRoute path="/employer/jobs/new" component={CreateJobPage} />
-                  <ProtectedRoute path="/employer/jobs/:id" component={EmployerJobDetailsPage} />
                   
                   <Route component={NotFound} />
                 </Switch>
