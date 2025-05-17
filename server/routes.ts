@@ -6,7 +6,7 @@ import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
-import { analyzeCVText } from "./services/localAI";
+import { atsRouter } from "./services/atsAnalyzer";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -921,46 +921,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Realtime ATS analysis endpoint using local AI service
-  app.post("/api/analyze-resume-text", async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { resumeContent, jobDescription } = req.body;
-      
-      if (!resumeContent) {
-        return res.status(400).json({ error: "Resume content is required" });
-      }
-      
-      // Use our advanced local AI service for CV analysis
-      const analysis = analyzeCVText(resumeContent);
-      
-      // Extract job-specific keywords from job description if provided
-      let jobKeywordMatch = null;
-      if (jobDescription && typeof jobDescription === 'string') {
-        // This could be enhanced to extract keywords from job description
-        // and match them against the CV
-        jobKeywordMatch = {
-          matchScore: Math.round(Math.random() * 20) + 60, // Placeholder for now
-          jobRelevance: "Medium" 
-        };
-      }
-      
-      // Return the analysis results in a structured format
-      return res.json({
-        score: analysis.overall_score,
-        rating: analysis.rating,
-        strengths: analysis.strengths.slice(0, 3),
-        weaknesses: analysis.improvements.slice(0, 3),
-        suggestions: analysis.format_feedback.slice(0, 2),
-        sa_score: analysis.sa_score,
-        sa_relevance: analysis.sa_relevance,
-        skills: analysis.skills_identified.slice(0, 8),
-        job_match: jobKeywordMatch
-      });
-    } catch (error) {
-      console.error("Error in CV analysis:", error);
-      next(error);
-    }
-  });
+  // Register ATS analysis routes
+  app.use('/api', atsRouter);
       
       const formatScore = Math.round(
         (hasProperSections ? 40 : 0) +
