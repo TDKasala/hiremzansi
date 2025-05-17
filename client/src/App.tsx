@@ -1,145 +1,18 @@
-import { Switch, Route } from "wouter";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
-import { ThemeProvider } from "next-themes";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Route, Switch } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/hooks/use-auth";
-import { MotivationProvider } from "@/hooks/use-motivation";
-import { ProtectedRoute } from "@/lib/protected-route";
-import { ScrollToTop } from "@/lib/scroll-to-top";
+import CVImprovementDemo from "./pages/CVImprovementDemo";
 
-import Layout from "@/components/Layout";
-import HomePage from "@/pages/HomePage";
-import HowItWorksPage from "@/pages/HowItWorksPage";
-import PricingPage from "@/pages/PricingPage";
-import BlogPage from "@/pages/BlogPage";
-import AboutPage from "@/pages/AboutPage";
-import PrivacyPage from "@/pages/PrivacyPage";
-import TermsPage from "@/pages/TermsPage";
-import ContactPage from "@/pages/ContactPage";
-import AuthPage from "@/pages/auth-page";
-import DashboardPage from "@/pages/dashboard-page";
-import UploadPage from "@/pages/UploadPage";
-import CVDetailsPage from "@/pages/CVDetailsPage";
-import LatestCVPage from "@/pages/LatestCVPage";
-import DeepAnalysisPage from "@/pages/DeepAnalysisPage";
-import ProfilePage from "@/pages/ProfilePage";
-import PremiumToolsPage from "@/pages/PremiumToolsPage";
-import RealtimeATSPage from "@/pages/RealtimeATSPage";
-import JobSeekerToolsPage from "@/pages/JobSeekerToolsPage";
-import ReferralPage from "@/pages/ReferralPage";
-import SubscriptionPage from "@/pages/SubscriptionPage";
-import BlogPost1 from "@/pages/BlogPost1";
-import NotFound from "@/pages/not-found";
+// Create a client
+const queryClient = new QueryClient();
 
-// Import job search pages
-import JobsPage from "@/pages/JobsPage";
-import JobDetailsPage from "@/pages/JobDetailsPage";
-import JobSitesPage from "@/pages/JobSitesPage";
-import InterviewPracticePage from "@/pages/InterviewPracticePage";
-import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
-
-// Import tool pages
-import CoverLetterPage from "@/pages/tools/CoverLetterPage";
-import CVTemplatesPage from "@/pages/tools/CVTemplatesPage";
-import ATSKeywordsPage from "@/pages/tools/ATSKeywordsPage";
-import AtsDemoPage from "@/pages/AtsDemoPage";
-import CoverLetterIdeasPage from "@/pages/tools/CoverLetterIdeasPage";
-import CVChecklistPage from "@/pages/tools/CVChecklistPage";
-import JobFitQuizPage from "@/pages/tools/JobFitQuizPage";
-import InterviewGuidePage from "@/pages/tools/InterviewGuidePage";
-
-// Import new blog posts
-import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
-import NQFLevelsExplained from "@/pages/blog/NQFLevelsExplained";
-import ATSSurvivalGuide2025 from "@/pages/blog/ATSSurvivalGuide2025";
-import RemoteWorkOpportunitiesSA from "@/pages/blog/RemoteWorkOpportunitiesSA";
-import IndustrySpecificCVTips from "@/pages/blog/IndustrySpecificCVTips";
-import LanguageProficiencyCV from "@/pages/blog/LanguageProficiencyCV";
-import LinkedInOptimizationSAProfessionals from "@/pages/blog/LinkedInOptimizationSAProfessionals";
-import GraduateCVTemplates from "@/pages/blog/GraduateCVTemplates";
-import PersonalBrandingJobSearch from "@/pages/blog/PersonalBrandingJobSearch";
-import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
-import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
-
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
-        <TooltipProvider>
-          <AuthProvider>
-            <MotivationProvider>
-              <Layout>
-                <ScrollToTop />
-                <Switch>
-                  <Route path="/" component={HomePage} />
-                  <Route path="/how-it-works" component={HowItWorksPage} />
-                  <Route path="/pricing" component={PricingPage} />
-                  <Route path="/blog" component={BlogPage} />
-                  <Route path="/about" component={AboutPage} />
-                  <Route path="/privacy" component={PrivacyPage} />
-                  <Route path="/terms" component={TermsPage} />
-                  <Route path="/contact" component={ContactPage} />
-                  <Route path="/auth" component={AuthPage} />
-                  <Route path="/realtime-ats" component={RealtimeATSPage} />
-                  <Route path="/refer" component={ReferralPage} />
-                  <Route path="/ats-analyzer" component={AtsDemoPage} />
-                  <Route path="/ats-demo" component={AtsDemoPage} />
-                  
-                  {/* Original blog post */}
-                  <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
-                  
-                  {/* New SEO-optimized blog posts */}
-                  <Route path="/blog/b-bbee-impact-sa-resumes" component={BBBEEImpactSAResumes} />
-                  <Route path="/blog/nqf-levels-explained" component={NQFLevelsExplained} />
-                  <Route path="/blog/ats-survival-guide-2025" component={ATSSurvivalGuide2025} />
-                  <Route path="/blog/remote-work-opportunities-sa" component={RemoteWorkOpportunitiesSA} />
-                  <Route path="/blog/industry-specific-cv-tips" component={IndustrySpecificCVTips} />
-                  <Route path="/blog/language-proficiency-cv" component={LanguageProficiencyCV} />
-                  <Route path="/blog/linkedin-optimization-sa-professionals" component={LinkedInOptimizationSAProfessionals} />
-                  <Route path="/blog/graduate-cv-templates" component={GraduateCVTemplates} />
-                  <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
-                  <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
-                  <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
-                  
-                  {/* Tool pages */}
-                  <Route path="/tools/cover-letter" component={CoverLetterPage} />
-                  <Route path="/tools/cv-templates" component={CVTemplatesPage} />
-                  <Route path="/tools/ats-keywords" component={ATSKeywordsPage} />
-                  <Route path="/tools/cover-letter-ideas" component={CoverLetterIdeasPage} />
-                  <Route path="/tools/cv-checklist" component={CVChecklistPage} />
-                  <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
-                  <Route path="/tools/interview-guide" component={InterviewGuidePage} />
-                  
-                  {/* Job search and career advancement pages */}
-                  <Route path="/jobs" component={JobsPage} />
-                  <Route path="/job/:id" component={JobDetailsPage} />
-                  <Route path="/job-sites" component={JobSitesPage} />
-                  <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
-                  <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
-                  
-                  {/* Protected routes requiring authentication */}
-                  <ProtectedRoute path="/dashboard" component={DashboardPage} />
-                  <ProtectedRoute path="/upload" component={UploadPage} />
-                  <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
-                  <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
-                  <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
-                  <ProtectedRoute path="/profile" component={ProfilePage} />
-                  <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
-                  <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
-                  <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-                  
-                  <Route component={NotFound} />
-                </Switch>
-                <Toaster />
-              </Layout>
-            </MotivationProvider>
-          </AuthProvider>
-        </TooltipProvider>
-      </ThemeProvider>
+      <Switch>
+        <Route path="/" component={CVImprovementDemo} />
+      </Switch>
+      <Toaster />
     </QueryClientProvider>
   );
 }
-
-export default App;
