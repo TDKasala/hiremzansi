@@ -3,7 +3,6 @@ import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { generateATSReport, downloadPDF } from '@/utils/pdfGenerator';
-import atsBoostLogo from '@/assets/atsboost-logo.png';
 
 interface PDFReportButtonProps {
   score: number;
@@ -69,17 +68,17 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
           {
             title: 'CV Overview',
             content: `This report analyzes your CV (${cvName || 'Uploaded CV'}) against modern Applicant Tracking Systems (ATS) criteria and South African job market standards. Your CV received an overall ATS compatibility score of ${score}%.`,
-            type: 'text',
+            type: 'text' as const,
           },
           {
             title: 'Key Strengths',
             content: strengths,
-            type: 'list',
+            type: 'list' as const,
           },
           {
             title: 'Areas for Improvement',
             content: improvements,
-            type: 'list',
+            type: 'list' as const,
           },
         ],
         recommendations: [],
@@ -90,7 +89,7 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
         reportData.sections.push({
           title: 'Critical Issues',
           content: issues,
-          type: 'list',
+          type: 'list' as const,
         });
       }
 
@@ -100,13 +99,13 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
           content: `Your CV includes ${saKeywordsFound.length} South African context-specific keywords or phrases, which is ${
             saKeywordsFound.length > 3 ? 'excellent' : 'good but could be improved'
           }. The following South African context keywords were detected:`,
-          type: 'text',
+          type: 'text' as const,
         });
 
         reportData.sections.push({
           title: 'Detected SA Keywords',
           content: saKeywordsFound,
-          type: 'list',
+          type: 'list' as const,
         });
       }
 
@@ -120,35 +119,34 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
               ? 'This is good but could be improved with more South African-specific elements.'
               : 'This needs significant improvement to better target South African employers.'
           }`,
-          type: 'text',
+          type: 'text' as const,
         });
       }
 
       if (keywordRecommendations && keywordRecommendations.length > 0) {
         reportData.sections.push({
           title: 'Keyword Recommendations',
-          content: 'The following keyword additions are recommended to improve your CV's ATS performance:',
-          type: 'text',
+          content: "The following keyword additions are recommended to improve your CV's ATS performance:",
+          type: 'text' as const,
         });
 
         reportData.sections.push({
           title: 'Suggested Keywords',
-          type: 'table',
+          content: [],
+          type: 'table' as const,
           tableHeaders: ['Missing Keyword', 'Suggested Implementation'],
           tableData: keywordRecommendations,
         });
       }
 
       // Add actionable recommendations
-      const recommendations = [
+      reportData.recommendations = [
         'Use a clean, ATS-friendly format with standard section headings',
         'Include relevant keywords from the job description naturally throughout your CV',
         'Quantify achievements with specific metrics where possible',
         'Include South African specific qualifications (NQF levels) and professional body memberships',
         'Mention B-BBEE status if applicable to your situation',
       ];
-
-      reportData.recommendations = recommendations;
 
       // Generate and download the PDF
       const pdfBlob = await generateATSReport(reportData);
