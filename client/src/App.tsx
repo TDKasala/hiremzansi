@@ -84,7 +84,7 @@ function App() {
                   <Route path="/auth" component={AuthPage} />
                   <Route path="/realtime-ats" component={RealtimeATSPage} />
                   <Route path="/refer" component={ReferralPage} />
-                  <Route path="/ats-analyzer" component={() => <AtsDemoPage />} />
+                  <Route path="/ats-analyzer" component={AtsDemoPage} />
                   <Route path="/ats-demo" component={AtsDemoPage} />
                   
                   {/* Original blog post */}
