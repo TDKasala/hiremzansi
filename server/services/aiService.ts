@@ -2,10 +2,16 @@ import fetch from 'node-fetch';
 
 // Define interfaces for strong typing
 interface MinimaxResponse {
-  reply?: string;
-  messages?: any[];
+  choices?: {
+    message: {
+      content: string;
+    };
+  }[];
   usage?: {
     total_tokens: number;
+  };
+  error?: {
+    message: string;
   };
   [key: string]: any;
 }
@@ -17,7 +23,7 @@ const AI_CONFIG = {
   API_BASE_URL: 'https://api.minimax.chat/v1',
   
   // Default model for CV analysis
-  DEFAULT_MODEL: "abab6-chat",
+  DEFAULT_MODEL: "abab5.5-chat",
   
   // API limits and parameters
   MAX_TOKENS: 2048,
@@ -57,12 +63,10 @@ export async function generateText(prompt: string, systemPrompt: string = ''): P
         messages: messages,
         temperature: AI_CONFIG.TEMPERATURE,
         max_tokens: AI_CONFIG.MAX_TOKENS,
-        bot_setting: [
-          {
-            bot_name: "Assistant",
-            content: "You are a helpful assistant specializing in CV analysis for South African job market."
-          }
-        ]
+        stream: false,
+        prompt_parameters: {
+          system: "You are a helpful assistant specializing in CV analysis for South African job market."
+        }
       })
     });
     
@@ -74,10 +78,10 @@ export async function generateText(prompt: string, systemPrompt: string = ''): P
     
     const data = await response.json() as MinimaxResponse;
     
-    if (data.reply) {
-      return data.reply;
+    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+      return data.choices[0].message.content;
     } else {
-      console.error('Unexpected response format:', data);
+      console.error('Unexpected response format:', JSON.stringify(data, null, 2));
       return "Sorry, I couldn't generate a response at this time.";
     }
   } catch (error) {
