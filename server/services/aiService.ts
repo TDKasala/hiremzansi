@@ -13,6 +13,7 @@ interface MinimaxResponse {
 // Configuration for API access
 const AI_CONFIG = {
   API_KEY: process.env.MINIMAX_API_KEY,
+  GROUP_ID: "1923793763893777283", // Extracted from your API key
   API_BASE_URL: 'https://api.minimax.chat/v1',
   
   // Default model for CV analysis
@@ -30,21 +31,22 @@ export async function generateText(prompt: string, systemPrompt: string = ''): P
   try {
     console.log('Generating text with AI service...');
     
+    // Minimax expects messages in a different format
     const messages = [];
+    
     if (systemPrompt) {
       messages.push({
-        sender_type: "USER",
-        sender_name: "system",
-        text: systemPrompt
+        role: "USER",
+        content: systemPrompt
       });
     }
     
     messages.push({
-      sender_type: "USER",
-      text: prompt
+      role: "USER", 
+      content: prompt
     });
     
-    const response = await fetch(`${AI_CONFIG.API_BASE_URL}/text/chatcompletion`, {
+    const response = await fetch(`${AI_CONFIG.API_BASE_URL}/text/chatcompletion?GroupId=${AI_CONFIG.GROUP_ID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
