@@ -22,17 +22,77 @@ const SKILL_CATEGORIES = {
   CERTIFICATIONS: ['certification', 'certified', 'certificate', 'diploma', 'degree', 'mba', 'bsc', 'ba', 'phd', 'btech', 'msc']
 };
 
-// Common ATS keywords per industry
+// Common ATS keywords per industry (South Africa focused)
 const INDUSTRY_KEYWORDS = {
-  SOFTWARE: ['software', 'developer', 'engineer', 'programming', 'code', 'web', 'app', 'mobile', 'frontend', 'backend', 'fullstack'],
-  FINANCE: ['finance', 'accounting', 'auditing', 'banking', 'investment', 'financial', 'analyst', 'budget', 'tax', 'capital'],
-  MARKETING: ['marketing', 'digital', 'social media', 'seo', 'content', 'brand', 'campaign', 'strategy', 'analytics', 'advertising'],
-  HEALTHCARE: ['healthcare', 'medical', 'clinical', 'patient', 'nurse', 'doctor', 'therapy', 'pharmaceutical', 'health'],
-  EDUCATION: ['education', 'teaching', 'lecturer', 'curriculum', 'learning', 'students', 'school', 'academic', 'training']
+  SOFTWARE: [
+    // General tech terms
+    'software', 'developer', 'engineer', 'programming', 'code', 'web', 'app', 'mobile', 'frontend', 'backend', 'fullstack',
+    // SA-specific tech terms
+    'systems development', 'vodacom', 'mtn', 'standard bank', 'fnb', 'discovery', 'takealot', 'superbalist', 'multichoice', 
+    'dstv', 'eoh', 'bbd', 'entelect', 'adapt it', 'altron', 'dimension data', 'aws partner'
+  ],
+  FINANCE: [
+    // General finance terms
+    'finance', 'accounting', 'auditing', 'banking', 'investment', 'financial', 'analyst', 'budget', 'tax', 'capital',
+    // SA-specific finance terms
+    'jse', 'johannesburg stock exchange', 'standard bank', 'fnb', 'absa', 'nedbank', 'capitec', 'investec', 'old mutual', 
+    'sanlam', 'liberty', 'discovery', 'outsurance', 'momentum', 'allan gray', 'saica', 'sarb', 'fsca', 'fais', 'fica'
+  ],
+  MARKETING: [
+    // General marketing terms
+    'marketing', 'digital', 'social media', 'seo', 'content', 'brand', 'campaign', 'strategy', 'analytics', 'advertising',
+    // SA-specific marketing terms
+    'multichoice', 'dstv', 'sabc', 'etv', 'primedia', 'media24', 'vodacom', 'mtn', 'telkom', 'cell c', 'woolworths', 
+    'shoprite', 'pick n pay', 'clicks', 'dischem', 'takealot', 'superbalist', 'saarf', 'amasa'
+  ],
+  HEALTHCARE: [
+    // General healthcare terms
+    'healthcare', 'medical', 'clinical', 'patient', 'nurse', 'doctor', 'therapy', 'pharmaceutical', 'health',
+    // SA-specific healthcare terms
+    'discovery health', 'mediclinic', 'netcare', 'life healthcare', 'clicks', 'dischem', 'medical aid', 'hpcsa', 'sanc', 
+    'sapc', 'nhls', 'medical scheme', 'council', 'registered'
+  ],
+  EDUCATION: [
+    // General education terms
+    'education', 'teaching', 'lecturer', 'curriculum', 'learning', 'students', 'school', 'academic', 'training',
+    // SA-specific education terms
+    'caps', 'dbe', 'department of education', 'ieb', 'uct', 'wits', 'up', 'ukzn', 'stellenbosch', 'unisa', 'uj', 'nwu', 
+    'rhodes', 'tutor', 'principal', 'sace', 'registered educator', 'saqa', 'facilitator'
+  ],
+  MINING: [
+    'mining', 'minerals', 'resources', 'gold', 'platinum', 'coal', 'diamond', 'copper', 'safety', 'engineer', 
+    'anglo american', 'anglogold ashanti', 'impala platinum', 'sibanye-stillwater', 'glencore', 'bhp', 'sasol', 
+    'harmony gold', 'dmr', 'mhsa', 'geologist', 'metallurgist', 'mine manager'
+  ],
+  AGRICULTURE: [
+    'agriculture', 'farming', 'crops', 'livestock', 'irrigation', 'harvest', 'sustainable', 'agribusiness', 
+    'agri-processing', 'agritech', 'food security', 'wine', 'viticulture', 'forestry', 'daff', 'horticulture', 
+    'aquaculture', 'agronomy', 'soil science'
+  ]
 };
 
 // South Africa specific terms
-const SA_TERMS = ['b-bbee', 'bbbee', 'bee', 'nqf', 'saqa', 'seta', 'matric', 'south africa', 'south african', 'sa', 'rsa'];
+const SA_TERMS = [
+  // BEE and Compliance
+  'b-bbee', 'bbbee', 'bee', 'black economic empowerment', 'employment equity', 'affirmative action',
+  
+  // Education & Qualification Frameworks
+  'nqf', 'saqa', 'seta', 'matric', 'national senior certificate', 'n diploma', 'national diploma',
+  
+  // Regions & Geographic Terms
+  'south africa', 'south african', 'sa', 'rsa', 'gauteng', 'western cape', 'eastern cape', 
+  'kwazulu-natal', 'free state', 'north west', 'mpumalanga', 'limpopo', 'northern cape',
+  'johannesburg', 'cape town', 'durban', 'pretoria', 'port elizabeth', 'bloemfontein',
+  
+  // Professional Bodies & Certifications
+  'ecsa', 'sacnasp', 'saica', 'icsa', 'ict seta', 'services seta', 'psira',
+  
+  // Languages
+  'bilingual', 'multilingual', 'afrikaans', 'zulu', 'xhosa', 'sotho', 'tswana', 'venda', 'tsonga', 'swati', 'ndebele',
+  
+  // Industry-Specific SA Terms
+  'jse', 'fsca', 'fais', 're5', 're1', 'fica'
+];
 
 /**
  * Extracts skills from CV text
@@ -72,9 +132,11 @@ function extractSkills(cvText: string): string[] {
  * @param cvText The CV text content
  * @returns Object with format analysis
  */
-function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
+function analyzeFormat(cvText: string): {score: number, feedback: string[], saElements: string[]} {
   const feedback: string[] = [];
+  const saElements: string[] = [];
   let score = 0;
+  const text = cvText.toLowerCase();
   
   // Check length
   const wordCount = cvText.split(/\s+/).length;
@@ -82,15 +144,15 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
     feedback.push("CV appears too short. Consider adding more detailed information.");
     score += 5;
   } else if (wordCount > 200 && wordCount < 600) {
-    feedback.push("CV length is appropriate.");
+    feedback.push("CV length is appropriate for South African employers.");
     score += 20;
   } else {
-    feedback.push("CV is quite lengthy. Consider making it more concise for ATS readability.");
+    feedback.push("CV is quite lengthy. In South Africa, recruiters prefer concise 2-3 page CVs.");
     score += 10;
   }
   
   // Check for contact details
-  if (/email|@|phone|tel|contact/i.test(cvText)) {
+  if (/email|@|phone|tel|contact/i.test(text)) {
     feedback.push("Contact information is present.");
     score += 15;
   } else {
@@ -99,7 +161,7 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
   }
   
   // Check for education section
-  if (/education|qualification|degree|diploma/i.test(cvText)) {
+  if (/education|qualification|degree|diploma/i.test(text)) {
     feedback.push("Education section detected.");
     score += 15;
   } else {
@@ -108,7 +170,7 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
   }
   
   // Check for experience section
-  if (/experience|work|employment|career/i.test(cvText)) {
+  if (/experience|work|employment|career/i.test(text)) {
     feedback.push("Experience section detected.");
     score += 15;
   } else {
@@ -117,7 +179,7 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
   }
   
   // Check for skills section
-  if (/skills|abilities|competencies/i.test(cvText)) {
+  if (/skills|abilities|competencies/i.test(text)) {
     feedback.push("Skills section detected.");
     score += 15;
   } else {
@@ -125,14 +187,56 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[]} {
     score += 0;
   }
   
-  // Check for South African specific elements
-  const saTermsFound = SA_TERMS.filter(term => cvText.toLowerCase().includes(term));
-  if (saTermsFound.length > 0) {
-    feedback.push("South African specific elements detected: " + saTermsFound.join(", "));
-    score += 20;
+  // Check for B-BBEE information
+  if (/b-bbee|bbbee|bee|black economic empowerment/i.test(text)) {
+    feedback.push("B-BBEE information detected - this is valuable for South African employers.");
+    saElements.push("B-BBEE information");
+    score += 10;
   } else {
-    feedback.push("Consider adding South African specific information like B-BBEE status or NQF levels if applicable.");
-    score += 0;
+    feedback.push("Consider adding your B-BBEE status which is often valuable in South African job applications.");
+  }
+  
+  // Check for NQF levels
+  if (/nqf level|nqf \d/i.test(text)) {
+    feedback.push("NQF level information detected - this clarifies your qualification level.");
+    saElements.push("NQF level");
+    score += 5;
+  }
+  
+  // Check for South African languages
+  const languages = ['english', 'afrikaans', 'zulu', 'xhosa', 'sotho', 'tswana', 'venda', 'tsonga', 'swati', 'ndebele'];
+  const languagesFound = languages.filter(lang => text.includes(lang));
+  if (languagesFound.length > 0) {
+    feedback.push("South African language proficiency section detected - multilingual skills are valuable in SA.");
+    saElements.push("Language proficiency: " + languagesFound.join(", "));
+    score += 5;
+  } else {
+    feedback.push("Consider adding your South African language proficiencies, as multilingual skills are valued by employers.");
+  }
+  
+  // Check for ID number (privacy-aware check - don't extract the number)
+  if (/id number|identity number|id no|id:/i.test(text)) {
+    feedback.push("ID information referenced - this is common in South African CVs, but ensure it's secure when sharing electronically.");
+    saElements.push("ID reference");
+    score += 5;
+  }
+  
+  // Check for other South African specific elements
+  const saTermsFound = SA_TERMS.filter(term => text.includes(term));
+  if (saTermsFound.length > 0) {
+    // Only add terms not already counted
+    const uniqueTerms = saTermsFound.filter(term => 
+      !term.includes('b-bbee') && !term.includes('bee') && 
+      !term.includes('nqf') && !languages.includes(term)
+    );
+    
+    if (uniqueTerms.length > 0) {
+      feedback.push("Additional South African elements detected: " + uniqueTerms.slice(0, 5).join(", "));
+      saElements.push(...uniqueTerms.slice(0, 5));
+      score += Math.min(uniqueTerms.length * 2, 10); // Up to 10 points for SA terms
+    }
+  } else {
+    feedback.push("Consider adding South African specific information to localize your CV.");
   }
   
   return {
