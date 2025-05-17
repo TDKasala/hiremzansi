@@ -171,19 +171,31 @@ export default function UploadSection() {
             
             <div className="flex flex-col sm:flex-row sm:justify-between items-center">
               <div className="mb-4 sm:mb-0 w-full sm:w-auto">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2">
                   <Checkbox 
                     id="consent" 
                     checked={consent} 
                     onCheckedChange={(checked) => setConsent(checked as boolean)} 
+                    required
+                    aria-required="true"
                   />
-                  <label 
-                    htmlFor="consent" 
-                    className="text-sm text-neutral-600 cursor-pointer"
-                  >
-                    I consent to ATSBoost processing my CV data (POPIA compliant)
-                  </label>
+                  <div>
+                    <label 
+                      htmlFor="consent" 
+                      className="text-sm text-neutral-700 font-medium cursor-pointer"
+                    >
+                      I consent to ATSBoost processing my CV data (POPIA compliant) *
+                    </label>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      This consent is required to proceed with analysis as per South African data protection laws
+                    </p>
+                  </div>
                 </div>
+                {!consent && cvFile && (
+                  <p className="text-xs text-red-500 mt-2 font-medium">
+                    Please provide consent to continue with CV analysis
+                  </p>
+                )}
               </div>
               <Button 
                 onClick={handleAnalyzeClick}
