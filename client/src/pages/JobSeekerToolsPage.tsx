@@ -129,14 +129,14 @@ const JobSeekerToolsPage: React.FC = () => {
           
           <div className="bg-background p-5 rounded-lg border flex flex-col">
             <h3 className="font-medium text-lg flex items-center">
-              <FileQuestion className="h-5 w-5 text-primary mr-2" />
-              Job Fit Quiz
+              <FileText className="h-5 w-5 text-primary mr-2" />
+              Cover Letter Ideas
             </h3>
             <p className="text-sm text-muted-foreground my-3">
-              10-question assessment to match your skills to job requirements and understand your fit for different roles in the South African market.
+              Templates and guidance for writing effective cover letters for the South African job market with industry-specific examples.
             </p>
             <Button variant="outline" className="mt-auto" asChild>
-              <Link href="/tools/job-fit-quiz">Take Quiz</Link>
+              <Link href="/tools/cover-letter-ideas">Cover Letter Tips</Link>
             </Button>
           </div>
           
