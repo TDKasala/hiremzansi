@@ -47,27 +47,21 @@ export default function NotFound() {
             <p className="text-sm text-gray-500 mb-3">Popular pages you might be looking for:</p>
             <ul className="text-sm text-primary space-y-2">
               <li>
-                <Link href="/upload">
-                  <a className="hover:underline flex items-center">
-                    <Search className="h-3 w-3 mr-2 inline-block" />
-                    Free ATS Score Checker
-                  </a>
+                <Link href="/upload" className="hover:underline flex items-center">
+                  <Search className="h-3 w-3 mr-2 inline-block" />
+                  Free ATS Score Checker
                 </Link>
               </li>
               <li>
-                <Link href="/blog/ats-survival-guide-2025">
-                  <a className="hover:underline flex items-center">
-                    <Search className="h-3 w-3 mr-2 inline-block" />
-                    2025 ATS Survival Guide
-                  </a>
+                <Link href="/blog/ats-survival-guide-2025" className="hover:underline flex items-center">
+                  <Search className="h-3 w-3 mr-2 inline-block" />
+                  2025 ATS Survival Guide
                 </Link>
               </li>
               <li>
-                <Link href="/pricing">
-                  <a className="hover:underline flex items-center">
-                    <Search className="h-3 w-3 mr-2 inline-block" />
-                    Premium Tools & Pricing
-                  </a>
+                <Link href="/pricing" className="hover:underline flex items-center">
+                  <Search className="h-3 w-3 mr-2 inline-block" />
+                  Premium Tools & Pricing
                 </Link>
               </li>
             </ul>

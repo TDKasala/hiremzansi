@@ -137,8 +137,7 @@ const BlogPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {blogPosts.map((post) => (
           <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md transition-all hover:shadow-xl">
-            <Link href={`/blog/${post.slug}`}>
-              <a className="block">
+            <Link href={`/blog/${post.slug}`} className="block">
                 <img 
                   src={post.image} 
                   alt={post.title} 
@@ -168,17 +167,14 @@ const BlogPage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-              </a>
             </Link>
           </div>
         ))}
       </div>
       
       <div className="text-center mt-16">
-        <Link href="/contact">
-          <a className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors">
-            Request CV Review
-          </a>
+        <Link href="/contact" className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block">
+          Request CV Review
         </Link>
         
         <p className="mt-4 text-sm text-gray-500">
