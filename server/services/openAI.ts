@@ -1,5 +1,13 @@
 import OpenAI from 'openai';
 
+// Type definitions for the OpenAI client
+type MessageRole = 'system' | 'user' | 'assistant';
+
+interface Message {
+  role: MessageRole;
+  content: string;
+}
+
 // Initialize the OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -40,7 +48,7 @@ export async function generateTextCompletion(
     const maxTokens = options.maxTokens || OPENAI_CONFIG.MAX_TOKENS;
     const systemPrompt = options.systemPrompt || '';
 
-    const messages = [];
+    const messages: Array<{role: MessageRole, content: string}> = [];
     
     if (systemPrompt) {
       messages.push({ role: 'system', content: systemPrompt });
@@ -70,12 +78,14 @@ export async function generateTextCompletion(
  */
 export async function analyzeText(text: string, systemPrompt: string): Promise<any> {
   try {
+    const messages: Array<{role: MessageRole, content: string}> = [
+      { role: 'system', content: systemPrompt + " Return your response as a valid JSON object." },
+      { role: 'user', content: text }
+    ];
+
     const response = await openai.chat.completions.create({
       model: OPENAI_CONFIG.PREMIUM_TIER_MODEL,
-      messages: [
-        { role: 'system', content: systemPrompt + " Return your response as a valid JSON object." },
-        { role: 'user', content: text }
-      ],
+      messages: messages,
       temperature: OPENAI_CONFIG.STANDARD_TEMPERATURE,
       max_tokens: OPENAI_CONFIG.MAX_TOKENS,
       response_format: { type: "json_object" }
