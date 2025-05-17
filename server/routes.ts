@@ -961,8 +961,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
-      const hasBulletPoints = /•|-|\*/i.test(resumeContent);
-      const hasDates = /20\d{2}|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december/i.test(resumeLower);
       
       const formatScore = Math.round(
         (hasProperSections ? 40 : 0) +

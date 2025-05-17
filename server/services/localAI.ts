@@ -1,476 +1,293 @@
 /**
  * Local AI Service for CV Analysis
  * 
- * This module provides CV analysis functionality without requiring external AI services.
- * It uses rule-based analysis to evaluate CVs and provide feedback.
+ * This service provides rule-based CV analysis optimized for South African job market,
+ * eliminating the need for external API calls and enabling offline functionality.
  */
 
-// Define score thresholds
-const SCORE_THRESHOLDS = {
-  POOR: 40,
-  AVERAGE: 60,
-  GOOD: 80,
-  EXCELLENT: 95
-};
+import { createHash } from 'crypto';
 
-// Define skills categories for South African job market
-const SKILL_CATEGORIES = {
-  TECHNICAL: ['javascript', 'python', 'java', 'c++', 'react', 'angular', 'node', 'typescript', 
-              'html', 'css', 'php', 'sql', 'postgresql', 'mongodb', 'aws', 'azure', 'git'],
-  SOFT: ['communication', 'teamwork', 'leadership', 'problem solving', 'time management', 
-         'adaptability', 'creativity', 'critical thinking', 'conflict resolution'],
-  CERTIFICATIONS: ['certification', 'certified', 'certificate', 'diploma', 'degree', 'mba', 'bsc', 'ba', 'phd', 'btech', 'msc']
-};
+interface AnalysisResult {
+  overall_score: number;
+  rating: string;
+  strengths: string[];
+  improvements: string[];
+  format_feedback: string[];
+  skills_identified: string[];
+  sa_score: number;
+  sa_relevance: string;
+}
 
-// Common ATS keywords per industry (South Africa focused)
-const INDUSTRY_KEYWORDS = {
-  SOFTWARE: [
-    // General tech terms
-    'software', 'developer', 'engineer', 'programming', 'code', 'web', 'app', 'mobile', 'frontend', 'backend', 'fullstack',
-    // SA-specific tech terms
-    'systems development', 'vodacom', 'mtn', 'standard bank', 'fnb', 'discovery', 'takealot', 'superbalist', 'multichoice', 
-    'dstv', 'eoh', 'bbd', 'entelect', 'adapt it', 'altron', 'dimension data', 'aws partner'
-  ],
-  FINANCE: [
-    // General finance terms
-    'finance', 'accounting', 'auditing', 'banking', 'investment', 'financial', 'analyst', 'budget', 'tax', 'capital',
-    // SA-specific finance terms
-    'jse', 'johannesburg stock exchange', 'standard bank', 'fnb', 'absa', 'nedbank', 'capitec', 'investec', 'old mutual', 
-    'sanlam', 'liberty', 'discovery', 'outsurance', 'momentum', 'allan gray', 'saica', 'sarb', 'fsca', 'fais', 'fica'
-  ],
-  MARKETING: [
-    // General marketing terms
-    'marketing', 'digital', 'social media', 'seo', 'content', 'brand', 'campaign', 'strategy', 'analytics', 'advertising',
-    // SA-specific marketing terms
-    'multichoice', 'dstv', 'sabc', 'etv', 'primedia', 'media24', 'vodacom', 'mtn', 'telkom', 'cell c', 'woolworths', 
-    'shoprite', 'pick n pay', 'clicks', 'dischem', 'takealot', 'superbalist', 'saarf', 'amasa'
-  ],
-  HEALTHCARE: [
-    // General healthcare terms
-    'healthcare', 'medical', 'clinical', 'patient', 'nurse', 'doctor', 'therapy', 'pharmaceutical', 'health',
-    // SA-specific healthcare terms
-    'discovery health', 'mediclinic', 'netcare', 'life healthcare', 'clicks', 'dischem', 'medical aid', 'hpcsa', 'sanc', 
-    'sapc', 'nhls', 'medical scheme', 'council', 'registered'
-  ],
-  EDUCATION: [
-    // General education terms
-    'education', 'teaching', 'lecturer', 'curriculum', 'learning', 'students', 'school', 'academic', 'training',
-    // SA-specific education terms
-    'caps', 'dbe', 'department of education', 'ieb', 'uct', 'wits', 'up', 'ukzn', 'stellenbosch', 'unisa', 'uj', 'nwu', 
-    'rhodes', 'tutor', 'principal', 'sace', 'registered educator', 'saqa', 'facilitator'
-  ],
-  MINING: [
-    'mining', 'minerals', 'resources', 'gold', 'platinum', 'coal', 'diamond', 'copper', 'safety', 'engineer', 
-    'anglo american', 'anglogold ashanti', 'impala platinum', 'sibanye-stillwater', 'glencore', 'bhp', 'sasol', 
-    'harmony gold', 'dmr', 'mhsa', 'geologist', 'metallurgist', 'mine manager'
-  ],
-  AGRICULTURE: [
-    'agriculture', 'farming', 'crops', 'livestock', 'irrigation', 'harvest', 'sustainable', 'agribusiness', 
-    'agri-processing', 'agritech', 'food security', 'wine', 'viticulture', 'forestry', 'daff', 'horticulture', 
-    'aquaculture', 'agronomy', 'soil science'
-  ]
-};
+// South African specific keywords
+const SA_KEYWORDS = [
+  "south africa", "sa", "cape town", "johannesburg", "pretoria", "durban", 
+  "bloemfontein", "port elizabeth", "east london", "pietermaritzburg", "polokwane",
+  "nelspruit", "kimberley", "rustenburg", "b-bbee", "bee", "bbbee", "nqf", "saqa", 
+  "matric", "seta", "ieb", "unisa", "wits", "uct", "ukzn", "up", "uj", "ufs", "uwc",
+  "tut", "cput", "vut", "cut", "dut", "nmmu", "spu", "sol plaatje", "rhodes", "ump",
+  "zulu", "xhosa", "afrikaans", "sesotho", "setswana", "sepedi", "venda", "tsonga", 
+  "swazi", "ndebele", "south african", "rsa", "republic of south africa"
+];
 
-// South Africa specific terms
-const SA_TERMS = [
-  // BEE and Compliance
-  'b-bbee', 'bbbee', 'bee', 'black economic empowerment', 'employment equity', 'affirmative action',
-  
-  // Education & Qualification Frameworks
-  'nqf', 'saqa', 'seta', 'matric', 'national senior certificate', 'n diploma', 'national diploma',
-  
-  // Regions & Geographic Terms
-  'south africa', 'south african', 'sa', 'rsa', 'gauteng', 'western cape', 'eastern cape', 
-  'kwazulu-natal', 'free state', 'north west', 'mpumalanga', 'limpopo', 'northern cape',
-  'johannesburg', 'cape town', 'durban', 'pretoria', 'port elizabeth', 'bloemfontein',
-  
-  // Professional Bodies & Certifications
-  'ecsa', 'sacnasp', 'saica', 'icsa', 'ict seta', 'services seta', 'psira',
-  
-  // Languages
-  'bilingual', 'multilingual', 'afrikaans', 'zulu', 'xhosa', 'sotho', 'tswana', 'venda', 'tsonga', 'swati', 'ndebele',
-  
-  // Industry-Specific SA Terms
-  'jse', 'fsca', 'fais', 're5', 're1', 'fica'
+// Common skills to detect
+const COMMON_SKILLS = [
+  "javascript", "python", "java", "c#", "c++", "react", "angular", "vue",
+  "node.js", "express", "django", "flask", "spring", "asp.net", "php", "ruby",
+  "html", "css", "sql", "nosql", "mongodb", "mysql", "postgresql", "oracle",
+  "aws", "azure", "gcp", "docker", "kubernetes", "jenkins", "git", "terraform",
+  "typescript", "redux", "graphql", "rest api", "soap", "microservices", "agile",
+  "scrum", "kanban", "jira", "confluence", "bitbucket", "github", "gitlab",
+  "ci/cd", "testing", "tdd", "bdd", "junit", "jest", "mocha", "selenium",
+  "cypress", "postman", "swagger", "oauth", "jwt", "authentication", "authorization",
+  "data analysis", "data science", "machine learning", "deep learning", "nlp",
+  "computer vision", "tensorflow", "pytorch", "scikit-learn", "pandas", "numpy",
+  "r", "data visualization", "tableau", "power bi", "excel", "vba", "spss", "stata",
+  "sas", "matlab", "scala", "hadoop", "spark", "kafka", "airflow", "etl", "elt",
+  "data warehouse", "data lake", "big data", "analytics", "reporting", "dashboard",
+  "bi", "business intelligence", "data modeling", "data mining", "data engineering",
+  "cloud computing", "serverless", "devops", "sre", "security", "penetration testing",
+  "vulnerability assessment", "ethical hacking", "cryptography", "encryption",
+  "firewalls", "ips", "ids", "siem", "soc", "incident response", "disaster recovery",
+  "business continuity", "risk management", "compliance", "gdpr", "popia", "pci-dss",
+  "iso27001", "hipaa", "sox", "itil", "cobit", "togaf", "enterprise architecture",
+  "solution architecture", "technical architecture", "systems design", "uml",
+  "erp", "crm", "salesforce", "sap", "oracle", "microsoft dynamics", "workday",
+  "product management", "project management", "program management", "portfolio management",
+  "pmp", "prince2", "msp", "scrum master", "product owner", "business analysis",
+  "requirements gathering", "user stories", "use cases", "user experience", "ui/ux",
+  "wireframing", "prototyping", "figma", "sketch", "adobe xd", "invision", "zeplin",
+  "mobile development", "ios", "android", "swift", "kotlin", "react native", "flutter",
+  "xamarin", "cordova", "ionic", "progressive web apps", "responsive design", "accessibility",
+  "wcag", "section 508", "localization", "internationalization", "seo", "sem", "smm",
+  "content marketing", "email marketing", "affiliate marketing", "digital marketing",
+  "analytics", "google analytics", "adobe analytics", "marketing automation", "hubspot",
+  "mailchimp", "constant contact", "marketo", "pardot", "eloqua", "customer success",
+  "saas", "paas", "iaas", "faas", "cloud native", "web3", "blockchain", "ethereum",
+  "smart contracts", "solidity", "truffle", "web3.js", "metamask", "nft", "dao",
+  "defi", "cryptocurrency", "bitcoin", "artificial intelligence", "chatgpt", "openai",
+  "prompt engineering", "llm", "generative ai", "ai ethics", "responsible ai",
+  "data privacy", "data governance", "data quality", "data stewardship", "data catalog",
+  "data lineage", "data fabric", "data mesh", "data virtualization", "data integration",
+  "api management", "api gateway", "api security", "websockets", "grpc", "message queue",
+  "pub/sub", "event-driven architecture", "domain-driven design", "clean architecture",
+  "solid principles", "design patterns", "refactoring", "continuous integration",
+  "continuous delivery", "continuous deployment", "feature flags", "a/b testing",
+  "canary releases", "blue-green deployments", "chaos engineering", "resilience engineering",
+  "observability", "monitoring", "logging", "tracing", "metrics", "alerting", "notification",
+  "on-call", "sla", "slo", "sli", "uptime", "availability", "reliability", "performance",
+  "scalability", "load balancing", "caching", "cdn", "edge computing", "iot",
+  "embedded systems", "firmware", "drivers", "rtos", "low-level programming", "assembly",
+  "networking", "tcp/ip", "http", "https", "dns", "dhcp", "vpn", "ssh", "ftp", "smtp",
+  "imap", "ldap", "active directory", "sso", "identity management", "federated identity",
+  "oauth2", "openid connect", "saml", "kerberos", "radius", "2fa", "mfa", "biometrics",
+  "facial recognition", "voice recognition", "fingerprint", "iris recognition", "gait analysis"
+];
+
+// South African professional bodies and certifications
+const SA_CERTIFICATIONS = [
+  "sacnasp", "ecsa", "saica", "saipa", "iacsa", "cisa", "acca", "cia", "cfa", 
+  "fpi", "sabpp", "pmsa", "saiee", "cssa", "icsa", "pmi-sa", "isaca", "iitpsa", 
+  "bla", "saia", "asaqs", "sacpcmp", "sacap", "saci", "ilasa", "saiw", "plato", 
+  "hpcsa", "sanc", "sapc", "sama", "sacssp", "sabs", "nrcs", "sanas", "sans"
 ];
 
 /**
- * Extracts skills from CV text
- * @param cvText The CV text content
- * @returns Array of identified skills
+ * Analyze CV text and return detailed analysis results
+ * 
+ * @param text The CV text content to analyze
+ * @returns Analysis result with scores, ratings, and recommendations
  */
-function extractSkills(cvText: string): string[] {
-  const text = cvText.toLowerCase();
-  const foundSkills: string[] = [];
+export function analyzeCVText(text: string): AnalysisResult {
+  const content = text.trim().toLowerCase();
+  const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
   
-  // Check for technical skills
-  SKILL_CATEGORIES.TECHNICAL.forEach(skill => {
-    if (text.includes(skill)) {
-      foundSkills.push(skill);
-    }
-  });
+  // Check formatting factors
+  const hasSections = /education|experience|skills|qualifications|work history|employment|references|personal details/i.test(content);
+  const hasBulletPoints = /•|-|\*/i.test(content);
+  const hasContactInfo = /email|phone|tel|mobile|address|linkedin/i.test(content);
+  const hasDateRanges = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec).+?-|to\b.+?(20\d{2}|present)/i.test(content);
+  const hasDates = /\b(20\d{2}|19\d{2})\b/i.test(content);
   
-  // Check for soft skills
-  SKILL_CATEGORIES.SOFT.forEach(skill => {
-    if (text.includes(skill)) {
-      foundSkills.push(skill);
-    }
-  });
+  // Calculate format score
+  const formatScore = Math.round(
+    (hasSections ? 25 : 0) +
+    (hasBulletPoints ? 25 : 0) +
+    (hasContactInfo ? 20 : 0) +
+    (hasDateRanges ? 15 : 0) +
+    (hasDates ? 15 : 0)
+  );
   
-  // Check for certifications
-  SKILL_CATEGORIES.CERTIFICATIONS.forEach(cert => {
-    if (text.includes(cert)) {
-      foundSkills.push(cert);
-    }
-  });
+  // Check content quality
+  const avgLineLength = lines.reduce((sum, line) => sum + line.length, 0) / lines.length;
+  const hasActionVerbs = /\b(managed|developed|created|implemented|led|designed|improved|increased|reduced|achieved|launched|organized|coordinated|established|executed|generated|maintained|negotiated|operated|performed|planned|resolved|supervised|trained|transformed|won|delivered|enabled|guided)\b/i.test(content);
+  const hasNumbers = /\b\d+%|\d+ percent|increased by \d+|decreased by \d+|reduced \d+|improved \d+|generated \d+|saved \d+|over \d+|more than \d+/i.test(content);
+  const hasKeySkills = COMMON_SKILLS.some(skill => content.includes(skill.toLowerCase()));
   
-  return foundSkills;
-}
-
-/**
- * Analyze CV format and structure
- * @param cvText The CV text content
- * @returns Object with format analysis
- */
-function analyzeFormat(cvText: string): {score: number, feedback: string[], saElements: string[]} {
-  const feedback: string[] = [];
-  const saElements: string[] = [];
-  let score = 0;
-  const text = cvText.toLowerCase();
+  // Calculate content score
+  const contentScore = Math.round(
+    (avgLineLength > 30 && avgLineLength < 200 ? 25 : 0) +
+    (hasActionVerbs ? 25 : 0) +
+    (hasNumbers ? 25 : 0) +
+    (hasKeySkills ? 25 : 0)
+  );
   
-  // Check length
-  const wordCount = cvText.split(/\s+/).length;
-  if (wordCount < 200) {
-    feedback.push("CV appears too short. Consider adding more detailed information.");
-    score += 5;
-  } else if (wordCount > 200 && wordCount < 600) {
-    feedback.push("CV length is appropriate for South African employers.");
-    score += 20;
-  } else {
-    feedback.push("CV is quite lengthy. In South Africa, recruiters prefer concise 2-3 page CVs.");
-    score += 10;
-  }
+  // Calculate South African context score
+  const foundSaKeywords = SA_KEYWORDS.filter(keyword => content.includes(keyword.toLowerCase()));
+  const foundSaCertifications = SA_CERTIFICATIONS.filter(cert => content.includes(cert.toLowerCase()));
   
-  // Check for contact details
-  if (/email|@|phone|tel|contact/i.test(text)) {
-    feedback.push("Contact information is present.");
-    score += 15;
-  } else {
-    feedback.push("Ensure your contact information is clearly visible at the top of your CV.");
-    score += 0;
-  }
+  const hasB_BBEE = /\b(b-bbee|bbbee|bee|broad.based black economic empowerment|level \d b-bbee|previously disadvantaged|employment equity|affirmative action)\b/i.test(content);
+  const hasNQF = /\bnqf level \d+\b|national qualifications framework|saqa/i.test(content);
+  const hasSaAddress = /\b(south africa|gauteng|western cape|eastern cape|northern cape|kwazulu-natal|kzn|free state|north west|limpopo|mpumalanga)\b/i.test(content);
+  const hasSaLanguages = /\b(zulu|xhosa|afrikaans|sesotho|setswana|sepedi|venda|tsonga|swazi|ndebele)\b/i.test(content);
   
-  // Check for education section
-  if (/education|qualification|degree|diploma/i.test(text)) {
-    feedback.push("Education section detected.");
-    score += 15;
-  } else {
-    feedback.push("Consider adding an education section to your CV.");
-    score += 0;
-  }
+  const saContextScore = Math.round(
+    ((foundSaKeywords.length > 0 ? Math.min(foundSaKeywords.length * 5, 30) : 0)) +
+    ((foundSaCertifications.length > 0 ? Math.min(foundSaCertifications.length * 10, 20) : 0)) +
+    (hasB_BBEE ? 20 : 0) +
+    (hasNQF ? 15 : 0) + 
+    (hasSaAddress ? 10 : 0) +
+    (hasSaLanguages ? 5 : 0)
+  );
   
-  // Check for experience section
-  if (/experience|work|employment|career/i.test(text)) {
-    feedback.push("Experience section detected.");
-    score += 15;
-  } else {
-    feedback.push("Your CV should include detailed work experience.");
-    score += 0;
-  }
+  // Extract skills
+  const skillsFound = COMMON_SKILLS.filter(skill => 
+    new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(content)
+  );
   
-  // Check for skills section
-  if (/skills|abilities|competencies/i.test(text)) {
-    feedback.push("Skills section detected.");
-    score += 15;
-  } else {
-    feedback.push("Consider adding a dedicated skills section to highlight your capabilities.");
-    score += 0;
-  }
+  // Calculate overall ATS score (format, content, and SA context)
+  const overallScore = Math.round(
+    formatScore * 0.3 + 
+    contentScore * 0.4 + 
+    saContextScore * 0.3
+  );
   
-  // Check for B-BBEE information
-  if (/b-bbee|bbbee|bee|black economic empowerment/i.test(text)) {
-    feedback.push("B-BBEE information detected - this is valuable for South African employers.");
-    saElements.push("B-BBEE information");
-    score += 10;
-  } else {
-    feedback.push("Consider adding your B-BBEE status which is often valuable in South African job applications.");
-  }
+  // Determine rating
+  let rating = '';
+  if (overallScore >= 80) rating = 'Excellent';
+  else if (overallScore >= 65) rating = 'Good';
+  else if (overallScore >= 50) rating = 'Average';
+  else rating = 'Needs Improvement';
   
-  // Check for NQF levels
-  if (/nqf level|nqf \d/i.test(text)) {
-    feedback.push("NQF level information detected - this clarifies your qualification level.");
-    saElements.push("NQF level");
-    score += 5;
-  }
+  // Determine SA relevance rating
+  let saRelevance = '';
+  if (saContextScore >= 80) saRelevance = 'Excellent';
+  else if (saContextScore >= 60) saRelevance = 'Good';
+  else if (saContextScore >= 40) saRelevance = 'Average';
+  else saRelevance = 'Low';
   
-  // Check for South African languages
-  const languages = ['english', 'afrikaans', 'zulu', 'xhosa', 'sotho', 'tswana', 'venda', 'tsonga', 'swati', 'ndebele'];
-  const languagesFound = languages.filter(lang => text.includes(lang));
-  if (languagesFound.length > 0) {
-    feedback.push("South African language proficiency section detected - multilingual skills are valuable in SA.");
-    saElements.push("Language proficiency: " + languagesFound.join(", "));
-    score += 5;
-  } else {
-    feedback.push("Consider adding your South African language proficiencies, as multilingual skills are valued by employers.");
-  }
-  
-  // Check for ID number (privacy-aware check - don't extract the number)
-  if (/id number|identity number|id no|id:/i.test(text)) {
-    feedback.push("ID information referenced - this is common in South African CVs, but ensure it's secure when sharing electronically.");
-    saElements.push("ID reference");
-    score += 5;
-  }
-  
-  // Check for other South African specific elements
-  const saTermsFound = SA_TERMS.filter(term => text.includes(term));
-  if (saTermsFound.length > 0) {
-    // Only add terms not already counted
-    const uniqueTerms = saTermsFound.filter(term => 
-      !term.includes('b-bbee') && !term.includes('bee') && 
-      !term.includes('nqf') && !languages.includes(term)
-    );
-    
-    if (uniqueTerms.length > 0) {
-      feedback.push("Additional South African elements detected: " + uniqueTerms.slice(0, 5).join(", "));
-      saElements.push(...uniqueTerms.slice(0, 5));
-      score += Math.min(uniqueTerms.length * 2, 10); // Up to 10 points for SA terms
-    }
-  } else {
-    feedback.push("Consider adding South African specific information to localize your CV.");
-  }
-  
-  return {
-    score: Math.min(score, 100),
-    feedback,
-    saElements
-  };
-}
-
-/**
- * Score CV against ATS criteria
- * @param cvText The CV text content 
- * @returns ATS score and feedback
- */
-function scoreAgainstATS(cvText: string): {score: number, strengths: string[], improvements: string[], saScore: number} {
-  const text = cvText.toLowerCase();
+  // Generate strengths
   const strengths: string[] = [];
+  
+  if (hasSections) strengths.push('Well-structured CV with clear sections');
+  if (hasBulletPoints) strengths.push('Effective use of bullet points improves readability');
+  if (hasActionVerbs) strengths.push('Uses strong action verbs to highlight achievements');
+  if (hasNumbers) strengths.push('Quantifies achievements with specific numbers and percentages');
+  if (hasKeySkills) strengths.push('Contains relevant skills that ATS systems look for');
+  if (hasDateRanges) strengths.push('Clear timeline of work experience');
+  if (hasB_BBEE) strengths.push('Includes B-BBEE status, important for South African employers');
+  if (hasNQF) strengths.push('Specifies NQF levels for qualifications, aligning with SA standards');
+  if (hasSaAddress) strengths.push('Includes South African location information');
+  if (foundSaKeywords.length > 3) strengths.push('Well-optimized for South African job market');
+  if (foundSaCertifications.length > 0) strengths.push('Includes relevant South African certifications/professional bodies');
+  
+  // Generate improvements
   const improvements: string[] = [];
-  let score = 0;
-  let saScore = 0; // South African specific score
   
-  // Check skills presence
-  const skills = extractSkills(cvText);
-  if (skills.length >= 5) {
-    strengths.push(`Strong skills section with ${skills.length} relevant skills identified`);
-    score += 20;
-  } else if (skills.length > 0) {
-    improvements.push(`Add more specific skills to your CV. Only ${skills.length} skills were identified`);
-    score += 10;
-  } else {
-    improvements.push("No specific skills were identified. Add a detailed skills section");
-    score += 0;
-  }
+  if (!hasSections) improvements.push('Add clear section headings (Education, Experience, Skills, etc.)');
+  if (!hasBulletPoints) improvements.push('Use bullet points to highlight achievements and responsibilities');
+  if (!hasActionVerbs) improvements.push('Include strong action verbs to describe achievements');
+  if (!hasNumbers) improvements.push('Quantify achievements with specific numbers and percentages');
+  if (!hasKeySkills) improvements.push('Add industry-relevant skills and keywords');
+  if (!hasDateRanges) improvements.push('Include clear date ranges for education and work experience');
+  if (!hasB_BBEE && saContextScore < 60) improvements.push('Consider adding B-BBEE status information if applicable');
+  if (!hasNQF && saContextScore < 60) improvements.push('Add NQF levels to your qualifications');
+  if (!hasSaAddress && saContextScore < 60) improvements.push('Include your location in South Africa');
+  if (foundSaCertifications.length === 0 && saContextScore < 60) improvements.push('Add relevant South African certifications or professional body memberships');
+  if (lines.some(line => line.length > 200)) improvements.push('Shorten long paragraphs for better readability');
   
-  // Check quantifiable achievements
-  const hasNumbers = /\d+%|\d+ years|\d+\+?%|\d+ team|increased by \d+/i.test(text);
-  if (hasNumbers) {
-    strengths.push("Contains quantifiable achievements with metrics");
-    score += 15;
-  } else {
-    improvements.push("Add quantifiable achievements with specific numbers/percentages");
-    score += 0;
-  }
+  // Format feedback
+  const formatFeedback: string[] = [];
   
-  // Check for keyword density
-  let keywordMatches = 0;
-  let saTotalKeywords = 0;
-  let saMatchedKeywords = 0;
+  if (avgLineLength > 200) formatFeedback.push('Shorten your bullet points to 1-2 lines each');
+  if (!hasContactInfo) formatFeedback.push('Add complete contact information (phone, email, LinkedIn)');
+  if (content.length > 5000) formatFeedback.push('Consider shortening your CV to 2-3 pages maximum');
+  if (content.length < 1500) formatFeedback.push('Your CV may be too short - add more relevant details');
+  if (!hasDates) formatFeedback.push('Add dates to your work experience and education sections');
   
-  // Count SA-specific keywords for each industry
-  for (const industry in INDUSTRY_KEYWORDS) {
-    const allKeywords = INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS];
-    const industryKeywords = allKeywords.filter(keyword => text.includes(keyword));
-    
-    keywordMatches += industryKeywords.length;
-    
-    // Calculate South African specific keywords
-    // We consider SA-specific ones after the general terms in each category
-    const generalTermsCount = 11; // First 11 items in each array are general terms
-    const saKeywords = allKeywords.slice(generalTermsCount);
-    saTotalKeywords += saKeywords.length;
-    
-    const matchedSaKeywords = saKeywords.filter(keyword => text.includes(keyword));
-    saMatchedKeywords += matchedSaKeywords.length;
-  }
-  
-  // Score general keywords
-  if (keywordMatches >= 8) {
-    strengths.push("Strong keyword optimization for ATS");
-    score += 20;
-  } else if (keywordMatches >= 4) {
-    strengths.push("Good keyword presence, but could be improved");
-    score += 10;
-  } else {
-    improvements.push("Add more industry-relevant keywords to pass ATS screening");
-    score += 5;
-  }
-  
-  // Score SA-specific keywords
-  if (saMatchedKeywords >= 6) {
-    strengths.push("Excellent South African industry keywords - well optimized for local employers");
-    score += 10;
-    saScore += 25;
-  } else if (saMatchedKeywords >= 3) {
-    strengths.push("Good South African context, but could add more local industry terms");
-    score += 5;
-    saScore += 15;
-  } else if (saMatchedKeywords > 0) {
-    improvements.push("Add more South African industry-specific keywords to improve local relevance");
-    saScore += 5;
-  } else {
-    improvements.push("Include South African companies, institutions or industry terms relevant to your field");
-    saScore += 0;
-  }
-  
-  // Check for South African education formatting
-  if (/matric|national senior certificate|nsc/i.test(text)) {
-    if (/matric .*?with|nsc .*?with|distinction/i.test(text)) {
-      strengths.push("Clearly formatted South African education qualifications with achievement levels");
-      saScore += 10;
-    } else {
-      strengths.push("Includes South African basic education qualification (Matric/NSC)");
-      saScore += 5;
-    }
-  }
-  
-  // Check for NQF levels 
-  if (/nqf level \d|nqf \d/i.test(text)) {
-    strengths.push("Includes NQF levels for qualifications - important for South African employers");
-    saScore += 10;
-  } else if (/diploma|degree|qualification/i.test(text)) {
-    improvements.push("Consider adding NQF levels to your qualifications for South African employer clarity");
-  }
-  
-  // Check file format readability (simplified)
-  if (text.includes('summary') || text.includes('profile') || text.includes('objective')) {
-    strengths.push("Good structure with clear sections");
-    score += 10;
-  } else {
-    improvements.push("Add clear section headings like 'Professional Summary', 'Work Experience'");
-    score += 5;
-  }
-  
-  // Check for action verbs
-  const actionVerbs = ['managed', 'developed', 'created', 'implemented', 'achieved', 'led', 'increased', 'reduced', 'improved'];
-  const actionVerbCount = actionVerbs.filter(verb => text.includes(verb)).length;
-  
-  if (actionVerbCount >= 4) {
-    strengths.push("Strong use of action verbs to describe experience");
-    score += 15;
-  } else {
-    improvements.push("Use more action verbs like 'developed', 'achieved', 'implemented'");
-    score += 5;
-  }
-  
-  // Check for job title matching
-  if (/position|job title|role|designation/i.test(text)) {
-    strengths.push("Includes clear job titles which helps with ATS keyword matching");
-    score += 10;
-  } else {
-    improvements.push("Ensure each position includes a clear, industry-standard job title");
-    score += 0;
-  }
-  
-  // Final score capping
-  score = Math.min(score, 100);
-  saScore = Math.min(saScore, 100);
-  
-  // Ensure we have at least one strength and one improvement
-  if (strengths.length === 0) {
-    strengths.push("Your CV has a good foundation to build upon");
-  }
-  
-  if (improvements.length === 0) {
-    improvements.push("Continue updating your CV with recent achievements");
-  }
-  
+  // Return the analysis result
   return {
-    score,
-    strengths,
-    improvements,
-    saScore
+    overall_score: overallScore,
+    rating,
+    strengths: shuffle(strengths),
+    improvements: shuffle(improvements),
+    format_feedback: shuffle(formatFeedback),
+    skills_identified: shuffle(skillsFound.slice(0, 15)),
+    sa_score: saContextScore,
+    sa_relevance: saRelevance
   };
 }
 
 /**
- * Main function to analyze a CV
- * @param cvText The CV text content
- * @returns Analysis results
+ * Shuffle an array using Fisher-Yates algorithm
  */
-export function analyzeCVText(cvText: string): any {
-  try {
-    // Extract skills
-    const skills = extractSkills(cvText);
-    
-    // Analyze format
-    const formatAnalysis = analyzeFormat(cvText);
-    
-    // Score against ATS
-    const atsScore = scoreAgainstATS(cvText);
-    
-    // Calculate overall score (weighted average)
-    // Include South African relevance in the scoring
-    const overallScore = Math.round(
-      (formatAnalysis.score * 0.3) + 
-      (atsScore.score * 0.5) + 
-      (atsScore.saScore * 0.2)
-    );
-    
-    // Determine rating based on overall score
-    let rating = "Poor";
-    if (overallScore >= SCORE_THRESHOLDS.EXCELLENT) {
-      rating = "Excellent";
-    } else if (overallScore >= SCORE_THRESHOLDS.GOOD) {
-      rating = "Good";
-    } else if (overallScore >= SCORE_THRESHOLDS.AVERAGE) {
-      rating = "Average";
-    }
-    
-    // Determine South African relevance rating
-    let saRelevance = "Low";
-    if (atsScore.saScore >= 80) {
-      saRelevance = "Excellent";
-    } else if (atsScore.saScore >= 60) {
-      saRelevance = "High";
-    } else if (atsScore.saScore >= 40) {
-      saRelevance = "Medium";
-    }
-    
-    return {
-      success: true,
-      timestamp: new Date().toISOString(),
-      overall_score: overallScore,
-      rating: rating,
-      ats_score: atsScore.score,
-      format_score: formatAnalysis.score,
-      sa_score: atsScore.saScore,
-      sa_relevance: saRelevance,
-      sa_elements: formatAnalysis.saElements,
-      skills_identified: skills,
-      strengths: atsScore.strengths,
-      improvements: atsScore.improvements,
-      format_feedback: formatAnalysis.feedback
-    };
-  } catch (error) {
-    console.error('Error analyzing CV:', error);
-    return {
-      success: false,
-      error: "Failed to analyze the CV",
-      timestamp: new Date().toISOString()
-    };
+function shuffle<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
   }
+  return result;
 }
 
-export default {
-  analyzeCVText
-};
+/**
+ * Benchmark the performance of the local AI service
+ * @returns Benchmark results
+ */
+export function benchmarkLocalAI(): { 
+  executionTime: number, 
+  memoryUsage: number 
+} {
+  const start = performance.now();
+  const memBefore = process.memoryUsage().heapUsed;
+  
+  // Run 100 analyses with a randomized CV
+  for (let i = 0; i < 100; i++) {
+    const mockCV = generateMockCV();
+    analyzeCVText(mockCV);
+  }
+  
+  const end = performance.now();
+  const memAfter = process.memoryUsage().heapUsed;
+  
+  return {
+    executionTime: end - start,
+    memoryUsage: memAfter - memBefore
+  };
+}
+
+/**
+ * Generate a mock CV for testing
+ */
+function generateMockCV(): string {
+  const sections = [
+    "PERSONAL DETAILS",
+    "EDUCATION",
+    "WORK EXPERIENCE",
+    "SKILLS",
+    "REFERENCES"
+  ];
+  
+  const randomText = createHash('md5').update(Math.random().toString()).digest('hex');
+  
+  let cv = '';
+  
+  for (const section of sections) {
+    cv += section + '\n\n';
+    for (let i = 0; i < 5; i++) {
+      cv += '• ' + randomText.slice(0, 30 + i * 5) + '\n';
+    }
+    cv += '\n';
+  }
+  
+  return cv;
+}
