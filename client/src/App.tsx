@@ -124,6 +124,7 @@ function App() {
                   <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
+                  <ProtectedRoute path="/job-seeker-tools" component={JobSeekerToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />
                   
                   <Route component={NotFound} />

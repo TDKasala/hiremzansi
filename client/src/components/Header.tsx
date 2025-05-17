@@ -98,6 +98,9 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/premium-tools">Premium Tools</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/job-seeker-tools">Job Seeker Tools</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/jobs">Find Jobs</Link>

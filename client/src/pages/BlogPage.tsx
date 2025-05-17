@@ -20,7 +20,7 @@ const blogPosts: BlogPost[] = [
     title: "How B-BBEE Status Impacts Your South African Resume",
     excerpt: "B-BBEE status has become an important factor in the South African job market. Learn how to properly highlight your B-BBEE information on your CV.",
     date: "May 12, 2025",
-    author: "Thabo Mabena",
+    author: "The ATSBoost team",
     image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=B-BBEE+Impact",
     category: "South African Job Market"
   },
@@ -30,7 +30,7 @@ const blogPosts: BlogPost[] = [
     title: "NQF Levels Explained: What South African Employers Look For",
     excerpt: "Understanding the National Qualifications Framework (NQF) is essential when applying for jobs in South Africa. Learn how to correctly present your qualifications.",
     date: "May 8, 2025",
-    author: "Sarah Johnson",
+    author: "The ATSBoost team",
     image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=NQF+Levels",
     category: "Education & Qualifications"
   },
@@ -40,7 +40,7 @@ const blogPosts: BlogPost[] = [
     title: "2025 ATS Survival Guide for South African Job Seekers",
     excerpt: "With 90% of large companies using Applicant Tracking Systems, understanding how to optimize your resume for ATS is more crucial than ever.",
     date: "April 30, 2025",
-    author: "Lerato Moloi",
+    author: "The ATSBoost team",
     image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=ATS+Guide",
     category: "Resume Optimization"
   },

@@ -80,16 +80,9 @@ export default function TestimonialsSection() {
                 <span className="ml-2 text-neutral-600">{testimonial.rating.toFixed(1)}</span>
               </div>
               <p className="text-neutral-700 mb-4">{testimonial.text}</p>
-              <div className="flex items-center">
-                <img 
-                  src={testimonial.author.image} 
-                  alt={testimonial.author.name} 
-                  className="w-12 h-12 rounded-full object-cover mr-3" 
-                />
-                <div>
-                  <div className="font-semibold">{testimonial.author.name}</div>
-                  <div className="text-sm text-neutral-600">{testimonial.author.title}</div>
-                </div>
+              <div>
+                <div className="font-semibold">{testimonial.author.name}</div>
+                <div className="text-sm text-neutral-600">{testimonial.author.title}</div>
               </div>
             </div>
           ))}
