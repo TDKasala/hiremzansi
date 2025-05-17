@@ -34,7 +34,7 @@ export default function Footer() {
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">
                 <FaFacebookF />
               </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
+              <a href="https://twitter.com/supportatsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
                 <FaTwitter />
               </a>
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">
@@ -55,8 +55,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="text-neutral-400 hover:text-white transition-colors">
-                  How It Works
+                <Link href="/jobs" className="text-neutral-400 hover:text-white transition-colors">
+                  Job Board
                 </Link>
               </li>
               <li>

@@ -31,8 +31,8 @@ interface InteractiveResumePreviewProps {
   jobDescription?: string;
 }
 
-// Sample resumeTemplate for South African market
-const defaultResumeTemplate = `DENIS KASALA
+// Sample CV template for South African market
+const defaultCVTemplate = `DENIS KASALA
 B-BBEE Level 2 | +27 82 123 4567 | denis.kasala@email.co.za | Johannesburg, Gauteng
 
 PROFESSIONAL SUMMARY
