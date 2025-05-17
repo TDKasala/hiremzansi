@@ -992,6 +992,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analyzed: true,
         timestamp: new Date().toISOString()
       });
+    } catch (error) {
+      next(error);
+    }
   });
 
   // WhatsApp settings endpoints
