@@ -1,92 +1,68 @@
-// Test script for Abacus AI integration
-import 'dotenv/config';
-import fetch from 'node-fetch';
+const { generateTextCompletion, analyzeText, testAbacusAI: testConnection } = require('./services/abacusAI');
 
-// Configuration
-const ABACUS_API_KEY = process.env.ABACUS_API_KEY || 's2_e3c10fb6b7e44af5bf25bf9c6ece8805';
-const ABACUS_API_URL = 'https://api.abacus.ai/api/v0';
+async function runAbacusAITests() {
+  console.log("Testing Abacus AI API...");
 
-async function testAbacusAI() {
-  console.log('Starting Abacus AI API test...');
-  
   try {
-    console.log('Testing connection to Abacus AI API...');
-    
-    // Test basic completion
-    console.log('Testing basic text completion...');
-    const response = await fetch(`${ABACUS_API_URL}/llm/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ABACUS_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "claude-3-sonnet",
-        messages: [
-          { role: 'user', content: 'Respond with a single word: "Success"' }
-        ],
-        max_tokens: 10,
-        temperature: 0.2
-      })
-    });
+    // Test connectivity
+    console.log("Testing basic connectivity...");
+    const isWorking = await testAbacusAI();
+    console.log(`Basic connectivity test: ${isWorking ? "PASSED" : "FAILED"}`);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API error: ${JSON.stringify(errorData)}`);
-    }
+    // Test text generation
+    console.log("\nTesting text generation...");
+    const testPrompt = "Explain why ATS optimization is important for job seekers in South Africa in 2 sentences.";
+    const completionResult = await generateTextCompletion(testPrompt);
+    console.log("Text generation result:");
+    console.log("----------");
+    console.log(completionResult);
+    console.log("----------");
 
-    const data = await response.json();
-    console.log('Response:', data.choices[0].message.content);
-    console.log('✅ Basic text completion test successful');
-    
     // Test JSON response
-    console.log('\nTesting JSON response format...');
-    const jsonResponse = await fetch(`${ABACUS_API_URL}/llm/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ABACUS_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "claude-3-sonnet",
-        messages: [
-          { 
-            role: 'system', 
-            content: 'Return your response as a valid JSON object.' 
-          },
-          { 
-            role: 'user', 
-            content: 'Create a JSON object with a status field set to "success" and a message field with value "Abacus AI is working correctly".' 
-          }
-        ],
-        max_tokens: 100,
-        temperature: 0.2,
-        response_format: { type: "json_object" }
-      })
-    });
+    console.log("\nTesting JSON response analysis...");
+    const systemPrompt = "You are an expert CV analyzer. Analyze the following CV text and identify key skills, experience, and recommendations.";
+    const sampleCV = `
+JOHN SMITH
+Cape Town, South Africa | +27 12 345 6789 | john.smith@email.com
 
-    if (!jsonResponse.ok) {
-      const errorData = await jsonResponse.json();
-      throw new Error(`API error: ${JSON.stringify(errorData)}`);
-    }
+PROFESSIONAL SUMMARY
+Experienced software developer with 5 years experience in web development and mobile applications.
+Proficient in JavaScript, React, and Node.js.
 
-    const jsonData = await jsonResponse.json();
-    console.log('JSON Response:', jsonData.choices[0].message.content);
-    console.log('✅ JSON format test successful');
-    
-    console.log('\n✅ All Abacus AI tests completed successfully');
-    
+SKILLS
+- JavaScript, TypeScript, React, Node.js
+- RESTful API design
+- Mobile application development
+- Agile methodologies
+
+EXPERIENCE
+Senior Developer, TechCorp SA
+January 2022 - Present
+- Developed e-commerce platform that increased sales by 35%
+- Led team of 5 junior developers
+- Implemented CI/CD pipelines
+
+Developer, WebSolutions
+March 2019 - December 2021
+- Created responsive web applications for clients
+- Maintained legacy codebase
+
+EDUCATION
+Bachelor of Science, Computer Science
+University of Cape Town, 2018
+    `;
+
+    const analysisResult = await analyzeText(sampleCV, systemPrompt);
+    console.log("Analysis result:");
+    console.log("----------");
+    console.log(JSON.stringify(analysisResult, null, 2));
+    console.log("----------");
+
+    console.log("\nAll tests completed!");
   } catch (error) {
-    console.error('❌ Abacus AI test failed:', error.message);
-    
-    console.log('\n⚠️ Troubleshooting tips:');
-    console.log('1. Check that your Abacus API key is valid');
-    console.log('2. Verify that you have access to the requested models');
-    console.log('3. Check your network connection');
-    
-    process.exit(1);
+    console.error("Test failed with error:", error);
   }
 }
 
 // Run the test
-await testAbacusAI();
+testAbacusAI();

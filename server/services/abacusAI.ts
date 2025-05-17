@@ -1,5 +1,30 @@
 import fetch from 'node-fetch';
 
+// Type definitions for Abacus AI API responses
+interface AbacusAIMessage {
+  role: string;
+  content: string;
+}
+
+interface AbacusAIChoice {
+  message: AbacusAIMessage;
+  index: number;
+  finish_reason: string;
+}
+
+interface AbacusAIResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: AbacusAIChoice[];
+  usage: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
+
 // Abacus AI Configuration
 const ABACUS_CONFIG = {
   // API Information
@@ -56,13 +81,27 @@ export async function generateTextCompletion(
       })
     });
 
+    // Read the response body once
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const errorData = await response.json() as any;
-      throw new Error(`Abacus AI API error: ${errorData.message || response.statusText}`);
+      // Try to parse the error message, but don't throw if it fails
+      try {
+        const errorData = JSON.parse(responseText) as Record<string, any>;
+        throw new Error(`Abacus AI API error: ${errorData.message || response.statusText}`);
+      } catch (parseError) {
+        throw new Error(`Abacus AI API error: ${response.statusText}, Response: ${responseText}`);
+      }
     }
 
-    const data = await response.json() as any;
-    return data.choices[0].message.content || "No response generated";
+    // Parse the successful response
+    try {
+      const data = JSON.parse(responseText) as AbacusAIResponse;
+      return data.choices[0].message.content || "No response generated";
+    } catch (parseError) {
+      console.error("Error parsing response:", parseError);
+      return `Error parsing response: ${responseText.substring(0, 100)}...`;
+    }
   } catch (error) {
     console.error("Abacus AI API error:", error);
     return "An error occurred while generating the response";
@@ -95,15 +134,24 @@ export async function analyzeText(text: string, systemPrompt: string): Promise<a
       })
     });
 
+    // Read the response body once
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const errorData = await response.json() as any;
-      throw new Error(`Abacus AI API error: ${errorData.message || response.statusText}`);
+      // Try to parse the error message, but don't throw if it fails
+      try {
+        const errorData = JSON.parse(responseText) as Record<string, any>;
+        throw new Error(`Abacus AI API error: ${errorData.message || response.statusText}`);
+      } catch (parseError) {
+        throw new Error(`Abacus AI API error: ${response.statusText}, Response: ${responseText}`);
+      }
     }
 
-    const data = await response.json() as any;
-    const content = data.choices[0].message.content || "{}";
-    
+    // Parse the successful response
     try {
+      const data = JSON.parse(responseText) as AbacusAIResponse;
+      const content = data.choices[0].message.content || "{}";
+      
       return JSON.parse(content);
     } catch (parseError) {
       console.error("Error parsing JSON response:", parseError);
