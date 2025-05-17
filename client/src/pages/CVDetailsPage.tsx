@@ -26,7 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Clock, FileText, Download } from 'lucide-react';
-import PDFReportButton from '@/components/PDFReportButton';
+import DownloadReportButton from '@/components/DownloadReportButton';
 
 interface CVDetails {
   id: number;
@@ -58,11 +58,11 @@ const CVDetailsPage: React.FC = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: cv, isLoading: cvLoading } = useQuery({
+  const { data: cv, isLoading: cvLoading } = useQuery<CVDetails>({
     queryKey: [`/api/cv/${cvId}`],
   });
 
-  const { data: atsScore, isLoading: scoreLoading } = useQuery({
+  const { data: atsScore, isLoading: scoreLoading } = useQuery<ATSScore>({
     queryKey: [`/api/ats-score/${cvId}`],
     enabled: !!cv?.isAnalyzed,
   });
@@ -142,7 +142,7 @@ const CVDetailsPage: React.FC = () => {
           </Link>
           
           {atsScore && (
-            <PDFReportButton
+            <DownloadReportButton
               score={atsScore.score}
               strengths={atsScore.strengths}
               improvements={atsScore.improvements}
