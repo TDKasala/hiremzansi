@@ -88,7 +88,7 @@ export default function UploadSection() {
             <div className="flex items-center mb-8 p-3 bg-primary/5 border border-primary/20 rounded-md">
               <Lightbulb className="h-5 w-5 text-primary shrink-0 mr-3" />
               <p className="text-sm text-neutral-700">
-                Try our <Link href="/realtime-ats" className="text-primary font-medium hover:underline">Real-Time ATS Scanner</Link> to instantly see how your resume performs and get immediate feedback!
+                Try our <Link href="/realtime-ats" className="text-primary font-medium hover:underline">Real-Time ATS Scanner</Link> to instantly see how your CV performs and get immediate feedback!
               </p>
             </div>
             
