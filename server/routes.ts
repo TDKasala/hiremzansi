@@ -6,6 +6,7 @@ import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
+import { analyzeCVText } from "./services/localAI";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -930,7 +931,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use our advanced local AI service for CV analysis
-      const { analyzeCVText } = require('./services/localAI');
       const analysis = analyzeCVText(resumeContent);
       
       // Extract job-specific keywords from job description if provided
@@ -943,14 +943,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           jobRelevance: "Medium" 
         };
       }
-          (foundSaKeywords.length / 5) * 50 + // Up to 50 points for keywords
-          (bbbeeDetected ? 25 : 0) +           // 25 points for B-BBEE
-          (nqfDetected ? 25 : 0)               // 25 points for NQF
-        )
-      );
       
-      // Format score - check for proper sections, bullet points, etc.
-      const hasProperSections = /education|experience|skills|qualifications/i.test(resumeLower);
+      // Return the analysis results in a structured format
+      return res.json({
+        score: analysis.overall_score,
+        rating: analysis.rating,
+        strengths: analysis.strengths.slice(0, 3),
+        weaknesses: analysis.improvements.slice(0, 3),
+        suggestions: analysis.format_feedback.slice(0, 2),
+        sa_score: analysis.sa_score,
+        sa_relevance: analysis.sa_relevance,
+        skills: analysis.skills_identified.slice(0, 8),
+        job_match: jobKeywordMatch
+      });
+    } catch (error) {
+      console.error("Error in CV analysis:", error);
+      next(error);
+    }
+  });
       const hasBulletPoints = /•|-|\*/i.test(resumeContent);
       const hasDates = /20\d{2}|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december/i.test(resumeLower);
       
