@@ -1,137 +1,194 @@
 import React from 'react';
-import { Link } from 'wouter';
 import { Helmet } from 'react-helmet';
+import { Link } from 'wouter';
 import { 
-  CheckSquare, 
-  FileType, 
-  FileText, 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { 
   Briefcase, 
-  MessageSquare, 
-  Key, 
-  PenTool,
-  Award
-} from 'lucide-react';
-
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+  FileText, 
+  LayoutGrid, 
+  Book, 
+  ListChecks, 
+  FileQuestion,
+  Gift
+} from "lucide-react";
 
 const JobSeekerToolsPage: React.FC = () => {
-  const tools = [
-    {
-      title: "ATS Keywords Tool",
-      description: "Find industry-specific keywords to boost your CV's ATS score for South African employers.",
-      icon: Key,
-      link: "/tools/ats-keywords",
-      buttonText: "Explore Keywords"
-    },
-    {
-      title: "Cover Letter Ideas",
-      description: "Get templates and samples for effective cover letters tailored for South African job applications.",
-      icon: PenTool,
-      link: "/tools/cover-letter-ideas",
-      buttonText: "View Templates"
-    },
-    {
-      title: "CV Checklist",
-      description: "Comprehensive checklist to ensure your CV meets both ATS and South African recruiter standards.",
-      icon: CheckSquare,
-      link: "/tools/cv-checklist",
-      buttonText: "View Checklist"
-    },
-    {
-      title: "CV Templates",
-      description: "Access ATS-friendly CV templates optimized for South African employers and job applications.",
-      icon: FileType,
-      link: "/tools/cv-templates",
-      buttonText: "Browse Templates"
-    },
-    {
-      title: "Job Fit Quiz",
-      description: "Take a quiz to determine which career paths best match your skills and experience.",
-      icon: Briefcase,
-      link: "/tools/job-fit-quiz",
-      buttonText: "Start Quiz"
-    },
-    {
-      title: "Interview Guide",
-      description: "Prepare for interviews with sample questions and answers for common South African positions.",
-      icon: MessageSquare,
-      link: "/tools/interview-guide",
-      buttonText: "Preparation Tips"
-    },
-    {
-      title: "Interview Practice",
-      description: "Interactive AI-powered interview simulator to practice your responses to common questions.",
-      icon: Award,
-      link: "/interview/practice",
-      buttonText: "Practice Now",
-      premium: true
-    },
-    {
-      title: "Skills Gap Analyzer",
-      description: "Identify gaps in your skill set and get personalized recommendations to boost employability.",
-      icon: FileText,
-      link: "/skills/analyze",
-      buttonText: "Analyze Skills",
-      premium: true
-    }
-  ];
-
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto px-4 py-10">
       <Helmet>
         <title>Job Seeker Tools | ATSBoost</title>
         <meta 
           name="description" 
-          content="Access a suite of specialized tools designed to help South African job seekers improve their CV, practice interviews, and boost employability."
+          content="Access tools to boost your job search success in the South African market - CV templates, ATS keywords, cover letter templates, and more."
         />
       </Helmet>
-
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Job Seeker Tools</h1>
-        <p className="text-gray-600">
-          Comprehensive resources to help you stand out in the South African job market
+      
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold">Job Seeker Tools</h1>
+        <p className="text-muted-foreground mt-2">
+          Tools to help you succeed in the South African job market
         </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tools.map((tool, index) => {
-          const Icon = tool.icon;
-          return (
-            <Card key={index} className={tool.premium ? 'border-amber-500 border-2' : ''}>
-              <CardHeader>
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 mt-1">
-                    <Icon className="h-8 w-8 text-amber-500 mb-2" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">{tool.title}</CardTitle>
-                    {tool.premium && (
-                      <span className="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded mt-1">
-                        Premium
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm text-gray-600 min-h-[60px]">
-                  {tool.description}
-                </CardDescription>
-              </CardContent>
-              <CardFooter>
-                <Link href={tool.link} className="w-full">
-                  <Button 
-                    variant={tool.premium ? "default" : "outline"} 
-                    className="w-full"
-                  >
-                    {tool.buttonText}
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          );
-        })}
+      
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+        {/* CV Templates */}
+        <Card className="hover:border-primary/50 transition-colors group">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <LayoutGrid className="h-5 w-5 mr-2 text-primary" />
+              CV Templates
+            </CardTitle>
+            <CardDescription>
+              South African focused resume templates
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            <p>Access professional CV templates optimized for the South African job market and ATS systems.</p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+              <Link href="/tools/cv-templates">Browse Templates</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        {/* ATS Keywords Tool */}
+        <Card className="hover:border-primary/50 transition-colors group">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-primary" />
+              ATS Keywords Tool
+            </CardTitle>
+            <CardDescription>
+              Industry-specific keywords for South Africa
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            <p>Generate tailored keywords for your industry that will help your CV pass ATS filters in South Africa.</p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+              <Link href="/tools/ats-keywords">Find Keywords</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        {/* Cover Letter Generator */}
+        <Card className="hover:border-primary/50 transition-colors group">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FileText className="h-5 w-5 mr-2 text-primary" />
+              Cover Letter Ideas
+            </CardTitle>
+            <CardDescription>
+              South African cover letter guidance
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            <p>Get industry-specific cover letter templates and prompts tailored for South African employers.</p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
+              <Link href="/tools/cover-letter-ideas">Create Cover Letter</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+      
+      {/* Premium Features */}
+      <div className="border border-primary/30 rounded-lg p-6 bg-primary/5 mb-10">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center">
+            <Gift className="h-6 w-6 text-primary mr-3" />
+            <h2 className="font-semibold text-xl">Premium Tools</h2>
+          </div>
+          <Button size="sm" variant="default">Upgrade</Button>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-background p-5 rounded-lg border flex flex-col">
+            <h3 className="font-medium text-lg flex items-center">
+              <ListChecks className="h-5 w-5 text-primary mr-2" />
+              CV Checklist
+            </h3>
+            <p className="text-sm text-muted-foreground my-3">
+              Complete South African specific CV checklist with 50+ points to ensure your resume meets local standards and expectations.
+            </p>
+            <Button variant="outline" className="mt-auto" asChild>
+              <Link href="/tools/cv-checklist">Access Tool</Link>
+            </Button>
+          </div>
+          
+          <div className="bg-background p-5 rounded-lg border flex flex-col">
+            <h3 className="font-medium text-lg flex items-center">
+              <FileQuestion className="h-5 w-5 text-primary mr-2" />
+              Job Fit Quiz
+            </h3>
+            <p className="text-sm text-muted-foreground my-3">
+              10-question assessment to match your skills to job requirements and understand your fit for different roles in the South African market.
+            </p>
+            <Button variant="outline" className="mt-auto" asChild>
+              <Link href="/tools/job-fit-quiz">Take Quiz</Link>
+            </Button>
+          </div>
+          
+          <div className="bg-background p-5 rounded-lg border flex flex-col">
+            <h3 className="font-medium text-lg flex items-center">
+              <Book className="h-5 w-5 text-primary mr-2" />
+              Interview Guide
+            </h3>
+            <p className="text-sm text-muted-foreground my-3">
+              South African interview preparation with common questions, industry-specific examples, and tips for answering in the local context.
+            </p>
+            <Button variant="outline" className="mt-auto" asChild>
+              <Link href="/tools/interview-guide">Prepare for Interviews</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Resources */}
+      <div className="bg-muted/50 p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Additional Resources</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">South African CV Guide</CardTitle>
+              <CardDescription>Comprehensive guide on creating CVs for the local market</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Learn about B-BBEE information, NQF levels, and other South African specific elements to include in your CV.</p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" asChild className="w-full">
+                <Link href="/blog/south-african-cv-guide">Read Guide</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">ATS Survival Guide</CardTitle>
+              <CardDescription>Maximize your chances of getting past automated screening</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">With 90% of large companies using Applicant Tracking Systems, our 2025 guide helps you navigate these systems.</p>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" asChild className="w-full">
+                <Link href="/blog/ats-survival-guide-2025">Read Guide</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </div>
   );

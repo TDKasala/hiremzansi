@@ -400,129 +400,27 @@ export default function UploadPage() {
           </div>
         )}
         
-        {/* Job Seeker Tools Section */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Briefcase className="h-6 w-6 mr-2 text-primary" />
-            Job Seeker Tools
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* CV Templates */}
-            <Card className="hover:border-primary/50 transition-colors group">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <LayoutGrid className="h-5 w-5 mr-2 text-primary" />
-                  CV Templates
-                </CardTitle>
-                <CardDescription>
-                  South African focused resume templates
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Access professional CV templates optimized for the South African job market and ATS systems.</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
-                  <Link href="/tools/cv-templates">Browse Templates</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            {/* ATS Keywords Tool */}
-            <Card className="hover:border-primary/50 transition-colors group">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="h-5 w-5 mr-2 text-primary" />
-                  ATS Keywords Tool
-                </CardTitle>
-                <CardDescription>
-                  Industry-specific keywords for South Africa
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Generate tailored keywords for your industry that will help your CV pass ATS filters in South Africa.</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
-                  <Link href="/tools/ats-keywords">Find Keywords</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            {/* Cover Letter Generator */}
-            <Card className="hover:border-primary/50 transition-colors group">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="h-5 w-5 mr-2 text-primary" />
-                  Cover Letter Ideas
-                </CardTitle>
-                <CardDescription>
-                  South African cover letter guidance
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                <p>Get industry-specific cover letter templates and prompts tailored for South African employers.</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" asChild className="w-full group-hover:bg-primary/5">
-                  <Link href="/tools/cover-letter">Create Cover Letter</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
-          
-          {/* Premium Features (Interview Guide) */}
-          <div className="mt-8 border border-primary/30 rounded-lg p-4 bg-primary/5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <Gift className="h-5 w-5 text-primary mr-2" />
-                <h3 className="font-semibold text-lg">Premium Tools</h3>
-              </div>
-              <Button size="sm" variant="default">Upgrade</Button>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-background p-3 rounded border flex flex-col">
-                <h4 className="font-medium flex items-center">
-                  <ListChecks className="h-4 w-4 text-primary mr-2" />
-                  CV Checklist
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  Complete South African specific CV checklist with 50+ points
-                </p>
-                <Button variant="outline" size="sm" className="mt-auto" disabled>
-                  Premium Feature
-                </Button>
-              </div>
-              
-              <div className="bg-background p-3 rounded border flex flex-col">
-                <h4 className="font-medium flex items-center">
-                  <FileQuestion className="h-4 w-4 text-primary mr-2" />
-                  Job Fit Quiz
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  10-question assessment to match your skills to job requirements
-                </p>
-                <Button variant="outline" size="sm" className="mt-auto" disabled>
-                  Premium Feature
-                </Button>
-              </div>
-              
-              <div className="bg-background p-3 rounded border flex flex-col">
-                <h4 className="font-medium flex items-center">
-                  <Book className="h-4 w-4 text-primary mr-2" />
-                  Interview Guide
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1 mb-2">
-                  South African interview preparation with common questions
-                </p>
-                <Button variant="outline" size="sm" className="mt-auto" disabled>
-                  Premium Feature
-                </Button>
-              </div>
-            </div>
-          </div>
+        {/* Link to Job Seeker Tools Page */}
+        <div className="mt-12 flex justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Briefcase className="h-5 w-5 mr-2 text-primary" />
+                Need more job search tools?
+              </CardTitle>
+              <CardDescription>
+                Access our complete collection of South African job seeker resources
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground">
+              <p>From CV templates to interview guides, our job seeker tools page has everything you need to succeed in the South African job market.</p>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Button asChild>
+                <Link href="/job-seeker-tools">Browse Job Seeker Tools</Link>
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
         
         {/* South African job market tips */}
