@@ -15,7 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Briefcase, Download, FileCheck, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-import CVCheckPDF from "@/assets/tools/CV Check.pdf";
+// Reference to public file
+const CV_CHECKLIST_PDF_URL = '/cv-checklist.pdf';
 
 interface ChecklistItem {
   id: string;
@@ -107,7 +108,7 @@ const CVChecklistPage: React.FC = () => {
   };
   
   const downloadPDF = () => {
-    window.open(CVCheckPDF, '_blank');
+    window.open(CV_CHECKLIST_PDF_URL, '_blank');
   };
   
   return (

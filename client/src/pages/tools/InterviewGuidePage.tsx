@@ -22,11 +22,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-import InterviewGuidePDF from "@/assets/tools/interview Guide.pdf";
+// Reference to public file
+const INTERVIEW_GUIDE_PDF_URL = '/interview-guide.pdf';
 
 const InterviewGuidePage: React.FC = () => {
   const downloadGuide = () => {
-    window.open(InterviewGuidePDF, '_blank');
+    window.open(INTERVIEW_GUIDE_PDF_URL, '_blank');
   };
   
   return (
