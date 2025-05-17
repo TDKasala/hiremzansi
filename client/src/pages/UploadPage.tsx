@@ -206,7 +206,7 @@ export default function UploadPage() {
                 Add the job description for targeted CV analysis (required)
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <div className="p-4 sm:p-6">
               <Textarea
                 placeholder="Paste the job description here to get tailored ATS scoring and recommendations"
                 className="min-h-[120px]"
@@ -217,7 +217,7 @@ export default function UploadPage() {
               <p className="mt-2 text-xs text-muted-foreground">
                 Adding a job description helps us analyze your CV specifically for the position you're applying for
               </p>
-            </CardContent>
+            </div>
           </Card>
           
           {/* Upload Methods - CV File Upload and WhatsApp */}
