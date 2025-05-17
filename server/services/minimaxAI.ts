@@ -28,7 +28,7 @@ interface MinimaxResponse {
 const MINIMAX_CONFIG = {
   // API Information
   API_KEY: process.env.MINIMAX_API_KEY,
-  API_URL: 'https://api.minimax.chat/v1/text/completion',
+  API_URL: 'https://api.minimax.chat/v1/text/chatcompletion_v2',
   
   // Models
   FREE_TIER_MODEL: "abab6-chat",  // For basic CV analysis
