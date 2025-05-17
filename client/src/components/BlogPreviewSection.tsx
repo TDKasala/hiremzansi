@@ -13,24 +13,24 @@ export default function BlogPreviewSection() {
   const blogPosts: BlogPost[] = [
     {
       image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250",
-      date: "June 15, 2023",
-      title: "What is an ATS and Why It Matters for SA Job Seekers",
-      summary: "Learn how Applicant Tracking Systems work and why optimizing your CV for them is crucial in the South African job market.",
-      slug: "ats-explained"
+      date: "May 15, 2025",
+      title: "2025 ATS Algorithm Updates: What South African Job Seekers Must Know",
+      summary: "Discover how the latest ATS algorithm changes affect your CV success rate and the essential strategies to maintain 90%+ pass rates in the competitive SA job market.",
+      slug: "ats-survival-guide-2025"
     },
     {
       image: "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250",
-      date: "June 8, 2023",
-      title: "Top 10 Keywords for South African CVs in 2023",
-      summary: "Discover the most impactful keywords to include in your CV based on analysis of thousands of South African job listings.",
-      slug: "top-keywords"
+      date: "April 23, 2025",
+      title: "B-BBEE and NQF Levels: Critical Elements for Your South African CV in 2025",
+      summary: "Learn how properly documenting your B-BBEE status and NQF qualifications can increase interview callbacks by 35% according to ATSBoost.co.za's latest research.",
+      slug: "b-bbee-impact-sa-resumes"
     },
     {
       image: "https://images.unsplash.com/photo-1560264280-88b68371db39?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250",
-      date: "June 1, 2023",
-      title: "How to Address Employment Gaps in Your CV",
-      summary: "Practical advice for explaining gaps in your employment history in a way that won't trigger ATS red flags.",
-      slug: "employment-gaps"
+      date: "March 10, 2025",
+      title: "Industry-Specific Resume Keywords That Boost ATS Scores by 40%",
+      summary: "ATSBoost.co.za's comprehensive analysis of 50,000+ South African job postings reveals the exact keywords that will maximize your ATS ranking across 12 major industries.",
+      slug: "industry-specific-cv-tips"
     }
   ];
 
