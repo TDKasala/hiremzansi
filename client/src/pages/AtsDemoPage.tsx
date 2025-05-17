@@ -351,7 +351,8 @@ const AtsDemoPage = () => {
             </TabsContent>
           </Tabs>
           
-          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+          <div className="space-y-4">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-md">
             <h3 className="font-medium text-amber-800 mb-2">South African ATS Tips</h3>
             <ul className="list-disc pl-5 space-y-1 text-sm text-amber-700">
               <li>Include your B-BBEE status if applicable</li>
@@ -361,6 +362,142 @@ const AtsDemoPage = () => {
               <li>Include South African cities/provinces in your address</li>
             </ul>
           </div>
+          
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <h3 className="font-medium text-blue-800 mb-2">Example CV Text</h3>
+            <button 
+              className="text-blue-600 text-sm underline" 
+              onClick={() => {
+                setCvText(`JOHN VENTER
+SENIOR SOFTWARE DEVELOPER
+
+CONTACT INFORMATION
+Email: john.venter@email.co.za
+Phone: +27 82 123 4567
+LinkedIn: linkedin.com/in/johnventer
+Location: Cape Town, Western Cape, South Africa
+
+PROFESSIONAL SUMMARY
+Results-driven Software Developer with 6+ years of experience building scalable web applications. Skilled in JavaScript, Python, and AWS cloud services. Strong background in agile methodologies and team leadership. Level 2 B-BBEE contributor seeking opportunities to leverage technical expertise in a collaborative environment.
+
+SKILLS
+• JavaScript, TypeScript, React, Node.js, Express
+• Python, Django, Flask
+• AWS, Docker, Kubernetes
+• SQL, NoSQL databases
+• Agile/Scrum methodologies
+• CI/CD pipelines
+• Technical leadership
+
+WORK EXPERIENCE
+
+SENIOR SOFTWARE DEVELOPER
+DataTech Solutions | Cape Town
+January 2020 - Present
+
+• Led a team of 5 developers to rebuild the company's client portal, resulting in a 40% increase in user engagement
+• Designed and implemented microservices architecture that reduced server costs by 35%
+• Improved application performance by optimizing database queries, decreasing load times by 60%
+• Mentored junior developers and implemented code review processes that reduced production bugs by 25%
+• Collaborated with UX designers to implement responsive interfaces using React and Material UI
+
+SOFTWARE DEVELOPER
+TechInnovate | Johannesburg
+March 2017 - December 2019
+
+• Developed RESTful APIs using Node.js and Express, serving over 10,000 daily users
+• Created automated testing suite that increased code coverage from 45% to 90%
+• Implemented real-time data synchronization features using WebSockets
+• Reduced application build time by 50% through optimizing webpack configuration
+• Collaborated with cross-functional teams to deliver products on schedule
+
+EDUCATION
+
+UNIVERSITY OF CAPE TOWN
+BSc Computer Science (NQF Level 7)
+2013 - 2016
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect
+• SAICSIT Professional Member
+• Certified Scrum Master (CSM)
+
+LANGUAGES
+• English (Fluent)
+• Afrikaans (Fluent)
+• Xhosa (Basic)
+
+PROJECTS
+
+E-COMMERCE PLATFORM
+• Built a full-stack e-commerce application using React, Node.js, and MongoDB
+• Implemented Stripe payment integration and inventory management features
+• Deployed using AWS services including EC2, S3, and CloudFront
+
+REAL-TIME ANALYTICS DASHBOARD
+• Developed a dashboard for monitoring business metrics in real-time
+• Used D3.js for data visualization and Socket.IO for real-time updates
+• Reduced reporting time from days to minutes for executive decision-making
+`);
+              }}
+            >
+              Load Example CV
+            </button>
+          </div>
+          
+          <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+            <h3 className="font-medium text-green-800 mb-2">Example Job Description</h3>
+            <button 
+              className="text-green-600 text-sm underline" 
+              onClick={() => {
+                setJobText(`SENIOR SOFTWARE DEVELOPER - CAPE TOWN
+
+COMPANY PROFILE:
+Our client, a leading tech company in Cape Town, is looking for a Senior Software Developer to join their dynamic team. They are at the forefront of developing innovative solutions for the South African market.
+
+JOB DESCRIPTION:
+We are seeking an experienced Senior Software Developer to design, develop, and maintain high-quality software solutions. The ideal candidate will have a strong background in full-stack development and be passionate about creating efficient, scalable applications.
+
+REQUIREMENTS:
+• 5+ years of experience in software development
+• Strong proficiency in JavaScript/TypeScript and Python
+• Experience with React, Node.js, and modern frontend frameworks
+• Knowledge of cloud services (AWS, Azure, or GCP)
+• Experience with database design and optimization
+• Understanding of software development best practices
+• B-BBEE status advantageous
+• Bachelor's degree in Computer Science or related field (NQF Level 7 or higher)
+• South African citizenship or valid work permit
+
+RESPONSIBILITIES:
+• Design, implement, and maintain software applications
+• Collaborate with cross-functional teams to define and develop new features
+• Write clean, maintainable, and efficient code
+• Troubleshoot, debug, and upgrade existing systems
+• Participate in code reviews and mentor junior developers
+• Stay up-to-date with emerging trends and technologies
+
+BENEFITS:
+• Competitive salary
+• Medical aid and pension contributions
+• Flexible working arrangements
+• Professional development opportunities
+• Modern office in a prime location
+
+LOCATION:
+Cape Town, Western Cape
+(Remote work options available)
+
+START DATE:
+Immediate
+
+If you have the required skills and experience, please apply with your updated CV.`);
+              }}
+            >
+              Load Example Job
+            </button>
+          </div>
+        </div>
         </div>
 
         {/* Results section */}

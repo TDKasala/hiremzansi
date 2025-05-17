@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -16,11 +16,20 @@ import {
   Loader2,
   BookOpen,
   Clock,
-  Flag
+  Flag,
+  Printer,
+  Download,
+  Share2,
+  Copy,
+  FileDown
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Types for the analysis result
 interface AnalysisResult {
@@ -44,6 +53,8 @@ interface ATSAnalysisResultProps {
 }
 
 const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading = false }) => {
+  const resultCardRef = useRef<HTMLDivElement>(null);
+  
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600';
     if (score >= 65) return 'text-amber-500';
@@ -65,6 +76,76 @@ const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading
     return 'bg-red-100 text-red-800';
   };
   
+  // Function to generate PDF from the results
+  const generatePDF = async () => {
+    if (!resultCardRef.current) return;
+    
+    try {
+      // Show loading state UI here if needed
+      
+      const canvas = await html2canvas(resultCardRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      
+      pdf.addImage(imgData, 'PNG', imgX, 10, imgWidth * ratio, imgHeight * ratio);
+      
+      // Add footer with date and website info
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Generated on ${new Date().toLocaleDateString()} by ATSBoost.co.za`, 10, pdfHeight - 10);
+      
+      pdf.save(`CV_ATS_Analysis_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Show error message UI here if needed
+    }
+  };
+  
+  // Function to copy a shareable summary to clipboard
+  const copyShareableSummary = () => {
+    const summary = `
+🔍 ATS CV Analysis Results
+
+Overall Score: ${result.score}% (${result.rating})
+${result.sa_score ? `South African Relevance: ${result.sa_score}% (${result.sa_relevance})` : ''}
+${result.job_match ? `Job Match: ${result.job_match.matchScore}% (${result.job_match.jobRelevance} Relevance)` : ''}
+
+Strengths:
+${result.strengths.map(s => `✓ ${s}`).join('\n')}
+
+Areas for Improvement:
+${result.weaknesses.map(w => `→ ${w}`).join('\n')}
+
+Skills Identified:
+${result.skills ? result.skills.join(', ') : 'None identified'}
+
+Analyzed with ATSBoost.co.za - South Africa's AI-powered CV optimization platform
+    `;
+    
+    navigator.clipboard.writeText(summary)
+      .then(() => {
+        // Show success message (could use toast here)
+        alert('Summary copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy:', err);
+        // Show error message
+      });
+  };
+  
   if (isLoading) {
     return (
       <Card className="h-full flex flex-col justify-center items-center p-6">
@@ -78,17 +159,56 @@ const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading
   }
   
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col" ref={resultCardRef}>
       <CardHeader className="pb-3">
-        <CardTitle className="text-xl flex justify-between items-center">
-          <span>ATS Analysis Results</span>
-          <Badge variant="outline" className="ml-2 font-normal">
-            {new Date().toLocaleDateString()}
-          </Badge>
-        </CardTitle>
-        <CardDescription>
-          Based on South African ATS standards and hiring practices
-        </CardDescription>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl">ATS Analysis Results</CardTitle>
+            <CardDescription>
+              Based on South African ATS standards and hiring practices
+            </CardDescription>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Badge variant="outline" className="mr-2 font-normal">
+              {new Date().toLocaleDateString()}
+            </Badge>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8" 
+                    onClick={generatePDF}
+                  >
+                    <Printer className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Save as PDF</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8" 
+                    onClick={copyShareableSummary}
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Copy shareable summary</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col">
@@ -238,7 +358,7 @@ const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading
                 <span className="text-xs text-center text-muted-foreground mt-1">Add job description</span>
                 <div className="mt-3">
                   <Badge variant="outline" className="border-dashed">
-                    <Upload className="h-3 w-3 mr-1" /> Add Job Info
+                    <FileDown className="h-3 w-3 mr-1" /> Add Job Info
                   </Badge>
                 </div>
               </div>
