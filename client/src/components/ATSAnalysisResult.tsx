@@ -106,10 +106,11 @@ const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading
           
           <Progress 
             value={result.score} 
-            className="w-full mt-4" 
-            indicatorClassName={result.score >= 80 ? "bg-green-500" : 
-                                result.score >= 65 ? "bg-amber-500" : 
-                                result.score >= 50 ? "bg-amber-600" : "bg-red-500"}
+            className={`w-full mt-4 ${
+              result.score >= 80 ? "bg-green-100" : 
+              result.score >= 65 ? "bg-amber-100" : 
+              result.score >= 50 ? "bg-amber-200" : "bg-red-100"
+            }`}
           />
         </div>
         
