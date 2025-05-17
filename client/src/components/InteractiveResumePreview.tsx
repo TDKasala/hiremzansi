@@ -78,7 +78,7 @@ export default function InteractiveResumePreview({
   jobDescription = ""
 }: InteractiveResumePreviewProps) {
   const { toast } = useToast();
-  const [resumeContent, setResumeContent] = useState(initialContent || defaultResumeTemplate);
+  const [resumeContent, setResumeContent] = useState(initialContent || defaultCVTemplate);
   const [jobDesc, setJobDesc] = useState(jobDescription || "");
   const [showResults, setShowResults] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -322,7 +322,7 @@ export default function InteractiveResumePreview({
         className="w-full"
       >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="resume">Resume Content</TabsTrigger>
+          <TabsTrigger value="resume">CV Content</TabsTrigger>
           <TabsTrigger value="results" disabled={!showResults}>ATS Results</TabsTrigger>
         </TabsList>
         
@@ -332,16 +332,16 @@ export default function InteractiveResumePreview({
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="mr-2 h-5 w-5 text-primary" />
-                  Your Resume
+                  Your CV
                 </CardTitle>
                 <CardDescription>
-                  Enter your resume content for real-time ATS analysis
+                  Enter your CV content for real-time ATS analysis
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Textarea 
                   className="min-h-[300px] font-mono text-sm resize-none"
-                  placeholder="Paste your resume content here..."
+                  placeholder="Paste your CV content here..."
                   value={resumeContent}
                   onChange={(e) => setResumeContent(e.target.value)}
                 />
@@ -349,7 +349,7 @@ export default function InteractiveResumePreview({
               <CardFooter className="flex justify-between">
                 <Button 
                   variant="outline" 
-                  onClick={() => setResumeContent(defaultResumeTemplate)}
+                  onClick={() => setResumeContent(defaultCVTemplate)}
                 >
                   Use Template
                 </Button>
@@ -410,7 +410,7 @@ export default function InteractiveResumePreview({
                 <h2 className="text-xl font-semibold">ATS Analysis Results</h2>
                 <Button variant="outline" onClick={resetAnalysis}>
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit Resume
+                  Edit CV
                 </Button>
               </div>
               
@@ -421,7 +421,7 @@ export default function InteractiveResumePreview({
                     <div className="mb-4 md:mb-0">
                       <h3 className="text-xl font-semibold mb-2">Overall ATS Score</h3>
                       <p className="text-muted-foreground">
-                        How well your resume performs with Applicant Tracking Systems
+                        How well your CV performs with Applicant Tracking Systems
                       </p>
                     </div>
                     <div className="flex flex-col items-center">
