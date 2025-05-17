@@ -1,12 +1,12 @@
-import { generateTextCompletion, analyzeText, testAbacusAI as testConnection } from './services/abacusAI.ts';
+import { generateTextCompletion, analyzeText, testOpenAI } from './services/openAI';
 
-async function runAbacusAITests() {
-  console.log("Testing Abacus AI API...");
+async function runTests() {
+  console.log("Testing OpenAI API Integration...");
 
   try {
     // Test connectivity
     console.log("Testing basic connectivity...");
-    const isWorking = await testConnection();
+    const isWorking = await testOpenAI();
     console.log(`Basic connectivity test: ${isWorking ? "PASSED" : "FAILED"}`);
 
     // Test text generation
@@ -64,5 +64,5 @@ University of Cape Town, 2018
   }
 }
 
-// Run the test
-runAbacusAITests();
+// Run the tests
+runTests();

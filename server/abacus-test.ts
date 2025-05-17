@@ -1,12 +1,12 @@
-import { generateTextCompletion, analyzeText, testAbacusAI as testConnection } from './services/abacusAI.ts';
+import { generateTextCompletion, analyzeText, testAbacusAI } from './services/abacusAI';
 
-async function runAbacusAITests() {
+async function runTests() {
   console.log("Testing Abacus AI API...");
 
   try {
     // Test connectivity
     console.log("Testing basic connectivity...");
-    const isWorking = await testConnection();
+    const isWorking = await testAbacusAI();
     console.log(`Basic connectivity test: ${isWorking ? "PASSED" : "FAILED"}`);
 
     // Test text generation
@@ -64,5 +64,5 @@ University of Cape Town, 2018
   }
 }
 
-// Run the test
-runAbacusAITests();
+// Run the tests
+runTests();
