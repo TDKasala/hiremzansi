@@ -85,6 +85,7 @@ function App() {
                   <Route path="/realtime-ats" component={RealtimeATSPage} />
                   <Route path="/refer" component={ReferralPage} />
                   <Route path="/ats-analyzer" component={ATSAnalyzerPage} />
+                  <Route path="/ats-demo" component={AtsDemoPage} />
                   
                   {/* Original blog post */}
                   <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />

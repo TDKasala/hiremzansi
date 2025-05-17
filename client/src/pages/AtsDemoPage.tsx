@@ -1,3 +1,10 @@
+/**
+ * ATS Analyzer Demo Page 
+ * 
+ * A simplified, fully client-side implementation of the ATS analyzer
+ * that works without needing server-side functionality.
+ */
+
 import { useState } from 'react';
 import { 
   Card, 
@@ -14,16 +21,185 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Upload } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ATSAnalysisResult from '@/components/ATSAnalysisResult';
-import { analyzeCVText, calculateJobMatch } from '@/lib/atsAnalyzer';
 
-const ATSAnalyzerPage = () => {
+// South African specific keywords
+const SA_KEYWORDS = [
+  "south africa", "sa", "cape town", "johannesburg", "pretoria", "durban", 
+  "b-bbee", "bee", "bbbee", "nqf", "saqa", "matric", "seta", "unisa", "wits"
+];
+
+// Common skills to detect
+const COMMON_SKILLS = [
+  "javascript", "python", "java", "react", "angular", "node.js", 
+  "html", "css", "sql", "aws", "communication", "leadership", "excel"
+];
+
+/**
+ * Analyze CV text locally in the browser
+ */
+function analyzeCVText(text: string) {
+  const content = text.trim().toLowerCase();
+  const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
+  
+  // Check formatting factors
+  const hasSections = /education|experience|skills|qualifications|work history/i.test(content);
+  const hasBulletPoints = /•|-|\*/i.test(content);
+  const hasContactInfo = /email|phone|tel|mobile|address|linkedin/i.test(content);
+  const hasDateRanges = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec).+?-|to\b.+?(20\d{2}|present)/i.test(content);
+  const hasDates = /\b(20\d{2}|19\d{2})\b/i.test(content);
+  
+  // Calculate format score
+  const formatScore = Math.round(
+    (hasSections ? 25 : 0) +
+    (hasBulletPoints ? 25 : 0) +
+    (hasContactInfo ? 20 : 0) +
+    (hasDateRanges ? 15 : 0) +
+    (hasDates ? 15 : 0)
+  );
+  
+  // Check content quality
+  const avgLineLength = lines.reduce((sum, line) => sum + line.length, 0) / lines.length;
+  const hasActionVerbs = /\b(managed|developed|created|implemented|led|designed|improved|increased|reduced|achieved)\b/i.test(content);
+  const hasNumbers = /\b\d+%|\d+ percent|increased by \d+|decreased by \d+|reduced \d+|improved \d+/i.test(content);
+  const hasKeySkills = COMMON_SKILLS.some(skill => content.includes(skill.toLowerCase()));
+  
+  // Calculate content score
+  const contentScore = Math.round(
+    (avgLineLength > 30 && avgLineLength < 200 ? 25 : 0) +
+    (hasActionVerbs ? 25 : 0) +
+    (hasNumbers ? 25 : 0) +
+    (hasKeySkills ? 25 : 0)
+  );
+  
+  // Calculate South African context score
+  const foundSaKeywords = SA_KEYWORDS.filter(keyword => content.includes(keyword.toLowerCase()));
+  
+  const hasB_BBEE = /\b(b-bbee|bbbee|bee|broad.based black economic empowerment|level \d b-bbee)\b/i.test(content);
+  const hasNQF = /\bnqf level \d+\b|national qualifications framework|saqa/i.test(content);
+  const hasSaAddress = /\b(south africa|gauteng|western cape|eastern cape|kwazulu-natal|kzn|free state)\b/i.test(content);
+  
+  const saContextScore = Math.round(
+    ((foundSaKeywords.length > 0 ? Math.min(foundSaKeywords.length * 5, 30) : 0)) +
+    (hasB_BBEE ? 25 : 0) +
+    (hasNQF ? 25 : 0) + 
+    (hasSaAddress ? 20 : 0)
+  );
+  
+  // Extract skills
+  const skillsFound = COMMON_SKILLS.filter(skill => 
+    new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(content)
+  );
+  
+  // Calculate overall ATS score (format, content, and SA context)
+  const overallScore = Math.round(
+    formatScore * 0.3 + 
+    contentScore * 0.4 + 
+    saContextScore * 0.3
+  );
+  
+  // Determine rating
+  let rating = '';
+  if (overallScore >= 80) rating = 'Excellent';
+  else if (overallScore >= 65) rating = 'Good';
+  else if (overallScore >= 50) rating = 'Average';
+  else rating = 'Needs Improvement';
+  
+  // Determine SA relevance rating
+  let saRelevance = '';
+  if (saContextScore >= 80) saRelevance = 'Excellent';
+  else if (saContextScore >= 60) saRelevance = 'Good';
+  else if (saContextScore >= 40) saRelevance = 'Average';
+  else saRelevance = 'Low';
+  
+  // Generate strengths
+  const strengths: string[] = [];
+  
+  if (hasSections) strengths.push('Well-structured CV with clear sections');
+  if (hasBulletPoints) strengths.push('Effective use of bullet points improves readability');
+  if (hasActionVerbs) strengths.push('Uses strong action verbs to highlight achievements');
+  if (hasNumbers) strengths.push('Quantifies achievements with specific numbers');
+  if (hasKeySkills) strengths.push('Contains relevant skills that ATS systems look for');
+  if (hasDateRanges) strengths.push('Clear timeline of work experience');
+  if (hasB_BBEE) strengths.push('Includes B-BBEE status, important for South African employers');
+  if (hasNQF) strengths.push('Specifies NQF levels for qualifications');
+  if (hasSaAddress) strengths.push('Includes South African location information');
+  if (foundSaKeywords.length > 3) strengths.push('Well-optimized for South African job market');
+  
+  // Generate improvements
+  const improvements: string[] = [];
+  
+  if (!hasSections) improvements.push('Add clear section headings (Education, Experience, Skills)');
+  if (!hasBulletPoints) improvements.push('Use bullet points to highlight achievements');
+  if (!hasActionVerbs) improvements.push('Include strong action verbs to describe achievements');
+  if (!hasNumbers) improvements.push('Quantify achievements with specific numbers');
+  if (!hasKeySkills) improvements.push('Add industry-relevant skills and keywords');
+  if (!hasDateRanges) improvements.push('Include clear date ranges for education and work experience');
+  if (!hasB_BBEE && saContextScore < 60) improvements.push('Consider adding B-BBEE status information if applicable');
+  if (!hasNQF && saContextScore < 60) improvements.push('Add NQF levels to your qualifications');
+  if (!hasSaAddress && saContextScore < 60) improvements.push('Include your location in South Africa');
+  
+  // Format feedback
+  const formatFeedback: string[] = [];
+  
+  if (avgLineLength > 200) formatFeedback.push('Shorten your bullet points to 1-2 lines each');
+  if (!hasContactInfo) formatFeedback.push('Add complete contact information (phone, email, LinkedIn)');
+  if (content.length > 5000) formatFeedback.push('Consider shortening your CV to 2-3 pages maximum');
+  if (content.length < 1500) formatFeedback.push('Your CV may be too short - add more relevant details');
+  if (!hasDates) formatFeedback.push('Add dates to your work experience and education sections');
+  
+  // Shuffle arrays for variety
+  const shuffle = (arr: string[]) => [...arr].sort(() => Math.random() - 0.5);
+  
+  return {
+    overall_score: overallScore,
+    rating,
+    strengths: shuffle(strengths),
+    improvements: shuffle(improvements),
+    format_feedback: shuffle(formatFeedback),
+    skills_identified: shuffle(skillsFound.slice(0, 15)),
+    sa_score: saContextScore,
+    sa_relevance: saRelevance
+  };
+}
+
+/**
+ * Calculate job match score
+ */
+function calculateJobMatch(cvText: string, jobText: string) {
+  if (!cvText || !jobText) return null;
+  
+  const cv = cvText.toLowerCase();
+  const job = jobText.toLowerCase();
+  
+  // Extract potential keywords from job description
+  const jobWords = job.split(/\s+/)
+    .filter(word => word.length > 4) // Only words longer than 4 chars
+    .filter(word => !['and', 'the', 'for', 'with', 'that', 'this', 'have', 'from'].includes(word)); // Skip common words
+  
+  // Count word matches
+  const matches = jobWords.filter(word => cv.includes(word));
+  const matchPercentage = Math.min(90, Math.round((matches.length / jobWords.length) * 100));
+  
+  // Determine job relevance rating
+  let jobRelevance = 'Medium';
+  if (matchPercentage >= 75) jobRelevance = 'High';
+  else if (matchPercentage >= 50) jobRelevance = 'Medium';
+  else jobRelevance = 'Low';
+  
+  return {
+    matchScore: matchPercentage,
+    jobRelevance
+  };
+}
+
+const AtsDemoPage = () => {
   const [cvText, setCvText] = useState('');
   const [jobText, setJobText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!cvText.trim()) {
       setError('Please enter your CV text before analyzing');
       return;
@@ -59,7 +235,7 @@ const ATSAnalyzerPage = () => {
         
         setAnalysisResult(result);
         setIsAnalyzing(false);
-      }, 1500);
+      }, 1200);
     } catch (err) {
       setError('An error occurred while analyzing your CV. Please try again.');
       console.error('CV analysis error:', err);
@@ -211,4 +387,4 @@ const ATSAnalyzerPage = () => {
   );
 };
 
-export default ATSAnalyzerPage;
+export default AtsDemoPage;

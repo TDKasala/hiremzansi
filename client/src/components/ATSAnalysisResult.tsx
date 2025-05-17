@@ -6,30 +6,36 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Separator } from '@/components/ui/separator';
+  CheckCircle2, 
+  XCircle, 
+  AlertTriangle, 
+  InfoIcon,
+  ArrowUp,
+  Award,
+  Loader2,
+  BookOpen,
+  Clock,
+  Flag
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 
+// Types for the analysis result
 interface AnalysisResult {
   score: number;
   rating: string;
   strengths: string[];
   weaknesses: string[];
   suggestions: string[];
+  skills?: string[];
   sa_score?: number;
   sa_relevance?: string;
-  skills?: string[];
   job_match?: {
     matchScore: number;
     jobRelevance: string;
-  };
+  } | null;
 }
 
 interface ATSAnalysisResultProps {
@@ -37,205 +43,192 @@ interface ATSAnalysisResultProps {
   isLoading?: boolean;
 }
 
-const RatingBadge = ({ rating }: { rating: string }) => {
-  let color = "";
+const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ result, isLoading = false }) => {
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 65) return 'text-amber-500';
+    if (score >= 50) return 'text-amber-600';
+    return 'text-red-600';
+  };
   
-  switch (rating.toLowerCase()) {
-    case "excellent":
-      color = "bg-green-100 text-green-800 hover:bg-green-100";
-      break;
-    case "good":
-      color = "bg-blue-100 text-blue-800 hover:bg-blue-100";
-      break;
-    case "average":
-      color = "bg-amber-100 text-amber-800 hover:bg-amber-100";
-      break;
-    default:
-      color = "bg-red-100 text-red-800 hover:bg-red-100";
-  }
+  const getScoreBg = (score: number) => {
+    if (score >= 80) return 'bg-green-100';
+    if (score >= 65) return 'bg-amber-100';
+    if (score >= 50) return 'bg-amber-100';
+    return 'bg-red-100';
+  };
   
-  return (
-    <Badge variant="outline" className={color}>
-      {rating}
-    </Badge>
-  );
-};
-
-const ATSAnalysisResult: React.FC<ATSAnalysisResultProps> = ({ 
-  result,
-  isLoading = false
-}) => {
+  const getRelevanceColor = (relevance: string) => {
+    if (relevance === 'Excellent') return 'bg-green-100 text-green-800';
+    if (relevance === 'Good') return 'bg-amber-100 text-amber-800';
+    if (relevance === 'Average') return 'bg-orange-100 text-orange-800';
+    return 'bg-red-100 text-red-800';
+  };
+  
   if (isLoading) {
     return (
-      <Card className="w-full">
-        <CardHeader className="pb-2">
-          <CardTitle>Analyzing your CV...</CardTitle>
-          <CardDescription>Evaluating your CV against South African ATS systems</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-12 bg-gray-200 rounded"></div>
-            <div className="h-20 bg-gray-200 rounded"></div>
-          </div>
-        </CardContent>
+      <Card className="h-full flex flex-col justify-center items-center p-6">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500 mb-4" />
+        <h3 className="text-lg font-medium">Analyzing Your CV</h3>
+        <p className="text-sm text-muted-foreground mt-2">
+          Please wait while we analyze your CV for ATS compatibility...
+        </p>
       </Card>
     );
   }
-
-  const { score, rating, strengths, weaknesses, suggestions, sa_score, sa_relevance, skills, job_match } = result;
   
-  // Score color based on value
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-blue-600";
-    if (score >= 40) return "text-amber-600";
-    return "text-red-600";
-  };
-
-  // Progress color based on value
-  const getProgressColor = (score: number) => {
-    if (score >= 80) return "bg-green-600";
-    if (score >= 60) return "bg-blue-600";
-    if (score >= 40) return "bg-amber-600";
-    return "bg-red-600";
-  };
-
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle>CV Analysis Results</CardTitle>
-          <RatingBadge rating={rating} />
-        </div>
-        <CardDescription>Analysis of your CV with South African context</CardDescription>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-xl flex justify-between items-center">
+          <span>ATS Analysis Results</span>
+          <Badge variant="outline" className="ml-2 font-normal">
+            {new Date().toLocaleDateString()}
+          </Badge>
+        </CardTitle>
+        <CardDescription>
+          Based on South African ATS standards and hiring practices
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        {/* Overall score */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-medium">Overall ATS Score</h3>
-            <span className={`text-2xl font-bold ${getScoreColor(score)}`}>{score}%</span>
+      
+      <CardContent className="flex-1 flex flex-col">
+        {/* Overall Score */}
+        <div className="flex flex-col items-center justify-center p-4 mb-4 rounded-lg border bg-background">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+            Overall ATS Score
           </div>
+          <div className={`text-4xl font-bold mb-2 ${getScoreColor(result.score)}`}>
+            {result.score}%
+          </div>
+          <Badge className={`${getScoreBg(result.score)} hover:${getScoreBg(result.score)} border-0`}>
+            {result.rating}
+          </Badge>
+          
           <Progress 
-            value={score} 
-            className={`h-2 ${getProgressColor(score)}`} 
+            value={result.score} 
+            className="w-full mt-4" 
+            indicatorClassName={result.score >= 80 ? "bg-green-500" : 
+                                result.score >= 65 ? "bg-amber-500" : 
+                                result.score >= 50 ? "bg-amber-600" : "bg-red-500"}
           />
         </div>
-
-        {/* South African relevance score */}
-        {sa_score !== undefined && (
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium">South African Relevance</h3>
-              <div className="flex items-center">
-                <span className={`text-lg font-medium ${getScoreColor(sa_score)}`}>{sa_score}%</span>
-                <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700">
-                  {sa_relevance}
+        
+        {/* South African Context Score */}
+        {result.sa_score !== undefined && (
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="flex flex-col items-center p-3 rounded-lg border bg-background">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                SA Relevance
+              </div>
+              <div className={`text-2xl font-bold ${getScoreColor(result.sa_score)}`}>
+                {result.sa_score}%
+              </div>
+              {result.sa_relevance && (
+                <Badge className={getRelevanceColor(result.sa_relevance)}>
+                  {result.sa_relevance}
+                </Badge>
+              )}
+            </div>
+            
+            {/* Job Match Score */}
+            {result.job_match ? (
+              <div className="flex flex-col items-center p-3 rounded-lg border bg-background">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                  Job Match
+                </div>
+                <div className={`text-2xl font-bold ${getScoreColor(result.job_match.matchScore)}`}>
+                  {result.job_match.matchScore}%
+                </div>
+                <Badge className={getRelevanceColor(result.job_match.jobRelevance)}>
+                  {result.job_match.jobRelevance} Relevance
                 </Badge>
               </div>
-            </div>
-            <Progress 
-              value={sa_score} 
-              className={`h-2 ${getProgressColor(sa_score)}`} 
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              How well your CV is optimized for South African employers
-            </p>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-3 rounded-lg border bg-background">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+                  Job Match
+                </div>
+                <div className="text-xl text-muted-foreground">N/A</div>
+                <span className="text-xs text-center text-muted-foreground mt-1">Add job description</span>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Job match score if available */}
-        {job_match && (
-          <div className="mb-6 p-3 border rounded-md bg-blue-50">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium">Job Match Score</h3>
-              <span className={`text-lg font-medium ${getScoreColor(job_match.matchScore)}`}>{job_match.matchScore}%</span>
-            </div>
-            <Progress 
-              value={job_match.matchScore} 
-              className={`h-2 ${getProgressColor(job_match.matchScore)}`} 
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Job relevance: {job_match.jobRelevance}
-            </p>
-          </div>
-        )}
-
-        <Accordion type="single" collapsible className="w-full">
+        
+        {/* Key Findings */}
+        <div className="space-y-4 mb-4">
           {/* Strengths */}
-          <AccordionItem value="strengths">
-            <AccordionTrigger className="text-green-600">
-              <div className="flex items-center">
-                <CheckCircle className="mr-2 h-4 w-4" /> 
-                Strengths
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-2 pl-6">
-                {strengths.map((strength, index) => (
-                  <li key={index} className="list-disc text-green-700">
-                    {strength}
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Areas for improvement */}
-          <AccordionItem value="weaknesses">
-            <AccordionTrigger className="text-red-600">
-              <div className="flex items-center">
-                <XCircle className="mr-2 h-4 w-4" />
-                Areas for Improvement
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-2 pl-6">
-                {weaknesses.map((weakness, index) => (
-                  <li key={index} className="list-disc text-red-600">
-                    {weakness}
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
+          <div>
+            <h3 className="text-sm font-medium flex items-center mb-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600 mr-2" />
+              Strengths
+            </h3>
+            <ul className="space-y-1 pl-6">
+              {result.strengths.map((strength, index) => (
+                <li key={index} className="text-sm text-green-800 list-disc">
+                  {strength}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Weaknesses/Areas for Improvement */}
+          <div>
+            <h3 className="text-sm font-medium flex items-center mb-2">
+              <ArrowUp className="h-4 w-4 text-amber-600 mr-2" />
+              Areas for Improvement
+            </h3>
+            <ul className="space-y-1 pl-6">
+              {result.weaknesses.map((weakness, index) => (
+                <li key={index} className="text-sm text-amber-800 list-disc">
+                  {weakness}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
           {/* Suggestions */}
-          <AccordionItem value="suggestions">
-            <AccordionTrigger className="text-amber-600">
-              <div className="flex items-center">
-                <AlertCircle className="mr-2 h-4 w-4" />
-                Format Suggestions
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-2 pl-6">
-                {suggestions.map((suggestion, index) => (
-                  <li key={index} className="list-disc text-amber-600">
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        {/* Skills identified */}
-        {skills && skills.length > 0 && (
-          <div className="mt-6">
-            <Separator className="my-2" />
-            <h3 className="text-sm font-medium mb-2">Key Skills Identified</h3>
+          <div>
+            <h3 className="text-sm font-medium flex items-center mb-2">
+              <InfoIcon className="h-4 w-4 text-blue-600 mr-2" />
+              Quick Suggestions
+            </h3>
+            <ul className="space-y-1 pl-6">
+              {result.suggestions.map((suggestion, index) => (
+                <li key={index} className="text-sm text-blue-800 list-disc">
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        
+        {/* Skills Identified */}
+        {result.skills && result.skills.length > 0 && (
+          <div className="mt-auto">
+            <Separator className="my-4" />
+            <h3 className="text-sm font-medium mb-2">Skills Identified</h3>
             <div className="flex flex-wrap gap-2">
-              {skills.map((skill, index) => (
-                <Badge key={index} variant="secondary">
+              {result.skills.map((skill, index) => (
+                <Badge key={index} variant="secondary" className="bg-slate-100">
                   {skill}
                 </Badge>
               ))}
             </div>
           </div>
         )}
+        
+        {/* South African-specific advice */}
+        <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-100 text-xs text-amber-800">
+          <div className="flex items-start">
+            <Flag className="h-4 w-4 mr-2 mt-0.5" />
+            <div>
+              <p className="font-medium">South African Tip</p>
+              <p>Including your B-BBEE status, NQF levels, and South African certifications can significantly improve your CV's performance with local employers.</p>
+            </div>
+          </div>
+        </div>
+        
       </CardContent>
     </Card>
   );
