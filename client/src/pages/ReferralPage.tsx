@@ -312,9 +312,11 @@ export default function ReferralPage() {
               <Copy className="mr-2 h-4 w-4" />
               Copy Referral Link
             </Button>
-            <Button variant="outline" onClick={() => window.open('/jobs', '_self')}>
-              Job Board
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button variant="outline" asChild>
+              <Link href="/job-sites">
+                Job Board
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>
@@ -358,9 +360,11 @@ export default function ReferralPage() {
                 Your network needs quality CV feedback to succeed in South Africa's job market.
                 Share ATSBoost and get valuable tools to boost your own career journey.
               </p>
-              <Button variant="default" className="bg-white text-secondary hover:bg-white/90" onClick={() => window.open('/refer', '_self')}>
-                Start Referring Now
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button variant="default" className="bg-white text-secondary hover:bg-white/90" asChild>
+                <Link href="/refer">
+                  Start Referring Now
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
             </div>
           </CardContent>
@@ -418,9 +422,11 @@ export default function ReferralPage() {
             <Share2 className="mr-2 h-5 w-5" />
             Share Your Referral Link
           </Button>
-          <Button size="lg" variant="outline" onClick={() => window.open('/tools/ats-keywords', '_self')}>
-            Try ATS Keywords Tool
-            <ArrowRight className="ml-2 h-5 w-5" />
+          <Button size="lg" variant="outline" asChild>
+            <Link href="/tools/ats-keywords">
+              Try ATS Keywords Tool
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
         </div>
       </div>
