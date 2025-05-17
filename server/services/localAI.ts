@@ -241,7 +241,8 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[], saEl
   
   return {
     score: Math.min(score, 100),
-    feedback
+    feedback,
+    saElements
   };
 }
 
@@ -250,11 +251,12 @@ function analyzeFormat(cvText: string): {score: number, feedback: string[], saEl
  * @param cvText The CV text content 
  * @returns ATS score and feedback
  */
-function scoreAgainstATS(cvText: string): {score: number, strengths: string[], improvements: string[]} {
+function scoreAgainstATS(cvText: string): {score: number, strengths: string[], improvements: string[], saScore: number} {
   const text = cvText.toLowerCase();
   const strengths: string[] = [];
   const improvements: string[] = [];
   let score = 0;
+  let saScore = 0; // South African specific score
   
   // Check skills presence
   const skills = extractSkills(cvText);
@@ -281,29 +283,78 @@ function scoreAgainstATS(cvText: string): {score: number, strengths: string[], i
   
   // Check for keyword density
   let keywordMatches = 0;
+  let saTotalKeywords = 0;
+  let saMatchedKeywords = 0;
+  
+  // Count SA-specific keywords for each industry
   for (const industry in INDUSTRY_KEYWORDS) {
-    INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS].forEach(keyword => {
-      if (text.includes(keyword)) {
-        keywordMatches++;
-      }
-    });
+    const allKeywords = INDUSTRY_KEYWORDS[industry as keyof typeof INDUSTRY_KEYWORDS];
+    const industryKeywords = allKeywords.filter(keyword => text.includes(keyword));
+    
+    keywordMatches += industryKeywords.length;
+    
+    // Calculate South African specific keywords
+    // We consider SA-specific ones after the general terms in each category
+    const generalTermsCount = 11; // First 11 items in each array are general terms
+    const saKeywords = allKeywords.slice(generalTermsCount);
+    saTotalKeywords += saKeywords.length;
+    
+    const matchedSaKeywords = saKeywords.filter(keyword => text.includes(keyword));
+    saMatchedKeywords += matchedSaKeywords.length;
   }
   
+  // Score general keywords
   if (keywordMatches >= 8) {
     strengths.push("Strong keyword optimization for ATS");
-    score += 25;
+    score += 20;
   } else if (keywordMatches >= 4) {
     strengths.push("Good keyword presence, but could be improved");
-    score += 15;
+    score += 10;
   } else {
     improvements.push("Add more industry-relevant keywords to pass ATS screening");
     score += 5;
   }
   
+  // Score SA-specific keywords
+  if (saMatchedKeywords >= 6) {
+    strengths.push("Excellent South African industry keywords - well optimized for local employers");
+    score += 10;
+    saScore += 25;
+  } else if (saMatchedKeywords >= 3) {
+    strengths.push("Good South African context, but could add more local industry terms");
+    score += 5;
+    saScore += 15;
+  } else if (saMatchedKeywords > 0) {
+    improvements.push("Add more South African industry-specific keywords to improve local relevance");
+    saScore += 5;
+  } else {
+    improvements.push("Include South African companies, institutions or industry terms relevant to your field");
+    saScore += 0;
+  }
+  
+  // Check for South African education formatting
+  if (/matric|national senior certificate|nsc/i.test(text)) {
+    if (/matric .*?with|nsc .*?with|distinction/i.test(text)) {
+      strengths.push("Clearly formatted South African education qualifications with achievement levels");
+      saScore += 10;
+    } else {
+      strengths.push("Includes South African basic education qualification (Matric/NSC)");
+      saScore += 5;
+    }
+  }
+  
+  // Check for NQF levels 
+  if (/nqf level \d|nqf \d/i.test(text)) {
+    strengths.push("Includes NQF levels for qualifications - important for South African employers");
+    saScore += 10;
+  } else if (/diploma|degree|qualification/i.test(text)) {
+    improvements.push("Consider adding NQF levels to your qualifications for South African employer clarity");
+  }
+  
   // Check file format readability (simplified)
   if (text.includes('summary') || text.includes('profile') || text.includes('objective')) {
     strengths.push("Good structure with clear sections");
-    score += 15;
+    score += 10;
   } else {
     improvements.push("Add clear section headings like 'Professional Summary', 'Work Experience'");
     score += 5;
@@ -321,8 +372,18 @@ function scoreAgainstATS(cvText: string): {score: number, strengths: string[], i
     score += 5;
   }
   
+  // Check for job title matching
+  if (/position|job title|role|designation/i.test(text)) {
+    strengths.push("Includes clear job titles which helps with ATS keyword matching");
+    score += 10;
+  } else {
+    improvements.push("Ensure each position includes a clear, industry-standard job title");
+    score += 0;
+  }
+  
   // Final score capping
   score = Math.min(score, 100);
+  saScore = Math.min(saScore, 100);
   
   // Ensure we have at least one strength and one improvement
   if (strengths.length === 0) {
@@ -336,7 +397,8 @@ function scoreAgainstATS(cvText: string): {score: number, strengths: string[], i
   return {
     score,
     strengths,
-    improvements
+    improvements,
+    saScore
   };
 }
 
@@ -357,7 +419,12 @@ export function analyzeCVText(cvText: string): any {
     const atsScore = scoreAgainstATS(cvText);
     
     // Calculate overall score (weighted average)
-    const overallScore = Math.round((formatAnalysis.score * 0.4) + (atsScore.score * 0.6));
+    // Include South African relevance in the scoring
+    const overallScore = Math.round(
+      (formatAnalysis.score * 0.3) + 
+      (atsScore.score * 0.5) + 
+      (atsScore.saScore * 0.2)
+    );
     
     // Determine rating based on overall score
     let rating = "Poor";
@@ -369,6 +436,16 @@ export function analyzeCVText(cvText: string): any {
       rating = "Average";
     }
     
+    // Determine South African relevance rating
+    let saRelevance = "Low";
+    if (atsScore.saScore >= 80) {
+      saRelevance = "Excellent";
+    } else if (atsScore.saScore >= 60) {
+      saRelevance = "High";
+    } else if (atsScore.saScore >= 40) {
+      saRelevance = "Medium";
+    }
+    
     return {
       success: true,
       timestamp: new Date().toISOString(),
@@ -376,6 +453,9 @@ export function analyzeCVText(cvText: string): any {
       rating: rating,
       ats_score: atsScore.score,
       format_score: formatAnalysis.score,
+      sa_score: atsScore.saScore,
+      sa_relevance: saRelevance,
+      sa_elements: formatAnalysis.saElements,
       skills_identified: skills,
       strengths: atsScore.strengths,
       improvements: atsScore.improvements,

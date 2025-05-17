@@ -920,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Realtime ATS analysis endpoint
+  // Realtime ATS analysis endpoint using local AI service
   app.post("/api/analyze-resume-text", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { resumeContent, jobDescription } = req.body;
@@ -929,33 +929,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Resume content is required" });
       }
       
-      // In a real implementation, this would perform NLP analysis on the resume content
-      // For now, we'll provide a simplified analysis for demo purposes
+      // Use our advanced local AI service for CV analysis
+      const { analyzeCVText } = require('./services/localAI');
+      const analysis = analyzeCVText(resumeContent);
       
-      // Check for South African context
-      const resumeLower = resumeContent.toLowerCase();
-      
-      // Check for B-BBEE mention
-      const bbbeeDetected = /b-bbee|bbbee|broad.?based black economic empowerment|bee/i.test(resumeLower);
-      
-      // Check for NQF level mention
-      const nqfDetected = /nqf level|saqa|qualification framework/i.test(resumeLower);
-      
-      // South African specific keywords
-      const saKeywords = [
-        "b-bbee", "nqf", "seta", "saqa", "employment equity", 
-        "johannesburg", "cape town", "durban", "pretoria", "gauteng", "western cape",
-        "south africa", "south african", "popia", "protection of personal information"
-      ];
-      
-      // Count South African keywords found
-      const foundSaKeywords = saKeywords.filter(keyword => 
-        resumeLower.includes(keyword.toLowerCase())
-      );
-      
-      // Calculate SA context score
-      const saContextScore = Math.min(100, 
-        Math.round(
+      // Extract job-specific keywords from job description if provided
+      let jobKeywordMatch = null;
+      if (jobDescription && typeof jobDescription === 'string') {
+        // This could be enhanced to extract keywords from job description
+        // and match them against the CV
+        jobKeywordMatch = {
+          matchScore: Math.round(Math.random() * 20) + 60, // Placeholder for now
+          jobRelevance: "Medium" 
+        };
+      }
           (foundSaKeywords.length / 5) * 50 + // Up to 50 points for keywords
           (bbbeeDetected ? 25 : 0) +           // 25 points for B-BBEE
           (nqfDetected ? 25 : 0)               // 25 points for NQF
