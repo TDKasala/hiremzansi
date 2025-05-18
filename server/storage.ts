@@ -289,63 +289,75 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCV(insertCV: InsertCV): Promise<CV> {
-    const now = new Date();
-    
-    // CRITICAL FIX: Build a clean object explicitly for all required fields
-    const cleanCV = {
-      userId: insertCV.userId,
-      fileName: insertCV.fileName || `cv_${Date.now()}.pdf`,
-      fileType: insertCV.fileType || "application/pdf",
-      fileSize: insertCV.fileSize || 0,
-      content: insertCV.content || " ", 
-      title: insertCV.title || "CV",
-      isGuest: insertCV.isGuest || false,
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    // Log the exact data going to the database for debugging
-    console.log("STORAGE: Creating CV with explicit cleaned data:", {
-      fileName: cleanCV.fileName,
-      fileType: cleanCV.fileType,
-      fileSize: cleanCV.fileSize,
-      userId: cleanCV.userId
-    });
-    
-    // Execute direct SQL query to ensure all fields are explicitly provided
+    // Use raw SQL to bypass any ORM issues - this ensures file_name is explicitly set
     try {
-      const result = await db
-        .insert(cvs)
-        .values(cleanCV)
-        .returning();
-        
-      if (!result || result.length === 0) {
-        throw new Error("No CV record returned after insert");
+      // Generate a guaranteed valid filename with timestamp for uniqueness
+      const timestamp = Date.now();
+      const safeFileName = `cv_${timestamp}.pdf`;
+      
+      // Prepare safe values for critical fields to satisfy the NOT NULL constraints
+      const sql = `
+        INSERT INTO cvs (
+          user_id, 
+          file_name, 
+          file_type, 
+          file_size, 
+          content, 
+          title, 
+          is_guest, 
+          created_at, 
+          updated_at
+        ) 
+        VALUES (
+          $1, 
+          $2, 
+          $3, 
+          $4, 
+          $5, 
+          $6, 
+          $7, 
+          NOW(), 
+          NOW()
+        )
+        RETURNING *
+      `;
+
+      // Get safe values with fallbacks for all required fields
+      const userId = insertCV.userId;  // This can be null for guests
+      const fileName = insertCV.fileName || safeFileName;
+      const fileType = insertCV.fileType || 'application/pdf';
+      const fileSize = insertCV.fileSize || 0;
+      const content = insertCV.content || ' ';
+      const title = insertCV.title || 'CV';
+      const isGuest = insertCV.isGuest || false;
+      
+      console.log("DIRECT SQL CV UPLOAD:", {
+        userId, fileName, fileType, fileSize, 
+        contentLength: content ? content.length : 0,
+        title, isGuest
+      });
+      
+      // Execute the SQL directly to ensure database constraints are met
+      const result = await db.execute(sql, [
+        userId,
+        fileName,
+        fileType,
+        fileSize,
+        content,
+        title,
+        isGuest
+      ]);
+      
+      console.log("CV upload SQL result:", result.rows[0]);
+      
+      if (!result || !result.rows || result.rows.length === 0) {
+        throw new Error("No CV returned after insert");
       }
       
-      return result[0];
+      return result.rows[0] as CV;
     } catch (error) {
-      console.error("CV INSERT ERROR:", error);
-      // Create a fallback CV object that matches the DB schema if the insert fails
-      // This is for development/testing only
-      const fallbackCV: CV = {
-        id: -1, // Will be changed by client error handling
-        userId: cleanCV.userId,
-        fileName: cleanCV.fileName,
-        fileType: cleanCV.fileType,
-        fileSize: cleanCV.fileSize,
-        content: cleanCV.content,
-        title: cleanCV.title,
-        description: null,
-        isDefault: false,
-        targetPosition: null,
-        targetIndustry: null, 
-        jobDescription: null,
-        isGuest: cleanCV.isGuest,
-        createdAt: now,
-        updatedAt: now
-      };
-      throw error; // Re-throw the error after logging
+      console.error("FATAL CV UPLOAD ERROR:", error);
+      throw error;
     }
   }
 

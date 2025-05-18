@@ -136,7 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get title from form data or use filename as the title, or fallback to default
       const title = req.body.title || (req.file.originalname ? req.file.originalname.replace(/\.[^/.]+$/, "") : "Untitled CV");
       const isGuest = !req.isAuthenticated();
-      let userId = isGuest ? null : (req.user ? req.user.id : null);
+      
+      // CRITICAL FIX: Handle user ID correctly - guest uploads have null userIds
+      const userId = isGuest ? null : (req.isAuthenticated() && req.user ? req.user.id : null);
       
       // Extract text based on file type
       let textContent = "";
