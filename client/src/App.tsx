@@ -29,6 +29,7 @@ import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import JobSeekerToolsPage from "@/pages/JobSeekerToolsPage";
 import ATSResultsPage from "@/pages/ATSResultsPage";
+import MotivationDemoPage from "@/pages/MotivationDemoPage";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
@@ -124,6 +125,7 @@ function App() {
                   <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
                   <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
                   <Route path="/ats-results" component={() => <ATSResultsPage />} />
+                  <Route path="/motivation-demo" component={() => <MotivationDemoPage />} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />

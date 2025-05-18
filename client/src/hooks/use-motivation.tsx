@@ -1,223 +1,162 @@
-import { createContext, ReactNode, useContext, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 
-// Types for the motivation context
-type MotivationType = 'upload' | 'score' | 'daily' | 'milestone';
-
-interface MotivationState {
-  latestType: MotivationType | null;
-  latestTrigger: string | number | null;
-  seenMotivations: Record<string, boolean>;
-  activityStreak: number;
-  lastActivityDate: string | null;
-  activeAchievement: string | null;
-}
+type MotivationType = 'general' | 'upload' | 'analysis' | 'improvement' | 'application';
 
 interface MotivationContextType {
-  motivationState: MotivationState;
-  triggerMotivation: (type: MotivationType, trigger?: string | number) => void;
-  dismissMotivation: (type: MotivationType, trigger?: string | number) => void;
-  shouldShowMotivation: (type: MotivationType, trigger?: string | number) => boolean;
-  triggerAchievement: (achievementId: string) => void;
-  dismissAchievement: () => void;
+  showMotivation: (type: MotivationType) => void;
+  celebrateProgress: (achievement: string) => void;
+  motivationEnabled: boolean;
+  setMotivationEnabled: (enabled: boolean) => void;
 }
 
-// Create the context
-export const MotivationContext = createContext<MotivationContextType | null>(null);
+const MotivationContext = createContext<MotivationContextType | undefined>(undefined);
 
-// Initial state for the motivation
-const initialState: MotivationState = {
-  latestType: null,
-  latestTrigger: null,
-  seenMotivations: {},
-  activityStreak: 0,
-  lastActivityDate: null,
-  activeAchievement: null,
+// Motivational messages by category
+const MOTIVATIONAL_MESSAGES = {
+  general: [
+    "Keep going! Every step brings you closer to your dream job.",
+    "Your efforts today are building your success tomorrow.",
+    "You've got this! Your dedication will pay off.",
+    "Small progress is still progress. Keep going!",
+    "Believe in yourself as much as we believe in you!"
+  ],
+  upload: [
+    "Great job uploading your CV! First step complete.",
+    "CV uploaded successfully! Let's optimize it together.",
+    "Your CV is now ready for analysis. You're on the right track!",
+    "That's a solid first step. Your CV is now in our system."
+  ],
+  analysis: [
+    "Taking time to analyze your CV shows real commitment to your career.",
+    "By analyzing your CV, you're already ahead of many job seekers.",
+    "Understanding your CV's strengths and weaknesses is key to success.",
+    "Knowledge is power! This analysis will help you stand out."
+  ],
+  improvement: [
+    "Each improvement to your CV increases your chances of success.",
+    "Small changes can make a big difference. Keep refining!",
+    "You're making your CV stronger with every edit.",
+    "Fantastic work on improving your CV! It's looking better already."
+  ],
+  application: [
+    "Your optimized CV is ready to impress employers!",
+    "You've put in the work - now go confidently to your applications.",
+    "With your improved CV, you're setting yourself up for success.",
+    "Your dedication to perfecting your CV will be noticed by employers."
+  ]
 };
 
-// Key for local storage
-const MOTIVATION_STORAGE_KEY = 'atsboost_motivation_state';
+// South African specific motivational messages
+const SA_MOTIVATIONAL_MESSAGES = [
+  "Including your B-BBEE status makes your CV more relevant for South African employers.",
+  "Adding NQF levels to your qualifications helps South African recruiters understand your education.",
+  "Mentioning experience with local regulations shows your value to South African companies.",
+  "Your knowledge of South African business culture is a valuable asset - make sure it shows in your CV.",
+  "Don't forget to highlight experience with South African software systems when relevant."
+];
 
-// Provider component
-export function MotivationProvider({ children }: { children: ReactNode }) {
-  const { t } = useTranslation();
+export const MotivationProvider = ({ children }: { children: ReactNode }) => {
+  const { toast } = useToast();
+  const [motivationEnabled, setMotivationEnabled] = useState<boolean>(true);
   const { user } = useAuth();
-  const [motivationState, setMotivationState] = useState<MotivationState>(initialState);
-
-  // Load saved state from localStorage on mount
-  useEffect(() => {
-    if (user) {
-      const savedState = localStorage.getItem(`${MOTIVATION_STORAGE_KEY}_${user.id}`);
-      if (savedState) {
-        try {
-          const parsedState = JSON.parse(savedState);
-          setMotivationState(parsedState);
-          
-          // Check for daily activity streak
-          checkActivityStreak(parsedState);
-        } catch (e) {
-          console.error('Error parsing motivation state', e);
-        }
-      } else {
-        // First time user, show first-time motivation later
-        setMotivationState({
-          ...initialState,
-          lastActivityDate: new Date().toISOString().split('T')[0],
-          activityStreak: 1,
-        });
-      }
-    } else {
-      // Reset for logged out users
-      setMotivationState(initialState);
-    }
-  }, [user]);
-
-  // Track user activity streaks
-  const checkActivityStreak = (state: MotivationState) => {
-    const today = new Date().toISOString().split('T')[0];
-    
-    if (state.lastActivityDate) {
-      const lastActivity = new Date(state.lastActivityDate);
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayString = yesterday.toISOString().split('T')[0];
-      
-      if (state.lastActivityDate === today) {
-        // Already logged in today, do nothing
-        return;
-      } else if (state.lastActivityDate === yesterdayString) {
-        // Consecutive day, increment streak
-        setMotivationState(prev => ({
-          ...prev,
-          activityStreak: prev.activityStreak + 1,
-          lastActivityDate: today
-        }));
-        
-        // If streak is a milestone (7, 14, 30 days), trigger a milestone motivation
-        if ((state.activityStreak + 1) === 7 || 
-            (state.activityStreak + 1) === 14 || 
-            (state.activityStreak + 1) === 30) {
-          triggerMotivation('milestone', `streak_${state.activityStreak + 1}`);
-        }
-      } else {
-        // Streak broken, reset to 1
-        setMotivationState(prev => ({
-          ...prev,
-          activityStreak: 1,
-          lastActivityDate: today
-        }));
-      }
-    } else {
-      // First activity
-      setMotivationState(prev => ({
-        ...prev,
-        activityStreak: 1,
-        lastActivityDate: today
-      }));
-    }
+  
+  // Track user's last motivation time to prevent too frequent messages
+  const [lastMotivationTime, setLastMotivationTime] = useState<Date | null>(null);
+  
+  // Helper to get a random message from an array
+  const getRandomMessage = (messages: string[]): string => {
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
   };
-
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    if (user && motivationState !== initialState) {
-      localStorage.setItem(
-        `${MOTIVATION_STORAGE_KEY}_${user.id}`, 
-        JSON.stringify(motivationState)
-      );
-    }
-  }, [motivationState, user]);
-
-  // Function to trigger a new motivation
-  const triggerMotivation = (type: MotivationType, trigger?: string | number) => {
-    const triggerValue = trigger || 'default';
-    const motivationKey = `${type}_${triggerValue}`;
-    
-    // Update the state
-    setMotivationState(prev => ({
-      ...prev,
-      latestType: type,
-      latestTrigger: trigger || null,
-      // Mark this motivation as seen
-      seenMotivations: {
-        ...prev.seenMotivations,
-        [motivationKey]: true
-      }
-    }));
+  
+  // Add South African specific messaging occasionally
+  const shouldAddSASpecific = (): boolean => {
+    return Math.random() > 0.7; // 30% chance to add SA specific message
   };
-
-  // Function to dismiss a motivation
-  const dismissMotivation = (type: MotivationType, trigger?: string | number) => {
-    setMotivationState(prev => {
-      // Only clear if this is the currently displayed motivation
-      if (prev.latestType === type && 
-          (trigger === undefined || prev.latestTrigger === trigger)) {
-        return {
-          ...prev,
-          latestType: null,
-          latestTrigger: null
-        };
-      }
-      return prev;
+  
+  // Show a motivational toast with optional animation
+  const showMotivation = (type: MotivationType) => {
+    if (!motivationEnabled) return;
+    
+    // Don't show too many motivational messages (max one per minute)
+    const now = new Date();
+    if (lastMotivationTime && now.getTime() - lastMotivationTime.getTime() < 60000) {
+      return;
+    }
+    
+    // Get message for the specific action type
+    let message = getRandomMessage(MOTIVATIONAL_MESSAGES[type]);
+    
+    // Occasionally add South African specific motivation
+    if (shouldAddSASpecific()) {
+      message = getRandomMessage(SA_MOTIVATIONAL_MESSAGES);
+    }
+    
+    // Personalize with name if available
+    if (user?.name) {
+      const personalizedIntros = ["Great job, ", "Keep it up, ", "Excellent work, ", "You're doing great, "];
+      const intro = getRandomMessage(personalizedIntros);
+      message = `${intro}${user.name}! ${message}`;
+    }
+    
+    toast({
+      title: "Motivation Boost",
+      description: message,
+      variant: "default",
+      className: "motivation-toast",
+      duration: 5000,
     });
+    
+    setLastMotivationTime(now);
   };
-
-  // Function to check if a motivation should be shown
-  const shouldShowMotivation = (type: MotivationType, trigger?: string | number): boolean => {
-    // Don't show if user is not logged in
-    if (!user) return false;
+  
+  // Celebration for major achievements
+  const celebrateProgress = (achievement: string) => {
+    if (!motivationEnabled) return;
     
-    const triggerValue = trigger || 'default';
-    const motivationKey = `${type}_${triggerValue}`;
+    toast({
+      title: "Achievement Unlocked!",
+      description: achievement,
+      variant: "default",
+      className: "celebration-toast",
+      duration: 6000,
+    });
     
-    // For daily motivations, check if we already showed one today
-    if (type === 'daily') {
-      const today = new Date().toISOString().split('T')[0];
-      const dailyKey = `daily_${today}`;
-      return !motivationState.seenMotivations[dailyKey];
+    // Here we could trigger confetti or other celebration animations
+    // This would be connected to a confetti library in a real implementation
+  };
+  
+  // Load user preferences for motivation
+  useEffect(() => {
+    const savedPreference = localStorage.getItem('motivationEnabled');
+    if (savedPreference !== null) {
+      setMotivationEnabled(savedPreference === 'true');
     }
-    
-    // For other types, check if this specific motivation has been seen
-    return !motivationState.seenMotivations[motivationKey];
-  };
+  }, []);
   
-  // Function to trigger an achievement popup
-  const triggerAchievement = (achievementId: string) => {
-    setMotivationState(prev => ({
-      ...prev,
-      activeAchievement: achievementId
-    }));
-  };
+  // Save preferences when they change
+  useEffect(() => {
+    localStorage.setItem('motivationEnabled', motivationEnabled.toString());
+  }, [motivationEnabled]);
   
-  // Function to dismiss the achievement popup
-  const dismissAchievement = () => {
-    setMotivationState(prev => ({
-      ...prev,
-      activeAchievement: null
-    }));
-  };
-
   return (
-    <MotivationContext.Provider
-      value={{
-        motivationState,
-        triggerMotivation,
-        dismissMotivation,
-        shouldShowMotivation,
-        triggerAchievement,
-        dismissAchievement
-      }}
-    >
+    <MotivationContext.Provider value={{ 
+      showMotivation, 
+      celebrateProgress,
+      motivationEnabled,
+      setMotivationEnabled
+    }}>
       {children}
     </MotivationContext.Provider>
   );
-}
+};
 
-// Hook to use the motivation context
-export function useMotivation() {
+export const useMotivation = () => {
   const context = useContext(MotivationContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useMotivation must be used within a MotivationProvider');
   }
   return context;
-}
+};
