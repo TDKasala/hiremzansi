@@ -34,8 +34,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Link, useLocation } from "wouter";
-import FileUpload from "@/components/FileUpload";
 import { WhatsAppUpload } from "@/components/WhatsAppUpload";
+import SimpleUploadForm from "@/components/SimpleUploadForm";
 import { CV, ATSScore } from "@shared/schema";
 
 export default function UploadPage() {
@@ -243,12 +243,7 @@ export default function UploadPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-4 sm:p-6">
-                  <FileUpload 
-                    onUploadComplete={handleUploadComplete}
-                    title="Upload your CV"
-                    description="Drag and drop your CV here or click to browse"
-                    withJobDescription={true}
-                  />
+                  <SimpleUploadForm />
                 </CardContent>
               </Card>
             </TabsContent>
