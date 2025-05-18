@@ -3,6 +3,7 @@ import { Route, Switch } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import HomePage from "@/pages/HomePage";
 import CVImprovementDemo from "@/pages/CVImprovementDemo";
 import CVImprovementPage from "@/pages/CVImprovementPage";
@@ -11,11 +12,15 @@ import AuthPage from "@/pages/AuthPage";
 import PricingPage from "@/pages/PricingPage";
 import ContactPage from "@/pages/ContactPage";
 import { AuthProvider } from "@/hooks/use-auth";
+import { useScrollTop } from "@/hooks/use-scroll-top";
 
 // Create a client
 const queryClient = new QueryClient();
 
 export default function App() {
+  // This hook will scroll to top on route changes
+  useScrollTop();
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -33,6 +38,7 @@ export default function App() {
             </Switch>
           </main>
           <Footer />
+          <ScrollToTop />
         </div>
         <Toaster />
       </AuthProvider>
