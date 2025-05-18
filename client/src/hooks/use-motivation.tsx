@@ -9,6 +9,12 @@ interface MotivationContextType {
   celebrateProgress: (achievement: string) => void;
   motivationEnabled: boolean;
   setMotivationEnabled: (enabled: boolean) => void;
+  shouldShowMotivation: (type: string, trigger?: string | number) => boolean;
+  triggerMotivation: (type: string, trigger?: string | number) => void;
+  motivationState: {
+    lastShown: Record<string, number>;
+    milestones: string[];
+  };
 }
 
 const MotivationContext = createContext<MotivationContextType | undefined>(undefined);
@@ -61,6 +67,15 @@ export const MotivationProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const [motivationEnabled, setMotivationEnabled] = useState<boolean>(true);
   const { user } = useAuth();
+  
+  // Track motivation state
+  const [motivationState, setMotivationState] = useState<{
+    lastShown: Record<string, number>;
+    milestones: string[];
+  }>({
+    lastShown: {},
+    milestones: []
+  });
   
   // Track user's last motivation time to prevent too frequent messages
   const [lastMotivationTime, setLastMotivationTime] = useState<Date | null>(null);
@@ -141,12 +156,92 @@ export const MotivationProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('motivationEnabled', motivationEnabled.toString());
   }, [motivationEnabled]);
   
+  // Function to determine if we should show a particular type of motivation
+  const shouldShowMotivation = (type: string, trigger?: string | number): boolean => {
+    if (!motivationEnabled) return false;
+    
+    const now = Date.now();
+    const key = trigger ? `${type}_${trigger}` : type;
+    
+    // Don't show milestones more than once
+    if (type === 'milestone' && motivationState.milestones.includes(String(trigger))) {
+      return false;
+    }
+    
+    // Define cooldown periods for different types (in milliseconds)
+    const cooldowns: Record<string, number> = {
+      daily: 24 * 60 * 60 * 1000, // Once per day
+      score: 6 * 60 * 60 * 1000,  // Every 6 hours
+      milestone: 0,               // Always show milestones (but only once)
+      upload: 30 * 60 * 1000,     // Every 30 minutes
+      general: 2 * 60 * 60 * 1000 // Every 2 hours
+    };
+    
+    const lastShown = motivationState.lastShown[key] || 0;
+    const cooldown = cooldowns[type] || cooldowns.general;
+    
+    return now - lastShown > cooldown;
+  };
+  
+  // Function to record that we've shown a motivation and update state
+  const triggerMotivation = (type: string, trigger?: string | number) => {
+    const now = Date.now();
+    const key = trigger ? `${type}_${trigger}` : type;
+    
+    setMotivationState(prev => {
+      const updatedLastShown = { ...prev.lastShown, [key]: now };
+      let updatedMilestones = [...prev.milestones];
+      
+      // For milestones, record that we've shown it
+      if (type === 'milestone' && trigger && !prev.milestones.includes(String(trigger))) {
+        updatedMilestones = [...updatedMilestones, String(trigger)];
+      }
+      
+      return {
+        lastShown: updatedLastShown,
+        milestones: updatedMilestones
+      };
+    });
+    
+    // For milestone triggers, also show a celebration
+    if (type === 'milestone' && trigger) {
+      const milestoneMessages: Record<string, string> = {
+        first_upload: "You've uploaded your first CV!",
+        multiple_cvs: "You've created multiple CV versions - great for targeting different jobs!",
+        score_improvement: "Your CV score has improved! Great progress!"
+      };
+      
+      const message = milestoneMessages[String(trigger)] || "You've reached a milestone!";
+      celebrateProgress(message);
+    }
+  };
+  
+  // Load saved state from localStorage
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('motivationState');
+      if (savedState) {
+        setMotivationState(JSON.parse(savedState));
+      }
+    } catch (error) {
+      console.error("Error loading motivation state:", error);
+    }
+  }, []);
+  
+  // Save state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('motivationState', JSON.stringify(motivationState));
+  }, [motivationState]);
+
   return (
     <MotivationContext.Provider value={{ 
       showMotivation, 
       celebrateProgress,
       motivationEnabled,
-      setMotivationEnabled
+      setMotivationEnabled,
+      shouldShowMotivation,
+      triggerMotivation,
+      motivationState
     }}>
       {children}
     </MotivationContext.Provider>
