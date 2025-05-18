@@ -118,12 +118,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload a new CV
   app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("File upload request received:", req.file ? "File included" : "No file");
+      
       if (!req.file) {
         return res.status(400).json({ 
           error: "No file uploaded", 
           message: "Please upload a CV file in PDF or DOCX format" 
         });
       }
+      
+      console.log("Uploaded file info:", {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      });
       
       const title = req.body.title || "Untitled CV";
       const isGuest = !req.isAuthenticated();
@@ -170,21 +178,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store the CV in the database
       try {
         const fileSize = req.file.size;
+        
+        // Ensure fileName exists and has valid value
+        let fileName = req.file.originalname;
+        if (!fileName || fileName.trim() === '') {
+          fileName = 'uploaded_cv.pdf'; // Default filename if missing
+          console.log("Setting default filename:", fileName);
+        }
+        
+        console.log("Creating CV with fields:", {
+          userId, 
+          title, 
+          fileName,
+          fileType: req.file.mimetype,
+          fileSize
+        });
+        
         const cv = await storage.createCV({
           userId,
           title,
-          fileName: req.file.originalname, // Add the required fileName field
+          fileName: fileName,
           fileType: req.file.mimetype,
           fileSize,
-          content: textContent
+          content: textContent,
+          isGuest: isGuest || false
         });
+        
+        console.log("CV created successfully with ID:", cv.id);
         
         res.status(201).json({
           success: true,
           message: "CV uploaded successfully",
           cv: {
             id: cv.id,
-            title: cv.title
+            title: cv.title,
+            fileName: cv.fileName
           },
           isGuest: isGuest
         });
