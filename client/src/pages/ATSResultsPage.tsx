@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-// Using div instead of container
-// import { Container } from '@/components/ui/container';
 import CVAnalysisResults from '@/components/CVAnalysisResults';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Printer, Download, Share2 } from 'lucide-react';
@@ -112,7 +110,7 @@ const ATSResultsPage: React.FC = () => {
           </Button>
         </div>
       </div>
-    </Container>
+    </div>
   );
 };
 

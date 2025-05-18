@@ -123,6 +123,7 @@ function App() {
                   <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                   <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
                   <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
+                  <Route path="/ats-results" component={() => <ATSResultsPage />} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
