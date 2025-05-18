@@ -1,15 +1,22 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { z } from 'zod';
+import { Card, CardContent } from '@/components/ui/card';
+import { 
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -21,8 +28,8 @@ const formSchema = z.object({
   subject: z.string().min(5, {
     message: 'Subject must be at least 5 characters.',
   }),
-  message: z.string().min(20, {
-    message: 'Message must be at least 20 characters.',
+  message: z.string().min(10, {
+    message: 'Message must be at least 10 characters.',
   }),
 });
 
@@ -40,227 +47,232 @@ const ContactPage = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, this would send the form data to a server
+    // In a real application, you would send this data to your backend
     console.log(values);
     
     toast({
-      title: 'Message sent!',
-      description: 'We\'ll get back to you as soon as possible.',
+      title: "Message sent!",
+      description: "Thank you for contacting us. We will get back to you soon.",
     });
     
     form.reset();
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions about ATSBoost or need help with your CV optimization? Our team is here to assist you.
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
+          <p className="text-xl text-gray-600">
+            Have questions about ATSBoost or need assistance? We're here to help.
           </p>
-        </motion.div>
-        
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-center"
-          >
-            <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mail className="h-7 w-7 text-amber-600" />
-            </div>
-            <h3 className="text-lg font-medium mb-1">Email</h3>
-            <p className="text-gray-600">support@atsboost.co.za</p>
-            <p className="text-gray-600">info@atsboost.co.za</p>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-center"
-          >
-            <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Phone className="h-7 w-7 text-amber-600" />
-            </div>
-            <h3 className="text-lg font-medium mb-1">Phone</h3>
-            <p className="text-gray-600">+27 87 123 4567</p>
-            <p className="text-gray-600">Mon-Fri: 8:00 AM - 5:00 PM SAST</p>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-center"
-          >
-            <div className="bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <MapPin className="h-7 w-7 text-amber-600" />
-            </div>
-            <h3 className="text-lg font-medium mb-1">Location</h3>
-            <p className="text-gray-600">101 Tech Hub Road, Sandton</p>
-            <p className="text-gray-600">Johannesburg, South Africa</p>
-          </motion.div>
         </div>
-        
-        <div className="grid md:grid-cols-5 gap-8">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="md:col-span-2"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Get in Touch</CardTitle>
-                <CardDescription>
-                  We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                    <h3 className="font-medium mb-2 text-amber-700">Support Hours</h3>
-                    <p className="text-sm text-gray-600">
-                      Our support team is available Monday to Friday from 8:00 AM to 5:00 PM South African Standard Time (SAST).
-                    </p>
-                  </div>
-                  
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <h3 className="font-medium mb-2 text-blue-700">Corporate Inquiries</h3>
-                    <p className="text-sm text-gray-600">
-                      For corporate plans and bulk licenses, please contact our sales team at sales@atsboost.co.za
-                    </p>
-                  </div>
-                  
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h3 className="font-medium mb-2 text-green-700">Partners</h3>
-                    <p className="text-sm text-gray-600">
-                      Interested in partnering with ATSBoost? Reach out to our partnerships team at partners@atsboost.co.za
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="md:col-span-3"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle>Send Us a Message</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll respond as soon as possible.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Your name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input placeholder="your.email@example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Contact Information */}
+            <div className="space-y-8">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <Mail className="h-6 w-6 text-amber-500 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">Email Us</h3>
+                      <p className="text-gray-600 text-sm mb-2">For general inquiries & support</p>
+                      <a href="mailto:support@atsboost.co.za" className="text-amber-600 hover:underline">
+                        support@atsboost.co.za
+                      </a>
                     </div>
-                    
-                    <FormField
-                      control={form.control}
-                      name="subject"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Subject</FormLabel>
-                          <FormControl>
-                            <Input placeholder="What is your message about?" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="message"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Message</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Your message..." 
-                              className="min-h-[120px]" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <Button type="submit" className="w-full">
-                      <Send className="h-4 w-4 mr-2" />
-                      Send Message
-                    </Button>
-                  </form>
-                </Form>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <Phone className="h-6 w-6 text-amber-500 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">Call Us</h3>
+                      <p className="text-gray-600 text-sm mb-2">Mon-Fri, 9am-5pm SAST</p>
+                      <a href="tel:+27123456789" className="text-amber-600 hover:underline">
+                        +27 12 345 6789
+                      </a>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="h-6 w-6 text-amber-500 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">Office</h3>
+                      <p className="text-gray-600 text-sm mb-2">Johannesburg, South Africa</p>
+                      <p className="text-gray-600">
+                        45 Digital Drive<br />
+                        Sandton, 2196
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start space-x-3">
+                    <Clock className="h-6 w-6 text-amber-500 mt-1" />
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">Hours</h3>
+                      <p className="text-gray-600 text-sm mb-2">We're here to help</p>
+                      <p className="text-gray-600">
+                        Monday-Friday: 9am-5pm SAST<br />
+                        Saturday: 10am-2pm SAST<br />
+                        Sunday: Closed
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contact Form */}
+            <div className="md:col-span-2">
+              <Card className="shadow-md">
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Your Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email Address</FormLabel>
+                              <FormControl>
+                                <Input placeholder="you@example.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="subject"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Subject</FormLabel>
+                            <FormControl>
+                              <Input placeholder="How can we help you?" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Message</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Please describe your question or issue in detail..." 
+                                className="min-h-[150px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button 
+                        type="submit" 
+                        className="bg-amber-500 hover:bg-amber-600 w-full md:w-auto"
+                      >
+                        Send Message
+                      </Button>
+                    </form>
+                  </Form>
+                  
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-20 max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions</h2>
+            <p className="text-gray-600">
+              Find quick answers to common questions about ATSBoost.
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-lg mb-2">What is ATSBoost?</h3>
+                <p className="text-gray-600">
+                  ATSBoost is a South African CV optimization platform that helps job seekers improve their CVs
+                  to pass Applicant Tracking Systems (ATS) and increase their chances of landing interviews.
+                </p>
               </CardContent>
             </Card>
-          </motion.div>
-        </div>
-        
-        <div className="mt-16">
-          <h2 className="text-xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="font-medium mb-2">How quickly will I receive a response?</h3>
-              <p className="text-gray-600">We aim to respond to all inquiries within 24 hours during business days.</p>
-            </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="font-medium mb-2">Do you offer phone support?</h3>
-              <p className="text-gray-600">Yes, our phone support is available during business hours for all premium plan subscribers.</p>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-lg mb-2">How do I cancel my subscription?</h3>
+                <p className="text-gray-600">
+                  You can cancel your subscription at any time from your account dashboard. 
+                  Go to "My Account" > "Subscriptions" and click on "Cancel Subscription". 
+                  You'll continue to have access until the end of your current billing cycle.
+                </p>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="font-medium mb-2">Can I visit your office?</h3>
-              <p className="text-gray-600">Meetings are by appointment only. Please contact us in advance to schedule a visit.</p>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-lg mb-2">Is my CV data secure?</h3>
+                <p className="text-gray-600">
+                  Absolutely. We take data privacy seriously and are fully POPIA compliant. 
+                  Your CV data is encrypted and securely stored. We never share your personal 
+                  information with third parties without your consent.
+                </p>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <h3 className="font-medium mb-2">Do you offer bulk discounts?</h3>
-              <p className="text-gray-600">Yes, we offer special rates for organizations looking to provide ATSBoost to multiple employees.</p>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-lg mb-2">What payment methods do you accept?</h3>
+                <p className="text-gray-600">
+                  We accept all major credit and debit cards, as well as PayFast payments, 
+                  which is the preferred payment method for many South Africans.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
