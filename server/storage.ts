@@ -289,39 +289,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCV(insertCV: InsertCV): Promise<CV> {
-    // Use raw SQL to bypass any ORM issues - this ensures file_name is explicitly set
     try {
-      // Generate a guaranteed valid filename with timestamp for uniqueness
+      // Generate a guaranteed valid filename with timestamp for uniqueness if not provided
       const timestamp = Date.now();
       const safeFileName = `cv_${timestamp}.pdf`;
       
-      // Prepare safe values for critical fields to satisfy the NOT NULL constraints
-      const sql = `
-        INSERT INTO cvs (
-          user_id, 
-          file_name, 
-          file_type, 
-          file_size, 
-          content, 
-          title, 
-          is_guest, 
-          created_at, 
-          updated_at
-        ) 
-        VALUES (
-          $1, 
-          $2, 
-          $3, 
-          $4, 
-          $5, 
-          $6, 
-          $7, 
-          NOW(), 
-          NOW()
-        )
-        RETURNING *
-      `;
-
       // Get safe values with fallbacks for all required fields
       const userId = insertCV.userId;  // This can be null for guests
       const fileName = insertCV.fileName || safeFileName;
@@ -331,14 +303,14 @@ export class DatabaseStorage implements IStorage {
       const title = insertCV.title || 'CV';
       const isGuest = insertCV.isGuest || false;
       
-      console.log("DIRECT SQL CV UPLOAD:", {
+      console.log("CV Upload Data:", {
         userId, fileName, fileType, fileSize, 
         contentLength: content ? content.length : 0,
         title, isGuest
       });
       
-      // Execute the SQL directly to ensure database constraints are met
-      const result = await db.execute(sql, [
+      // Use Drizzle ORM to insert the record
+      const [cv] = await db.insert(cvs).values({
         userId,
         fileName,
         fileType,
@@ -346,15 +318,11 @@ export class DatabaseStorage implements IStorage {
         content,
         title,
         isGuest
-      ]);
+      }).returning();
       
-      console.log("CV upload SQL result:", result.rows[0]);
+      console.log("CV created successfully:", cv);
       
-      if (!result || !result.rows || result.rows.length === 0) {
-        throw new Error("No CV returned after insert");
-      }
-      
-      return result.rows[0] as CV;
+      return cv;
     } catch (error) {
       console.error("FATAL CV UPLOAD ERROR:", error);
       throw error;
