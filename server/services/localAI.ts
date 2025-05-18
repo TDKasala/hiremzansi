@@ -170,12 +170,11 @@ export class LocalAIService {
     );
     
     const improvements = this.generateImprovements(
-      formatScore, 
-      skillScore, 
-      saScore, 
-      sectionsDetected, 
-      skillsIdentified, 
-      saElementsDetected
+      sectionsDetected,
+      skillsIdentified,
+      saElementsDetected,
+      formatScore,
+      text
     );
     
     // Determine rating based on overall score
@@ -614,7 +613,7 @@ export class LocalAIService {
     }
     
     // Add specific improvement for bullet points if missing
-    const formatFeedback = this.generateFormatFeedback(cvText, formatScore);
+    const formatFeedback = this.generateFormatFeedback(content, formatScore);
     if (formatFeedback.some(feedback => feedback.includes('bullet points'))) {
       improvements.push('Use bullet points to highlight your experiences and achievements.');
     }
