@@ -1,32 +1,16 @@
-import { useState, useRef } from "react";
-import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  CheckCircle, 
-  AlertCircle, 
-  XCircle,
-  Lightbulb,
-  Upload
-} from "lucide-react";
-import { useAtsScore } from "@/hooks/useAtsScore";
+import SimpleUploadForm from "@/components/SimpleUploadForm";
+import { Separator } from "@/components/ui/separator";
+import { ArrowRight } from "lucide-react";
 
 export default function UploadSection() {
-  const [step, setStep] = useState<'select' | 'upload' | 'analyze' | 'results'>('select');
-  const [consent, setConsent] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
-  const { score, analysis, isLoading, analyzeCv } = useAtsScore();
-  const { toast } = useToast();
-  const [_, setLocation] = useLocation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Step 1: Handle file selection
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
+  const [uploadComplete, setUploadComplete] = useState(false);
+  
+  const handleUploadComplete = (data: any) => {
+    setUploadComplete(true);
+  };
     if (!files || files.length === 0) return;
     
     const file = files[0];

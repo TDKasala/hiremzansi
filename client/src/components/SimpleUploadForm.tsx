@@ -3,8 +3,9 @@ import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { CloudUpload, CheckCircle, XCircle, AlertCircle, Lightbulb } from "lucide-react";
+import { CloudUpload, CheckCircle, XCircle, AlertCircle, Lightbulb, FileText } from "lucide-react";
 import { useAtsScore } from "@/hooks/useAtsScore";
 
 interface SimpleUploadFormProps {
@@ -15,12 +16,13 @@ interface SimpleUploadFormProps {
 export default function SimpleUploadForm({ 
   onUploadComplete,
   withJobDescription = false
-}: SimpleUploadFormProps = {}) {
+}: SimpleUploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [consent, setConsent] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [jobDescription, setJobDescription] = useState("");
   const { score, analysis, isLoading, analyzeCv } = useAtsScore();
   const { toast } = useToast();
   
@@ -89,6 +91,11 @@ export default function SimpleUploadForm({
       const safeName = `cv_${timestamp}.${fileExt}`;
       formData.append('filename', safeName);
       
+      // Add job description if available
+      if (withJobDescription && jobDescription) {
+        formData.append('jobDescription', jobDescription);
+      }
+      
       // Upload the file
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -108,6 +115,11 @@ export default function SimpleUploadForm({
         // Analyze the CV
         await analyzeCv(data.cv.id);
         setShowResults(true);
+        
+        // Call the parent component's onUploadComplete callback if provided
+        if (onUploadComplete) {
+          onUploadComplete(data);
+        }
         
         toast({
           title: "Success",
@@ -151,6 +163,24 @@ export default function SimpleUploadForm({
             
             {!showResults ? (
               <div className="space-y-6">
+                {withJobDescription && (
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <h3 className="text-lg font-semibold">Job Description</h3>
+                    </div>
+                    <Textarea
+                      placeholder="Paste the job description here to get tailored ATS scoring and recommendations"
+                      className="min-h-[120px]"
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                    />
+                    <p className="mt-2 text-xs text-neutral-600">
+                      Adding a job description helps us analyze your CV specifically for the position you're applying for
+                    </p>
+                  </div>
+                )}
+
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   <CloudUpload className="h-16 w-16 text-primary mb-4 mx-auto" />
                   <h3 className="text-xl font-semibold mb-2">
