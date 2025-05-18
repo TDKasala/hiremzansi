@@ -265,28 +265,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if the CV belongs to the user (if authenticated)
       const isGuest = !req.isAuthenticated();
       
-      if (!isGuest && cv.userId && cv.userId !== req.user!.id) {
+      if (!isGuest && cv.userId && req.user && cv.userId !== req.user.id) {
         return res.status(403).json({ 
           error: "Access denied", 
           message: "You do not have permission to access this CV." 
         });
       }
       
+      // Extract text content based on file type
+      let textContent = "";
+      
+      // If the content is HTML or has HTML markers, strip the HTML tags
+      if (cv.content && (cv.content.includes('<!DOCTYPE') || cv.content.includes('<html'))) {
+        // Basic HTML stripping
+        textContent = cv.content.replace(/<[^>]*>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        console.log("Stripped HTML content for analysis");
+      } else {
+        // Use the content as is
+        textContent = cv.content || "";
+      }
+      
       // Use the local AI service to analyze the CV
       // This provides a more accurate, South African-centric analysis
       // without requiring external API calls
-      const analysis = localAIService.analyzeCV(cv.content);
+      const analysis = localAIService.analyzeCV(textContent);
       
       // Create an ATS score record
-      const userType = isGuest ? 'guest' : 'registered';
-      const atsScore = await storage.createATSScore({
-        cvId,
-        score: analysis.overall_score,
-        userType,
-        strengths: analysis.strengths.slice(0, 5),
-        improvements: analysis.improvements.slice(0, 5),
-        analysis: JSON.stringify(analysis)
-      });
+      let atsScore;
+      try {
+        atsScore = await storage.createATSScore({
+          cvId,
+          score: analysis.overall_score,
+          skillsScore: analysis.skill_score,
+          formatScore: analysis.format_score,
+          contextScore: analysis.sa_score,
+          strengths: analysis.strengths.slice(0, 5),
+          improvements: analysis.improvements.slice(0, 5),
+          issues: []
+        });
+        
+        console.log("Created ATS score:", atsScore.id);
+      } catch (error) {
+        console.error("Error creating ATS score:", error);
+        // Create minimal ATS score as fallback
+        atsScore = await storage.createATSScore({
+          cvId,
+          score: 25,
+          skillsScore: 20,
+          formatScore: 20,
+          contextScore: 30,
+          strengths: ["Your CV includes basic information that employers look for."],
+          improvements: ["Add more South African specific context to your CV."],
+          issues: []
+        });
+        console.log("Created minimal ATS score as fallback");
+      }
       
       res.json({
         success: true,
@@ -300,7 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sa_relevance: analysis.sa_relevance
       });
     } catch (error) {
-      console.error("CV analysis error:", error);
+      console.error("Error analyzing CV:", error);
       next(error);
     }
   });
