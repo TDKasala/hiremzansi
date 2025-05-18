@@ -6,7 +6,7 @@ import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
-import { analyzeCVText } from "./services/localAI";
+import { localAIService } from "./services/localAI";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title,
           fileType: req.file.mimetype,
           fileSize,
-          textContent,
+          content: textContent,
           originalFilename: req.file.originalname
         });
         
@@ -239,7 +239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use the local AI service to analyze the CV
       // This provides a more accurate, South African-centric analysis
       // without requiring external API calls
-      const analysis = analyzeCVText(cv.textContent);
+      const analysis = localAIService.analyzeCV(cv.content);
       
       // Create an ATS score record
       const userType = isGuest ? 'guest' : 'registered';
@@ -423,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use our advanced local AI service for CV analysis
-      const analysis = analyzeCVText(resumeContent);
+      const analysis = localAIService.analyzeCV(resumeContent);
       
       // Extract job-specific keywords from job description if provided
       let jobKeywordMatch = null;
