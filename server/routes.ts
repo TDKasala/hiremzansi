@@ -107,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/cvs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user.id;
-      const cvs = await storage.getUserCVs(userId);
+      const cvs = await storage.getCVsByUser(userId);
       
       res.json(cvs);
     } catch (error) {
@@ -381,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
       
-      const atsScore = await storage.getLatestATSScore(cvId);
+      const atsScore = await storage.getATSScoreByCV(cvId);
       
       if (!atsScore) {
         return res.status(404).json({ error: "ATS score not found" });
@@ -401,16 +401,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const userId = req.user.id;
-      const cvs = await storage.getUserCVs(userId);
+      const cv = await storage.getLatestCVByUser(userId);
       
-      if (cvs.length === 0) {
+      if (!cv) {
         return res.status(404).json({ error: "No CVs found for this user" });
       }
       
-      // Sort CVs by creation date (newest first) and return the first one
-      cvs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      
-      res.json(cvs[0]);
+      res.json(cv);
     } catch (error) {
       next(error);
     }
