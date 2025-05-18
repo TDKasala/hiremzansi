@@ -180,31 +180,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const fileSize = req.file.size;
         
-        // Get filename from the uploaded file with a guaranteed default
-        let fileName = "default_cv.pdf";
-        if (req.file && req.file.originalname && req.file.originalname.trim() !== '') {
-          fileName = req.file.originalname;
-        }
+        // CRITICAL FIX: Force a guaranteed filename for the database
+        const fileName = "uploaded_cv_" + Date.now() + ".pdf";
         
         // Log what we're saving to help with debugging
-        console.log("CV upload details:", {
-          fileName,
+        console.log("Fixed CV upload attempt:", {
+          fileName, // Using guaranteed filename
           fileType: req.file.mimetype,
           fileSize,
           title,
-          isGuest
+          contentLength: textContent.length
         });
-                
-        // Directly create the CV with explicit fields - hardcoded to ensure it works
-        const cv = await storage.createCV({
-          userId,
-          fileName: fileName, // Explicitly set with fallback
-          fileType: req.file.mimetype,
-          fileSize: req.file.size,
-          content: textContent,
-          title: title,
-          isGuest: isGuest || false
-        });
+        
+        // Create a completely defined object with hardcoded default values where needed
+        const cvToCreate = {
+          userId: userId,
+          fileName: fileName, // Using guaranteed filename
+          fileType: req.file.mimetype || "application/pdf",
+          fileSize: fileSize || 0,
+          content: textContent || " ",
+          title: title || "CV",
+          isGuest: Boolean(isGuest)
+        };
+        
+        // Create CV with the fully defined object
+        const cv = await storage.createCV(cvToCreate);
         
         console.log("CV created successfully with ID:", cv.id);
         

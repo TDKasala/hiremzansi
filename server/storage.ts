@@ -290,11 +290,22 @@ export class DatabaseStorage implements IStorage {
 
   async createCV(insertCV: InsertCV): Promise<CV> {
     const now = new Date();
-    const [cv] = await db.insert(cvs).values({
+    
+    // Ensure fileName is always provided (critical field)
+    const safeInsertCV = {
       ...insertCV,
+      fileName: insertCV.fileName || "uploaded_cv.pdf",
       createdAt: now,
       updatedAt: now
-    }).returning();
+    };
+    
+    console.log("STORAGE: Creating CV with validated data:", {
+      fileName: safeInsertCV.fileName,
+      fileType: safeInsertCV.fileType,
+      userId: safeInsertCV.userId
+    });
+    
+    const [cv] = await db.insert(cvs).values(safeInsertCV).returning();
     return cv;
   }
 
