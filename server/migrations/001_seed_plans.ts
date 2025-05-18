@@ -1,140 +1,107 @@
-import { Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import { eq } from 'drizzle-orm';
-import * as schema from '../../shared/schema';
+import { Pool } from '@neondatabase/serverless';
+import * as schema from '@shared/schema';
+import { getPool } from '../db-pool';
+import { log } from '../vite';
 
-// Define our default plans
-const defaultPlans = [
-  {
-    name: 'Free',
-    description: 'Basic ATS score and limited features',
-    price: 0,
-    currency: 'ZAR',
-    featureJson: JSON.stringify({
-      maxCVUploads: 2,
-      maxATSScans: 2,
-      atsReportFeatures: ['basicScore', 'keywordMatching', 'formatCheck'],
-      aiAssistance: false,
-      beforeAfterComparison: false,
-      deepAnalysis: false,
-      careerGuidance: false,
-      interviewPrep: false,
-      jobBoardAccess: false,
-      prioritySupport: false,
-    }),
-    billingPeriod: 'monthly',
-    isActive: true,
-    sortOrder: 1,
-  },
-  {
-    name: 'Essential',
-    description: 'Enhanced ATS scoring with detailed recommendations',
-    price: 30,
-    currency: 'ZAR',
-    featureJson: JSON.stringify({
-      maxCVUploads: 5,
-      maxATSScans: 5,
-      atsReportFeatures: ['basicScore', 'keywordMatching', 'formatCheck', 'contentSuggestions', 'sectionAnalysis'],
-      aiAssistance: true,
-      beforeAfterComparison: true,
-      deepAnalysis: false,
-      careerGuidance: false,
-      interviewPrep: false,
-      jobBoardAccess: false,
-      prioritySupport: false,
-    }),
-    billingPeriod: 'monthly',
-    isActive: true,
-    sortOrder: 2,
-  },
-  {
-    name: 'Professional',
-    description: 'Complete CV optimization with AI assistance',
-    price: 100,
-    currency: 'ZAR',
-    featureJson: JSON.stringify({
-      maxCVUploads: 10,
-      maxATSScans: 15,
-      atsReportFeatures: ['basicScore', 'keywordMatching', 'formatCheck', 'contentSuggestions', 'sectionAnalysis', 'industryComparison', 'skillGapAnalysis'],
-      aiAssistance: true,
-      beforeAfterComparison: true,
-      deepAnalysis: true,
-      careerGuidance: true,
-      interviewPrep: false,
-      jobBoardAccess: true,
-      prioritySupport: false,
-    }),
-    billingPeriod: 'monthly',
-    isActive: true,
-    sortOrder: 3,
-  },
-  {
-    name: 'Career Growth',
-    description: 'Ultimate career advancement toolset',
-    price: 200,
-    currency: 'ZAR',
-    featureJson: JSON.stringify({
-      maxCVUploads: 25,
-      maxATSScans: 50,
-      atsReportFeatures: ['basicScore', 'keywordMatching', 'formatCheck', 'contentSuggestions', 'sectionAnalysis', 'industryComparison', 'skillGapAnalysis', 'careerPathPlanning'],
-      aiAssistance: true,
-      beforeAfterComparison: true,
-      deepAnalysis: true,
-      careerGuidance: true,
-      interviewPrep: true,
-      jobBoardAccess: true,
-      prioritySupport: true,
-    }),
-    billingPeriod: 'monthly',
-    isActive: true, 
-    sortOrder: 4,
-  },
-];
-
+/**
+ * Seeds the default subscription plans for ATSBoost
+ */
 export async function seedPlans() {
-  console.log('Starting plan seeding...');
-  
-  if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL environment variable is not set');
-    return;
-  }
-  
-  // Create database connection
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const db = drizzle(pool, { schema });
-  
   try {
-    // Check if plans already exist
-    const existingPlans = await db.select().from(schema.plans);
-    
-    if (existingPlans.length > 0) {
-      console.log(`Plans already seeded (${existingPlans.length} plans found). Skipping.`);
-      return;
-    }
-    
-    console.log('No plans found. Seeding default plans...');
-    
-    // Insert default plans
-    const results = await db.insert(schema.plans).values(defaultPlans).returning();
-    
-    console.log(`Successfully seeded ${results.length} plans`);
-  } catch (error) {
-    console.error('Error seeding plans:', error);
-    throw error;
-  } finally {
-    await pool.end();
-  }
-}
+    log('Seeding default plans...', 'db');
+    const pool = getPool();
+    const db = drizzle(pool, { schema });
 
-// If this file is run directly, execute the seed function
-if (require.main === module) {
-  seedPlans()
-    .then(() => {
-      console.log('Plan seeding completed');
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error('Plan seeding failed:', error);
-      process.exit(1);
+    // Create Free Plan
+    await db.insert(schema.plans).values({
+      name: 'Free',
+      description: 'Basic CV analysis with limited insights.',
+      price: 0,
+      interval: 'month',
+      features: [
+        'Basic ATS compatibility score',
+        'Limited formatting suggestions',
+        '2 CV scans per month',
+        'South African context analysis'
+      ],
+      isActive: true,
+      isPopular: false,
+      scanLimit: 2,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
+
+    // Create Starter Plan
+    await db.insert(schema.plans).values({
+      name: 'Starter',
+      description: 'Enhanced CV analysis with deeper insights.',
+      price: 3000, // R30 in cents
+      interval: 'month',
+      features: [
+        'Full ATS compatibility score',
+        'Detailed formatting suggestions',
+        '10 CV scans per month',
+        'South African keyword recommendations',
+        'B-BBEE and NQF level detection',
+        'Before/after comparison tracking'
+      ],
+      isActive: true,
+      isPopular: false,
+      scanLimit: 10,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Create Premium Plan
+    await db.insert(schema.plans).values({
+      name: 'Premium',
+      description: 'Comprehensive CV optimization for serious job seekers.',
+      price: 10000, // R100 in cents
+      interval: 'month',
+      features: [
+        'Full ATS compatibility score',
+        'Detailed formatting suggestions',
+        '30 CV scans per month',
+        'Advanced South African context analysis',
+        'Industry-specific keyword recommendations',
+        'B-BBEE and NQF level optimization',
+        'Job description matching',
+        'PDF export of analysis results',
+        'CV improvement tracking'
+      ],
+      isActive: true,
+      isPopular: true, // Most popular plan
+      scanLimit: 30,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // Create Pro Plan
+    await db.insert(schema.plans).values({
+      name: 'Pro',
+      description: 'Premium features plus advanced career development tools.',
+      price: 20000, // R200 in cents
+      interval: 'month',
+      features: [
+        'All Premium features',
+        'Unlimited CV scans',
+        'Interview simulation',
+        'Skill gap analysis',
+        'Career path planning',
+        'Job match notifications',
+        'Priority support'
+      ],
+      isActive: true,
+      isPopular: false,
+      scanLimit: 0, // 0 means unlimited
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    log('Default plans seeded successfully', 'db');
+  } catch (error) {
+    log(`Error seeding plans: ${error}`, 'db');
+    throw error;
+  }
 }

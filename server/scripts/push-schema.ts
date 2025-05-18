@@ -27,20 +27,30 @@ async function pushSchema() {
     
     // Direct schema push for development (not recommended for production)
     // In a real production environment, you would use proper migrations
-    await db.execute(schema.plans.create().ifNotExists());
-    await db.execute(schema.users.create().ifNotExists());
-    await db.execute(schema.saProfiles.create().ifNotExists());
-    await db.execute(schema.cvs.create().ifNotExists());
-    await db.execute(schema.atsScores.create().ifNotExists());
-    await db.execute(schema.deepAnalysisReports.create().ifNotExists());
-    await db.execute(schema.subscriptions.create().ifNotExists());
-    await db.execute(schema.employers.create().ifNotExists());
-    await db.execute(schema.jobPostings.create().ifNotExists());
-    await db.execute(schema.jobMatches.create().ifNotExists());
-    await db.execute(schema.skills.create().ifNotExists());
-    await db.execute(schema.userSkills.create().ifNotExists());
-    await db.execute(schema.payments.create().ifNotExists());
-    await db.execute(schema.notifications.create().ifNotExists());
+    // Instead of calling create() which isn't available, we'll use raw SQL
+    
+    // Run the drizzle-kit push command to create schema
+    const { exec } = require('child_process');
+    
+    log('Running drizzle-kit push to create database schema...', 'db');
+    await new Promise((resolve, reject) => {
+      exec('npx drizzle-kit push:pg', (error, stdout, stderr) => {
+        if (error) {
+          log(`Schema push error: ${error.message}`, 'db');
+          reject(error);
+          return;
+        }
+        
+        log('Schema push output:', 'db');
+        log(stdout, 'db');
+        
+        if (stderr) {
+          log(`Schema push stderr: ${stderr}`, 'db');
+        }
+        
+        resolve(stdout);
+      });
+    });
     
     log('Schema push completed successfully', 'db');
   } catch (error) {

@@ -175,10 +175,11 @@ export async function executeWithRetry<T>(
       attempt++;
       
       // Only retry on connection issues
+      const errorMessage = error instanceof Error ? error.message : String(error);
       const isConnectionError = 
-        error.message.includes('connection') ||
-        error.message.includes('timeout') ||
-        error.message.includes('terminated');
+        errorMessage.includes('connection') ||
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('terminated');
       
       if (!isConnectionError) {
         break;
