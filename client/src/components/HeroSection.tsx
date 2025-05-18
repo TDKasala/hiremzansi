@@ -78,87 +78,65 @@ export default function HeroSection() {
             </div>
           </div>
           
-          {/* Animated CV showcase */}
+          {/* Modern CV showcase with image */}
           <div className="md:w-1/2 flex justify-center relative">
-            {/* CV Document with animated elements */}
-            <div className={`relative w-full max-w-md bg-white text-black p-6 rounded-lg shadow-2xl transition-all duration-1000 
-                ${isAnimated ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-              
-              {/* CV Header */}
-              <div className="border-b border-gray-200 pb-4 mb-4">
-                <h2 className="text-xl font-bold text-center mb-1">Denis Kasala</h2>
-                <p className="text-gray-600 text-sm text-center">
-                  Marketing Specialist | B-BBEE Level 2 | Johannesburg
-                </p>
+            {/* Modern CV with animations */}
+            <div 
+              className={`relative w-full max-w-md rounded-lg shadow-2xl transition-all duration-1000 overflow-hidden
+                ${isAnimated ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+              style={{ 
+                transformStyle: 'preserve-3d',
+                perspective: '1000px'
+              }}
+            >
+              {/* Resume image with hover effects */}
+              <div 
+                className={`${isAnimated ? 'animate-float' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'float 6s ease-in-out infinite' : 'none',
+                }}
+              >
+                <img 
+                  src="/attached_assets/ChatGPT Image May 18, 2025, 09_46_48 PM.png" 
+                  alt="Modern CV template" 
+                  className="w-full h-auto rounded-lg shadow-lg" 
+                />
               </div>
               
-              {/* CV Skills Section - Highlighted when active */}
-              <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 0 ? 'bg-primary/10 border border-primary/30' : ''}`}>
-                <div className="flex items-center mb-2">
-                  <Star className={`h-4 w-4 mr-2 ${highlightedSection === 0 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">{t('home.keySkills')}</h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">Digital Marketing</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">SETA Certified</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">Analytics</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">Project Management</span>
-                </div>
-              </div>
+              {/* Animated highlights that appear one by one */}
+              <div 
+                className={`absolute top-[15%] left-[11%] w-[78%] h-[6%] bg-amber-200 rounded-full opacity-0 pointer-events-none
+                  ${isAnimated ? 'animate-highlight-1' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'highlight-1 2s forwards 0.5s' : 'none',
+                }}
+              ></div>
               
-              {/* CV Experience Section */}
-              <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 1 ? 'bg-primary/10 border border-primary/30' : ''}`}>
-                <div className="flex items-center mb-2">
-                  <Zap className={`h-4 w-4 mr-2 ${highlightedSection === 1 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">{t('home.experience')}</h3>
-                </div>
-                <div className="text-sm">
-                  <div className="mb-2">
-                    <div className="font-medium">Marketing Manager</div>
-                    <div className="text-gray-600 text-xs">Cape Town Media Group | 2020 - Present</div>
-                  </div>
-                </div>
-              </div>
+              <div 
+                className={`absolute top-[36%] left-[15%] w-[70%] h-[20%] bg-amber-200 rounded-lg opacity-0 pointer-events-none
+                  ${isAnimated ? 'animate-highlight-2' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'highlight-2 2s forwards 1.5s' : 'none',
+                }}
+              ></div>
               
-              {/* CV Education Section */}
-              <div className={`mb-4 p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 2 ? 'bg-primary/10 border border-primary/30' : ''}`}>
-                <div className="flex items-center mb-2">
-                  <LineChart className={`h-4 w-4 mr-2 ${highlightedSection === 2 ? 'text-primary' : 'text-gray-400'}`} />
-                  <h3 className="font-semibold">{t('home.education')}</h3>
-                </div>
-                <div className="text-sm">
-                  <div className="font-medium">B.Com Marketing (NQF Level 7)</div>
-                  <div className="text-gray-600 text-xs">University of Cape Town | 2016 - 2019</div>
-                </div>
-              </div>
+              <div 
+                className={`absolute top-[78%] left-[10%] w-[75%] h-[10%] bg-amber-200 rounded-lg opacity-0 pointer-events-none
+                  ${isAnimated ? 'animate-highlight-3' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'highlight-3 2s forwards 2.5s' : 'none',
+                }}
+              ></div>
               
-              {/* ATS Score Section */}
-              <div className={`p-3 rounded-lg transition-colors duration-500 ${highlightedSection === 3 ? 'bg-primary/10 border border-primary/30' : ''}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center">
-                      <BarChart className={`h-4 w-4 mr-2 ${highlightedSection === 3 ? 'text-primary' : 'text-gray-400'}`} />
-                      <h3 className="font-semibold">{t('home.atsScore')}</h3>
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1">{t('home.optimizedForSA')}</div>
-                  </div>
-                  <div 
-                    className={`flex items-center justify-center h-12 w-12 rounded-full bg-green-100 text-green-600 font-bold text-lg
-                    ${isAnimated ? 'animate-pulse' : ''}`}
-                  >
-                    <span className={isAnimated ? 'animate-countup-delay-2' : ''}>92%</span>
-                  </div>
-                </div>
-                
-                {/* Little ATS checks */}
-                <div className={`mt-2 flex items-center text-xs text-green-600 ${isAnimated ? 'animate-countup-delay-1' : ''}`}>
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  <span>{t('home.bbbeeIncluded')}</span>
-                </div>
-                <div className={`mt-1 flex items-center text-xs text-green-600 ${isAnimated ? 'animate-countup-delay-2' : ''}`}>
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  <span>{t('home.nqfSpecified')}</span>
-                </div>
+              {/* Floating 92% score that appears with a bounce effect */}
+              <div 
+                className={`absolute bottom-5 right-8 w-20 h-20 rounded-full bg-green-400 flex items-center justify-center opacity-0
+                  ${isAnimated ? 'animate-score-appear' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'score-appear 1s forwards 3s, float 3s ease-in-out infinite 4s' : 'none',
+                }}
+              >
+                <span className="text-3xl font-bold text-white">92%</span>
               </div>
               
               {/* Animated scan effect */}
@@ -166,6 +144,16 @@ export default function HeroSection() {
                 className={`absolute inset-0 bg-gradient-to-b from-transparent via-primary/20 to-transparent 
                 opacity-0 pointer-events-none rounded-lg
                 ${isAnimated ? 'animate-scan' : ''}`}
+              ></div>
+              
+              {/* Glowing pulsing effect around the entire CV */}
+              <div 
+                className={`absolute -inset-1 bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 rounded-xl blur-xl opacity-0
+                  ${isAnimated ? 'animate-pulse-glow' : ''}`}
+                style={{ 
+                  animation: isAnimated ? 'pulse-glow 4s ease-in-out infinite alternate' : 'none',
+                  zIndex: -1
+                }}
               ></div>
             </div>
           </div>
