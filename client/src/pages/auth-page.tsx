@@ -49,16 +49,15 @@ export default function AuthPage() {
   const [isSubmittingReset, setIsSubmittingReset] = useState(false);
   const { toast } = useToast();
   
-  // Default credentials for demo purposes
-  const defaultCredentials = {
-    username: "admin",
-    password: "ChangeMe123!"
-  };
+  // No default credentials in production
   
   // Create form for login
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: defaultCredentials,
+    defaultValues: {
+      username: "",
+      password: ""
+    },
   });
   
   // Create form for registration
@@ -197,12 +196,7 @@ export default function AuthPage() {
                           </Alert>
                         )}
                         
-                        <Alert variant="default" className="mt-2 bg-primary/5 border-primary/20">
-                          <Info className="h-4 w-4" />
-                          <AlertDescription className="text-xs">
-                            Demo credentials are pre-filled. Just click "Login".
-                          </AlertDescription>
-                        </Alert>
+
                         
                         <div className="flex justify-end mb-2">
                           <Button 
