@@ -30,6 +30,7 @@ import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import JobSeekerToolsPage from "@/pages/JobSeekerToolsPage";
 import ATSResultsPage from "@/pages/ATSResultsPage";
 import MotivationDemoPage from "@/pages/MotivationDemoPage";
+import MotivationDashboard from "@/pages/MotivationDashboard";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
@@ -126,6 +127,7 @@ function App() {
                   <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
                   <Route path="/ats-results" component={() => <ATSResultsPage />} />
                   <Route path="/motivation-demo" component={() => <MotivationDemoPage />} />
+                  <Route path="/motivation-dashboard" component={() => <MotivationDashboard />} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />

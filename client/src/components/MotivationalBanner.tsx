@@ -18,9 +18,8 @@ export function MotivationalBanner({
   const { t } = useTranslation();
   const { user } = useAuth();
   const { 
-    motivationState, 
-    triggerMotivation, 
-    shouldShowMotivation 
+    showMotivation: triggerMotivation,
+    celebrateProgress
   } = useMotivation();
   const [showMotivation, setShowMotivation] = useState(false);
   const [motivationType, setMotivationType] = useState<'daily' | 'score' | 'milestone' | 'upload'>('daily');
@@ -32,28 +31,29 @@ export function MotivationalBanner({
     // Dashboard experiences
     if (location === 'dashboard') {
       // Check for daily motivation
-      if (shouldShowMotivation('daily')) {
+      const shouldShowDaily = Math.random() > 0.7; // 30% chance to show daily motivation
+      if (shouldShowDaily) {
         setMotivationType('daily');
         setShowMotivation(true);
-        triggerMotivation('daily');
+        triggerMotivation('general');
         return;
       }
 
       // First CV upload milestone
-      if (cvCount === 1 && shouldShowMotivation('milestone', 'first_upload')) {
+      if (cvCount === 1) {
         setMotivationType('milestone');
         setMotivationTrigger('first_upload');
         setShowMotivation(true);
-        triggerMotivation('milestone', 'first_upload');
+        celebrateProgress("You've uploaded your first CV! Great start!");
         return;
       }
       
       // Multiple CVs milestone
-      if (cvCount === 3 && shouldShowMotivation('milestone', 'multiple_cvs')) {
+      if (cvCount === 3) {
         setMotivationType('milestone');
         setMotivationTrigger('multiple_cvs');
         setShowMotivation(true);
-        triggerMotivation('milestone', 'multiple_cvs');
+        celebrateProgress("You've created multiple CV versions - perfect for targeting different jobs!");
         return;
       }
     }
@@ -61,11 +61,12 @@ export function MotivationalBanner({
     // CV Details page experiences
     if (location === 'cv-details' && cvScore !== undefined) {
       // Show score-based motivation
-      if (shouldShowMotivation('score', cvScore)) {
+      const shouldShowScore = Math.random() > 0.5; // 50% chance to show score motivation
+      if (shouldShowScore) {
         setMotivationType('score');
         setMotivationTrigger(cvScore);
         setShowMotivation(true);
-        triggerMotivation('score', cvScore);
+        triggerMotivation('improvement');
         return;
       }
       
@@ -73,23 +74,21 @@ export function MotivationalBanner({
       const previousScoreKey = 'previous_cv_score';
       const previousScore = localStorage.getItem(previousScoreKey);
       if (previousScore && Number(previousScore) < cvScore) {
-        if (shouldShowMotivation('milestone', 'score_improvement')) {
-          setMotivationType('milestone');
-          setMotivationTrigger('score_improvement');
-          setShowMotivation(true);
-          triggerMotivation('milestone', 'score_improvement');
-        }
+        setMotivationType('milestone');
+        setMotivationTrigger('score_improvement');
+        setShowMotivation(true);
+        celebrateProgress(`Your CV score improved from ${previousScore}% to ${cvScore}%!`);
       }
       localStorage.setItem(previousScoreKey, String(cvScore));
     }
 
     // Upload page experiences
     if (location === 'upload') {
-      if (cvCount === 0 && shouldShowMotivation('upload', 'first_time')) {
+      if (cvCount === 0) {
         setMotivationType('upload');
         setMotivationTrigger('first_time');
         setShowMotivation(true);
-        triggerMotivation('upload', 'first_time');
+        triggerMotivation('upload');
       }
     }
   }, [location, user, cvScore, cvCount]);
