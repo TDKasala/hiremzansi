@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -21,18 +20,18 @@ export default function Header() {
       <div className="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <Link href="/" onClick={closeMenu}>
-            <a className="flex items-center">
+            <div className="flex items-center cursor-pointer">
               <div className="bg-amber-500 text-white font-bold p-2 rounded-lg mr-2">ATS</div>
               <span className="text-xl font-bold">Boost</span>
               <span className="text-amber-500 text-xl font-bold">.co.za</span>
-            </a>
+            </div>
           </Link>
         </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-6">
           <Link href="/">
-            <a className="font-medium hover:text-amber-500 transition-colors">Home</a>
+            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Home</div>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center font-medium hover:text-amber-500 transition-colors">
@@ -42,32 +41,32 @@ export default function Header() {
             <DropdownMenuContent>
               <DropdownMenuItem>
                 <Link href="/analyzer">
-                  <a className="w-full">ATS Analyzer</a>
+                  <div className="w-full cursor-pointer">ATS Analyzer</div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link href="/cv-improvement">
-                  <a className="w-full">CV Improvement</a>
+                  <div className="w-full cursor-pointer">CV Improvement</div>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link href="/job-matcher">
-                  <a className="w-full">Job Matcher</a>
+                  <div className="w-full cursor-pointer">Job Matcher</div>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Link href="/pricing">
-            <a className="font-medium hover:text-amber-500 transition-colors">Pricing</a>
+            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Pricing</div>
           </Link>
           <Link href="/job-sites">
-            <a className="font-medium hover:text-amber-500 transition-colors">Job Board</a>
+            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Job Board</div>
           </Link>
           <Link href="/blog">
-            <a className="font-medium hover:text-amber-500 transition-colors">Blog</a>
+            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Blog</div>
           </Link>
           <Link href="/contact">
-            <a className="font-medium hover:text-amber-500 transition-colors">Contact</a>
+            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Contact</div>
           </Link>
         </nav>
 
@@ -91,31 +90,31 @@ export default function Header() {
         <div className="md:hidden absolute top-[61px] left-0 right-0 bg-white border-b border-border shadow-lg z-50">
           <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
             <Link href="/" onClick={closeMenu}>
-              <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md">Home</a>
+              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Home</div>
             </Link>
             <div className="border-t border-border pt-2">
               <p className="text-sm text-muted-foreground mb-2 px-2">Tools</p>
               <Link href="/analyzer" onClick={closeMenu}>
-                <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block">ATS Analyzer</a>
+                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">ATS Analyzer</div>
               </Link>
               <Link href="/cv-improvement" onClick={closeMenu}>
-                <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block">CV Improvement</a>
+                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">CV Improvement</div>
               </Link>
               <Link href="/job-matcher" onClick={closeMenu}>
-                <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block">Job Matcher</a>
+                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">Job Matcher</div>
               </Link>
             </div>
             <Link href="/pricing" onClick={closeMenu}>
-              <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md">Pricing</a>
+              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Pricing</div>
             </Link>
             <Link href="/job-sites" onClick={closeMenu}>
-              <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md">Job Board</a>
+              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Job Board</div>
             </Link>
             <Link href="/blog" onClick={closeMenu}>
-              <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md">Blog</a>
+              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Blog</div>
             </Link>
             <Link href="/contact" onClick={closeMenu}>
-              <a className="font-medium px-2 py-1.5 hover:bg-muted rounded-md">Contact</a>
+              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Contact</div>
             </Link>
             <div className="border-t border-border pt-4 flex space-x-2">
               <Link href="/auth" onClick={closeMenu}>

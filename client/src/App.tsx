@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import HomePage from "@/pages/HomePage";
 import CVImprovementDemo from "@/pages/CVImprovementDemo";
+import BlogPage from "@/pages/BlogPage";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/" component={HomePage} />
             <Route path="/cv-improvement" component={CVImprovementDemo} />
             <Route path="/analyzer" component={CVImprovementDemo} />
+            <Route path="/blog" component={BlogPage} />
           </Switch>
         </main>
         <Footer />

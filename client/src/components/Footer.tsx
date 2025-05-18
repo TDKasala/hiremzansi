@@ -10,11 +10,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link href="/">
-              <a className="flex items-center mb-4">
+              <div className="flex items-center mb-4 cursor-pointer">
                 <div className="bg-amber-500 text-white font-bold p-2 rounded-lg mr-2">ATS</div>
                 <span className="text-xl font-bold text-white">Boost</span>
                 <span className="text-amber-500 text-xl font-bold">.co.za</span>
-              </a>
+              </div>
             </Link>
             <p className="mb-4">
               Helping South Africans optimize their CVs for ATS systems and overcome
@@ -41,22 +41,22 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/analyzer">
-                  <a className="hover:text-amber-500 transition-colors">ATS Analyzer</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">ATS Analyzer</div>
                 </Link>
               </li>
               <li>
                 <Link href="/cv-improvement">
-                  <a className="hover:text-amber-500 transition-colors">CV Improvement Tracker</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">CV Improvement Tracker</div>
                 </Link>
               </li>
               <li>
                 <Link href="/job-matcher">
-                  <a className="hover:text-amber-500 transition-colors">Job Matcher</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Job Matcher</div>
                 </Link>
               </li>
               <li>
                 <Link href="/interview-simulator">
-                  <a className="hover:text-amber-500 transition-colors">Interview Simulator</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Interview Simulator</div>
                 </Link>
               </li>
             </ul>
@@ -67,22 +67,22 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/blog">
-                  <a className="hover:text-amber-500 transition-colors">Blog</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Blog</div>
                 </Link>
               </li>
               <li>
                 <Link href="/job-sites">
-                  <a className="hover:text-amber-500 transition-colors">South African Job Sites</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">South African Job Sites</div>
                 </Link>
               </li>
               <li>
                 <Link href="/cv-templates">
-                  <a className="hover:text-amber-500 transition-colors">CV Templates</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">CV Templates</div>
                 </Link>
               </li>
               <li>
                 <Link href="/faq">
-                  <a className="hover:text-amber-500 transition-colors">FAQ</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">FAQ</div>
                 </Link>
               </li>
             </ul>
@@ -93,27 +93,27 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/about">
-                  <a className="hover:text-amber-500 transition-colors">About Us</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">About Us</div>
                 </Link>
               </li>
               <li>
                 <Link href="/contact">
-                  <a className="hover:text-amber-500 transition-colors">Contact</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Contact</div>
                 </Link>
               </li>
               <li>
                 <Link href="/pricing">
-                  <a className="hover:text-amber-500 transition-colors">Pricing</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Pricing</div>
                 </Link>
               </li>
               <li>
                 <Link href="/privacy">
-                  <a className="hover:text-amber-500 transition-colors">Privacy Policy</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Privacy Policy</div>
                 </Link>
               </li>
               <li>
                 <Link href="/terms">
-                  <a className="hover:text-amber-500 transition-colors">Terms of Service</a>
+                  <div className="hover:text-amber-500 transition-colors cursor-pointer">Terms of Service</div>
                 </Link>
               </li>
             </ul>
