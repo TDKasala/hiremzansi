@@ -1,147 +1,130 @@
 import { Link } from "wouter";
-import { ChartLine } from "lucide-react";
-import { 
-  FaFacebookF, 
-  FaTwitter, 
-  FaLinkedinIn, 
-  FaInstagram, 
-  FaEnvelope, 
-  FaMapMarkerAlt 
-} from "react-icons/fa";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import atsBoostLogo from "@/assets/atsboost-logo.png";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-
+  
   return (
-    <footer className="bg-neutral-800 text-white pt-12 pb-6">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+    <footer className="bg-gray-900 text-gray-300">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4 flex items-center">
-              <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-8 mr-2" />
-              <span>
-                <span className="text-[#6bc04b]">ATS</span><span className="text-[#1a5fa0]">BOOST</span>
-                <span className="text-[#ffca28] ml-1">•</span>
-              </span>
-            </h3>
-            <p className="text-neutral-400 mb-4">
-              Helping South African job seekers beat ATS systems and land more interviews.
+            <Link href="/">
+              <a className="flex items-center mb-4">
+                <div className="bg-amber-500 text-white font-bold p-2 rounded-lg mr-2">ATS</div>
+                <span className="text-xl font-bold text-white">Boost</span>
+                <span className="text-amber-500 text-xl font-bold">.co.za</span>
+              </a>
+            </Link>
+            <p className="mb-4">
+              Helping South Africans optimize their CVs for ATS systems and overcome
+              the unemployment crisis with localized job market solutions.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <FaFacebookF />
+              <a href="https://facebook.com" className="hover:text-amber-500 transition-colors">
+                <Facebook />
               </a>
-              <a href="https://twitter.com/supportatsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
-                <FaTwitter />
+              <a href="https://twitter.com" className="hover:text-amber-500 transition-colors">
+                <Twitter />
               </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <FaLinkedinIn />
+              <a href="https://instagram.com" className="hover:text-amber-500 transition-colors">
+                <Instagram />
               </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <FaInstagram />
+              <a href="https://linkedin.com" className="hover:text-amber-500 transition-colors">
+                <Linkedin />
               </a>
             </div>
           </div>
-
+          
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h3 className="text-lg font-semibold mb-4 text-white">Features</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-neutral-400 hover:text-white transition-colors">
-                  Home
+                <Link href="/analyzer">
+                  <a className="hover:text-amber-500 transition-colors">ATS Analyzer</a>
                 </Link>
               </li>
               <li>
-                <Link href="/jobs" className="text-neutral-400 hover:text-white transition-colors">
-                  Job Board
+                <Link href="/cv-improvement">
+                  <a className="hover:text-amber-500 transition-colors">CV Improvement Tracker</a>
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-neutral-400 hover:text-white transition-colors">
-                  Pricing
+                <Link href="/job-matcher">
+                  <a className="hover:text-amber-500 transition-colors">Job Matcher</a>
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-neutral-400 hover:text-white transition-colors">
-                  About Us
+                <Link href="/interview-simulator">
+                  <a className="hover:text-amber-500 transition-colors">Interview Simulator</a>
                 </Link>
               </li>
             </ul>
           </div>
-
+          
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
+            <h3 className="text-lg font-semibold mb-4 text-white">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/#upload" className="text-neutral-400 hover:text-white transition-colors">
-                  Free ATS Score
+                <Link href="/blog">
+                  <a className="hover:text-amber-500 transition-colors">Blog</a>
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
-                  CV Tips
+                <Link href="/job-sites">
+                  <a className="hover:text-amber-500 transition-colors">South African Job Sites</a>
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works#faq" className="text-neutral-400 hover:text-white transition-colors">
-                  FAQ
+                <Link href="/cv-templates">
+                  <a className="hover:text-amber-500 transition-colors">CV Templates</a>
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-neutral-400 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-neutral-400 hover:text-white transition-colors">
-                  Terms of Service
+                <Link href="/faq">
+                  <a className="hover:text-amber-500 transition-colors">FAQ</a>
                 </Link>
               </li>
             </ul>
           </div>
-
+          
           <div>
-            <h4 className="font-semibold mb-4">Contact Us</h4>
+            <h3 className="text-lg font-semibold mb-4 text-white">Company</h3>
             <ul className="space-y-2">
-              <li className="flex items-start">
-                <FaEnvelope className="mt-1 mr-2 text-neutral-400" />
-                <span className="text-neutral-400">support@atsboost.co.za</span>
+              <li>
+                <Link href="/about">
+                  <a className="hover:text-amber-500 transition-colors">About Us</a>
+                </Link>
               </li>
-              <li className="flex items-start">
-                <FaMapMarkerAlt className="mt-1 mr-2 text-neutral-400" />
-                <span className="text-neutral-400">Cape Town, South Africa</span>
+              <li>
+                <Link href="/contact">
+                  <a className="hover:text-amber-500 transition-colors">Contact</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing">
+                  <a className="hover:text-amber-500 transition-colors">Pricing</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy">
+                  <a className="hover:text-amber-500 transition-colors">Privacy Policy</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms">
+                  <a className="hover:text-amber-500 transition-colors">Terms of Service</a>
+                </Link>
               </li>
             </ul>
-            <div className="mt-4">
-              <form className="flex flex-col space-y-2">
-                <Input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="px-3 py-2 bg-neutral-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                />
-                <Button type="submit" className="bg-primary text-white hover:bg-opacity-90">
-                  Subscribe to Newsletter
-                </Button>
-              </form>
-            </div>
           </div>
         </div>
-
-        <div className="border-t border-neutral-700 pt-6 text-neutral-400 text-sm flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            &copy; {currentYear} ATSBoost. All rights reserved.
-          </div>
-          <div>
-            <span>Built for South African job seekers | POPIA Compliant</span>
-          </div>
+        
+        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm">
+          <p>© {currentYear} ATSBoost.co.za. All rights reserved.</p>
+          <p className="mt-2">
+            Helping South Africans overcome the unemployment crisis with localized ATS optimization.
+          </p>
         </div>
       </div>
     </footer>
