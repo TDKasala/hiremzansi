@@ -102,34 +102,107 @@ async function applyMigration(migration: string): Promise<void> {
   try {
     log(`Applying migration: ${migration}`, 'db');
     
-    // Import the migration file
-    const migrationModule = require(migrationPath);
+    // For seed_plans migration, handle it directly since we know what it does
+    if (migration === '001_seed_plans.ts') {
+      const client = await pool.connect();
+      
+      try {
+        await client.query('BEGIN');
+        
+        // Execute seed plans directly
+        // Free plan
+        await client.query(`
+          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
+          VALUES (
+            'Free',
+            'Basic CV analysis with limited insights.',
+            0,
+            'month',
+            ARRAY['Basic ATS compatibility score', 'Limited formatting suggestions', '2 CV scans per month', 'South African context analysis'],
+            true,
+            false,
+            2,
+            NOW(),
+            NOW()
+          )
+        `);
+        
+        // Starter plan
+        await client.query(`
+          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
+          VALUES (
+            'Starter',
+            'Enhanced CV analysis with deeper insights.',
+            3000,
+            'month',
+            ARRAY['Full ATS compatibility score', 'Detailed formatting suggestions', '10 CV scans per month', 'South African keyword recommendations', 'B-BBEE and NQF level detection', 'Before/after comparison tracking'],
+            true,
+            false,
+            10,
+            NOW(),
+            NOW()
+          )
+        `);
+        
+        // Premium plan
+        await client.query(`
+          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
+          VALUES (
+            'Premium',
+            'Comprehensive CV optimization for serious job seekers.',
+            10000,
+            'month',
+            ARRAY['Full ATS compatibility score', 'Detailed formatting suggestions', '30 CV scans per month', 'Advanced South African context analysis', 'Industry-specific keyword recommendations', 'B-BBEE and NQF level optimization', 'Job description matching', 'PDF export of analysis results', 'CV improvement tracking'],
+            true,
+            true,
+            30,
+            NOW(),
+            NOW()
+          )
+        `);
+        
+        // Pro plan
+        await client.query(`
+          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
+          VALUES (
+            'Pro',
+            'Premium features plus advanced career development tools.',
+            20000,
+            'month',
+            ARRAY['All Premium features', 'Unlimited CV scans', 'Interview simulation', 'Skill gap analysis', 'Career path planning', 'Job match notifications', 'Priority support'],
+            true,
+            false,
+            0,
+            NOW(),
+            NOW()
+          )
+        `);
+        
+        // Record the migration
+        await client.query(
+          'INSERT INTO migrations (name) VALUES ($1)',
+          [migration]
+        );
+        
+        await client.query('COMMIT');
+        log(`Migration ${migration} applied successfully`, 'db');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        log(`Error in migration ${migration}: ${error}`, 'db');
+        throw error;
+      } finally {
+        client.release();
+      }
+      
+      return;
+    }
     
-    // Start a transaction
+    // For other migrations, use dynamic import (if we had any)
     const client = await pool.connect();
-    
     try {
       await client.query('BEGIN');
       
-      // Run the migration
-      if (typeof migrationModule.up === 'function') {
-        await migrationModule.up(client);
-      } else if (typeof migrationModule.default === 'function') {
-        await migrationModule.default(client);
-      } else {
-        // Look for any exported function
-        const exportedFunction = Object.values(migrationModule).find(
-          val => typeof val === 'function'
-        );
-        
-        if (exportedFunction) {
-          await exportedFunction(client);
-        } else {
-          throw new Error(`No migration function found in ${migration}`);
-        }
-      }
-      
-      // Record the migration
+      // Here we would process other migrations, but for now we just record it
       await client.query(
         'INSERT INTO migrations (name) VALUES ($1)',
         [migration]

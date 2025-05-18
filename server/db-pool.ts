@@ -13,7 +13,7 @@ let globalPool: Pool | null = null;
 const HEALTH_CHECK_INTERVAL = 60000; // 1 minute
 
 // Configure pool settings
-const getPoolConfig = (): NeonPoolConfig => {
+const getPoolConfig = (): PoolConfig => {
   // Check for required environment variables
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL environment variable is required');
