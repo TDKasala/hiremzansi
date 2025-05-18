@@ -180,33 +180,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const fileSize = req.file.size;
         
-        // Get filename from the uploaded file or use a default name
-        const fileName = req.file.originalname || 'CV.pdf';
+        // Get filename from the uploaded file with a guaranteed default
+        let fileName = "default_cv.pdf";
+        if (req.file && req.file.originalname && req.file.originalname.trim() !== '') {
+          fileName = req.file.originalname;
+        }
         
-        // Log the exact data we're inserting to debug the issue
-        console.log("Creating CV with data:", {
-          userId,
-          title,
+        // Log what we're saving to help with debugging
+        console.log("CV upload details:", {
           fileName,
           fileType: req.file.mimetype,
           fileSize,
-          contentLength: textContent.length,
+          title,
+          isGuest
+        });
+                
+        // Directly create the CV with explicit fields - hardcoded to ensure it works
+        const cv = await storage.createCV({
+          userId,
+          fileName: fileName, // Explicitly set with fallback
+          fileType: req.file.mimetype,
+          fileSize: req.file.size,
+          content: textContent,
+          title: title,
           isGuest: isGuest || false
         });
-        
-        // Create a database-ready object with all required fields
-        const cvData = {
-          userId,
-          title,
-          fileName, // This is the required field that was causing issues
-          fileType: req.file.mimetype,
-          fileSize,
-          content: textContent,
-          isGuest: isGuest || false
-        };
-        
-        // Insert the CV into the database
-        const cv = await storage.createCV(cvData);
         
         console.log("CV created successfully with ID:", cv.id);
         
