@@ -1,276 +1,591 @@
 /**
- * LocalAI Service
+ * LocalAI Service for CV Analysis
  * 
- * This service provides CV analysis capabilities without requiring external API calls.
- * It's specifically designed for South African job market analysis and works entirely
- * within the application, with no dependencies on external AI services.
+ * This service provides an AI-like analysis for CVs using local rule-based algorithms.
+ * It's specifically designed for South African job market analysis without requiring external API keys.
  */
 
-// South African specific keywords and terms
-const SA_KEYWORDS = [
-  'b-bbee', 'bbbee', 'broad-based black economic empowerment',
-  'nqf', 'national qualifications framework',
-  'saqa', 'south african qualifications authority',
-  'seta', 'sector education and training authority',
-  'johannesburg', 'cape town', 'durban', 'pretoria', 'bloemfontein',
-  'western cape', 'gauteng', 'kwazulu-natal', 'free state', 'eastern cape',
-  'south africa', 'south african',
-  'jse', 'johannesburg stock exchange',
-  'bcom', 'b.com', 'bsc', 'b.sc', 
-  'matric',
-  'popi', 'popia', 'protection of personal information act',
-  'icasa', 'fsca', 'fais',
-  'btech', 'national diploma',
-  'unisa', 'university of cape town', 'wits', 'university of johannesburg',
-  'stellenbosch',
-  'afrikaans', 'zulu', 'xhosa', 'sotho', 'tswana', 'venda', 'tsonga', 'ndebele'
-];
+import { randomUUID } from 'crypto';
 
-// Skills that are valued in the South African job market
-const VALUED_SKILLS = [
-  'project management', 'leadership', 'communication', 'teamwork',
-  'microsoft office', 'excel', 'powerpoint', 'word',
-  'javascript', 'python', 'java', 'c#', 'html', 'css',
-  'data analysis', 'business intelligence', 'power bi', 'tableau',
-  'accounting', 'financial management', 'budgeting',
-  'operations', 'logistics', 'supply chain',
-  'sales', 'marketing', 'customer service',
-  'human resources', 'recruitment', 'training',
-  'research', 'analysis', 'problem solving',
-  'bilingual', 'multilingual'
-];
-
-// Common CV sections to check for
-const CV_SECTIONS = [
-  'professional summary', 'summary', 'profile', 'objective',
-  'experience', 'work experience', 'employment history',
-  'education', 'qualifications', 'academic background',
-  'skills', 'key skills', 'technical skills', 'competencies',
-  'achievements', 'accomplishments',
-  'references', 'professional references'
-];
-
-/**
- * Analyzes CV text and provides an assessment with South African context
- * 
- * @param cvText The raw text content of the CV
- * @returns Comprehensive analysis results
- */
-export function analyzeCVText(cvText: string) {
-  // Normalize text for analysis
-  const text = cvText.toLowerCase();
-  
-  // Check for sections presence
-  const detectedSections = CV_SECTIONS.filter(section => 
-    text.includes(section) || 
-    text.includes(section + ':') || 
-    text.includes(section + ' ')
-  );
-  
-  const hasProperSections = detectedSections.length >= 3;
-  
-  // Check for proper formatting
-  const hasBulletPoints = /•|-|\*/i.test(cvText);
-  const hasDates = /20\d{2}|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december/i.test(text);
-  
-  // Formatting score calculation
-  const formatScore = Math.round(
-    (hasProperSections ? 40 : 0) +
-    (hasBulletPoints ? 30 : 0) +
-    (hasDates ? 30 : 0)
-  );
-  
-  // Detect skills
-  const detectedSkills = VALUED_SKILLS.filter(skill => 
-    text.includes(skill) || 
-    text.includes(skill + 's') || 
-    text.includes(skill + 'ing')
-  );
-  
-  // Calculate skill score
-  const skillScore = Math.min(100, Math.round((detectedSkills.length / 10) * 100));
-  
-  // Detect South African specific elements
-  const detectedSAElements = SA_KEYWORDS.filter(element => text.includes(element));
-  
-  // Calculate South African relevance score
-  const saScore = Math.min(100, Math.round((detectedSAElements.length / 5) * 100));
-  
-  // Determine South African relevance rating
-  let saRelevance = "Low";
-  if (saScore >= 80) saRelevance = "Excellent";
-  else if (saScore >= 60) saRelevance = "High";
-  else if (saScore >= 30) saRelevance = "Medium";
-  
-  // Calculate overall score (weighted average)
-  const overall_score = Math.round(
-    (formatScore * 0.4) + 
-    (skillScore * 0.4) + 
-    (saScore * 0.2)
-  );
-  
-  // Determine overall rating
-  let rating = "Needs Improvement";
-  if (overall_score >= 80) rating = "Excellent";
-  else if (overall_score >= 70) rating = "Very Good";
-  else if (overall_score >= 60) rating = "Good";
-  else if (overall_score >= 40) rating = "Average";
-  
-  // Generate actionable feedback
-  const strengths = [];
-  const improvements = [];
-  const format_feedback = [];
-  
-  // Format feedback
-  if (hasProperSections) {
-    strengths.push("CV has a good structure with clear sections");
-  } else {
-    improvements.push("Add clear section headings (e.g., Profile, Experience, Education, Skills)");
-    format_feedback.push("Organize your CV into distinct sections with clear headings");
-  }
-  
-  if (hasBulletPoints) {
-    strengths.push("Effective use of bullet points to highlight information");
-  } else {
-    improvements.push("Use bullet points to make achievements and responsibilities stand out");
-    format_feedback.push("Add bullet points (•) to list your responsibilities and achievements");
-  }
-  
-  if (hasDates) {
-    strengths.push("Timeline is clear with proper dates");
-  } else {
-    improvements.push("Include dates for your work experience and education");
-    format_feedback.push("Add specific dates (month and year) for each position and qualification");
-  }
-  
-  // South African context feedback
-  if (saScore >= 60) {
-    strengths.push("Good inclusion of South African specific information");
-  } else {
-    improvements.push("Add more South African context (e.g., B-BBEE status, NQF levels)");
-    
-    if (!text.includes('bbee') && !text.includes('b-bbee')) {
-      improvements.push("Consider adding your B-BBEE status if applicable");
-    }
-    
-    if (!text.includes('nqf')) {
-      improvements.push("Include NQF levels for your qualifications");
-    }
-  }
-  
-  // Skills feedback
-  if (detectedSkills.length >= 7) {
-    strengths.push("Strong skills section with relevant keywords");
-  } else if (detectedSkills.length >= 3) {
-    improvements.push("Expand your skills section with more relevant keywords");
-  } else {
-    improvements.push("Add a dedicated skills section with relevant keywords");
-  }
-  
-  // Return comprehensive analysis
-  return {
-    overall_score,
-    rating,
-    format_score: formatScore,
-    skill_score: skillScore,
-    sa_score: saScore,
-    sa_relevance: saRelevance,
-    strengths,
-    improvements,
-    format_feedback,
-    sections_detected: detectedSections,
-    skills_identified: detectedSkills,
-    sa_elements_detected: detectedSAElements
-  };
+export interface LocalAIAnalysisResult {
+  overall_score: number;
+  rating: string;
+  format_score: number;
+  skill_score: number;
+  sa_score: number;
+  sa_relevance: string;
+  strengths: string[];
+  improvements: string[];
+  format_feedback: string[];
+  sections_detected: string[];
+  skills_identified: string[];
+  sa_elements_detected: string[];
 }
 
+// Dictionary of South African specific terms and patterns to recognize
+const SA_PATTERNS = {
+  b_bbee: /(b-bbee|bbbee|broad[- ]based black economic empowerment|bee )/i,
+  nqf: /nqf level \d+|national qualifications? framework/i,
+  sa_cities: /(johannesburg|cape town|durban|pretoria|bloemfontein|port elizabeth|gqeberha|east london|polokwane|nelspruit|mbombela|kimberley|pietermaritzburg|stellenbosch|potchefstroom)/i,
+  sa_provinces: /(gauteng|western cape|kwazulu[- ]natal|eastern cape|mpumalanga|limpopo|north west|free state|northern cape)/i,
+  sa_currencies: /(r\d+|zar|rand)/i,
+  sa_languages: /(afrikaans|xhosa|zulu|ndebele|sepedi|sesotho|setswana|siswati|tshivenda|xitsonga)/i,
+  sa_universities: /(university of (cape town|witwatersrand|pretoria|stellenbosch|johannesburg|kwazulu[- ]natal|the western cape)|uct|wits|tuks|up|uj|ukzn|uwc|unisa|north west university|rhodes university)/i,
+  sa_companies: /(sasol|standard bank|fnb|absa|nedbank|mtn|vodacom|multichoice|shoprite|pick n pay|sanlam|old mutual|discovery|telkom|transnet|eskom|denel|sappi)/i,
+  sa_regulations: /(popi act|protection of personal information|fais|fica|national credit act|consumer protection act|employment equity act|skills development act|labor relations act|bcea)/i
+};
+
+// List of common job skills for matching
+const COMMON_SKILLS = [
+  'microsoft office', 'excel', 'word', 'powerpoint', 'outlook',
+  'project management', 'team leadership', 'problem solving', 'communication',
+  'javascript', 'python', 'java', 'c#', 'c++', 'php', 'typescript',
+  'html', 'css', 'react', 'angular', 'vue', 'node.js', 'express',
+  'sql', 'postgresql', 'mysql', 'mongodb', 'database management',
+  'aws', 'azure', 'google cloud', 'cloud computing',
+  'agile', 'scrum', 'kanban', 'waterfall',
+  'customer service', 'sales', 'marketing', 'seo', 'social media',
+  'data analysis', 'machine learning', 'artificial intelligence',
+  'budgeting', 'financial analysis', 'accounting',
+  'research', 'critical thinking', 'strategic planning',
+  'writing', 'editing', 'content creation',
+  'adobe photoshop', 'illustrator', 'indesign', 'ui/ux design',
+  'human resources', 'recruitment', 'training', 'onboarding',
+  'logistics', 'supply chain', 'inventory management',
+  'quality assurance', 'quality control', 'testing',
+];
+
+// Section patterns to identify CV structure
+const SECTION_PATTERNS = {
+  summary: /(professional|career|personal|summary|profile|objective)/i,
+  skills: /skills|technical skills|competencies|core competencies|expertise|areas of expertise/i,
+  experience: /experience|work experience|professional experience|employment history|work history/i,
+  education: /education|academic|qualifications|educational background|academic qualifications/i,
+  projects: /projects|portfolio|key projects|personal projects|major projects/i,
+  awards: /awards|achievements|honors|recognitions|accolades/i,
+  certifications: /certifications|certificates|professional certifications|accreditations/i,
+  languages: /languages|language proficiency|spoken languages/i,
+  references: /references|professional references/i,
+  volunteer: /volunteer|volunteering|community service|community involvement/i,
+  interests: /interests|hobbies|personal interests|activities/i,
+  publications: /publications|research|papers|articles|published works/i
+};
+
+// Format patterns to check for good CV structure
+const FORMAT_PATTERNS = {
+  bullet_points: /•|\*|➢|→|✓|-|∙|⋅/,
+  contact_info: /email|phone|mobile|linkedin|github|website/i,
+  dates: /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december)[a-z]* \d{4}/i,
+  quantified_achievements: /increased|decreased|reduced|improved|grew|won|launched|developed|created|managed|led/i,
+  action_verbs: /developed|managed|created|implemented|designed|led|coordinated|analyzed|achieved|launched/i
+};
+
 /**
- * Performs a deep analysis of a CV with additional South African context
- * 
- * @param cvText The raw text content of the CV
- * @param jobDescription Optional job description to match against
- * @returns Detailed analysis with additional insights
+ * Service class for local CV analysis
  */
-export function performDeepAnalysis(cvText: string, jobDescription?: string) {
-  // Get basic analysis first
-  const basicAnalysis = analyzeCVText(cvText);
-  
-  // Additional deep analysis logic
-  const hasQuantifiableAchievements = /increased|decreased|improved|reduced|achieved|won|grew|delivered|managed|led|created/i.test(cvText);
-  const hasMetrics = /\d+%|\d+ percent|\d+ million|\dM|R\d+|\$\d+|ZAR \d+/i.test(cvText);
-  const hasActionVerbs = /managed|led|developed|implemented|created|designed|analyzed|coordinated|achieved|delivered/i.test(cvText);
-  
-  // Advanced formatting checks
-  const hasConsistentFormatting = !(/\n\n\n/.test(cvText)); // No excessive spacing
-  const hasAppropriateLength = cvText.length > 1000 && cvText.length < 8000; // Not too short or long
-  
-  // South African specific checks
-  const hasLocalCompanies = /(vodacom|mtn|shoprite|spar|pick n pay|absa|standard bank|fnb|nedbank|sasol|multichoice|telkom|eskom|transnet|denel|sanlam|discovery|old mutual)/i.test(cvText);
-  const hasLocalDegrees = /(bachelor|bsc|ba|bcom|nqf|n4|n5|n6)/i.test(cvText);
-  
-  let saContextScore = basicAnalysis.sa_score;
-  
-  // Boost SA score based on additional checks
-  if (hasLocalCompanies) saContextScore = Math.min(100, saContextScore + 15);
-  if (hasLocalDegrees) saContextScore = Math.min(100, saContextScore + 10);
-  
-  // Extended strengths and suggestions
-  const extendedStrengths = [...basicAnalysis.strengths];
-  const extendedImprovements = [...basicAnalysis.improvements];
-  
-  if (hasQuantifiableAchievements) {
-    extendedStrengths.push("Good use of quantifiable achievements");
-  } else {
-    extendedImprovements.push("Add numbers and metrics to quantify your achievements");
+export class LocalAIService {
+  /**
+   * Analyze CV text to provide ATS and South African market specific feedback
+   * without requiring external API calls
+   */
+  analyzeCV(cvText: string): LocalAIAnalysisResult {
+    // Count total words for statistics
+    const wordCount = cvText.split(/\s+/).length;
+    const lineCount = cvText.split('\n').length;
+    
+    // Detect CV sections
+    const sectionsDetected = this.detectSections(cvText);
+    
+    // Detect skills
+    const skillsIdentified = this.detectSkills(cvText);
+    
+    // Evaluate format
+    const formatScore = this.evaluateFormat(cvText);
+    const formatFeedback = this.generateFormatFeedback(cvText, formatScore);
+    
+    // Evaluate South African context
+    const { saScore, saElementsDetected } = this.evaluateSAContext(cvText);
+    
+    // Calculate overall score
+    // Format: 40%, Skills: 40%, SA Relevance: 20%
+    const skillScore = Math.min(100, Math.round((skillsIdentified.length / 10) * 100));
+    const overallScore = Math.round(
+      (formatScore * 0.4) + 
+      (skillScore * 0.4) + 
+      (saScore * 0.2)
+    );
+    
+    // Determine SA relevance label
+    let saRelevance = 'Low';
+    if (saScore >= 80) saRelevance = 'Excellent';
+    else if (saScore >= 60) saRelevance = 'High';
+    else if (saScore >= 40) saRelevance = 'Medium';
+    
+    // Generate strengths and improvement suggestions
+    const strengths = this.generateStrengths(
+      formatScore, 
+      skillScore, 
+      saScore, 
+      sectionsDetected, 
+      skillsIdentified, 
+      saElementsDetected
+    );
+    
+    const improvements = this.generateImprovements(
+      formatScore, 
+      skillScore, 
+      saScore, 
+      sectionsDetected, 
+      skillsIdentified, 
+      saElementsDetected
+    );
+    
+    // Determine rating
+    let rating = 'Poor';
+    if (overallScore >= 90) rating = 'Excellent';
+    else if (overallScore >= 80) rating = 'Very Good';
+    else if (overallScore >= 70) rating = 'Good';
+    else if (overallScore >= 60) rating = 'Above Average';
+    else if (overallScore >= 50) rating = 'Average';
+    else if (overallScore >= 40) rating = 'Below Average';
+    
+    return {
+      overall_score: overallScore,
+      rating,
+      format_score: formatScore,
+      skill_score: skillScore,
+      sa_score: saScore,
+      sa_relevance: saRelevance,
+      strengths,
+      improvements,
+      format_feedback: formatFeedback,
+      sections_detected: sectionsDetected,
+      skills_identified: skillsIdentified,
+      sa_elements_detected: saElementsDetected
+    };
   }
   
-  if (hasMetrics) {
-    extendedStrengths.push("Effective use of metrics to demonstrate impact");
-  } else {
-    extendedImprovements.push("Include metrics (percentages, amounts, etc.) to show your impact");
+  /**
+   * Detect CV sections to evaluate structure and completeness
+   */
+  private detectSections(cvText: string): string[] {
+    const sections: string[] = [];
+    
+    // Detect sections using regex patterns
+    for (const [section, pattern] of Object.entries(SECTION_PATTERNS)) {
+      if (pattern.test(cvText)) {
+        sections.push(section);
+      }
+    }
+    
+    return sections;
   }
   
-  if (hasActionVerbs) {
-    extendedStrengths.push("Strong action verbs to describe your experience");
-  } else {
-    extendedImprovements.push("Use more powerful action verbs to describe your responsibilities");
+  /**
+   * Detect skills mentioned in the CV
+   */
+  private detectSkills(cvText: string): string[] {
+    const skills: string[] = [];
+    const lowerText = cvText.toLowerCase();
+    
+    // Match against common skills list
+    for (const skill of COMMON_SKILLS) {
+      if (lowerText.includes(skill.toLowerCase())) {
+        // Avoid duplicates
+        if (!skills.includes(skill)) {
+          skills.push(skill);
+        }
+      }
+    }
+    
+    return skills;
   }
   
-  if (hasConsistentFormatting) {
-    extendedStrengths.push("Consistent formatting throughout the document");
-  } else {
-    extendedImprovements.push("Ensure consistent formatting and spacing throughout your CV");
+  /**
+   * Evaluate CV format quality
+   */
+  private evaluateFormat(cvText: string): number {
+    let score = 0;
+    const lines = cvText.split('\n');
+    
+    // Check for appropriate length (300-700 words ideal)
+    const wordCount = cvText.split(/\s+/).length;
+    if (wordCount >= 300 && wordCount <= 700) {
+      score += 20;
+    } else if (wordCount > 200 && wordCount < 900) {
+      score += 10;
+    }
+    
+    // Check for section headers
+    const sectionsFound = this.detectSections(cvText);
+    score += Math.min(20, sectionsFound.length * 4);
+    
+    // Check for bullet points
+    let bulletPointsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.bullet_points.test(line)) {
+        bulletPointsFound++;
+      }
+    }
+    
+    if (bulletPointsFound >= 10) {
+      score += 15;
+    } else if (bulletPointsFound >= 5) {
+      score += 10;
+    } else if (bulletPointsFound >= 1) {
+      score += 5;
+    }
+    
+    // Check for contact information
+    if (FORMAT_PATTERNS.contact_info.test(cvText)) {
+      score += 10;
+    }
+    
+    // Check for dates
+    let datesFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.dates.test(line)) {
+        datesFound++;
+      }
+    }
+    
+    if (datesFound >= 3) {
+      score += 15;
+    } else if (datesFound >= 1) {
+      score += 10;
+    }
+    
+    // Check for quantified achievements
+    let quantifiedAchievementsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.quantified_achievements.test(line)) {
+        quantifiedAchievementsFound++;
+      }
+    }
+    
+    if (quantifiedAchievementsFound >= 5) {
+      score += 15;
+    } else if (quantifiedAchievementsFound >= 3) {
+      score += 10;
+    } else if (quantifiedAchievementsFound >= 1) {
+      score += 5;
+    }
+    
+    // Check for strong action verbs
+    let actionVerbsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.action_verbs.test(line)) {
+        actionVerbsFound++;
+      }
+    }
+    
+    if (actionVerbsFound >= 8) {
+      score += 15;
+    } else if (actionVerbsFound >= 5) {
+      score += 10;
+    } else if (actionVerbsFound >= 2) {
+      score += 5;
+    }
+    
+    // Cap score at 100
+    return Math.min(100, score);
   }
   
-  if (hasAppropriateLength) {
-    extendedStrengths.push("Appropriate CV length for South African standards");
-  } else if (cvText.length < 1000) {
-    extendedImprovements.push("Your CV is too short. Expand on your experience and skills");
-  } else {
-    extendedImprovements.push("Your CV is too long. Try to keep it within 2-3 pages for South African standards");
+  /**
+   * Generate format feedback based on evaluation
+   */
+  private generateFormatFeedback(cvText: string, formatScore: number): string[] {
+    const feedback: string[] = [];
+    const lines = cvText.split('\n');
+    const wordCount = cvText.split(/\s+/).length;
+    
+    // Length feedback
+    if (wordCount < 300) {
+      feedback.push('Your CV is too short. Aim for 300-700 words to provide enough detail while remaining concise.');
+    } else if (wordCount > 800) {
+      feedback.push('Your CV is quite lengthy. Consider condensing to 2 pages maximum to maintain recruiter interest.');
+    }
+    
+    // Section headers feedback
+    const sectionsFound = this.detectSections(cvText);
+    const missingSections = ['summary', 'skills', 'experience', 'education'].filter(
+      section => !sectionsFound.includes(section)
+    );
+    
+    if (missingSections.length > 0) {
+      feedback.push(`Add clear section headers for: ${missingSections.join(', ')}.`);
+    }
+    
+    // Bullet points feedback
+    let bulletPointsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.bullet_points.test(line)) {
+        bulletPointsFound++;
+      }
+    }
+    
+    if (bulletPointsFound < 5) {
+      feedback.push('Use more bullet points to highlight your experiences and achievements.');
+    }
+    
+    // Contact information feedback
+    if (!FORMAT_PATTERNS.contact_info.test(cvText)) {
+      feedback.push('Include complete contact information at the top of your CV.');
+    }
+    
+    // Dates feedback
+    let datesFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.dates.test(line)) {
+        datesFound++;
+      }
+    }
+    
+    if (datesFound < 2) {
+      feedback.push('Include clear dates for your work experience and education sections.');
+    }
+    
+    // Quantified achievements feedback
+    let quantifiedAchievementsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.quantified_achievements.test(line)) {
+        quantifiedAchievementsFound++;
+      }
+    }
+    
+    if (quantifiedAchievementsFound < 3) {
+      feedback.push('Add more quantified achievements using numbers and percentages to demonstrate your impact.');
+    }
+    
+    // Action verbs feedback
+    let actionVerbsFound = 0;
+    for (const line of lines) {
+      if (FORMAT_PATTERNS.action_verbs.test(line)) {
+        actionVerbsFound++;
+      }
+    }
+    
+    if (actionVerbsFound < 5) {
+      feedback.push('Use more strong action verbs at the beginning of bullet points to describe your experiences.');
+    }
+    
+    return feedback;
   }
   
-  // South African context improvements
-  if (!hasLocalCompanies) {
-    extendedImprovements.push("Highlight experience with South African companies if applicable");
+  /**
+   * Evaluate South African context relevance
+   */
+  private evaluateSAContext(cvText: string): { saScore: number, saElementsDetected: string[] } {
+    let score = 0;
+    const saElementsDetected: string[] = [];
+    
+    // Check for B-BBEE status
+    if (SA_PATTERNS.b_bbee.test(cvText)) {
+      score += 20;
+      saElementsDetected.push('B-BBEE Status');
+    }
+    
+    // Check for NQF levels
+    if (SA_PATTERNS.nqf.test(cvText)) {
+      score += 20;
+      saElementsDetected.push('NQF Level');
+    }
+    
+    // Check for South African cities
+    if (SA_PATTERNS.sa_cities.test(cvText)) {
+      score += 10;
+      saElementsDetected.push('SA Location');
+    }
+    
+    // Check for South African provinces
+    if (SA_PATTERNS.sa_provinces.test(cvText)) {
+      score += 10;
+      saElementsDetected.push('SA Province');
+    }
+    
+    // Check for South African currencies
+    if (SA_PATTERNS.sa_currencies.test(cvText)) {
+      score += 10;
+      saElementsDetected.push('SA Currency (Rand/ZAR)');
+    }
+    
+    // Check for South African languages
+    if (SA_PATTERNS.sa_languages.test(cvText)) {
+      score += 15;
+      saElementsDetected.push('SA Languages');
+    }
+    
+    // Check for South African universities
+    if (SA_PATTERNS.sa_universities.test(cvText)) {
+      score += 15;
+      saElementsDetected.push('SA Education');
+    }
+    
+    // Check for South African companies
+    if (SA_PATTERNS.sa_companies.test(cvText)) {
+      score += 10;
+      saElementsDetected.push('SA Companies');
+    }
+    
+    // Check for South African regulations
+    if (SA_PATTERNS.sa_regulations.test(cvText)) {
+      score += 15;
+      saElementsDetected.push('SA Regulations');
+    }
+    
+    // Normalize score to 100
+    const normalizedScore = Math.min(100, score);
+    
+    return { saScore: normalizedScore, saElementsDetected };
   }
   
-  if (!hasLocalDegrees) {
-    extendedImprovements.push("Clearly indicate South African qualifications and their NQF levels");
+  /**
+   * Generate strengths based on analysis
+   */
+  private generateStrengths(
+    formatScore: number, 
+    skillScore: number, 
+    saScore: number, 
+    sectionsDetected: string[], 
+    skillsIdentified: string[],
+    saElementsDetected: string[]
+  ): string[] {
+    const strengths: string[] = [];
+    
+    // Format strengths
+    if (formatScore >= 80) {
+      strengths.push('Your CV has an excellent structure that makes it easy for ATS systems to parse.');
+    } else if (formatScore >= 70) {
+      strengths.push('Your CV has a good overall format with clear sections.');
+    }
+    
+    if (sectionsDetected.includes('summary')) {
+      strengths.push('Your professional summary provides a strong overview of your background and aspirations.');
+    }
+    
+    if (sectionsDetected.length >= 6) {
+      strengths.push('Your CV includes comprehensive sections that provide a well-rounded view of your qualifications.');
+    }
+    
+    // Skills strengths
+    if (skillScore >= 80) {
+      strengths.push('You have a diverse set of relevant skills that align well with job requirements.');
+    } else if (skillScore >= 60) {
+      strengths.push('You have included several in-demand skills that employers are looking for.');
+    }
+    
+    if (skillsIdentified.length >= 8) {
+      strengths.push('The range of technical and soft skills demonstrated in your CV is impressive.');
+    }
+    
+    // South African context strengths
+    if (saScore >= 80) {
+      strengths.push('Your CV is exceptionally well-tailored for the South African job market.');
+    } else if (saScore >= 60) {
+      strengths.push('Your CV includes important South African context that will benefit local applications.');
+    }
+    
+    if (saElementsDetected.includes('B-BBEE Status')) {
+      strengths.push('Including your B-BBEE status is valuable for South African employers focused on transformation.');
+    }
+    
+    if (saElementsDetected.includes('NQF Level')) {
+      strengths.push('Specifying NQF levels for your qualifications helps employers understand South African equivalencies.');
+    }
+    
+    if (saElementsDetected.includes('SA Languages')) {
+      strengths.push('Your multilingual capabilities are an asset in South Africa\'s diverse workplace environment.');
+    }
+    
+    if (saElementsDetected.includes('SA Regulations')) {
+      strengths.push('Your knowledge of South African regulations demonstrates valuable local industry understanding.');
+    }
+    
+    // Return 3-5 top strengths, or provide defaults if not enough found
+    if (strengths.length < 3) {
+      strengths.push(
+        'Your CV includes some key information that employers are looking for.',
+        'You have included specific details about your experience that add credibility.'
+      );
+    }
+    
+    return strengths.slice(0, 5);
   }
   
-  // Return the enhanced analysis
-  return {
-    ...basicAnalysis,
-    sa_score: saContextScore,
-    strengths: extendedStrengths,
-    improvements: extendedImprovements,
-    has_quantifiable_achievements: hasQuantifiableAchievements,
-    has_metrics: hasMetrics,
-    has_action_verbs: hasActionVerbs,
-    has_consistent_formatting: hasConsistentFormatting,
-    has_appropriate_length: hasAppropriateLength,
-    has_local_companies: hasLocalCompanies,
-    has_local_degrees: hasLocalDegrees
-  };
+  /**
+   * Generate improvement suggestions based on analysis
+   */
+  private generateImprovements(
+    formatScore: number, 
+    skillScore: number, 
+    saScore: number, 
+    sectionsDetected: string[], 
+    skillsIdentified: string[],
+    saElementsDetected: string[]
+  ): string[] {
+    const improvements: string[] = [];
+    
+    // Format improvements
+    if (formatScore < 60) {
+      improvements.push('Improve your CV format with clear section headers and consistent formatting.');
+    }
+    
+    if (!sectionsDetected.includes('summary')) {
+      improvements.push('Add a professional summary at the top to quickly highlight your value proposition.');
+    }
+    
+    if (!sectionsDetected.includes('skills')) {
+      improvements.push('Include a dedicated skills section to highlight your technical and soft skills.');
+    }
+    
+    // Skills improvements
+    if (skillScore < 60) {
+      improvements.push('Add more industry-relevant keywords to help your CV pass ATS screening.');
+    }
+    
+    if (skillsIdentified.length < 5) {
+      improvements.push('Expand the range of skills listed in your CV to demonstrate versatility.');
+    }
+    
+    // South African context improvements
+    if (saScore < 40) {
+      improvements.push('Add more South African specific elements to make your CV more relevant for local employers.');
+    }
+    
+    if (!saElementsDetected.includes('B-BBEE Status')) {
+      improvements.push('Include your B-BBEE status to increase opportunities with transformation-focused companies.');
+    }
+    
+    if (!saElementsDetected.includes('NQF Level')) {
+      improvements.push('Specify NQF levels for your qualifications to align with South African standards.');
+    }
+    
+    if (!saElementsDetected.includes('SA Languages')) {
+      improvements.push('Highlight South African language proficiencies which are valued in the local job market.');
+    }
+    
+    if (sectionsDetected.includes('education') && !saElementsDetected.includes('SA Education')) {
+      improvements.push('If applicable, ensure your educational institutions are clearly identified as South African.');
+    }
+    
+    // Return 3-5 top improvements, or provide defaults if not enough found
+    if (improvements.length < 3) {
+      improvements.push(
+        'Consider adding more quantified achievements to demonstrate the impact of your work.',
+        'Use more industry-specific terminology to better match job descriptions.'
+      );
+    }
+    
+    return improvements.slice(0, 5);
+  }
+  
+  /**
+   * Generate a unique ID for the analysis
+   */
+  generateAnalysisId(): string {
+    return randomUUID();
+  }
 }
+
+// Export singleton instance
+export const localAIService = new LocalAIService();

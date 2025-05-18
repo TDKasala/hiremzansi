@@ -675,7 +675,7 @@ export default function SkillGapAnalyzer() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {cvs.map((cv: any) => (
                             <SelectItem key={cv.id} value={cv.id.toString()}>
                               {cv.title || `CV #${cv.id}`}
