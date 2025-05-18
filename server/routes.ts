@@ -133,9 +133,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         size: req.file.size
       });
       
-      const title = req.body.title || "Untitled CV";
+      // Get title from form data or use filename as the title, or fallback to default
+      const title = req.body.title || (req.file.originalname ? req.file.originalname.replace(/\.[^/.]+$/, "") : "Untitled CV");
       const isGuest = !req.isAuthenticated();
-      let userId = isGuest ? null : req.user.id;
+      let userId = isGuest ? null : (req.user ? req.user.id : null);
       
       // Extract text based on file type
       let textContent = "";
