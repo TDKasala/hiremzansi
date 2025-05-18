@@ -96,11 +96,44 @@ export default function HeroSection() {
                   animation: isAnimated ? 'float 6s ease-in-out infinite' : 'none',
                 }}
               >
-                <img 
-                  src="/attached_assets/ChatGPT Image May 18, 2025, 09_46_48 PM.png" 
-                  alt="Modern CV template" 
-                  className="w-full h-auto rounded-lg shadow-lg" 
-                />
+                <div className="bg-white text-black p-6 rounded-lg shadow-lg">
+                  <div className="border-b border-gray-200 pb-4 mb-4">
+                    <h2 className="text-xl font-bold text-center mb-1">Your Name</h2>
+                    <p className="text-gray-600 text-sm text-center flex justify-center gap-3">
+                      <span>📧 your.email@example.com</span> 
+                      <span>📱 Your Phone Number</span>
+                    </p>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <div className="bg-amber-400 text-black px-4 py-2 rounded-md font-bold mb-3">Key Skills</div>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Digital Marketing</span>
+                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">Analytics</span>
+                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">SETA-Certified</span>
+                      <span className="text-sm bg-pink-200 px-3 py-1 rounded-md">Project Management</span>
+                    </div>
+                    
+                    <div className="bg-cyan-500 text-white px-4 py-2 rounded-md font-bold mb-3">Experience</div>
+                    <div className="mb-4">
+                      <p className="font-bold">Marketing Manager</p>
+                      <p className="text-sm">Cape Town Media Group</p>
+                      <p className="text-sm text-gray-600">2020 - Present</p>
+                      <ul className="list-disc ml-5 text-sm mt-2">
+                        <li>Leading digital marketing campaigns</li>
+                        <li>Overseeing project management</li>
+                        <li>Delivering results with analytics</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-purple-400 text-white px-4 py-2 rounded-md font-bold mb-3">Additional Information</div>
+                    <ul className="list-disc ml-5 text-sm">
+                      <li>SETA Certified</li>
+                      <li>B-BBEE information included</li>
+                      <li>NQF-levels specified</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
               
               {/* Animated highlights that appear one by one */}
