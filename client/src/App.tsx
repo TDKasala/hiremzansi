@@ -32,6 +32,7 @@ import ATSResultsPage from "@/pages/ATSResultsPage";
 import MotivationDemoPage from "@/pages/MotivationDemoPage";
 import MotivationDashboard from "@/pages/MotivationDashboard";
 import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
+import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
@@ -130,6 +131,7 @@ function App() {
                   <Route path="/motivation-demo" component={() => <MotivationDemoPage />} />
                   <Route path="/motivation-dashboard" component={() => <MotivationDashboard />} />
                   <Route path="/local-ai-demo" component={() => <LocalAIDemoPage />} />
+                  <Route path="/sa-ai-demo" component={() => <SouthAfricanAIDemo />} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
