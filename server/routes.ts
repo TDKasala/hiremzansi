@@ -7,6 +7,7 @@ import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
 import { atsRouter } from "./services/atsAnalyzer";
+import planFeaturesRouter from "./api/planFeatures";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -74,6 +75,8 @@ const hasActiveSubscription = async (req: Request, res: Response, next: NextFunc
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register plan features routes
+  app.use('/api', planFeaturesRouter);
   // Set up authentication routes and middleware
   setupAuth(app);
 

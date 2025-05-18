@@ -11,6 +11,7 @@ import BlogPage from "@/pages/BlogPage";
 import AuthPage from "@/pages/AuthPage";
 import PricingPage from "@/pages/PricingPage";
 import ContactPage from "@/pages/ContactPage";
+import Dashboard from "@/pages/Dashboard";
 import { AuthProvider } from "@/hooks/use-auth";
 import { useScrollTop } from "@/hooks/use-scroll-top";
 
@@ -35,6 +36,7 @@ export default function App() {
               <Route path="/auth" component={AuthPage} />
               <Route path="/pricing" component={PricingPage} />
               <Route path="/contact" component={ContactPage} />
+              <Route path="/dashboard" component={Dashboard} />
             </Switch>
           </main>
           <Footer />
