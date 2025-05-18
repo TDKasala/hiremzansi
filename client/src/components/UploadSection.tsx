@@ -1,77 +1,362 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { useDropzone } from "react-dropzone";
-import { useFileUpload } from "@/hooks/useFileUpload";
-import { useAtsScore } from "@/hooks/useAtsScore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  CloudUpload, 
   CheckCircle, 
   AlertCircle, 
   XCircle,
-  Lightbulb
+  Lightbulb,
+  Upload
 } from "lucide-react";
+import { useAtsScore } from "@/hooks/useAtsScore";
 
 export default function UploadSection() {
+  const [step, setStep] = useState<'select' | 'upload' | 'analyze' | 'results'>('select');
   const [consent, setConsent] = useState(false);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
-  const { uploadFile, isUploading } = useFileUpload();
   const { score, analysis, isLoading, analyzeCv } = useAtsScore();
   const { toast } = useToast();
   const [_, setLocation] = useLocation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Step 1: Handle file selection
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    
+    // Validate file type
+    if (file.type !== 'application/pdf' && 
+        file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a PDF or DOCX file",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Maximum file size is 2MB",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setSelectedFile(file);
+    setStep('upload');
+  };
   
-  // Function to handle analyzing the CV
-  const handleAnalyzeClick = async () => {
-    if (!uploadedCvId || !consent) return;
+  // Step 2: Upload the file once consent is given
+  const handleUpload = async () => {
+    if (!selectedFile || !consent) {
+      toast({
+        title: "Required information missing",
+        description: "Please select a file and give consent to proceed",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsUploading(true);
     
     try {
-      // Call the analyze CV endpoint
-      await analyzeCv(uploadedCvId);
+      // Create FormData
+      const formData = new FormData();
+      formData.append('file', selectedFile);
       
-      toast({
-        title: "CV Analysis Complete",
-        description: "Your CV has been analyzed successfully.",
+      // Use the filename without extension as the title
+      const title = selectedFile.name.replace(/\.[^/.]+$/, "") || "My CV";
+      formData.append('title', title);
+      
+      // Explicitly add the filename - this is key for our backend fix
+      const timestamp = Date.now();
+      const safeName = `cv_${timestamp}.${selectedFile.name.split('.').pop() || 'pdf'}`;
+      formData.append('filename', safeName);
+      
+      // Upload to server
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
       });
       
-      // Redirect to CV details page
-      setLocation(`/cv/${uploadedCvId}`);
+      if (!response.ok) {
+        throw new Error(`Upload failed with status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.cv && data.cv.id) {
+        setUploadedCvId(data.cv.id);
+        setStep('analyze');
+        
+        toast({
+          title: "Upload successful",
+          description: "Your CV has been uploaded successfully"
+        });
+      } else {
+        throw new Error("Invalid response format from server");
+      }
     } catch (error) {
       toast({
-        title: "Analysis Failed",
-        description: "There was an error analyzing your CV. Please try again.",
-        variant: "destructive",
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
+  // Step 3: Analyze the CV
+  const handleAnalyze = async () => {
+    if (!uploadedCvId) {
+      toast({
+        title: "CV not uploaded",
+        description: "Please upload your CV first",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      await analyzeCv(uploadedCvId);
+      setStep('results');
+      
+      // Optionally redirect to a detailed results page
+      // setLocation(`/cv/${uploadedCvId}`);
+    } catch (error) {
+      toast({
+        title: "Analysis failed",
+        description: "We couldn't analyze your CV. Please try again.",
+        variant: "destructive"
       });
     }
   };
-
-  const onDrop = async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      setCvFile(file);
-      try {
-        const response = await uploadFile(file);
-        if (response && response.cv && response.cv.id) {
-          setUploadedCvId(response.cv.id);
-        }
-      } catch (error) {
-        console.error("Upload error:", error);
-      }
+  
+  // Render different content based on current step
+  const renderStepContent = () => {
+    switch (step) {
+      case 'select':
+        return (
+          <div className="text-center py-8">
+            <div className="mb-6">
+              <Upload className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-4">Select your CV file</h3>
+              <p className="text-neutral-600 mb-6">
+                Upload your CV to get a detailed ATS analysis and improve your chances of getting interviews.
+              </p>
+            </div>
+            
+            <input
+              type="file"
+              ref={(el) => fileInputRef[1] = el}
+              onChange={handleFileSelect}
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              className="hidden"
+            />
+            
+            <Button 
+              onClick={() => fileInputRef[1]?.click()}
+              className="bg-primary text-white hover:bg-opacity-90"
+            >
+              Select CV File
+            </Button>
+            
+            <p className="text-sm text-neutral-500 mt-4">
+              Supported formats: PDF, DOCX (Max 2MB)
+            </p>
+          </div>
+        );
+        
+      case 'upload':
+        return (
+          <div className="py-6">
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold mb-2">Ready to upload</h3>
+              <div className="flex items-center border rounded p-3 mb-6">
+                <div className="p-2 bg-primary/10 rounded mr-3">
+                  <Upload className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">{selectedFile?.name}</p>
+                  <p className="text-sm text-neutral-500">
+                    {(selectedFile?.size ? (selectedFile.size / 1024).toFixed(1) : 0)} KB
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <div className="flex items-start space-x-2 mb-4">
+                  <Checkbox 
+                    id="consent" 
+                    checked={consent} 
+                    onCheckedChange={(checked) => setConsent(checked as boolean)} 
+                    required
+                  />
+                  <div>
+                    <label 
+                      htmlFor="consent" 
+                      className="text-sm text-neutral-700 font-medium cursor-pointer"
+                    >
+                      I consent to ATSBoost processing my CV data (POPIA compliant) *
+                    </label>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Required to proceed with analysis as per South African data protection laws
+                    </p>
+                  </div>
+                </div>
+                
+                {!consent && (
+                  <p className="text-xs text-red-500 font-medium mb-4">
+                    Please provide consent to continue with CV analysis
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSelectedFile(null);
+                  setStep('select');
+                }}
+                disabled={isUploading}
+              >
+                Back
+              </Button>
+              <Button 
+                className="bg-primary text-white hover:bg-opacity-90 flex-1"
+                onClick={handleUpload}
+                disabled={!consent || isUploading}
+              >
+                {isUploading ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                    Uploading...
+                  </>
+                ) : (
+                  'Upload CV'
+                )}
+              </Button>
+            </div>
+          </div>
+        );
+        
+      case 'analyze':
+        return (
+          <div className="py-6">
+            <div className="text-center mb-6">
+              <CheckCircle className="h-12 w-12 text-success mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">CV Uploaded Successfully</h3>
+              <p className="text-neutral-600">
+                Your CV has been uploaded and is ready for analysis.
+              </p>
+            </div>
+            
+            <Button 
+              className="bg-primary text-white hover:bg-opacity-90 w-full"
+              onClick={handleAnalyze}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                  Analyzing...
+                </>
+              ) : (
+                'Analyze My CV'
+              )}
+            </Button>
+          </div>
+        );
+        
+      case 'results':
+        return (
+          <div className="py-6">
+            <div className="flex flex-col md:flex-row items-start mb-6">
+              <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                <div 
+                  className="h-24 w-24 rounded-full border-4 border-primary flex items-center justify-center"
+                >
+                  <span className="text-3xl font-bold">{score}</span>
+                </div>
+              </div>
+              <div className="flex-grow">
+                <h3 className="text-xl font-semibold mb-2">
+                  {score >= 80 
+                    ? "Your CV is excellent!" 
+                    : score >= 60 
+                    ? "Your CV is on the right track!" 
+                    : "Your CV needs improvement!"}
+                </h3>
+                <p className="text-neutral-600 mb-4">
+                  {score >= 80 
+                    ? "Your CV is performing exceptionally well. Here's what you're doing right:"
+                    : score >= 60 
+                    ? "Your CV is performing well, but there's room for improvement. Here are some quick tips:"
+                    : "Your CV has several issues that might prevent it from passing ATS systems. Here's what to fix:"}
+                </p>
+                <ul className="space-y-2 text-neutral-700">
+                  {analysis?.strengths?.map((strength, index) => (
+                    <li key={`strength-${index}`} className="flex items-start">
+                      <CheckCircle className="text-success mt-1 mr-2 h-5 w-5" />
+                      <span>{strength}</span>
+                    </li>
+                  ))}
+                  {analysis?.improvements?.map((improvement, index) => (
+                    <li key={`improvement-${index}`} className="flex items-start">
+                      <AlertCircle className="text-warning mt-1 mr-2 h-5 w-5" />
+                      <span>{improvement}</span>
+                    </li>
+                  ))}
+                  {analysis?.issues?.map((issue, index) => (
+                    <li key={`issue-${index}`} className="flex items-start">
+                      <XCircle className="text-error mt-1 mr-2 h-5 w-5" />
+                      <span>{issue}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <div className="mt-6">
+                  <Button
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setUploadedCvId(null);
+                      setStep('select');
+                    }}
+                    className="bg-primary text-white hover:bg-opacity-90"
+                  >
+                    Upload a New CV
+                  </Button>
+                  
+                  {uploadedCvId && (
+                    <Button
+                      variant="outline"
+                      className="ml-3"
+                      onClick={() => setLocation(`/cv/${uploadedCvId}`)}
+                    >
+                      View Detailed Report
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
     }
   };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
-    },
-    maxSize: 2 * 1024 * 1024, // 2MB
-    maxFiles: 1,
-  });
 
   return (
     <section id="upload" className="py-16 bg-neutral-100">
@@ -92,119 +377,7 @@ export default function UploadSection() {
               </p>
             </div>
             
-            <div 
-              {...getRootProps()} 
-              className={`border-2 border-dashed rounded-lg p-6 text-center mb-8 cursor-pointer ${
-                isDragActive ? 'border-primary bg-primary/5' : 'border-neutral-300'
-              }`}
-            >
-              <input {...getInputProps()} />
-              <CloudUpload className="h-16 w-16 text-primary mb-4 mx-auto" />
-              <h3 className="text-xl font-semibold mb-2">
-                {isDragActive ? "Drop your CV here" : "Drag and drop your CV here"}
-              </h3>
-              <p className="text-neutral-500 mb-4">or</p>
-              <Button className="bg-primary text-white hover:bg-opacity-90">
-                Browse Files
-              </Button>
-              <p className="text-sm text-neutral-500 mt-4">
-                Supported formats: PDF, DOCX (Max 2MB)
-              </p>
-            </div>
-            
-            {score && !isLoading ? (
-              <div className="flex flex-col md:flex-row items-start mb-6">
-                <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
-                  <div 
-                    className="ats-score-display flex items-center justify-center" 
-                    style={{ "--score-percentage": `${score}%` } as React.CSSProperties}
-                  >
-                    <div className="ats-score-text flex flex-col items-center justify-center h-full">
-                      <span className="text-3xl font-bold">{score}</span>
-                      <span className="text-xs text-neutral-500">ATS SCORE</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-xl font-semibold mb-2">
-                    {score >= 80 
-                      ? "Your CV is excellent!" 
-                      : score >= 60 
-                      ? "Your CV is on the right track!" 
-                      : "Your CV needs improvement!"}
-                  </h3>
-                  <p className="text-neutral-600 mb-4">
-                    {score >= 80 
-                      ? "Your CV is performing exceptionally well. Here's what you're doing right:"
-                      : score >= 60 
-                      ? "Your CV is performing well, but there's room for improvement. Here are some quick tips:"
-                      : "Your CV has several issues that might prevent it from passing ATS systems. Here's what to fix:"}
-                  </p>
-                  <ul className="space-y-2 text-neutral-700">
-                    {analysis?.strengths?.map((strength, index) => (
-                      <li key={`strength-${index}`} className="flex items-start">
-                        <CheckCircle className="text-success mt-1 mr-2 h-5 w-5" />
-                        <span>{strength}</span>
-                      </li>
-                    ))}
-                    {analysis?.improvements?.map((improvement, index) => (
-                      <li key={`improvement-${index}`} className="flex items-start">
-                        <AlertCircle className="text-warning mt-1 mr-2 h-5 w-5" />
-                        <span>{improvement}</span>
-                      </li>
-                    ))}
-                    {analysis?.issues?.map((issue, index) => (
-                      <li key={`issue-${index}`} className="flex items-start">
-                        <XCircle className="text-error mt-1 mr-2 h-5 w-5" />
-                        <span>{issue}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : isUploading || isLoading ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-neutral-600">Analyzing your CV...</p>
-              </div>
-            ) : null}
-            
-            <div className="flex flex-col sm:flex-row sm:justify-between items-center">
-              <div className="mb-4 sm:mb-0 w-full sm:w-auto">
-                <div className="flex items-start space-x-2">
-                  <Checkbox 
-                    id="consent" 
-                    checked={consent} 
-                    onCheckedChange={(checked) => setConsent(checked as boolean)} 
-                    required
-                    aria-required="true"
-                  />
-                  <div>
-                    <label 
-                      htmlFor="consent" 
-                      className="text-sm text-neutral-700 font-medium cursor-pointer"
-                    >
-                      I consent to ATSBoost processing my CV data (POPIA compliant) *
-                    </label>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      This consent is required to proceed with analysis as per South African data protection laws
-                    </p>
-                  </div>
-                </div>
-                {!consent && cvFile && (
-                  <p className="text-xs text-red-500 mt-2 font-medium">
-                    Please provide consent to continue with CV analysis
-                  </p>
-                )}
-              </div>
-              <Button 
-                onClick={handleAnalyzeClick}
-                disabled={!consent || !cvFile} 
-                className="w-full sm:w-auto bg-primary text-white hover:bg-opacity-90"
-              >
-                Analyze CV
-              </Button>
-            </div>
+            {renderStepContent()}
           </CardContent>
         </Card>
       </div>

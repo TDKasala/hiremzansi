@@ -118,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload a new CV
   app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("File upload request received:", req.file ? "File included" : "No file");
+      console.log("CV upload request received at " + new Date().toISOString());
       
       if (!req.file) {
         return res.status(400).json({ 
@@ -127,41 +127,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      console.log("Uploaded file info:", {
+      console.log("Upload details:", {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
-        size: req.file.size
+        size: req.file.size,
+        body_fields: Object.keys(req.body),
+        hasFilename: !!req.body.filename,
+        authenticated: req.isAuthenticated()
       });
       
-      // Get title from form data or use filename as the title, or fallback to default
+      // CRITICAL FIX: Get filename from the new client implementation or generate a safe one
+      const safeFilename = req.body.filename || `cv_${Date.now()}.${req.file.mimetype.includes('pdf') ? 'pdf' : 'docx'}`;
+      
+      // Get title from form data or use original filename as the title
       const title = req.body.title || (req.file.originalname ? req.file.originalname.replace(/\.[^/.]+$/, "") : "Untitled CV");
       const isGuest = !req.isAuthenticated();
-      
-      // CRITICAL FIX: Handle user ID correctly - guest uploads have null userIds
       const userId = isGuest ? null : (req.isAuthenticated() && req.user ? req.user.id : null);
       
-      // Extract text based on file type
+      // Extract text from the uploaded file
       let textContent = "";
       const fileBuffer = req.file.buffer;
       
+      console.log("Processing file:", {
+        filename: safeFilename,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        title: title
+      });
+      
       if (req.file.mimetype === "application/pdf") {
         try {
+          // Try PDF text extraction
           textContent = await extractTextFromPDF(fileBuffer);
+          console.log("PDF text extraction successful, character count:", textContent.length);
         } catch (pdfError) {
           console.error("PDF extraction error:", pdfError);
           return res.status(400).json({ 
             error: "PDF parsing failed", 
-            message: "Unable to extract text from the PDF. Please ensure the PDF is not password protected and contains selectable text."
+            message: "Unable to extract text from the PDF. Please ensure it's not password protected and contains text."
           });
         }
       } else if (req.file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
         try {
+          // Try DOCX text extraction
           textContent = await extractTextFromDOCX(fileBuffer);
+          console.log("DOCX text extraction successful, character count:", textContent.length);
         } catch (docxError) {
           console.error("DOCX extraction error:", docxError);
           return res.status(400).json({ 
             error: "DOCX parsing failed", 
-            message: "Unable to extract text from the DOCX file. Please ensure the file is a valid Microsoft Word document."
+            message: "Unable to extract text from the DOCX file. Please ensure it's a valid Word document."
           });
         }
       } else {
@@ -171,53 +186,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Ensure we have content
       if (!textContent || textContent.trim().length === 0) {
         return res.status(400).json({ 
           error: "Empty document", 
-          message: "No text could be extracted from the uploaded file. Please ensure the file contains text content."
+          message: "No text could be extracted from the file. Please ensure it contains text content."
         });
       }
       
       // Store the CV in the database
       try {
-        const fileSize = req.file.size;
+        // Create a fully defined CV object with the filename from the form
+        console.log("Creating CV record with filename:", safeFilename);
         
-        // CRITICAL FIX: Generate a guaranteed unique filename with timestamp
-        const timestamp = Date.now();
-        const fileExtension = req.file.mimetype === "application/pdf" ? "pdf" : "docx";
-        const fileName = `cv_${timestamp}.${fileExtension}`;
-        
-        // Enhanced logging for troubleshooting
-        console.log("CV UPLOAD DATA:", {
-          fileName,
+        // Use storage.createCV but with guaranteed values
+        const cvData = {
+          userId: userId,
+          fileName: safeFilename,  // Guaranteed filename from form or generated
           fileType: req.file.mimetype,
-          fileSize,
-          title,
-          contentLength: textContent.length,
-          isGuest,
-          userId
-        });
-        
-        // Create a completely defined object with guaranteed values for all fields
-        const cvToCreate = {
-          userId: userId, 
-          fileName: fileName,
-          fileType: req.file.mimetype,
-          fileSize: fileSize,
-          content: textContent.trim().length > 0 ? textContent : "Content unavailable",
+          fileSize: req.file.size,
+          content: textContent || " ",
           title: title || "CV",
-          isGuest: Boolean(isGuest),
-          isDefault: false,
-          description: null,
-          targetPosition: null,
-          targetIndustry: null,
-          jobDescription: null
+          isGuest: Boolean(isGuest)
         };
         
-        // Create CV with the fully defined object
-        const cv = await storage.createCV(cvToCreate);
-        
-        console.log("CV created successfully with ID:", cv.id);
+        console.log("Creating CV with data:", cvData);
+        const cv = await storage.createCV(cvData);
+        console.log("CV created successfully:", cv);
         
         res.status(201).json({
           success: true,
@@ -225,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           cv: {
             id: cv.id,
             title: cv.title,
-            fileName: cv.fileName
+            fileName: safeFilename
           },
           isGuest: isGuest
         });
