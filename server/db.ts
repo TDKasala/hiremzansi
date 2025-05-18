@@ -1,14 +1,22 @@
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import * as schema from "@shared/schema";
+import * as schema from '@shared/schema';
 import { getPool, closePool } from './db-pool';
+import { log } from './vite';
 
-// Get the managed connection pool from our pool manager
+// Export the global pool
 export const pool = getPool();
 
-// Initialize Drizzle ORM with our schema
+// Initialize drizzle with our schema
 export const db = drizzle(pool, { schema });
 
-// Helper function to release pool on app shutdown
+// Close database connection
 export const closeDbConnection = async () => {
-  await closePool();
+  log('Closing database connection...', 'db');
+  
+  try {
+    await closePool();
+    log('Database connection closed successfully', 'db');
+  } catch (error) {
+    log(`Error closing database connection: ${error}`, 'db');
+  }
 };
