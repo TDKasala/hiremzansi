@@ -9,6 +9,7 @@ import CVImprovementPage from "@/pages/CVImprovementPage";
 import BlogPage from "@/pages/BlogPage";
 import AuthPage from "@/pages/AuthPage";
 import PricingPage from "@/pages/PricingPage";
+import ContactPage from "@/pages/ContactPage";
 import { AuthProvider } from "@/hooks/use-auth";
 
 // Create a client
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="/blog" component={BlogPage} />
               <Route path="/auth" component={AuthPage} />
               <Route path="/pricing" component={PricingPage} />
+              <Route path="/contact" component={ContactPage} />
             </Switch>
           </main>
           <Footer />
