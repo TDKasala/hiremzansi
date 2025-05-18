@@ -291,22 +291,62 @@ export class DatabaseStorage implements IStorage {
   async createCV(insertCV: InsertCV): Promise<CV> {
     const now = new Date();
     
-    // Ensure fileName is always provided (critical field)
-    const safeInsertCV = {
-      ...insertCV,
-      fileName: insertCV.fileName || "uploaded_cv.pdf",
+    // CRITICAL FIX: Build a clean object explicitly for all required fields
+    const cleanCV = {
+      userId: insertCV.userId,
+      fileName: insertCV.fileName || `cv_${Date.now()}.pdf`,
+      fileType: insertCV.fileType || "application/pdf",
+      fileSize: insertCV.fileSize || 0,
+      content: insertCV.content || " ", 
+      title: insertCV.title || "CV",
+      isGuest: insertCV.isGuest || false,
       createdAt: now,
       updatedAt: now
     };
     
-    console.log("STORAGE: Creating CV with validated data:", {
-      fileName: safeInsertCV.fileName,
-      fileType: safeInsertCV.fileType,
-      userId: safeInsertCV.userId
+    // Log the exact data going to the database for debugging
+    console.log("STORAGE: Creating CV with explicit cleaned data:", {
+      fileName: cleanCV.fileName,
+      fileType: cleanCV.fileType,
+      fileSize: cleanCV.fileSize,
+      userId: cleanCV.userId
     });
     
-    const [cv] = await db.insert(cvs).values(safeInsertCV).returning();
-    return cv;
+    // Execute direct SQL query to ensure all fields are explicitly provided
+    try {
+      const result = await db
+        .insert(cvs)
+        .values(cleanCV)
+        .returning();
+        
+      if (!result || result.length === 0) {
+        throw new Error("No CV record returned after insert");
+      }
+      
+      return result[0];
+    } catch (error) {
+      console.error("CV INSERT ERROR:", error);
+      // Create a fallback CV object that matches the DB schema if the insert fails
+      // This is for development/testing only
+      const fallbackCV: CV = {
+        id: -1, // Will be changed by client error handling
+        userId: cleanCV.userId,
+        fileName: cleanCV.fileName,
+        fileType: cleanCV.fileType,
+        fileSize: cleanCV.fileSize,
+        content: cleanCV.content,
+        title: cleanCV.title,
+        description: null,
+        isDefault: false,
+        targetPosition: null,
+        targetIndustry: null, 
+        jobDescription: null,
+        isGuest: cleanCV.isGuest,
+        createdAt: now,
+        updatedAt: now
+      };
+      throw error; // Re-throw the error after logging
+    }
   }
 
   async updateCV(id: number, updates: Partial<InsertCV>): Promise<CV> {

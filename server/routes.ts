@@ -180,27 +180,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const fileSize = req.file.size;
         
-        // CRITICAL FIX: Force a guaranteed filename for the database
-        const fileName = "uploaded_cv_" + Date.now() + ".pdf";
+        // CRITICAL FIX: Generate a guaranteed unique filename with timestamp
+        const timestamp = Date.now();
+        const fileExtension = req.file.mimetype === "application/pdf" ? "pdf" : "docx";
+        const fileName = `cv_${timestamp}.${fileExtension}`;
         
-        // Log what we're saving to help with debugging
-        console.log("Fixed CV upload attempt:", {
-          fileName, // Using guaranteed filename
+        // Enhanced logging for troubleshooting
+        console.log("CV UPLOAD DATA:", {
+          fileName,
           fileType: req.file.mimetype,
           fileSize,
           title,
-          contentLength: textContent.length
+          contentLength: textContent.length,
+          isGuest,
+          userId
         });
         
-        // Create a completely defined object with hardcoded default values where needed
+        // Create a completely defined object with guaranteed values for all fields
         const cvToCreate = {
-          userId: userId,
-          fileName: fileName, // Using guaranteed filename
-          fileType: req.file.mimetype || "application/pdf",
-          fileSize: fileSize || 0,
-          content: textContent || " ",
+          userId: userId, 
+          fileName: fileName,
+          fileType: req.file.mimetype,
+          fileSize: fileSize,
+          content: textContent.trim().length > 0 ? textContent : "Content unavailable",
           title: title || "CV",
-          isGuest: Boolean(isGuest)
+          isGuest: Boolean(isGuest),
+          isDefault: false,
+          description: null,
+          targetPosition: null,
+          targetIndustry: null,
+          jobDescription: null
         };
         
         // Create CV with the fully defined object
