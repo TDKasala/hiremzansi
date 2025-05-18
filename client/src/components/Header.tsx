@@ -6,14 +6,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger, 
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, User, LogOut, X } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logoutMutation } = useAuth();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+  
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50">
@@ -71,12 +77,43 @@ export default function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-3">
-          <Link href="/auth">
-            <Button variant="ghost">Log in</Button>
-          </Link>
-          <Link href="/auth">
-            <Button>Sign up</Button>
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>{user.username}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Link href="/profile">
+                    <div className="w-full cursor-pointer">My Profile</div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/dashboard">
+                    <div className="w-full cursor-pointer">Dashboard</div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button onClick={handleLogout} className="w-full text-left flex items-center">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>Log out</span>
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link href="/auth">
+                <Button variant="ghost">Log in</Button>
+              </Link>
+              <Link href="/auth">
+                <Button>Sign up</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -116,13 +153,47 @@ export default function Header() {
             <Link href="/contact" onClick={closeMenu}>
               <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Contact</div>
             </Link>
-            <div className="border-t border-border pt-4 flex space-x-2">
-              <Link href="/auth" onClick={closeMenu}>
-                <Button variant="outline" className="w-full">Log in</Button>
-              </Link>
-              <Link href="/auth" onClick={closeMenu}>
-                <Button className="w-full">Sign up</Button>
-              </Link>
+            <div className="border-t border-border pt-4">
+              {user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 px-2 py-1">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{user.username}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <Link href="/profile" onClick={closeMenu}>
+                      <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">
+                        My Profile
+                      </div>
+                    </Link>
+                    <Link href="/dashboard" onClick={closeMenu}>
+                      <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">
+                        Dashboard
+                      </div>
+                    </Link>
+                  </div>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full flex items-center justify-center"
+                    onClick={() => {
+                      handleLogout();
+                      closeMenu();
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>Log out</span>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex space-x-2">
+                  <Link href="/auth" onClick={closeMenu}>
+                    <Button variant="outline" className="w-full">Log in</Button>
+                  </Link>
+                  <Link href="/auth" onClick={closeMenu}>
+                    <Button className="w-full">Sign up</Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </nav>
         </div>

@@ -7,6 +7,9 @@ import HomePage from "@/pages/HomePage";
 import CVImprovementDemo from "@/pages/CVImprovementDemo";
 import CVImprovementPage from "@/pages/CVImprovementPage";
 import BlogPage from "@/pages/BlogPage";
+import AuthPage from "@/pages/AuthPage";
+import PricingPage from "@/pages/PricingPage";
+import { AuthProvider } from "@/hooks/use-auth";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -14,19 +17,23 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow">
-          <Switch>
-            <Route path="/" component={HomePage} />
-            <Route path="/cv-improvement" component={CVImprovementPage} />
-            <Route path="/analyzer" component={CVImprovementDemo} />
-            <Route path="/blog" component={BlogPage} />
-          </Switch>
-        </main>
-        <Footer />
-      </div>
-      <Toaster />
+      <AuthProvider>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="flex-grow">
+            <Switch>
+              <Route path="/" component={HomePage} />
+              <Route path="/cv-improvement" component={CVImprovementPage} />
+              <Route path="/analyzer" component={CVImprovementDemo} />
+              <Route path="/blog" component={BlogPage} />
+              <Route path="/auth" component={AuthPage} />
+              <Route path="/pricing" component={PricingPage} />
+            </Switch>
+          </main>
+          <Footer />
+        </div>
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
