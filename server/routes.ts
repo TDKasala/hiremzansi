@@ -173,10 +173,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const cv = await storage.createCV({
           userId,
           title,
+          fileName: req.file.originalname, // Add the required fileName field
           fileType: req.file.mimetype,
           fileSize,
-          content: textContent,
-          originalFilename: req.file.originalname
+          content: textContent
         });
         
         res.status(201).json({
