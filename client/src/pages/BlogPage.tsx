@@ -1,149 +1,187 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Helmet } from 'react-helmet';
 import { Link } from 'wouter';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowRight, Search } from 'lucide-react';
-import { blogPosts } from '../data/blog-content';
 
-type BlogPost = typeof blogPosts[0];
+interface BlogPost {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  image: string;
+  category: string;
+}
 
-const BlogPage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+const blogPosts: BlogPost[] = [
+  {
+    id: 1,
+    slug: "b-bbee-impact-sa-resumes",
+    title: "How B-BBEE Status Impacts Your South African Resume",
+    excerpt: "B-BBEE status has become an important factor in the South African job market. Learn how to properly highlight your B-BBEE information on your CV.",
+    date: "May 12, 2025",
+    author: "The ATSBoost team",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=B-BBEE+Impact",
+    category: "South African Job Market"
+  },
+  {
+    id: 2,
+    slug: "nqf-levels-explained",
+    title: "NQF Levels Explained: What South African Employers Look For",
+    excerpt: "Understanding the National Qualifications Framework (NQF) is essential when applying for jobs in South Africa. Learn how to correctly present your qualifications.",
+    date: "May 8, 2025",
+    author: "The ATSBoost team",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=NQF+Levels",
+    category: "Education & Qualifications"
+  },
+  {
+    id: 3,
+    slug: "ats-survival-guide-2025",
+    title: "2025 ATS Survival Guide for South African Job Seekers",
+    excerpt: "With 90% of large companies using Applicant Tracking Systems, understanding how to optimize your resume for ATS is more crucial than ever.",
+    date: "April 30, 2025",
+    author: "The ATSBoost team",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=ATS+Guide",
+    category: "Resume Optimization"
+  },
+  {
+    id: 4,
+    slug: "remote-work-opportunities-sa",
+    title: "Finding Remote Work Opportunities in South Africa",
+    excerpt: "Remote work has transformed the job landscape in South Africa. Discover how to position your CV for remote positions.",
+    date: "April 25, 2025",
+    author: "William Pretorius",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Remote+Work",
+    category: "Job Search Strategy"
+  },
+  {
+    id: 5,
+    slug: "industry-specific-cv-tips",
+    title: "Industry-Specific CV Tips for South Africa's Growth Sectors",
+    excerpt: "Different industries require different CV approaches. Learn how to tailor your resume for South Africa's growing industries like tech, renewable energy, and healthcare.",
+    date: "April 18, 2025",
+    author: "Nomsa Dlamini",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Industry+Tips",
+    category: "Industry Insights"
+  },
+  {
+    id: 6,
+    slug: "language-proficiency-cv",
+    title: "The Importance of Language Proficiency on Your South African CV",
+    excerpt: "In a country with 11 official languages, how you present your language skills can significantly impact your job prospects.",
+    date: "April 10, 2025",
+    author: "Daniel van der Merwe",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Language+Skills",
+    category: "Resume Essentials"
+  },
+  {
+    id: 7,
+    slug: "linkedin-optimization-sa-professionals",
+    title: "LinkedIn Optimization Tips for South African Professionals",
+    excerpt: "Your LinkedIn profile works alongside your CV. Learn how to optimize both for maximum impact in the South African job market.",
+    date: "April 3, 2025",
+    author: "Priya Naidoo",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=LinkedIn+Tips",
+    category: "Social Media Presence"
+  },
+  {
+    id: 8,
+    slug: "graduate-cv-templates",
+    title: "CV Templates for South African Graduates With No Experience",
+    excerpt: "New to the job market? Learn how to create an impressive CV even with limited work experience in the competitive South African job market.",
+    date: "March 28, 2025",
+    author: "Blessing Mokoena",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Graduate+CV",
+    category: "Entry-Level Strategies"
+  },
+  {
+    id: 9,
+    slug: "personal-branding-job-search",
+    title: "Personal Branding: The Secret Weapon in Your Job Search",
+    excerpt: "Discover how to develop a personal brand that makes your CV stand out to South African employers and ATS systems.",
+    date: "March 20, 2025",
+    author: "Jessica Adams",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=Personal+Branding",
+    category: "Career Development"
+  },
+  {
+    id: 10,
+    slug: "ai-tools-resume-optimization",
+    title: "AI Tools That Can Transform Your South African Resume",
+    excerpt: "Artificial intelligence is changing how resumes are created and optimized. Explore the best AI tools for South African job seekers.",
+    date: "March 15, 2025",
+    author: "Mandla Nkosi",
+    image: "https://placehold.co/600x400/28a745/FFFFFF/png?text=AI+Tools",
+    category: "Technology & Innovation"
+  }
+];
 
-  // Get unique categories
-  const categories = [...new Set(blogPosts.map((post) => post.category))];
-
-  // Filter posts based on search query and active tab
-  const filteredPosts = blogPosts.filter((post) => {
-    const matchesSearch = 
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = activeTab === 'all' || post.category === activeTab;
-    
-    return matchesSearch && matchesCategory;
-  });
-
+const BlogPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">ATS Insights for South African Job Seekers</h1>
-          <p className="text-xl text-gray-600">
-            Expert advice to help you navigate the South African job market and optimize your CV for ATS systems.
-          </p>
-        </div>
-
-        {/* Search and Filter */}
-        <div className="max-w-5xl mx-auto mb-12">
-          <div className="flex flex-col md:flex-row gap-4 items-center mb-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Search articles..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button 
-              variant="outline" 
-              className="md:w-auto w-full"
-              onClick={() => setSearchQuery('')}
-            >
-              Clear
-            </Button>
+    <div className="container mx-auto px-4 py-12">
+      <Helmet>
+        <title>Career Insights Blog | ATSBoost South Africa</title>
+        <meta 
+          name="description" 
+          content="Expert advice on CV optimization, ATS strategies, and job search tips for the South African market from ATSBoost.co.za" 
+        />
+      </Helmet>
+      
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">ATSBoost Career Insights</h1>
+        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Expert advice on resume optimization, ATS strategies, and job search tips tailored for the South African job market
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {blogPosts.map((post) => (
+          <div key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md transition-all hover:shadow-xl">
+            <Link href={`/blog/${post.slug}`} className="block">
+                <img 
+                  src={post.image} 
+                  alt={post.title} 
+                  className="w-full h-48 object-cover"
+                />
+                
+                <div className="p-6">
+                  <span className="text-xs font-semibold text-green-600 uppercase tracking-wider">
+                    {post.category}
+                  </span>
+                  
+                  <h2 className="text-xl font-bold mt-2 mb-3 hover:text-green-600 transition-colors">
+                    {post.title}
+                  </h2>
+                  
+                  <p className="text-gray-600 mb-4">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">
+                      {post.date} • {post.author}
+                    </span>
+                    
+                    <span className="text-green-600 font-semibold text-sm hover:underline">
+                      Read More →
+                    </span>
+                  </div>
+                </div>
+            </Link>
           </div>
-
-          <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-              <TabsTrigger value="all">All</TabsTrigger>
-              {categories.map(category => (
-                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Blog Posts */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <h3 className="text-xl font-semibold mb-2">No articles found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your search or filter criteria</p>
-              <Button onClick={() => { setSearchQuery(''); setActiveTab('all'); }}>
-                Reset Filters
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="mt-24 max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 border border-gray-200">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold mb-2">Stay Updated with ATS Trends</h2>
-            <p className="text-gray-600">
-              Get the latest job market insights and ATS optimization strategies delivered to your inbox.
-            </p>
-          </div>
-          <div className="flex flex-col md:flex-row gap-4">
-            <Input 
-              placeholder="Enter your email" 
-              className="md:flex-grow"
-              type="email"
-            />
-            <Button className="bg-amber-500 hover:bg-amber-600">
-              Subscribe
-            </Button>
-          </div>
-        </div>
+        ))}
+      </div>
+      
+      <div className="text-center mt-16">
+        <Link href="/contact" className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block">
+          Request CV Review
+        </Link>
+        
+        <p className="mt-4 text-sm text-gray-500">
+          Get personalized CV optimization advice from our team of experts at <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>
+        </p>
       </div>
     </div>
-  );
-};
-
-const BlogCard = ({ post }: { post: BlogPost }) => {
-  return (
-    <Card className="h-full flex flex-col">
-      <div className="h-48 overflow-hidden">
-        <img 
-          src={post.imageUrl} 
-          alt={post.title} 
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-      <CardHeader>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-amber-600 font-medium">{post.category}</span>
-          <span className="text-sm text-gray-500">{post.date}</span>
-        </div>
-        <CardTitle className="line-clamp-2 hover:text-amber-600">
-          <Link href={`/blog/${post.slug}`}>
-            {post.title}
-          </Link>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-gray-600 line-clamp-3">
-          {post.excerpt}
-        </p>
-      </CardContent>
-      <CardFooter>
-        <Link href={`/blog/${post.slug}`} className="text-amber-600 hover:text-amber-700 flex items-center">
-          Read More
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Link>
-      </CardFooter>
-    </Card>
   );
 };
 

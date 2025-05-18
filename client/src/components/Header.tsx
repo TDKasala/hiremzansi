@@ -1,201 +1,249 @@
-import { Link } from "wouter";
+import { useState } from "react";
+import { useLocation, Link } from "wouter";
+import { Menu, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import { useAuth } from "@/hooks/use-auth";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger, 
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Menu, User, LogOut, X } from "lucide-react";
-import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "react-i18next";
+import LanguageSelector from "./LanguageSelector";
+import atsBoostLogo from "@/assets/atsboost-logo.png";
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [location] = useLocation();
   const { user, logoutMutation } = useAuth();
+  const { t } = useTranslation();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
-  
-  const handleLogout = () => {
-    logoutMutation.mutate();
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const navLinks = [
+    { href: "/", label: t('common.home') },
+    { href: "/job-sites", label: "Job Board" },
+    { href: "/pricing", label: t('common.pricing') },
+    { href: "/refer", label: t('common.refer') },
+    { href: "/blog", label: t('common.blog') },
+    { href: "/about", label: t('common.about') },
+  ];
+
   return (
-    <header className="bg-white border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
-        <div className="flex items-center">
-          <Link href="/" onClick={closeMenu}>
-            <div className="flex items-center cursor-pointer">
-              <div className="bg-amber-500 text-white font-bold p-2 rounded-lg mr-2">ATS</div>
-              <span className="text-xl font-bold">Boost</span>
-              <span className="text-amber-500 text-xl font-bold">.co.za</span>
-            </div>
-          </Link>
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+        <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
+          <img src={atsBoostLogo} alt="ATSBoost Logo" className="h-12 md:h-14 mr-2" />
+          <span className="hidden sm:inline">
+            <span className="text-[#FFCA28] text-2xl md:text-3xl font-bold">ATS</span><span className="text-[#0D6EFD] text-2xl md:text-3xl font-bold">BOOST</span>
+            <span className="text-[#FFCA28] ml-1 text-2xl md:text-3xl">•</span>
+          </span>
+        </Link>
+
+        <div className="hidden md:flex space-x-1">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.href} 
+              href={link.href}
+              className={`px-3 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 font-medium ${
+                location === link.href ? "bg-neutral-100" : ""
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <Link href="/">
-            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Home</div>
-          </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center font-medium hover:text-amber-500 transition-colors">
-              <span>Tools</span>
-              <ChevronDown className="ml-1 h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Link href="/analyzer">
-                  <div className="w-full cursor-pointer">ATS Analyzer</div>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/cv-improvement">
-                  <div className="w-full cursor-pointer">CV Improvement</div>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/job-matcher">
-                  <div className="w-full cursor-pointer">Job Matcher</div>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link href="/pricing">
-            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Pricing</div>
-          </Link>
-          <Link href="/job-sites">
-            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Job Board</div>
-          </Link>
-          <Link href="/blog">
-            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Blog</div>
-          </Link>
-          <Link href="/contact">
-            <div className="font-medium hover:text-amber-500 transition-colors cursor-pointer">Contact</div>
-          </Link>
-        </nav>
-
-        <div className="hidden md:flex items-center space-x-3">
+        <div className="flex items-center space-x-3">
+          <div className="mr-3">
+            <LanguageSelector />
+          </div>
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span>{user.username}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Link href="/profile">
-                    <div className="w-full cursor-pointer">My Profile</div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/dashboard">
-                    <div className="w-full cursor-pointer">Dashboard</div>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <button onClick={handleLogout} className="w-full text-left flex items-center">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <span>Log out</span>
-                  </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            // Logged in UI
+            <div className="hidden md:flex items-center space-x-3">
+              <Button
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+                asChild
+              >
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user.name || user.username}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/job-sites">Job Listing Sites</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/premium-tools">Premium Tools</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/job-seeker-tools">Job Seeker Tools</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/jobs">Find Jobs</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/interview/practice">Interview Practice</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/skills/analyze">Skill Gap Analysis</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                    className="text-red-500 focus:text-red-500"
+                  >
+                    {logoutMutation.isPending ? "Logging out..." : (
+                      <>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>{t('common.logout')}</span>
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
-            <>
-              <Link href="/auth">
-                <Button variant="ghost">Log in</Button>
-              </Link>
-              <Link href="/auth">
-                <Button>Sign up</Button>
-              </Link>
-            </>
+            // Logged out UI
+            <div className="hidden md:flex items-center space-x-3">
+              <Button
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary hover:text-white"
+                asChild
+              >
+                <Link href="/auth">{t('common.login')}</Link>
+              </Button>
+              <Button 
+                className="hidden md:inline-flex"
+                asChild
+              >
+                <Link href="/auth?tab=register">{t('common.signup')}</Link>
+              </Button>
+            </div>
           )}
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-neutral-700"
+            onClick={toggleMobileMenu}
+            aria-label="Menu"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
         </div>
-
-        {/* Mobile menu button */}
-        <button className="md:hidden" onClick={toggleMenu} aria-label="Toggle menu">
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
 
       {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden absolute top-[61px] left-0 right-0 bg-white border-b border-border shadow-lg z-50">
-          <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <Link href="/" onClick={closeMenu}>
-              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Home</div>
-            </Link>
-            <div className="border-t border-border pt-2">
-              <p className="text-sm text-muted-foreground mb-2 px-2">Tools</p>
-              <Link href="/analyzer" onClick={closeMenu}>
-                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">ATS Analyzer</div>
+      {isMobileMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-neutral-200">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`block px-3 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 font-medium ${
+                  location === link.href ? "bg-neutral-100" : ""
+                }`}
+                onClick={closeMobileMenu}
+              >
+                {link.label}
               </Link>
-              <Link href="/cv-improvement" onClick={closeMenu}>
-                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">CV Improvement</div>
-              </Link>
-              <Link href="/job-matcher" onClick={closeMenu}>
-                <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md block cursor-pointer">Job Matcher</div>
-              </Link>
-            </div>
-            <Link href="/pricing" onClick={closeMenu}>
-              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Pricing</div>
-            </Link>
-            <Link href="/job-sites" onClick={closeMenu}>
-              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Job Board</div>
-            </Link>
-            <Link href="/blog" onClick={closeMenu}>
-              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Blog</div>
-            </Link>
-            <Link href="/contact" onClick={closeMenu}>
-              <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">Contact</div>
-            </Link>
-            <div className="border-t border-border pt-4">
-              {user ? (
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2 px-2 py-1">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{user.username}</span>
-                  </div>
-                  <div className="space-y-2">
-                    <Link href="/profile" onClick={closeMenu}>
-                      <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">
-                        My Profile
-                      </div>
-                    </Link>
-                    <Link href="/dashboard" onClick={closeMenu}>
-                      <div className="font-medium px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer">
-                        Dashboard
-                      </div>
-                    </Link>
-                  </div>
-                  <Button 
-                    variant="destructive" 
-                    className="w-full flex items-center justify-center"
-                    onClick={() => {
-                      handleLogout();
-                      closeMenu();
-                    }}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    <span>Log out</span>
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex space-x-2">
-                  <Link href="/auth" onClick={closeMenu}>
-                    <Button variant="outline" className="w-full">Log in</Button>
-                  </Link>
-                  <Link href="/auth" onClick={closeMenu}>
-                    <Button className="w-full">Sign up</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </nav>
+            ))}
+            {user ? (
+              <div className="space-y-2 mt-3 px-3">
+                <Link 
+                  href="/dashboard"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/premium-tools"
+                  className="block px-4 py-2 border-2 border-primary bg-primary/5 text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Premium Tools
+                </Link>
+                <Link 
+                  href="/job-sites"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Job Listing Sites
+                </Link>
+                <Link 
+                  href="/interview/practice"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Interview Practice
+                </Link>
+                <Link 
+                  href="/skills/analyze"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Skill Gap Analysis
+                </Link>
+                <button
+                  onClick={() => {
+                    logoutMutation.mutate();
+                    closeMobileMenu();
+                  }}
+                  disabled={logoutMutation.isPending}
+                  className="w-full px-4 py-2 bg-red-500 text-white text-center rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
+                >
+                  {logoutMutation.isPending ? "Logging out..." : (
+                    <>
+                      <LogOut className="h-4 w-4" />
+                      <span>{t('common.logout')}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="flex space-x-2 mt-3 px-3">
+                <Link 
+                  href="/auth"
+                  className="flex-1 px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  {t('common.login')}
+                </Link>
+                <Link 
+                  href="/auth?tab=register"
+                  className="flex-1 px-4 py-2 bg-primary text-white text-center rounded-md hover:bg-opacity-90 transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  {t('common.signup')}
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </header>

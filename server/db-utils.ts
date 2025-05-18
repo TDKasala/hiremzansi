@@ -1,125 +1,155 @@
-import { Pool } from '@neondatabase/serverless';
-import { getPool } from './db-pool';
-import { log } from './vite';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
+import { pool } from './db';
 
 /**
- * Generate documentation for the database schema
- * Useful for documenting the data model for development purposes
+ * Utility functions for database operations, particularly useful for development
+ * and documentation purposes.
  */
+
+// Create a directory if it doesn't exist
+const ensureDirectoryExists = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+};
+
+// Generate a SQL dump of the current schema for documentation
 export async function generateSchemaDocs() {
+  const docsDir = path.join(process.cwd(), 'docs');
+  const schemaFile = path.join(docsDir, 'db-schema.sql');
+  
+  ensureDirectoryExists(docsDir);
+  
   try {
-    const pool = getPool();
+    console.log('Generating schema documentation...');
     
-    // Get list of tables
-    const tablesResult = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public'
-      ORDER BY table_name
-    `);
+    // Query to get all tables
+    const tableQuery = `
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema='public'
+      AND table_type='BASE TABLE';
+    `;
     
-    const tables = tablesResult.rows.map(row => row.table_name);
+    const tableResult = await pool.query(tableQuery);
+    let schema = '-- ATSBoost Database Schema\n-- Generated on ' + new Date().toISOString() + '\n\n';
     
-    let documentation = '# ATSBoost Database Schema Documentation\n\n';
-    documentation += `Generated on ${new Date().toISOString()}\n\n`;
-    
-    // For each table, get columns, constraints, and indexes
-    for (const tableName of tables) {
-      documentation += `## Table: ${tableName}\n\n`;
+    for (const row of tableResult.rows) {
+      const tableName = row.table_name;
       
-      // Get columns
-      const columnsResult = await pool.query(`
+      // Get table structure
+      const tableStructureQuery = `
         SELECT 
           column_name, 
           data_type, 
           is_nullable, 
           column_default
-        FROM information_schema.columns 
-        WHERE table_name = $1
-        ORDER BY ordinal_position
-      `, [tableName]);
+        FROM 
+          information_schema.columns
+        WHERE 
+          table_name = $1
+        ORDER BY 
+          ordinal_position;
+      `;
       
-      // Add column information
-      documentation += '### Columns\n\n';
-      documentation += '| Name | Type | Nullable | Default |\n';
-      documentation += '| ---- | ---- | -------- | ------- |\n';
+      const columnResult = await pool.query(tableStructureQuery, [tableName]);
       
-      for (const column of columnsResult.rows) {
-        documentation += `| ${column.column_name} | ${column.data_type} | ${column.is_nullable} | ${column.column_default || ''} |\n`;
-      }
+      schema += `-- Table: ${tableName}\n`;
+      schema += `CREATE TABLE IF NOT EXISTS ${tableName} (\n`;
       
-      documentation += '\n';
+      const columns = columnResult.rows.map(col => {
+        let column = `  ${col.column_name} ${col.data_type}`;
+        if (col.is_nullable === 'NO') {
+          column += ' NOT NULL';
+        }
+        if (col.column_default) {
+          column += ` DEFAULT ${col.column_default}`;
+        }
+        return column;
+      });
       
-      // Get primary keys
-      const pkResult = await pool.query(`
+      schema += columns.join(',\n');
+      
+      // Get primary key
+      const pkQuery = `
         SELECT 
           c.column_name
-        FROM information_schema.table_constraints tc
-        JOIN information_schema.constraint_column_usage AS ccu
-          USING (constraint_schema, constraint_name)
-        JOIN information_schema.columns AS c
-          ON c.table_schema = tc.constraint_schema
-          AND tc.table_name = c.table_name 
+        FROM 
+          information_schema.table_constraints tc
+        JOIN 
+          information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)
+        JOIN 
+          information_schema.columns AS c ON c.table_schema = tc.constraint_schema
+          AND tc.table_name = c.table_name
           AND ccu.column_name = c.column_name
-        WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_name = $1
-      `, [tableName]);
+        WHERE 
+          tc.constraint_type = 'PRIMARY KEY' 
+          AND tc.table_name = $1;
+      `;
       
+      const pkResult = await pool.query(pkQuery, [tableName]);
       if (pkResult.rows.length > 0) {
-        documentation += '### Primary Key\n\n';
-        documentation += pkResult.rows.map(row => row.column_name).join(', ') + '\n\n';
+        schema += `,\n  PRIMARY KEY (${pkResult.rows.map(row => row.column_name).join(', ')})`;
       }
       
+      schema += '\n);\n\n';
+      
       // Get foreign keys
-      const fkResult = await pool.query(`
+      const fkQuery = `
         SELECT
           tc.constraint_name,
           kcu.column_name,
           ccu.table_name AS foreign_table_name,
           ccu.column_name AS foreign_column_name
-        FROM information_schema.table_constraints AS tc
-        JOIN information_schema.key_column_usage AS kcu
-          ON tc.constraint_name = kcu.constraint_name
-          AND tc.table_schema = kcu.table_schema
-        JOIN information_schema.constraint_column_usage AS ccu
-          ON ccu.constraint_name = tc.constraint_name
-          AND ccu.table_schema = tc.table_schema
-        WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name = $1
-      `, [tableName]);
+        FROM
+          information_schema.table_constraints AS tc
+        JOIN
+          information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name
+        JOIN
+          information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name
+        WHERE
+          tc.constraint_type = 'FOREIGN KEY'
+          AND tc.table_name = $1;
+      `;
       
-      if (fkResult.rows.length > 0) {
-        documentation += '### Foreign Keys\n\n';
-        documentation += '| Column | References |\n';
-        documentation += '| ------ | ---------- |\n';
-        
-        for (const fk of fkResult.rows) {
-          documentation += `| ${fk.column_name} | ${fk.foreign_table_name}.${fk.foreign_column_name} |\n`;
-        }
-        
-        documentation += '\n';
+      const fkResult = await pool.query(fkQuery, [tableName]);
+      
+      for (const fk of fkResult.rows) {
+        schema += `-- Foreign Key: ${fk.constraint_name}\n`;
+        schema += `ALTER TABLE ${tableName} ADD CONSTRAINT ${fk.constraint_name} ` +
+                  `FOREIGN KEY (${fk.column_name}) REFERENCES ${fk.foreign_table_name}(${fk.foreign_column_name});\n\n`;
       }
       
-      // Add a separator between tables
-      documentation += '---\n\n';
+      // Add indexes
+      const indexQuery = `
+        SELECT
+          indexname,
+          indexdef
+        FROM
+          pg_indexes
+        WHERE
+          tablename = $1
+          AND schemaname = 'public';
+      `;
+      
+      const indexResult = await pool.query(indexQuery, [tableName]);
+      
+      for (const idx of indexResult.rows) {
+        // Skip primary key indexes as they're already defined above
+        if (!idx.indexname.endsWith('_pkey')) {
+          schema += `-- Index: ${idx.indexname}\n`;
+          schema += `${idx.indexdef};\n\n`;
+        }
+      }
     }
     
-    // Write documentation to file
-    const docsDir = path.join(process.cwd(), 'docs');
-    if (!fs.existsSync(docsDir)) {
-      fs.mkdirSync(docsDir, { recursive: true });
-    }
-    
-    fs.writeFileSync(
-      path.join(docsDir, 'db-schema.md'),
-      documentation
-    );
-    
-    log('Database schema documentation generated successfully', 'db');
-    return true;
+    fs.writeFileSync(schemaFile, schema);
+    console.log(`Schema documentation generated at ${schemaFile}`);
+    return schemaFile;
   } catch (error) {
-    log(`Error generating schema docs: ${error}`, 'db');
-    return false;
+    console.error('Error generating schema documentation:', error);
+    throw error;
   }
 }
 
@@ -140,117 +170,11 @@ interface HealthStatus {
   issues: string[];
 }
 
-/**
- * Check database health and return detailed status information
- * @param detailed Set to true to include more detailed information (slower)
- */
+// Check database health and connection status
 export async function checkDatabaseHealth(detailed = true): Promise<HealthStatus> {
   try {
-    const pool = getPool();
-    let isHealthy = true;
-    const issues: string[] = [];
-    
-    // Basic connection test
-    let connectionOk = false;
-    let version = null;
-    
-    try {
-      const versionResult = await pool.query('SELECT version()');
-      connectionOk = true;
-      version = versionResult.rows[0].version;
-    } catch (error) {
-      isHealthy = false;
-      issues.push(`Connection failed: ${error instanceof Error ? error.message : String(error)}`);
-    }
-    
+    console.log('Checking database health...');
     const healthStatus: HealthStatus = {
-      isHealthy,
-      connectionOk,
-      version,
-      size: null,
-      connectionCount: null,
-      connectionUsage: null,
-      tableStats: {},
-      slowQueries: [],
-      issues
-    };
-    
-    // If connection failed, return what we have
-    if (!connectionOk) {
-      return healthStatus;
-    }
-    
-    if (detailed) {
-      try {
-        // Database size
-        const sizeResult = await pool.query(`
-          SELECT pg_size_pretty(pg_database_size(current_database())) as formatted,
-                 pg_database_size(current_database()) as bytes
-        `);
-        healthStatus.size = {
-          formatted: sizeResult.rows[0].formatted,
-          bytes: parseInt(sizeResult.rows[0].bytes, 10)
-        };
-        
-        // Connection stats
-        const connResult = await pool.query(`
-          SELECT count(*) as count, 
-                 (count(*) * 100 / (SELECT setting::int FROM pg_settings WHERE name = 'max_connections')) as usage_percent
-          FROM pg_stat_activity
-        `);
-        healthStatus.connectionCount = parseInt(connResult.rows[0].count, 10);
-        healthStatus.connectionUsage = parseFloat(connResult.rows[0].usage_percent);
-        
-        if (healthStatus.connectionUsage > 80) {
-          isHealthy = false;
-          issues.push(`High connection usage: ${healthStatus.connectionUsage.toFixed(2)}%`);
-        }
-        
-        // Table stats
-        const tableStats = await pool.query(`
-          SELECT relname as table_name, n_live_tup as row_count
-          FROM pg_stat_user_tables
-          ORDER BY row_count DESC
-        `);
-        
-        tableStats.rows.forEach((row: { table_name: string; row_count: string }) => {
-          healthStatus.tableStats[row.table_name] = parseInt(row.row_count, 10);
-        });
-        
-        // Find slow queries
-        const slowQueriesResult = await pool.query(`
-          SELECT pid, now() - query_start as duration, state, substr(query, 1, 100) as query_preview
-          FROM pg_stat_activity
-          WHERE state != 'idle' AND query_start < now() - interval '30 seconds'
-          ORDER BY query_start
-        `);
-        
-        healthStatus.slowQueries = slowQueriesResult.rows.map((row: any) => ({
-          pid: row.pid,
-          duration: row.duration,
-          state: row.state,
-          queryPreview: row.query_preview
-        }));
-        
-        if (healthStatus.slowQueries.length > 0) {
-          isHealthy = false;
-          issues.push(`Found ${healthStatus.slowQueries.length} slow running queries`);
-        }
-      } catch (error) {
-        log(`Error in detailed health check: ${error}`, 'db');
-        issues.push(`Error running detailed checks: ${error instanceof Error ? error.message : String(error)}`);
-        isHealthy = false;
-      }
-    }
-    
-    healthStatus.isHealthy = isHealthy;
-    healthStatus.issues = issues;
-    
-    return healthStatus;
-  } catch (error) {
-    log(`Database health check failed: ${error}`, 'db');
-    
-    return {
       isHealthy: false,
       connectionOk: false,
       version: null,
@@ -259,7 +183,150 @@ export async function checkDatabaseHealth(detailed = true): Promise<HealthStatus
       connectionUsage: null,
       tableStats: {},
       slowQueries: [],
-      issues: [`Health check failed: ${error instanceof Error ? error.message : String(error)}`]
+      issues: [],
+    };
+    
+    // Basic connectivity test
+    const result = await pool.query('SELECT 1 as connection_test');
+    
+    if (result.rows[0].connection_test === 1) {
+      console.log('✓ Database connection is healthy');
+      healthStatus.connectionOk = true;
+    } else {
+      healthStatus.issues.push('Failed basic connection test');
+    }
+    
+    // Skip further checks if connection failed
+    if (!healthStatus.connectionOk) {
+      return healthStatus;
+    }
+    
+    try {
+      // Check PostgreSQL version
+      const versionResult = await pool.query('SELECT version()');
+      const version = versionResult.rows[0].version;
+      console.log(`✓ PostgreSQL version: ${version}`);
+      healthStatus.version = version;
+      
+      // Get database size
+      const sizeQuery = `
+        SELECT pg_size_pretty(pg_database_size(current_database())) as db_size,
+               pg_database_size(current_database()) as db_size_bytes;
+      `;
+      const sizeResult = await pool.query(sizeQuery);
+      console.log(`✓ Current database size: ${sizeResult.rows[0].db_size}`);
+      healthStatus.size = {
+        formatted: sizeResult.rows[0].db_size,
+        bytes: parseInt(sizeResult.rows[0].db_size_bytes, 10)
+      };
+      
+      // Additional detailed checks for production environments
+      if (detailed && process.env.NODE_ENV === 'production') {
+        // Check active connections
+        const connectionsQuery = `
+          SELECT count(*) as active_connections,
+                (SELECT setting::integer FROM pg_settings WHERE name = 'max_connections') as max_connections
+          FROM pg_stat_activity 
+          WHERE datname = current_database();
+        `;
+        const connectionsResult = await pool.query(connectionsQuery);
+        const activeConnections = parseInt(connectionsResult.rows[0].active_connections, 10);
+        const maxConnections = parseInt(connectionsResult.rows[0].max_connections, 10);
+        const connectionPercent = Math.round((activeConnections / maxConnections) * 100);
+        
+        console.log(`✓ Database connections: ${activeConnections}/${maxConnections} (${connectionPercent}%)`);
+        healthStatus.connectionCount = activeConnections;
+        healthStatus.connectionUsage = connectionPercent;
+        
+        // Warning if connection usage is high
+        if (connectionPercent > 80) {
+          console.log(`⚠️ High connection usage: ${connectionPercent}%`);
+          healthStatus.issues.push(`High connection usage: ${connectionPercent}%`);
+        }
+        
+        // Check for long-running queries (potential issues)
+        const longQueriesQuery = `
+          SELECT pid, 
+                 now() - query_start as duration, 
+                 state, 
+                 substring(query, 1, 100) as query_preview
+          FROM pg_stat_activity 
+          WHERE state != 'idle' 
+            AND query_start < now() - interval '30 seconds'
+            AND datname = current_database()
+          ORDER BY duration DESC;
+        `;
+        const longQueriesResult = await pool.query(longQueriesQuery);
+        
+        if (longQueriesResult.rows.length > 0) {
+          console.log(`⚠️ Found ${longQueriesResult.rows.length} long-running queries`);
+          healthStatus.slowQueries = longQueriesResult.rows.map(q => ({
+            pid: q.pid,
+            duration: q.duration,
+            state: q.state,
+            queryPreview: q.query_preview
+          }));
+          
+          healthStatus.issues.push(`${longQueriesResult.rows.length} long-running queries detected`);
+        }
+      }
+      
+      // Count records in main tables
+      const tables = ['users', 'cvs', 'ats_scores', 'sa_profiles'];
+      healthStatus.tableStats = {};
+      
+      for (const table of tables) {
+        try {
+          const countResult = await pool.query(`SELECT COUNT(*) as count FROM ${table}`);
+          const count = parseInt(countResult.rows[0].count, 10);
+          console.log(`✓ Table ${table}: ${count} records`);
+          healthStatus.tableStats[table] = count;
+        } catch (err) {
+          console.log(`✗ Table ${table}: Error getting count`);
+          healthStatus.issues.push(`Could not query table ${table}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error during detailed health checks:', err);
+      healthStatus.issues.push('Failed during detailed health checks');
+    }
+    
+    // Overall health assessment
+    healthStatus.isHealthy = healthStatus.connectionOk && healthStatus.issues.length === 0;
+    
+    return healthStatus;
+  } catch (error) {
+    console.error('Database health check failed:', error);
+    // Create empty health status with error information
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { 
+      isHealthy: false, 
+      connectionOk: false,
+      version: null,
+      size: null,
+      connectionCount: null,
+      connectionUsage: null,
+      tableStats: {},
+      slowQueries: [],
+      issues: ['Database health check failed with error: ' + errorMessage]
     };
   }
+}
+
+// If this script is run directly, perform all checks
+const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+if (isMainModule) {
+  Promise.all([
+    checkDatabaseHealth(),
+    generateSchemaDocs()
+  ])
+  .then(() => {
+    console.log('Database utilities completed successfully');
+    pool.end();
+  })
+  .catch((err) => {
+    console.error('Database utilities failed:', err);
+    pool.end();
+    process.exit(1);
+  });
 }

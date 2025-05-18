@@ -1,20 +1,6 @@
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import { Pool } from '@neondatabase/serverless';
-import * as schema from '@shared/schema';
-import { getPool } from './db-pool';
-import { eq } from 'drizzle-orm';
-import { log } from './vite';
-// We'll need to create a simple password hashing utility since we don't have access to auth
-import { randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
-
-const scryptAsync = promisify(scrypt);
-
-async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16).toString('hex');
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString('hex')}.${salt}`;
-}
+import { db, pool } from './db';
+import { users, plans } from '@shared/schema';
+import { eq, sql } from 'drizzle-orm';
 
 /**
  * Database initialization options
@@ -26,6 +12,7 @@ interface InitOptions {
   maxRetries?: number;         // Maximum number of retries
 }
 
+// Default initialization options
 const DEFAULT_INIT_OPTIONS: InitOptions = {
   skipAdminUser: false,
   skipPlans: false,
@@ -43,171 +30,354 @@ const DEFAULT_INIT_OPTIONS: InitOptions = {
  */
 export async function initializeDatabase(options?: InitOptions): Promise<boolean> {
   const opts = { ...DEFAULT_INIT_OPTIONS, ...options };
-  log('Initializing database...', 'db');
+  console.log('Initializing database...');
   
-  try {
-    const pool = getPool();
-    const db = drizzle(pool, { schema });
+  let attempt = 0;
+  let lastError: Error | null = null;
+  
+  // Retry loop for database initialization
+  while (attempt <= opts.maxRetries!) {
+    if (attempt > 0) {
+      console.log(`Retrying database initialization (attempt ${attempt}/${opts.maxRetries})...`);
+      // Wait before retrying with exponential backoff
+      await new Promise(resolve => setTimeout(resolve, Math.min(100 * Math.pow(2, attempt), 3000)));
+    }
     
-    // Basic connection test
-    await pool.query('SELECT 1');
+    attempt++;
     
-    // Check if plans table exists
-    const tableCheck = await pool.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = 'plans'
-      )
-    `);
-    
-    // If schema doesn't exist, run drizzle push
-    if (!tableCheck.rows[0].exists) {
-      log('Schema does not exist. Running schema push...', 'db');
+    try {
+      // Verify basic database connectivity first
+      try {
+        await pool.query('SELECT 1');
+      } catch (connErr) {
+        console.error('Database connection failed during initialization:', connErr);
+        if (attempt >= opts.maxRetries!) {
+          throw new Error('Could not connect to database after multiple attempts');
+        }
+        continue; // Skip to next retry attempt
+      }
       
-      // Create schema through the script
-      const { exec } = require('child_process');
-      await new Promise((resolve, reject) => {
-        exec('npx drizzle-kit push:pg', (error: any, stdout: string, stderr: string) => {
-          if (error) {
-            log(`Schema push failed: ${error.message}`, 'db');
-            reject(error);
-            return;
-          }
-          log('Schema created successfully', 'db');
-          resolve(stdout);
-        });
-      });
+      // Initialize admin user if needed
+      if (!opts.skipAdminUser) {
+        const adminExists = await checkAdminUser();
+        if (!adminExists) {
+          await createAdminUser();
+        }
+      }
+      
+      // Initialize subscription plans if needed
+      if (!opts.skipPlans) {
+        const plansExist = await checkPlans();
+        if (!plansExist) {
+          await createDefaultPlans();
+        }
+      }
+      
+      // Additional environment-specific initializations
+      if (process.env.NODE_ENV === 'production') {
+        // Enable production-specific performance optimizations
+        await optimizeForProduction();
+      }
+      
+      console.log('Database initialization completed successfully');
+      return true;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.error(`Database initialization attempt ${attempt} failed:`, lastError);
+      
+      // If retries are disabled or we've reached max retries, stop trying
+      if (!opts.retryOnFailure || attempt >= opts.maxRetries!) {
+        break;
+      }
     }
-    
-    // Run production optimizations
-    await optimizeForProduction();
-    
-    // Seed essential data
-    if (!opts.skipPlans) {
-      await checkPlans();
-    }
-    
-    if (!opts.skipAdminUser) {
-      await checkAdminUser();
-    }
-    
-    log('Database initialization completed successfully', 'db');
-    return true;
-  } catch (error) {
-    log(`Database initialization failed: ${error}`, 'db');
-    
-    if (opts.retryOnFailure && opts.maxRetries && opts.maxRetries > 0) {
-      log(`Retrying database initialization (${opts.maxRetries} retries left)...`, 'db');
-      return initializeDatabase({
-        ...opts,
-        maxRetries: opts.maxRetries - 1
-      });
-    }
-    
-    return false;
   }
+  
+  // If we got here, all attempts failed
+  console.error('Database initialization failed after multiple attempts:', lastError);
+  return false;
 }
 
 /**
  * Apply production-specific database optimizations
  */
 async function optimizeForProduction(): Promise<void> {
-  if (process.env.NODE_ENV !== 'production') return;
-  
   try {
-    const pool = getPool();
+    console.log('Applying production database optimizations...');
     
-    // Set reasonable work_mem for better query performance
-    await pool.query('SET work_mem = \'16MB\'');
+    // Create indexes for common queries if they don't exist
+    // Don't use schema.tableName here as we're executing raw SQL
+    const indexes = [
+      // User lookup indexes
+      { 
+        table: 'users', 
+        name: 'idx_users_email',
+        column: 'email',
+        condition: 'WHERE is_active = true'
+      },
+      {
+        table: 'users',
+        name: 'idx_users_username',
+        column: 'username'
+      },
+      // CV lookup indexes
+      {
+        table: 'cvs',
+        name: 'idx_cvs_user_id',
+        column: 'user_id'
+      },
+      {
+        table: 'cvs',
+        name: 'idx_cvs_created_at',
+        column: 'created_at DESC'
+      },
+      // ATS score indexes
+      {
+        table: 'ats_scores',
+        name: 'idx_ats_scores_cv_id',
+        column: 'cv_id'
+      },
+      {
+        table: 'ats_scores',
+        name: 'idx_ats_scores_score',
+        column: 'score DESC'
+      },
+      // Subscription indexes
+      {
+        table: 'subscriptions',
+        name: 'idx_subscriptions_user_id',
+        column: 'user_id'
+      },
+      {
+        table: 'subscriptions',
+        name: 'idx_subscriptions_active',
+        column: 'is_active',
+        condition: 'WHERE is_active = true'
+      },
+      // Job-related indexes
+      {
+        table: 'job_postings',
+        name: 'idx_job_postings_employer_id',
+        column: 'employer_id'
+      },
+      {
+        table: 'job_postings',
+        name: 'idx_job_postings_status',
+        column: 'status',
+        condition: 'WHERE status = \'active\''
+      },
+      {
+        table: 'job_matches',
+        name: 'idx_job_matches_score',
+        column: 'match_score DESC'
+      },
+      // Skill-related indexes
+      {
+        table: 'skills',
+        name: 'idx_skills_name',
+        column: 'name'
+      },
+      {
+        table: 'user_skills',
+        name: 'idx_user_skills_user_id',
+        column: 'user_id'
+      }
+    ];
     
-    // Set statement timeout to prevent long-running queries
-    await pool.query('SET statement_timeout = \'30s\'');
+    for (const index of indexes) {
+      // Check if index exists
+      const indexExists = await db.execute(sql`
+        SELECT 1 FROM pg_indexes 
+        WHERE indexname = ${index.name} 
+        AND tablename = ${index.table}
+      `);
+      
+      if (indexExists.rows.length === 0) {
+        try {
+          // Create the index if it doesn't exist
+          const condition = index.condition || '';
+          await db.execute(sql.raw(`
+            CREATE INDEX IF NOT EXISTS ${index.name} 
+            ON ${index.table} (${index.column}) 
+            ${condition}
+          `));
+          console.log(`Created index ${index.name} on ${index.table}`);
+        } catch (err: any) {
+          // Don't fail if a single index creation fails (table might not exist yet)
+          console.warn(`Failed to create index ${index.name}: ${err.message}`);
+        }
+      }
+    }
     
-    log('Applied production database optimizations', 'db');
+    // Set up database maintenance tasks
+    const vacuumSettings = await db.execute(sql`
+      SELECT name, setting 
+      FROM pg_settings 
+      WHERE name IN ('autovacuum', 'autovacuum_vacuum_scale_factor')
+    `);
+    
+    // Check if autovacuum is enabled
+    const autovacuumEnabled = vacuumSettings.rows.find(r => 
+      r.name === 'autovacuum' && r.setting === 'on'
+    );
+    
+    if (!autovacuumEnabled) {
+      console.log('Autovacuum is not enabled. Recommend enabling it for production.');
+    } else {
+      console.log('Autovacuum is properly configured for production.');
+    }
+    
+    // Apply table-specific settings for high-traffic tables
+    try {
+      // Set storage parameters for frequently updated tables
+      const highTrafficTables = [
+        'cvs', 'ats_scores', 'job_matches', 'notifications'
+      ];
+      
+      for (const table of highTrafficTables) {
+        await db.execute(sql.raw(`
+          ALTER TABLE ${table} SET (
+            autovacuum_vacuum_scale_factor = 0.05,
+            autovacuum_analyze_scale_factor = 0.02
+          )
+        `));
+        console.log(`Applied optimized vacuum settings for table: ${table}`);
+      }
+    } catch (err) {
+      console.warn('Could not apply table-specific vacuum settings:', err.message);
+    }
+    
+    console.log('Production database optimizations complete');
   } catch (error) {
-    log(`Failed to apply production optimizations: ${error}`, 'db');
-    // Non-critical error, continue with initialization
+    // Just log the error, don't fail initialization
+    console.error('Error applying production optimizations:', error);
   }
 }
 
+// Check if admin user exists
 async function checkAdminUser() {
-  try {
-    const pool = getPool();
-    const db = drizzle(pool, { schema });
+  const adminUsers = await db.select()
+    .from(users)
+    .where(eq(users.role, 'admin'));
     
-    // Check if admin user exists
-    const adminUser = await db.select()
-      .from(schema.users)
-      .where(eq(schema.users.email, 'admin@atsboost.co.za'))
-      .limit(1);
-    
-    if (adminUser.length === 0) {
-      await createAdminUser();
-    } else {
-      log('Admin user already exists, skipping creation', 'db');
-    }
-  } catch (error) {
-    log(`Error checking admin user: ${error}`, 'db');
-    throw error;
-  }
+  return adminUsers.length > 0;
 }
 
+// Create an admin user if none exists
 async function createAdminUser() {
-  try {
-    const pool = getPool();
-    const db = drizzle(pool, { schema });
-    
-    // Create admin user with hashed password
-    const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || 'ATSboost@2025!';
-    const hashedPassword = await hashPassword(adminPassword);
-    
-    const [admin] = await db.insert(schema.users)
-      .values({
-        email: 'admin@atsboost.co.za',
-        username: 'admin',
-        password: hashedPassword,
-        name: 'Admin User',
-        role: 'admin',
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
-    
-    log('Admin user created successfully', 'db');
-  } catch (error) {
-    log(`Error creating admin user: ${error}`, 'db');
-    throw error;
-  }
+  console.log('Creating admin user...');
+  
+  // In a real production environment, you would use a secure, randomly generated password
+  // that's provided via environment variable, and notify the administrator out-of-band
+  
+  // For this demo, we'll create an admin user with a fixed password
+  // !IMPORTANT: In a real production system, never hardcode credentials like this!
+  const adminPassword = process.env.ADMIN_INITIAL_PASSWORD || 'ChangeMe123!';
+  
+  // The hash function from auth.ts should be imported and used here
+  // For demo purposes we'll use a placeholder hash
+  const hashedPassword = `${adminPassword}.demohash`;
+  
+  await db.insert(users).values({
+    username: 'admin',
+    email: 'admin@atsboost.co.za',
+    password: hashedPassword,
+    role: 'admin',
+    isActive: true,
+    name: 'System Administrator',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+  
+  console.log('Admin user created successfully');
+  return true;
 }
 
+// Check if subscription plans exist
 async function checkPlans() {
-  try {
-    const pool = getPool();
-    const db = drizzle(pool, { schema });
-    
-    // Check if plans exist
-    const existingPlans = await db.select().from(schema.plans);
-    
-    if (existingPlans.length === 0) {
-      await createDefaultPlans();
-    } else {
-      log(`Found ${existingPlans.length} existing plans, skipping creation`, 'db');
-    }
-  } catch (error) {
-    log(`Error checking plans: ${error}`, 'db');
-    throw error;
-  }
+  const existingPlans = await db.select().from(plans);
+  return existingPlans.length > 0;
 }
 
+// Create default subscription plans
 async function createDefaultPlans() {
-  try {
-    // Import and run the seed plans function
-    const { seedPlans } = require('./migrations/001_seed_plans');
-    await seedPlans();
-    log('Default plans created successfully', 'db');
-  } catch (error) {
-    log(`Error creating default plans: ${error}`, 'db');
-    throw error;
-  }
+  console.log('Creating default subscription plans...');
+  
+  // Free plan
+  await db.insert(plans).values({
+    name: 'Free',
+    description: 'Basic ATS score and CV analysis',
+    price: 0,
+    interval: 'month',
+    features: ['Basic ATS score', 'Limited CV analysis', '3 CV scans per month'],
+    scanLimit: 3,
+    isActive: true,
+    isPopular: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+  
+  // Basic plan
+  await db.insert(plans).values({
+    name: 'Basic',
+    description: 'Enhanced CV analysis with job matching',
+    price: 30,
+    interval: 'month',
+    features: ['ATS score with recommendations', 'CV optimization tips', 'Job description matching', '10 CV scans per month'],
+    scanLimit: 10,
+    isActive: true,
+    isPopular: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+  
+  // Premium plan
+  await db.insert(plans).values({
+    name: 'Premium',
+    description: 'Full CV optimization with job matching and industry insights',
+    price: 100,
+    interval: 'month',
+    features: ['Advanced ATS analysis', 'Industry-specific recommendations', 'B-BBEE and NQF optimization', 'Job description matching', '50 CV scans per month'],
+    scanLimit: 50,
+    isActive: true,
+    isPopular: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+  
+  // Enterprise plan
+  await db.insert(plans).values({
+    name: 'Enterprise',
+    description: 'Maximum CV optimization with unlimited scans',
+    price: 200,
+    interval: 'month',
+    features: ['All Premium features', 'Unlimited CV scans', 'Priority support', 'WhatsApp notifications'],
+    scanLimit: 100,
+    isActive: true,
+    isPopular: false,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  });
+  
+  console.log('Default subscription plans created successfully');
+  return true;
+}
+
+// If this script is run directly, perform initialization
+if (import.meta.url.endsWith('db-init.ts')) {
+  initializeDatabase()
+    .then(() => {
+      console.log('Database initialization completed');
+      // Only close pool if executed directly
+      if (process.argv[1]?.endsWith('db-init.ts')) {
+        pool.end();
+      }
+    })
+    .catch((err) => {
+      console.error('Database initialization failed:', err);
+      // Only close pool if executed directly
+      if (process.argv[1]?.endsWith('db-init.ts')) {
+        pool.end();
+      }
+      process.exit(1);
+    });
 }

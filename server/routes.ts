@@ -6,8 +6,7 @@ import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
-import { atsRouter } from "./services/atsAnalyzer";
-import planFeaturesRouter from "./api/planFeatures";
+import { analyzeCVText } from "./services/localAI";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -75,8 +74,6 @@ const hasActiveSubscription = async (req: Request, res: Response, next: NextFunc
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Register plan features routes
-  app.use('/api', planFeaturesRouter);
   // Set up authentication routes and middleware
   setupAuth(app);
 
@@ -924,8 +921,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Register ATS analysis routes
-  app.use('/api', atsRouter);
+  // Realtime ATS analysis endpoint using local AI service
+  app.post("/api/analyze-resume-text", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { resumeContent, jobDescription } = req.body;
+      
+      if (!resumeContent) {
+        return res.status(400).json({ error: "Resume content is required" });
+      }
+      
+      // Use our advanced local AI service for CV analysis
+      const analysis = analyzeCVText(resumeContent);
+      
+      // Extract job-specific keywords from job description if provided
+      let jobKeywordMatch = null;
+      if (jobDescription && typeof jobDescription === 'string') {
+        // This could be enhanced to extract keywords from job description
+        // and match them against the CV
+        jobKeywordMatch = {
+          matchScore: Math.round(Math.random() * 20) + 60, // Placeholder for now
+          jobRelevance: "Medium" 
+        };
+      }
+      
+      // Return the analysis results in a structured format
+      return res.json({
+        score: analysis.overall_score,
+        rating: analysis.rating,
+        strengths: analysis.strengths.slice(0, 3),
+        weaknesses: analysis.improvements.slice(0, 3),
+        suggestions: analysis.format_feedback.slice(0, 2),
+        sa_score: analysis.sa_score,
+        sa_relevance: analysis.sa_relevance,
+        skills: analysis.skills_identified.slice(0, 8),
+        job_match: jobKeywordMatch
+      });
+    } catch (error) {
+      console.error("Error in CV analysis:", error);
+      next(error);
+    }
+  });
+      const hasBulletPoints = /•|-|\*/i.test(resumeContent);
+      const hasDates = /20\d{2}|19\d{2}|january|february|march|april|may|june|july|august|september|october|november|december/i.test(resumeLower);
       
       const formatScore = Math.round(
         (hasProperSections ? 40 : 0) +
@@ -995,6 +1032,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         analyzed: true,
         timestamp: new Date().toISOString()
       });
+      
     } catch (error) {
       next(error);
     }

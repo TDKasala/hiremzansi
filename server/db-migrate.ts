@@ -1,224 +1,118 @@
-import { Pool } from '@neondatabase/serverless';
-import { getPool } from './db-pool';
+import { db, pool } from './db';
+import fs from 'fs';
+import path from 'path';
+import { sql } from 'drizzle-orm';
 import { log } from './vite';
-import * as fs from 'fs';
-import * as path from 'path';
 
 /**
- * Ensures the migrations table exists in the database
+ * Database migration manager for ATSBoost
+ * This utility handles database migrations using timestamp-based migration files
  */
+
+// Migration table name
+const MIGRATION_TABLE = 'schema_migrations';
+
+// Ensure the migrations table exists
 async function ensureMigrationsTable() {
-  const pool = getPool();
-  
   try {
-    log('Checking migrations table...', 'db');
-    
-    // Check if migrations table exists
-    const tableExists = await pool.query(`
+    // Check if table exists
+    const tableExists = await db.execute(sql`
       SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public'
-        AND table_name = 'migrations'
-      );
+        SELECT FROM pg_tables
+        WHERE schemaname = 'public'
+        AND tablename = ${MIGRATION_TABLE}
+      )
     `);
     
     if (!tableExists.rows[0].exists) {
-      log('Creating migrations table...', 'db');
-      
-      // Create migrations table
-      await pool.query(`
-        CREATE TABLE migrations (
+      // Create migrations table if it doesn't exist
+      log(`Creating migrations table: ${MIGRATION_TABLE}`, 'migrations');
+      await db.execute(sql`
+        CREATE TABLE ${sql.identifier(MIGRATION_TABLE)} (
           id SERIAL PRIMARY KEY,
-          name VARCHAR(255) NOT NULL UNIQUE,
-          applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
+          version VARCHAR(255) NOT NULL UNIQUE,
+          applied_at TIMESTAMP NOT NULL DEFAULT NOW()
+        )
       `);
-      
-      log('Migrations table created successfully', 'db');
-    } else {
-      log('Migrations table already exists', 'db');
     }
   } catch (error) {
-    log(`Error ensuring migrations table: ${error}`, 'db');
+    console.error('Error ensuring migrations table:', error);
     throw error;
   }
 }
 
-/**
- * Gets the list of already applied migrations
- */
+// Get all applied migrations
 async function getAppliedMigrations(): Promise<string[]> {
-  const pool = getPool();
-  
   try {
-    const result = await pool.query(`
-      SELECT name FROM migrations
-      ORDER BY applied_at
+    const result = await db.execute(sql`
+      SELECT version FROM ${sql.identifier(MIGRATION_TABLE)}
+      ORDER BY version ASC
     `);
     
-    return result.rows.map(row => row.name);
-  } catch (error) {
-    log(`Error getting applied migrations: ${error}`, 'db');
-    throw error;
-  }
-}
-
-/**
- * Gets the list of migration files from the migrations directory
- */
-function getMigrationFiles(): string[] {
-  const migrationsDir = path.join(process.cwd(), 'server', 'migrations');
-  
-  try {
-    if (!fs.existsSync(migrationsDir)) {
-      log('Migrations directory does not exist, creating...', 'db');
-      fs.mkdirSync(migrationsDir, { recursive: true });
+    // Explicitly cast to string array
+    const versions: string[] = [];
+    for (const row of result.rows) {
+      if (row && typeof row.version !== 'undefined') {
+        versions.push(String(row.version));
+      }
     }
-    
-    // Get all .js and .ts files from the migrations directory
-    const files = fs.readdirSync(migrationsDir).filter(file => 
-      (file.endsWith('.js') || file.endsWith('.ts')) && 
-      !file.includes('test') && 
-      file !== 'index.js' &&
-      file !== 'index.ts'
-    );
-    
-    // Sort to ensure consistent order
-    return files.sort();
+    return versions;
   } catch (error) {
-    log(`Error getting migration files: ${error}`, 'db');
+    console.error('Error getting applied migrations:', error);
     throw error;
   }
 }
 
-/**
- * Applies a single migration
- */
+// Get all migration files from the migrations directory
+function getMigrationFiles(): string[] {
+  const migrationsDir = path.join(process.cwd(), 'migrations');
+  
+  if (!fs.existsSync(migrationsDir)) {
+    log('Creating migrations directory', 'migrations');
+    fs.mkdirSync(migrationsDir, { recursive: true });
+    return [];
+  }
+  
+  return fs.readdirSync(migrationsDir)
+    .filter(file => file.endsWith('.sql'))
+    .sort(); // Sort by filename (which should start with a timestamp)
+}
+
+// Apply a single migration
 async function applyMigration(migration: string): Promise<void> {
-  const pool = getPool();
-  const migrationsDir = path.join(process.cwd(), 'server', 'migrations');
+  const migrationsDir = path.join(process.cwd(), 'migrations');
   const migrationPath = path.join(migrationsDir, migration);
   
   try {
-    log(`Applying migration: ${migration}`, 'db');
+    // Read the migration file
+    const migrationSql = fs.readFileSync(migrationPath, 'utf8');
     
-    // For seed_plans migration, handle it directly since we know what it does
-    if (migration === '001_seed_plans.ts') {
-      const client = await pool.connect();
-      
-      try {
-        await client.query('BEGIN');
-        
-        // Execute seed plans directly
-        // Free plan
-        await client.query(`
-          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
-          VALUES (
-            'Free',
-            'Basic CV analysis with limited insights.',
-            0,
-            'month',
-            ARRAY['Basic ATS compatibility score', 'Limited formatting suggestions', '2 CV scans per month', 'South African context analysis'],
-            true,
-            false,
-            2,
-            NOW(),
-            NOW()
-          )
-        `);
-        
-        // Starter plan
-        await client.query(`
-          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
-          VALUES (
-            'Starter',
-            'Enhanced CV analysis with deeper insights.',
-            3000,
-            'month',
-            ARRAY['Full ATS compatibility score', 'Detailed formatting suggestions', '10 CV scans per month', 'South African keyword recommendations', 'B-BBEE and NQF level detection', 'Before/after comparison tracking'],
-            true,
-            false,
-            10,
-            NOW(),
-            NOW()
-          )
-        `);
-        
-        // Premium plan
-        await client.query(`
-          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
-          VALUES (
-            'Premium',
-            'Comprehensive CV optimization for serious job seekers.',
-            10000,
-            'month',
-            ARRAY['Full ATS compatibility score', 'Detailed formatting suggestions', '30 CV scans per month', 'Advanced South African context analysis', 'Industry-specific keyword recommendations', 'B-BBEE and NQF level optimization', 'Job description matching', 'PDF export of analysis results', 'CV improvement tracking'],
-            true,
-            true,
-            30,
-            NOW(),
-            NOW()
-          )
-        `);
-        
-        // Pro plan
-        await client.query(`
-          INSERT INTO plans (name, description, price, interval, features, is_active, is_popular, scan_limit, created_at, updated_at)
-          VALUES (
-            'Pro',
-            'Premium features plus advanced career development tools.',
-            20000,
-            'month',
-            ARRAY['All Premium features', 'Unlimited CV scans', 'Interview simulation', 'Skill gap analysis', 'Career path planning', 'Job match notifications', 'Priority support'],
-            true,
-            false,
-            0,
-            NOW(),
-            NOW()
-          )
-        `);
-        
-        // Record the migration
-        await client.query(
-          'INSERT INTO migrations (name) VALUES ($1)',
-          [migration]
-        );
-        
-        await client.query('COMMIT');
-        log(`Migration ${migration} applied successfully`, 'db');
-      } catch (error) {
-        await client.query('ROLLBACK');
-        log(`Error in migration ${migration}: ${error}`, 'db');
-        throw error;
-      } finally {
-        client.release();
-      }
-      
-      return;
-    }
-    
-    // For other migrations, use dynamic import (if we had any)
+    // Start a transaction
     const client = await pool.connect();
+    
     try {
       await client.query('BEGIN');
       
-      // Here we would process other migrations, but for now we just record it
+      // Execute the migration
+      log(`Applying migration: ${migration}`, 'migrations');
+      await client.query(migrationSql);
+      
+      // Record the migration
       await client.query(
-        'INSERT INTO migrations (name) VALUES ($1)',
+        `INSERT INTO ${MIGRATION_TABLE} (version) VALUES ($1)`,
         [migration]
       );
       
       await client.query('COMMIT');
-      log(`Migration ${migration} applied successfully`, 'db');
+      log(`Migration applied successfully: ${migration}`, 'migrations');
     } catch (error) {
       await client.query('ROLLBACK');
-      log(`Error in migration ${migration}: ${error}`, 'db');
       throw error;
     } finally {
       client.release();
     }
   } catch (error) {
-    log(`Failed to apply migration ${migration}: ${error}`, 'db');
+    console.error(`Error applying migration ${migration}:`, error);
     throw error;
   }
 }
@@ -238,26 +132,23 @@ interface MigrationOptions {
   validateOnly?: boolean; // Only validate SQL syntax without executing (if supported by DB)
 }
 
+// Default migration options for different environments
 const DEFAULT_MIGRATION_OPTIONS: MigrationOptions = {
   dryRun: false,
   force: false,
   silent: false,
-  timeout: 30000,
-  backupBefore: false,
+  timeout: process.env.NODE_ENV === 'production' ? 60000 : 30000, // 60s in prod, 30s in dev
+  backupBefore: process.env.NODE_ENV === 'production',
   lockTable: true,
-  maxLockTime: 5000,
+  maxLockTime: 10000, // 10 seconds
   failFast: false,
   validateOnly: false
 };
 
-/**
- * Runs all pending migrations
- * @param options Migration options
- * @returns List of applied migrations
- */
+// Run all pending migrations
 export async function runMigrations(options?: MigrationOptions): Promise<string[]> {
+  // Merge provided options with defaults
   const opts = { ...DEFAULT_MIGRATION_OPTIONS, ...options };
-  const pool = getPool();
   
   try {
     // Ensure migrations table exists
@@ -265,100 +156,128 @@ export async function runMigrations(options?: MigrationOptions): Promise<string[
     
     // Get applied migrations
     const appliedMigrations = await getAppliedMigrations();
+    if (!opts.silent) {
+      log(`Found ${appliedMigrations.length} previously applied migrations`, 'migrations');
+    }
     
     // Get all migration files
     const migrationFiles = getMigrationFiles();
+    if (!opts.silent) {
+      log(`Found ${migrationFiles.length} migration files`, 'migrations');
+    }
     
-    // Filter out already applied migrations
+    // Determine pending migrations
     const pendingMigrations = migrationFiles.filter(
-      migration => !appliedMigrations.includes(migration)
+      file => !appliedMigrations.includes(file)
     );
     
-    // Check if there are any pending migrations
     if (pendingMigrations.length === 0) {
-      log('No pending migrations', 'db');
+      if (!opts.silent) {
+        log('No pending migrations to apply', 'migrations');
+      }
       return [];
     }
     
-    log(`Found ${pendingMigrations.length} pending migrations: ${pendingMigrations.join(', ')}`, 'db');
+    // In production, we should be extra careful about running migrations
+    if (process.env.NODE_ENV === 'production' && !opts.force && !opts.dryRun) {
+      log('⚠️ Production environment detected', 'migrations');
+      log('Running migrations in production without force flag is not recommended', 'migrations');
+      log('Set options.force=true to override this warning', 'migrations');
+      
+      // In an automated environment, we might want to abort here
+      // and require manual intervention
+      if (process.env.MIGRATION_REQUIRE_FORCE === 'true') {
+        throw new Error('Migrations in production require force flag');
+      }
+    }
     
-    // If dry run, just return the list of pending migrations
+    // If this is a dry run, just return what would be migrated
     if (opts.dryRun) {
-      log('Dry run mode - no migrations applied', 'db');
+      log(`Dry run: would apply ${pendingMigrations.length} migrations`, 'migrations');
       return pendingMigrations;
     }
     
-    // Apply migrations
-    const appliedMigrationsList: string[] = [];
+    log(`Applying ${pendingMigrations.length} migrations...`, 'migrations');
+    
+    // Apply each pending migration with timeout handling
     for (const migration of pendingMigrations) {
-      await applyMigration(migration);
-      appliedMigrationsList.push(migration);
+      const migrationPromise = applyMigration(migration);
+      
+      // Set up timeout if specified
+      if (opts.timeout) {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`Migration timed out after ${opts.timeout}ms: ${migration}`));
+          }, opts.timeout);
+        });
+        
+        // Race between migration and timeout
+        await Promise.race([migrationPromise, timeoutPromise]);
+      } else {
+        await migrationPromise;
+      }
     }
     
-    log(`Applied ${appliedMigrationsList.length} migrations successfully`, 'db');
-    return appliedMigrationsList;
+    log('All migrations applied successfully', 'migrations');
+    return pendingMigrations;
   } catch (error) {
-    log(`Migration failed: ${error}`, 'db');
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Migration failed: ${errorMessage}`);
     throw error;
   }
 }
 
-/**
- * Creates a new migration file
- * @param name Name of the migration
- * @returns Path to the created migration file
- */
+// Create a new migration file
 export function createMigration(name: string): string {
-  const migrationsDir = path.join(process.cwd(), 'server', 'migrations');
+  const migrationsDir = path.join(process.cwd(), 'migrations');
   
-  try {
-    if (!fs.existsSync(migrationsDir)) {
-      log('Migrations directory does not exist, creating...', 'db');
-      fs.mkdirSync(migrationsDir, { recursive: true });
-    }
-    
-    // Format name: YYYYMMDD_HHMMSS_name.ts
-    const timestamp = new Date().toISOString()
-      .replace(/[T:-]/g, '')
-      .replace(/\..+/, '');
-    
-    const safeName = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_|_$/g, '');
-    
-    const fileName = `${timestamp}_${safeName}.ts`;
-    const filePath = path.join(migrationsDir, fileName);
-    
-    // Create migration template
-    const template = `/**
- * Migration: ${name}
- * Created at: ${new Date().toISOString()}
- */
-import { PoolClient } from '@neondatabase/serverless';
-
-export async function up(client: PoolClient) {
-  // Write your migration here
-  await client.query(\`
-    -- Your SQL migration here
-  \`);
-}
-
-export async function down(client: PoolClient) {
-  // Write your rollback here (optional)
-  await client.query(\`
-    -- Your rollback SQL here
-  \`);
-}
-`;
-    
-    fs.writeFileSync(filePath, template, 'utf8');
-    log(`Created migration: ${fileName}`, 'db');
-    
-    return filePath;
-  } catch (error) {
-    log(`Error creating migration: ${error}`, 'db');
-    throw error;
+  // Create migrations directory if it doesn't exist
+  if (!fs.existsSync(migrationsDir)) {
+    fs.mkdirSync(migrationsDir, { recursive: true });
   }
+  
+  // Generate timestamp for migration file name
+  const timestamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0].replace('T', '_');
+  const filename = `${timestamp}_${name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.sql`;
+  
+  const migrationPath = path.join(migrationsDir, filename);
+  
+  // Create an empty migration file
+  fs.writeFileSync(migrationPath, `-- Migration: ${name}\n-- Created at: ${new Date().toISOString()}\n\n`);
+  
+  log(`Created new migration: ${filename}`, 'migrations');
+  return filename;
+}
+
+// If running directly, execute migrations
+if (import.meta.url.endsWith('db-migrate.ts')) {
+  const args = process.argv.slice(2);
+  const command = args[0];
+  
+  (async () => {
+    try {
+      if (command === 'create' && args[1]) {
+        // Create a new migration
+        createMigration(args[1]);
+      } else if (command === 'run' || !command) {
+        // Run pending migrations
+        await runMigrations();
+      } else {
+        console.error('Usage: npm run migrate [create <name>|run]');
+        process.exit(1);
+      }
+      
+      // Only close the pool if running directly - not when imported
+      if (process.argv[1]?.endsWith('db-migrate.ts')) {
+        await pool.end();
+      }
+    } catch (error) {
+      console.error('Migration command failed:', error);
+      // Only close the pool if running directly - not when imported
+      if (process.argv[1]?.endsWith('db-migrate.ts')) {
+        await pool.end();
+      }
+      process.exit(1);
+    }
+  })();
 }

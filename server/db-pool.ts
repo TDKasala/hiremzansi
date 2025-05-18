@@ -1,68 +1,100 @@
 import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless';
 import { log } from './vite';
-// Import the WebSocket implementation
 import ws from 'ws';
+import os from 'os';
 
-// Configure Neon to use the WebSocket implementation directly
+// Configure Neon WebSocket
 neonConfig.webSocketConstructor = ws;
 
-// Global pool instance (singleton pattern)
-let globalPool: Pool | null = null;
+/**
+ * Database connection pool manager
+ * Handles connection pooling for production and development environments
+ */
 
-// Pool health check interval (in ms)
-const HEALTH_CHECK_INTERVAL = 60000; // 1 minute
+// Connection pool singleton
+let _pool: Pool | null = null;
 
-// Configure pool settings
+// Pool settings for different environments
 const getPoolConfig = (): PoolConfig => {
-  // Check for required environment variables
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is required');
-  }
+  const isDev = process.env.NODE_ENV === 'development';
+  const isTest = process.env.NODE_ENV === 'test';
+  const isProduction = !isDev && !isTest;
   
-  // Base configuration for all environments
+  // Determine appropriate pool size based on environment
+  // For production, set max connections to a reasonable value based on expected load
+  // Default formula: num_cpu * 2 + 1 (but capped to avoid DB connection limits)
+  const cpuCount = os.cpus().length;
+  const maxPoolSize = isProduction ? Math.min(cpuCount * 2 + 1, 20) : (isDev ? 10 : 5);
+  
+  // Basic pool configuration
   const baseConfig: PoolConfig = {
     connectionString: process.env.DATABASE_URL,
-    // Default max connections
-    max: 10,
-    // Connection timeout
-    connectionTimeoutMillis: 5000,
-    // Idle timeout
-    idleTimeoutMillis: 30000
+    max: maxPoolSize,
+    idleTimeoutMillis: isProduction ? 60000 : 30000, // 1 minute in production, 30 seconds in dev
+    connectionTimeoutMillis: isProduction ? 10000 : 5000, // Connection timeout (10s prod, 5s dev)
+    ssl: isProduction || process.env.DATABASE_SSL === 'true', // Always use SSL in production
+    application_name: 'atsboost_app', // Identify application in PostgreSQL logs
   };
   
-  // Override settings based on environment
-  if (process.env.NODE_ENV === 'production') {
+  // Log the environment-specific configuration
+  const envType = isDev ? 'development' : (isTest ? 'test' : 'production');
+  log(`Setting up PostgreSQL connection pool (${envType} mode, max=${maxPoolSize} connections)`, 'postgres');
+  
+  // Special settings for different environments
+  if (isDev) {
+    return baseConfig;
+  } else if (isTest) {
     return {
       ...baseConfig,
-      // More connections for production
-      max: 20,
-      // Keep connections alive longer in production
-      idleTimeoutMillis: 60000
+      max: 5, // Fewer connections for testing
+      idleTimeoutMillis: 10000, // Shorter idle timeout for testing
+      statement_timeout: 5000, // Shorter timeout for tests
     };
-  } else if (process.env.NODE_ENV === 'test') {
+  } else {
+    // Production settings
     return {
       ...baseConfig,
-      // Fewer connections for test environment
-      max: 5,
-      // Shorter timeouts for test runs
-      connectionTimeoutMillis: 3000,
-      idleTimeoutMillis: 10000
+      // Production-specific timeouts
+      statement_timeout: 15000, // Statement timeout (15 seconds)
+      query_timeout: 20000, // Query timeout (20 seconds)
+      // Connection pool maintenance
+      max: maxPoolSize,
+      min: 2, // Keep at least 2 connections open
+      // Prevent connection leaks
+      allowExitOnIdle: true,
+      // Handle SSL properly
+      ssl: process.env.DATABASE_DISABLE_SSL === 'true' ? false : true
     };
   }
-  
-  return baseConfig;
 };
+
+// Connection check interval (in milliseconds)
+const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
+let healthCheckInterval: NodeJS.Timeout | null = null;
+let lastHealthCheckTime: number = Date.now();
+let consecutiveErrors: number = 0;
+const MAX_CONSECUTIVE_ERRORS = 3;
 
 /**
  * Get a connection pool instance (singleton pattern)
  * This ensures we only create one pool for the entire application
  */
 export function getPool(): Pool {
-  if (!globalPool) {
+  if (!_pool) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    
+    // Create the pool with the appropriate configuration
     createPool();
+    
+    // Start pool health monitoring for production
+    if (process.env.NODE_ENV === 'production') {
+      startPoolHealthCheck();
+    }
   }
   
-  return globalPool!;
+  return _pool!;
 }
 
 /**
@@ -70,28 +102,44 @@ export function getPool(): Pool {
  */
 function createPool(): void {
   try {
-    log('Creating new database connection pool', 'db');
-    globalPool = new Pool(getPoolConfig());
+    _pool = new Pool(getPoolConfig());
     
-    // Set up error handler
-    globalPool.on('error', (err: Error) => {
-      log(`Database pool error: ${err.message}`, 'db');
+    // Add connection event handlers
+    _pool.on('connect', () => {
+      log('New client connected to PostgreSQL', 'postgres');
+    });
+    
+    _pool.on('error', (err) => {
+      log(`PostgreSQL pool error: ${err.message}`, 'postgres');
       
-      // If the connection drops, attempt to reset the pool
-      if (err.message.includes('Connection terminated unexpectedly') || 
-          err.message.includes('Connection refused')) {
-        log('Connection dropped, resetting pool...', 'db');
-        resetPool();
+      // In production, handle critical errors that might indicate we should recreate the pool
+      if (process.env.NODE_ENV === 'production') {
+        const criticalErrors = [
+          'connection terminated unexpectedly',
+          'connection terminated',
+          'terminating connection due to administrator command',
+          'too many clients already'
+        ];
+        
+        if (criticalErrors.some(errMsg => err.message.includes(errMsg))) {
+          consecutiveErrors++;
+          log(`Critical database error detected (${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS})`, 'postgres');
+          
+          if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+            log('Too many consecutive errors, attempting to recreate pool', 'postgres');
+            resetPool();
+          }
+        }
       }
     });
     
-    // Start health check
-    startPoolHealthCheck();
-    
-    log('Database connection pool created successfully', 'db');
-  } catch (error) {
-    log(`Failed to create database connection pool: ${error}`, 'db');
-    throw error;
+    // Reset consecutive errors counter on successful pool creation
+    consecutiveErrors = 0;
+    log('PostgreSQL connection pool created successfully', 'postgres');
+  }
+  catch (err) {
+    console.error('Failed to create PostgreSQL connection pool:', err);
+    throw err;
   }
 }
 
@@ -101,17 +149,38 @@ function createPool(): void {
  */
 async function resetPool(): Promise<void> {
   try {
-    if (globalPool) {
-      // End all existing connections
-      await globalPool.end();
+    // Stop the health check before resetting pool
+    if (healthCheckInterval) {
+      clearInterval(healthCheckInterval);
+      healthCheckInterval = null;
+    }
+    
+    // Close existing pool if it exists
+    if (_pool) {
+      log('Closing existing connection pool before reset', 'postgres');
+      try {
+        await _pool.end();
+      } catch (err) {
+        // Just log the error, don't throw
+        console.error('Error closing pool during reset:', err);
+      }
+      _pool = null;
     }
     
     // Create a new pool
+    log('Creating new connection pool after reset', 'postgres');
     createPool();
-    log('Database connection pool reset successfully', 'db');
-  } catch (error) {
-    log(`Failed to reset database connection pool: ${error}`, 'db');
-    // Don't throw here as this is a recovery mechanism
+    
+    // Restart health check
+    if (process.env.NODE_ENV === 'production') {
+      startPoolHealthCheck();
+    }
+    
+    log('PostgreSQL connection pool reset completed', 'postgres');
+  } catch (err) {
+    console.error('Failed to reset PostgreSQL connection pool:', err);
+    // Don't throw, as this might be called from a background process
+    // We'll try again on the next health check
   }
 }
 
@@ -119,24 +188,47 @@ async function resetPool(): Promise<void> {
  * Starts a periodic health check for the connection pool
  */
 function startPoolHealthCheck(): void {
-  // Only run in production to avoid unnecessary overhead in development
-  if (process.env.NODE_ENV !== 'production') {
-    return;
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval);
   }
   
-  setInterval(async () => {
-    if (!globalPool) return;
-    
+  healthCheckInterval = setInterval(async () => {
     try {
-      // Simple query to check connection
-      await globalPool.query('SELECT 1');
-    } catch (error) {
-      log(`Health check failed: ${error}`, 'db');
-      resetPool();
+      // Skip if another health check is in progress
+      if (Date.now() - lastHealthCheckTime < HEALTH_CHECK_INTERVAL * 0.8) {
+        return;
+      }
+      
+      lastHealthCheckTime = Date.now();
+      log('Running database connection health check', 'postgres');
+      
+      if (!_pool) {
+        log('Pool does not exist during health check, recreating...', 'postgres');
+        createPool();
+        return;
+      }
+      
+      // Simple query to verify connection is working
+      const result = await _pool.query('SELECT 1 as connection_test');
+      if (result.rows[0].connection_test === 1) {
+        // Health check passed
+        consecutiveErrors = 0;
+      } else {
+        // Unexpected result
+        throw new Error('Unexpected result from health check query');
+      }
+    } catch (err) {
+      console.error('Database health check failed:', err);
+      consecutiveErrors++;
+      
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        log(`Health check failed ${consecutiveErrors} times, resetting pool`, 'postgres');
+        await resetPool();
+      }
     }
   }, HEALTH_CHECK_INTERVAL);
   
-  log(`Database health check started (interval: ${HEALTH_CHECK_INTERVAL}ms)`, 'db');
+  log('Started PostgreSQL connection health monitoring', 'postgres');
 }
 
 /**
@@ -145,11 +237,46 @@ function startPoolHealthCheck(): void {
  * needs to be completely reset
  */
 export async function closePool(): Promise<void> {
-  if (globalPool) {
-    log('Closing database connection pool', 'db');
-    await globalPool.end();
-    globalPool = null;
-    log('Database connection pool closed successfully', 'db');
+  // First, stop the health check if running
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval);
+    healthCheckInterval = null;
+    log('PostgreSQL health check stopped', 'postgres');
+  }
+  
+  // Close the connection pool
+  if (_pool) {
+    try {
+      // Use drain to allow existing queries to complete
+      // before closing the pool
+      if (process.env.NODE_ENV === 'production') {
+        log('Draining PostgreSQL connection pool...', 'postgres');
+        // Implement a timeout for the drain operation
+        const drainTimeout = setTimeout(() => {
+          log('Pool drain timeout reached, forcing close', 'postgres');
+          _pool?.end().catch(err => {
+            console.error('Error ending pool after drain timeout:', err);
+          });
+        }, 5000); // 5 second timeout
+        
+        // Try to drain connections gracefully
+        await _pool.end();
+        clearTimeout(drainTimeout);
+      } else {
+        // In dev/test, close immediately
+        await _pool.end();
+      }
+      
+      _pool = null;
+      log('PostgreSQL connection pool closed successfully', 'postgres');
+    } catch (err) {
+      console.error('Error closing PostgreSQL connection pool:', err);
+      // Force reset the pool reference even if there was an error
+      _pool = null;
+      throw err;
+    }
+  } else {
+    log('No active PostgreSQL connection pool to close', 'postgres');
   }
 }
 
@@ -159,7 +286,8 @@ export async function closePool(): Promise<void> {
  */
 export async function getClient() {
   const pool = getPool();
-  return await pool.connect();
+  const client = await pool.connect();
+  return client;
 }
 
 /**
@@ -168,37 +296,57 @@ export async function getClient() {
  * @param retries Number of retries (default: 3)
  */
 export async function executeWithRetry<T>(
-  queryFn: () => Promise<T>,
+  queryFn: () => Promise<T>, 
   retries = 3
 ): Promise<T> {
-  try {
-    return await queryFn();
-  } catch (error: any) {
-    if (
-      retries > 0 &&
-      (error.message.includes('Connection terminated') ||
-        error.message.includes('Connection refused') ||
-        error.message.includes('Connection timed out'))
-    ) {
-      log(`Retrying query, ${retries} attempts remaining...`, 'db');
-      // Wait a bit before retrying
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return executeWithRetry(queryFn, retries - 1);
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await queryFn();
+    } catch (err: any) {
+      lastError = err;
+      
+      // Only retry on connection-related errors
+      const isRetryable = err.code === 'ECONNRESET' || 
+                          err.code === 'ECONNREFUSED' ||
+                          err.code === '08006' ||  // Connection failure
+                          err.code === '08001';    // Unable to connect
+      
+      if (!isRetryable || attempt >= retries) {
+        throw err;
+      }
+      
+      // Wait before retrying, with exponential backoff
+      const delay = Math.min(100 * Math.pow(2, attempt), 2000);
+      log(`Retrying database query after error: ${err.message} (attempt ${attempt}/${retries})`, 'postgres');
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    throw error;
   }
+  
+  // This should never happen due to the throw in the loop
+  throw lastError || new Error('Unknown error during query execution');
 }
 
-/**
- * Test the database connection
- */
+// Test connection function that can be called directly without closing pool
 export async function testConnection(): Promise<boolean> {
   try {
     const pool = getPool();
-    await pool.query('SELECT 1');
+    const result = await pool.query('SELECT NOW() as time');
+    console.log('PostgreSQL connection successful:', result.rows[0].time);
     return true;
-  } catch (error) {
-    log(`Database connection test failed: ${error}`, 'db');
+  } catch (err) {
+    console.error('PostgreSQL connection failed:', err);
     return false;
   }
+}
+
+// Only run test if this file is directly executed (not when imported)
+if (import.meta.url.endsWith('db-pool.ts')) {
+  (async () => {
+    const success = await testConnection();
+    if (!success) {
+      process.exit(1);
+    }
+  })();
 }
