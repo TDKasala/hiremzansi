@@ -1,0 +1,30 @@
+1. **South African Context Detection (20% of score)**:
+   - Identify mentions of B-BBEE status (e.g., "black-owned," "HDI," "transformation-focused") and assign +10 points per valid instance, max 20.
+   - Detect NQF level specifications (e.g., "NQF 6") and validate against SAQA standards (1-10), +5 per correct level, max 10.
+   - Recognize South African entities: cities (e.g., Cape Town), provinces (e.g., KwaZulu-Natal), companies (e.g., Sasol), universities (e.g., Wits), currency (ZAR), +2 per entity, max 5.
+   - Flag South African languages (e.g., isiXhosa) or regulations (e.g., "POPIA"), +3 per instance, max 5.
+
+2. **CV Format Evaluation (40% of score)**:
+   - Check for section headers (summary, skills, experience, education) using regex (e.g., ^\w+:$), +15 per header, max 60.
+   - Verify bullet points (e.g., ^\s*[-•]\s) and action verbs (e.g., "led," "managed"), +10 for both, max 20.
+   - Assess quantified achievements (e.g., "increased by 15%") and date formats (e.g., 01/01/2025), +10 for both, max 20.
+   - Evaluate length (ideal 300-500 words), -5 per 100 words over, max penalty 20.
+
+3. **Skills Identification (40% of score)**:
+   - Match against a preloaded skills list (technical: Python, soft: communication), +8 per skill, max 40.
+   - Score diversity (minimum 5 skills), +5 if met, max 5.
+   - Weight relevance (e.g., IT skills x1.5 in 2025 SA market), +5 for top 3 demand skills, max 5.
+
+4. **Strengths & Improvements Generation**:
+   - List 3-5 strengths based on scores >80% in any category (e.g., "Strong B-BBEE alignment").
+   - List 3-5 improvements for scores <60% (e.g., "Add NQF level to education").
+
+5. **Output**:
+   - Return a JSON object with:
+     - "score": Final weighted score (0-100),
+     - "strengths": Array of 3-5 strengths,
+     - "improvements": Array of 3-5 improvements.
+   - Process offline, avoiding external calls, and ensure data privacy per POPIA by not storing input beyond analysis.
+
+Example Input: "CV text here mentioning NQF 6, Johannesburg, led team, Python..."
+Example Output: {"score": 85, "strengths": ["Strong SA context", "Good skills"], "improvements": ["Add bullet points", "Include B-BBEE status"]}
