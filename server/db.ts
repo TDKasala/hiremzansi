@@ -1,18 +1,43 @@
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import * as schema from '@shared/schema';
 import { getPool, closePool } from './db-pool';
+import { initializeDatabase } from './db-init';
 import { log } from './vite';
 
-// Export the global pool
+// Create drizzle instance with the pool
 export const pool = getPool();
-
-// Initialize drizzle with our schema
 export const db = drizzle(pool, { schema });
+
+// Initialize database and run migrations if needed
+export const initializeDb = async (skipInit = false): Promise<boolean> => {
+  try {
+    // Check if database is connected
+    try {
+      await pool.query('SELECT 1');
+      log('Database connection successful', 'db');
+    } catch (error) {
+      log(`Database connection failed: ${error}`, 'db');
+      return false;
+    }
+    
+    // Initialize database with essential data
+    if (!skipInit) {
+      const initialized = await initializeDatabase();
+      if (!initialized) {
+        log('Database initialization failed', 'db');
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    log(`Database setup failed: ${error}`, 'db');
+    return false;
+  }
+};
 
 // Close database connection
 export const closeDbConnection = async () => {
-  log('Closing database connection...', 'db');
-  
   try {
     await closePool();
     log('Database connection closed successfully', 'db');
