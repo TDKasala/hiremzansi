@@ -14,10 +14,10 @@ const BlogPage = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   // Get unique categories
-  const categories = [...new Set(blogPosts.map(post => post.category))];
+  const categories = [...new Set(blogPosts.map((post) => post.category))];
 
   // Filter posts based on search query and active tab
-  const filteredPosts = blogPosts.filter(post => {
+  const filteredPosts = blogPosts.filter((post) => {
     const matchesSearch = 
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||

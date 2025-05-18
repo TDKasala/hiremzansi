@@ -1,772 +1,580 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, ArrowUpDown, FileCheck, AlertCircle, Check, Award, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { ArrowRight, FileUp, Download, Share2, Trash2, Calendar } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 
 const CVImprovementPage = () => {
-  const [currentTab, setCurrentTab] = useState('preview');
+  const { toast } = useToast();
+  const [selectedVersion, setSelectedVersion] = useState('current');
   
-  // Mock data for before/after comparison
-  const beforeData = {
-    score: 62,
-    skills: {
-      score: 55,
-      items: [
-        { name: 'Technical Skills', score: 60, status: 'moderate' },
-        { name: 'Soft Skills', score: 40, status: 'poor' },
-        { name: 'Keyword Density', score: 65, status: 'moderate' }
-      ]
+  const cvHistory = [
+    { 
+      id: 1, 
+      date: '15 May 2025', 
+      score: 45, 
+      strengths: ['Contact information clear', 'Education formatted properly'],
+      improvements: ['Missing key skills', 'Experience section lacks metrics', 'No South African context']
     },
-    formatting: {
-      score: 70,
-      items: [
-        { name: 'Structure', score: 75, status: 'good' },
-        { name: 'Readability', score: 65, status: 'moderate' },
-        { name: 'Length', score: 70, status: 'good' }
-      ]
+    { 
+      id: 2, 
+      date: '18 May 2025', 
+      score: 68, 
+      strengths: ['Contact information clear', 'Education formatted properly', 'Added key skills', 'South African context added'],
+      improvements: ['Experience section lacks metrics', 'Complex formatting may confuse ATS']
     },
-    saContext: {
-      score: 45,
-      items: [
-        { name: 'B-BBEE Status', score: 0, status: 'missing' },
-        { name: 'NQF Qualifications', score: 60, status: 'moderate' },
-        { name: 'Local Context', score: 75, status: 'good' }
-      ]
-    },
-    strengths: [
-      'Good overall structure',
-      'Effective presentation of work history'
-    ],
-    weaknesses: [
-      'Missing B-BBEE status information',
-      'Limited keyword optimization',
-      'Soft skills not well articulated'
-    ]
-  };
-  
-  const afterData = {
-    score: 86,
-    skills: {
-      score: 85,
-      items: [
-        { name: 'Technical Skills', score: 90, status: 'excellent' },
-        { name: 'Soft Skills', score: 75, status: 'good' },
-        { name: 'Keyword Density', score: 90, status: 'excellent' }
-      ]
-    },
-    formatting: {
-      score: 88,
-      items: [
-        { name: 'Structure', score: 90, status: 'excellent' },
-        { name: 'Readability', score: 85, status: 'excellent' },
-        { name: 'Length', score: 90, status: 'excellent' }
-      ]
-    },
-    saContext: {
-      score: 85,
-      items: [
-        { name: 'B-BBEE Status', score: 100, status: 'excellent' },
-        { name: 'NQF Qualifications', score: 90, status: 'excellent' },
-        { name: 'Local Context', score: 75, status: 'good' }
-      ]
-    },
-    strengths: [
-      'Clear B-BBEE status presentation',
-      'Optimized keyword density for ATS systems',
-      'Balanced presentation of technical and soft skills',
-      'Well-structured with excellent readability',
-      'NQF qualification levels clearly displayed'
-    ],
-    weaknesses: [
-      'Could improve industry-specific terminology'
-    ]
-  };
-  
-  // Animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        duration: 0.3
-      }
+    { 
+      id: 3, 
+      date: '20 May 2025', 
+      score: 92, 
+      strengths: ['Contact information clear', 'Education with proper NQF levels', 'Skills section optimized', 'Experience includes metrics', 'South African context added', 'B-BBEE information included', 'ATS-friendly formatting'],
+      improvements: ['Could add more industry-specific keywords']
     }
+  ];
+  
+  const currentCV = cvHistory[2]; // Most recent entry
+  const firstCV = cvHistory[0]; // First entry
+  
+  const handleDownloadPDF = () => {
+    toast({
+      title: "PDF Downloaded",
+      description: "Your CV improvement report has been downloaded."
+    });
   };
   
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { duration: 0.5 }
-    }
+  const handleShare = () => {
+    // In a real application, this would copy a link to the clipboard
+    navigator.clipboard.writeText("https://atsboost.co.za/shared/improvement-report");
+    
+    toast({
+      title: "Link Copied",
+      description: "Share link has been copied to clipboard."
+    });
   };
   
-  // Helper function to determine improvement status and color
-  const getImprovementStatus = (before: number, after: number) => {
-    const difference = after - before;
-    if (difference >= 20) return { text: 'Major Improvement', color: 'bg-green-500' };
-    if (difference >= 10) return { text: 'Good Improvement', color: 'bg-green-400' };
-    if (difference > 0) return { text: 'Slight Improvement', color: 'bg-green-300' };
-    if (difference === 0) return { text: 'No Change', color: 'bg-gray-300' };
-    return { text: 'Decreased', color: 'bg-red-400' };
+  const handleDelete = () => {
+    toast({
+      title: "Action Required",
+      description: "Are you sure you want to delete this CV version? This action cannot be undone.",
+      variant: "destructive",
+    });
   };
   
-  // Get status badge for scores
-  const getStatusBadge = (status: string) => {
-    switch(status) {
-      case 'excellent':
-        return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
-      case 'good':
-        return <Badge className="bg-blue-100 text-blue-800">Good</Badge>;
-      case 'moderate':
-        return <Badge className="bg-amber-100 text-amber-800">Moderate</Badge>;
-      case 'poor':
-        return <Badge className="bg-red-100 text-red-800">Needs Improvement</Badge>;
-      case 'missing':
-        return <Badge className="bg-red-100 text-red-800">Missing</Badge>;
-      default:
-        return null;
-    }
+  const getScoreColor = (score: number) => {
+    if (score < 50) return "text-red-500";
+    if (score < 75) return "text-amber-500";
+    return "text-green-500";
   };
   
+  const getProgressColor = (score: number) => {
+    if (score < 50) return "bg-red-500";
+    if (score < 75) return "bg-amber-500";
+    return "bg-green-500";
+  };
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <header className="text-center mb-10">
-          <h1 className="text-3xl font-bold mb-4">CV Improvement Tracking</h1>
-          <p className="text-gray-600 mb-6">
-            Track your CV improvements over time and see exactly how your optimizations are improving your ATS score.
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">CV Improvement Tracker</h1>
+          <p className="text-gray-600">
+            Track how your CV has improved over time and see detailed before & after comparisons
           </p>
-        </header>
+        </div>
         
-        <Tabs defaultValue="preview" value={currentTab} onValueChange={setCurrentTab} className="mb-10">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="preview">Score Overview</TabsTrigger>
-            <TabsTrigger value="before-after">Before/After Comparison</TabsTrigger>
-            <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-          </TabsList>
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium text-gray-500">Initial ATS Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline">
+                <span className={`text-3xl font-bold ${getScoreColor(firstCV.score)}`}>{firstCV.score}%</span>
+                <span className="ml-2 text-sm text-gray-500">First upload</span>
+              </div>
+              <Progress value={firstCV.score} className={`mt-2 ${getProgressColor(firstCV.score)}`} />
+            </CardContent>
+          </Card>
           
-          {/* SCORE OVERVIEW TAB */}
-          <TabsContent value="preview" className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-8">
-              <Card className="md:w-1/2">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <span>Before Optimization</span>
-                    <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Poor</span>
-                  </CardTitle>
-                  <CardDescription>Original CV Score</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center mb-6">
-                    <div className="relative h-36 w-36 mx-auto">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-4xl font-bold">{beforeData.score}%</div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium text-gray-500">Current ATS Score</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline">
+                <span className={`text-3xl font-bold ${getScoreColor(currentCV.score)}`}>{currentCV.score}%</span>
+                <span className="ml-2 text-sm text-gray-500">Latest version</span>
+              </div>
+              <Progress value={currentCV.score} className={`mt-2 ${getProgressColor(currentCV.score)}`} />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-medium text-gray-500">Improvement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline">
+                <span className="text-3xl font-bold text-green-500">+{currentCV.score - firstCV.score}%</span>
+                <span className="ml-2 text-sm text-gray-500">Since first upload</span>
+              </div>
+              <div className="mt-2 h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-green-500 rounded-full" 
+                  style={{ width: `${((currentCV.score - firstCV.score)/100) * 100}%` }} 
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Main Content Section */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          
+          {/* CV History Sidebar */}
+          <div className="xl:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>CV Version History</CardTitle>
+                <CardDescription>Select a version to view details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cvHistory.map((version, index) => (
+                  <div 
+                    key={version.id}
+                    className={`p-3 ${selectedVersion === String(version.id) 
+                      ? 'bg-amber-50 border border-amber-200' 
+                      : 'bg-white border border-gray-200'} 
+                    rounded-lg cursor-pointer hover:bg-amber-50 transition-colors`}
+                    onClick={() => setSelectedVersion(String(version.id))}
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                        <span className="text-sm">{version.date}</span>
                       </div>
-                      <svg className="h-full w-full" viewBox="0 0 36 36">
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#f0f0f0"
-                          strokeWidth="3"
-                          strokeDasharray="100, 100"
-                        />
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#FDA4AF"
-                          strokeWidth="3"
-                          strokeDasharray={`${beforeData.score}, 100`}
-                        />
-                      </svg>
+                      <Badge variant={version.id === cvHistory.length ? "default" : "outline"}>
+                        {version.id === cvHistory.length ? "Latest" : `v${version.id}`}
+                      </Badge>
                     </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>Skills Score</span>
-                        <span>{beforeData.skills.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-400 rounded-full" style={{ width: `${beforeData.skills.score}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>Format Score</span>
-                        <span>{beforeData.formatting.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${beforeData.formatting.score}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>SA Context Score</span>
-                        <span>{beforeData.saContext.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-400 rounded-full" style={{ width: `${beforeData.saContext.score}%` }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <ul className="w-full text-sm space-y-1">
-                    <li className="text-red-600 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-2" />
-                      Missing B-BBEE status information
-                    </li>
-                    <li className="text-red-600 flex items-center">
-                      <AlertCircle className="w-4 h-4 mr-2" />
-                      Low skill keyword optimization
-                    </li>
-                  </ul>
-                </CardFooter>
-              </Card>
-              
-              <Card className="md:w-1/2">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <span>After Optimization</span>
-                    <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Excellent</span>
-                  </CardTitle>
-                  <CardDescription>Optimized CV Score</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center mb-6">
-                    <div className="relative h-36 w-36 mx-auto">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-4xl font-bold">{afterData.score}%</div>
-                      </div>
-                      <svg className="h-full w-full" viewBox="0 0 36 36">
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#f0f0f0"
-                          strokeWidth="3"
-                          strokeDasharray="100, 100"
-                        />
-                        <path
-                          d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke="#86EFAC"
-                          strokeWidth="3"
-                          strokeDasharray={`${afterData.score}, 100`}
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>Skills Score</span>
-                        <span>{afterData.skills.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.skills.score}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>Format Score</span>
-                        <span>{afterData.formatting.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.formatting.score}%` }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1 text-sm">
-                        <span>SA Context Score</span>
-                        <span>{afterData.saContext.score}%</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.saContext.score}%` }}></div>
+                    <div className="flex items-center">
+                      <div className="w-full">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-semibold">ATS Score</span>
+                          <span className={`text-sm font-bold ${getScoreColor(version.score)}`}>{version.score}%</span>
+                        </div>
+                        <Progress value={version.score} className={`h-2 ${getProgressColor(version.score)}`} />
                       </div>
                     </div>
                   </div>
-                </CardContent>
-                <CardFooter>
-                  <ul className="w-full text-sm space-y-1">
-                    <li className="text-green-600 flex items-center">
-                      <Check className="w-4 h-4 mr-2" />
-                      Added B-BBEE status information
-                    </li>
-                    <li className="text-green-600 flex items-center">
-                      <Check className="w-4 h-4 mr-2" />
-                      Optimized skills and keywords
-                    </li>
-                    <li className="text-green-600 flex items-center">
-                      <Check className="w-4 h-4 mr-2" />
-                      Added NQF qualification levels
-                    </li>
-                  </ul>
-                </CardFooter>
-              </Card>
-            </div>
+                ))}
+              </CardContent>
+              <CardFooter className="flex justify-between border-t pt-6">
+                <Button variant="outline" size="sm" onClick={handleDelete}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  <span>Delete</span>
+                </Button>
+                <div className="space-x-2">
+                  <Button variant="outline" size="sm" onClick={handleShare}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    <span>Share</span>
+                  </Button>
+                  <Button size="sm" onClick={handleDownloadPDF}>
+                    <Download className="h-4 w-4 mr-2" />
+                    <span>Export</span>
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
             
+            <div className="mt-6">
+              <Button className="w-full bg-amber-500 hover:bg-amber-600">
+                <FileUp className="h-4 w-4 mr-2" />
+                <span>Upload New Version</span>
+              </Button>
+            </div>
+          </div>
+          
+          {/* CV Comparison Area */}
+          <div className="xl:col-span-3">
             <Card>
               <CardHeader>
-                <CardTitle>Overall Improvement Summary</CardTitle>
-                <CardDescription>
-                  Your CV improvements across key South African job market factors
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
+                <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-medium mb-3">Overall Score Improvement</h3>
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Before: {beforeData.score}%</span>
-                        <span className="font-medium">+{afterData.score - beforeData.score}%</span>
-                        <span className="text-sm text-gray-600">After: {afterData.score}%</span>
-                      </div>
-                      <div className="relative pt-1">
-                        <div className="flex mb-2 items-center justify-between">
-                          <div>
-                            <span className="text-xs font-semibold inline-block py-1 px-2 rounded-full text-white bg-amber-500">
-                              {Math.round(((afterData.score - beforeData.score) / beforeData.score) * 100)}% Improvement
-                            </span>
-                          </div>
-                        </div>
-                        <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
-                          <div className="w-full bg-gray-200 rounded-l-full">
-                            <div style={{ width: `${beforeData.score}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-400 relative z-0"></div>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-r-full">
-                            <div style={{ width: `${afterData.score - beforeData.score}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-400 relative z-10"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <CardTitle>Before & After Comparison</CardTitle>
+                    <CardDescription>See how your CV has improved over time</CardDescription>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <BookOpen className="h-4 w-4 mr-2 text-amber-500" />
-                        Skills Score
-                        <Badge className="ml-2 bg-green-100 text-green-800">+{afterData.skills.score - beforeData.skills.score}%</Badge>
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-2">Keywords and skill presentation significantly improved</p>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.skills.score}%` }}></div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <FileCheck className="h-4 w-4 mr-2 text-amber-500" />
-                        Format Score
-                        <Badge className="ml-2 bg-green-100 text-green-800">+{afterData.formatting.score - beforeData.formatting.score}%</Badge>
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-2">Structure and readability enhanced</p>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.formatting.score}%` }}></div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h4 className="font-medium mb-2 flex items-center">
-                        <Award className="h-4 w-4 mr-2 text-amber-500" />
-                        SA Context Score
-                        <Badge className="ml-2 bg-green-100 text-green-800">+{afterData.saContext.score - beforeData.saContext.score}%</Badge>
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-2">B-BBEE and NQF information properly included</p>
-                      <div className="h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: `${afterData.saContext.score}%` }}></div>
-                      </div>
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-500">Compare with:</span>
+                    <Select 
+                      value="1" 
+                      onValueChange={(value) => console.log(value)}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="First Version" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cvHistory.map((version, index) => (
+                          <SelectItem key={version.id} value={String(version.id)}>
+                            {index === 0 ? "First Version" : `Version ${version.id}`} ({version.date})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button onClick={() => setCurrentTab('before-after')}>View Detailed Comparison</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          {/* BEFORE/AFTER COMPARISON TAB */}
-          <TabsContent value="before-after" className="space-y-6">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle>Detailed Before & After Comparison</CardTitle>
-                  <CardDescription>
-                    See exactly what improvements were made to your CV
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-4 border border-gray-200 rounded-lg">
-                      <div className="text-center mb-4">
-                        <h3 className="font-medium text-lg">Before Optimization</h3>
-                        <div className="mt-2 inline-block rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
-                          {beforeData.score}% ATS Score
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-medium mb-2">Skills Assessment</h4>
-                          <ul className="space-y-2">
-                            {beforeData.skills.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium mb-2">Formatting Quality</h4>
-                          <ul className="space-y-2">
-                            {beforeData.formatting.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium mb-2">South African Context</h4>
-                          <ul className="space-y-2">
-                            {beforeData.saContext.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 border border-green-200 rounded-lg bg-green-50">
-                      <div className="text-center mb-4">
-                        <h3 className="font-medium text-lg">After Optimization</h3>
-                        <div className="mt-2 inline-block rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
-                          {afterData.score}% ATS Score
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-medium mb-2">Skills Assessment</h4>
-                          <ul className="space-y-2">
-                            {afterData.skills.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                  {item.score > beforeData.skills.items[index].score && (
-                                    <span className="ml-2 text-green-600 flex items-center text-xs">
-                                      <ChevronUp className="h-3 w-3" />
-                                      {item.score - beforeData.skills.items[index].score}%
-                                    </span>
-                                  )}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium mb-2">Formatting Quality</h4>
-                          <ul className="space-y-2">
-                            {afterData.formatting.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                  {item.score > beforeData.formatting.items[index].score && (
-                                    <span className="ml-2 text-green-600 flex items-center text-xs">
-                                      <ChevronUp className="h-3 w-3" />
-                                      {item.score - beforeData.formatting.items[index].score}%
-                                    </span>
-                                  )}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium mb-2">South African Context</h4>
-                          <ul className="space-y-2">
-                            {afterData.saContext.items.map((item, index) => (
-                              <li key={index} className="flex justify-between items-center">
-                                <span>{item.name}</span>
-                                <div className="flex items-center">
-                                  <span className="mr-2">{item.score}%</span>
-                                  {getStatusBadge(item.status)}
-                                  {item.score > beforeData.saContext.items[index].score && (
-                                    <span className="ml-2 text-green-600 flex items-center text-xs">
-                                      <ChevronUp className="h-3 w-3" />
-                                      {item.score - beforeData.saContext.items[index].score}%
-                                    </span>
-                                  )}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Specific Improvements Made</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <motion.div
-                      variants={itemVariants}
-                      className="p-4 border border-amber-200 rounded-lg bg-amber-50"
-                    >
-                      <h3 className="font-medium text-lg mb-3">South African Specific Improvements</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="font-medium text-amber-800 mb-2">B-BBEE Status Information</h4>
-                          <p className="text-sm mb-4">Your B-BBEE status information was missing from your original CV. We've added this crucial information in a prominent position.</p>
-                          <div className="bg-white p-3 rounded border border-amber-200 mb-2">
-                            <div className="text-red-500 text-xs mb-1">Before</div>
-                            <div className="text-sm text-gray-500">[No B-BBEE information]</div>
-                          </div>
-                          <div className="bg-white p-3 rounded border border-green-200">
-                            <div className="text-green-500 text-xs mb-1">After</div>
-                            <div className="text-sm">B-BBEE Status: Level 2 Contributor</div>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium text-amber-800 mb-2">NQF Qualification Levels</h4>
-                          <p className="text-sm mb-4">NQF qualification levels were not specified in your original CV. We've clearly indicated NQF levels for all qualifications.</p>
-                          <div className="bg-white p-3 rounded border border-amber-200 mb-2">
-                            <div className="text-red-500 text-xs mb-1">Before</div>
-                            <div className="text-sm text-gray-500">Bachelor of Commerce, University of Cape Town</div>
-                          </div>
-                          <div className="bg-white p-3 rounded border border-green-200">
-                            <div className="text-green-500 text-xs mb-1">After</div>
-                            <div className="text-sm">Bachelor of Commerce (NQF Level 7), University of Cape Town</div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                    
-                    <motion.div variants={itemVariants} className="p-4 border border-blue-200 rounded-lg bg-blue-50">
-                      <h3 className="font-medium text-lg mb-3">Skills & Keywords Optimization</h3>
-                      <p className="text-sm mb-4">We've optimized your skills section to better match ATS requirements and South African job market terminology.</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="font-medium text-blue-800 mb-2">Technical Skills Enhancement</h4>
-                          <div className="bg-white p-3 rounded border border-amber-200 mb-2">
-                            <div className="text-red-500 text-xs mb-1">Before</div>
-                            <div className="text-sm text-gray-500">
-                              <ul className="list-disc pl-5 space-y-1">
-                                <li>Excel</li>
-                                <li>Data analysis</li>
-                                <li>Project management</li>
-                              </ul>
-                            </div>
-                          </div>
-                          <div className="bg-white p-3 rounded border border-green-200">
-                            <div className="text-green-500 text-xs mb-1">After</div>
-                            <div className="text-sm">
-                              <ul className="list-disc pl-5 space-y-1">
-                                <li>Advanced MS Excel (Power Query, Power Pivot)</li>
-                                <li>Data analysis & visualization (Tableau, PowerBI)</li>
-                                <li>Project management (PMBOK, Agile/Scrum)</li>
-                                <li>ERP systems (SAP, Oracle)</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium text-blue-800 mb-2">Soft Skills Presentation</h4>
-                          <div className="bg-white p-3 rounded border border-amber-200 mb-2">
-                            <div className="text-red-500 text-xs mb-1">Before</div>
-                            <div className="text-sm text-gray-500">
-                              <ul className="list-disc pl-5 space-y-1">
-                                <li>Team player</li>
-                                <li>Problem solver</li>
-                                <li>Good communication</li>
-                              </ul>
-                            </div>
-                          </div>
-                          <div className="bg-white p-3 rounded border border-green-200">
-                            <div className="text-green-500 text-xs mb-1">After</div>
-                            <div className="text-sm">
-                              <ul className="list-disc pl-5 space-y-1">
-                                <li>Cross-functional team leadership & collaboration</li>
-                                <li>Strategic problem-solving & decision-making</li>
-                                <li>Client relationship management & stakeholder communication</li>
-                                <li>Conflict resolution & negotiation</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                    
-                    <motion.div variants={itemVariants} className="p-4 border border-purple-200 rounded-lg bg-purple-50">
-                      <h3 className="font-medium text-lg mb-3">Formatting Improvements</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="font-medium text-purple-800 mb-2">Structure Enhancement</h4>
-                          <p className="text-sm">Restructured CV sections for optimal ATS scanning and readability, with clear section headings and consistent formatting.</p>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-medium text-purple-800 mb-2">Readability Optimization</h4>
-                          <p className="text-sm">Improved font consistency, spacing, bullet points, and alignment for better visual hierarchy and ATS parsing.</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-center">
-                  <Button onClick={() => setCurrentTab('recommendations')}>View Recommendations</Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          </TabsContent>
-          
-          {/* RECOMMENDATIONS TAB */}
-          <TabsContent value="recommendations" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Further Improvement Recommendations</CardTitle>
-                <CardDescription>
-                  While your CV has improved significantly, here are some additional recommendations to make it even better
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="p-4 border border-amber-200 rounded-lg">
-                    <h3 className="font-medium mb-3 flex items-center">
-                      <Award className="h-5 w-5 mr-2 text-amber-500" />
-                      South African Professional Body Memberships
-                    </h3>
-                    <p className="text-sm mb-3">
-                      Consider adding relevant South African professional body memberships to further enhance your CV's local context. This can include:
-                    </p>
-                    <ul className="text-sm space-y-2 pl-5 list-disc">
-                      <li>SAICA (South African Institute of Chartered Accountants)</li>
-                      <li>ECSA (Engineering Council of South Africa)</li>
-                      <li>HPCSA (Health Professions Council of South Africa)</li>
-                      <li>SACAP (South African Council for the Architectural Profession)</li>
-                      <li>Or other industry-specific professional bodies</li>
-                    </ul>
-                  </div>
+                <Tabs defaultValue="summary" className="w-full">
+                  <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-3 md:grid-cols-3">
+                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                    <TabsTrigger value="details">Detailed Changes</TabsTrigger>
+                    <TabsTrigger value="visual">Visual Comparison</TabsTrigger>
+                  </TabsList>
                   
-                  <div className="p-4 border border-blue-200 rounded-lg">
-                    <h3 className="font-medium mb-3 flex items-center">
-                      <BookOpen className="h-5 w-5 mr-2 text-blue-500" />
-                      Industry-Specific Terminology
-                    </h3>
-                    <p className="text-sm mb-3">
-                      Your CV would benefit from more industry-specific terminology relevant to your field in the South African context:
-                    </p>
-                    <ul className="text-sm space-y-2 pl-5 list-disc">
-                      <li>Research common terms used in job listings for your role</li>
-                      <li>Incorporate South African business and industry terminology</li>
-                      <li>Reference relevant South African regulations and standards</li>
-                      <li>Include specific software or methodologies commonly used in your industry in South Africa</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="p-4 border border-green-200 rounded-lg">
-                    <h3 className="font-medium mb-3 flex items-center">
-                      <FileCheck className="h-5 w-5 mr-2 text-green-500" />
-                      Achievements Quantification
-                    </h3>
-                    <p className="text-sm mb-3">
-                      Adding more specific, quantifiable achievements can further strengthen your CV:
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Before:</h4>
-                        <div className="bg-white p-3 rounded border text-sm">
-                          Improved department efficiency and reduced costs
+                  <TabsContent value="summary" className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2 flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+                            Initial Version (Score: {firstCV.score}%)
+                          </h3>
+                          <Card>
+                            <CardContent className="p-4 space-y-4">
+                              <div>
+                                <h4 className="font-semibold text-green-600 mb-2">Strengths</h4>
+                                <ul className="list-disc pl-5 space-y-1">
+                                  {firstCV.strengths.map((strength, index) => (
+                                    <li key={index} className="text-gray-700">{strength}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-red-600 mb-2">Areas for Improvement</h4>
+                                <ul className="list-disc pl-5 space-y-1">
+                                  {firstCV.improvements.map((improvement, index) => (
+                                    <li key={index} className="text-gray-700">{improvement}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
                         </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">After:</h4>
-                        <div className="bg-white p-3 rounded border text-sm">
-                          Improved department efficiency by 27% and reduced operational costs by R145,000 annually through process optimization
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-semibold mb-2 flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                            Current Version (Score: {currentCV.score}%)
+                          </h3>
+                          <Card>
+                            <CardContent className="p-4 space-y-4">
+                              <div>
+                                <h4 className="font-semibold text-green-600 mb-2">Strengths</h4>
+                                <ul className="list-disc pl-5 space-y-1">
+                                  {currentCV.strengths.map((strength, index) => (
+                                    <li key={index} className="text-gray-700">{strength}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-red-600 mb-2">Areas for Improvement</h4>
+                                <ul className="list-disc pl-5 space-y-1">
+                                  {currentCV.improvements.map((improvement, index) => (
+                                    <li key={index} className="text-gray-700">{improvement}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
                         </div>
                       </div>
                     </div>
-                  </div>
+                    
+                    <div className="mt-10 bg-green-50 border border-green-200 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-4 text-green-800">Key Improvements Made</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">Added Proper NQF Levels</h4>
+                          <p className="text-gray-700">Educational qualifications now include proper NQF levels following South African standards.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">Quantified Achievements</h4>
+                          <p className="text-gray-700">Experience section now includes specific metrics and quantifiable results.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">B-BBEE Information</h4>
+                          <p className="text-gray-700">Added appropriate B-BBEE information relevant to South African employers.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">ATS-Friendly Formatting</h4>
+                          <p className="text-gray-700">Simplified formatting to ensure compatibility with Applicant Tracking Systems.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">Optimized Skills Section</h4>
+                          <p className="text-gray-700">Added relevant industry-specific and technical skills for the South African job market.</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <h4 className="font-semibold text-green-700 mb-2">South African Context</h4>
+                          <p className="text-gray-700">Added relevant South African context including location-specific experience.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
                   
-                  <div className="p-4 border border-purple-200 rounded-lg">
-                    <h3 className="font-medium mb-3 flex items-center">
-                      <ChevronDown className="h-5 w-5 mr-2 text-purple-500" />
-                      Additional South African Context Elements
-                    </h3>
-                    <p className="text-sm mb-3">
-                      Consider adding these South African specific elements to your CV:
-                    </p>
-                    <ul className="text-sm space-y-2 pl-5 list-disc">
-                      <li>Experience with South African tax and labor laws (if applicable)</li>
-                      <li>Familiarity with Employment Equity Act and implementation</li>
-                      <li>South African language proficiencies (e.g., English, Afrikaans, isiZulu, etc.)</li>
-                      <li>Knowledge of specific provincial business environments if applying for region-specific roles</li>
-                    </ul>
-                  </div>
-                </div>
+                  <TabsContent value="details" className="mt-6">
+                    <div className="space-y-8">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 font-semibold">
+                          Contact Information
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Before</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800">John Smith</p>
+                              <p className="text-gray-800">john.smith@email.com</p>
+                              <p className="text-gray-800">0821234567</p>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">After</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800">John Smith</p>
+                              <p className="text-gray-800">john.smith@email.com</p>
+                              <p className="text-gray-800">+27 82 123 4567</p>
+                              <p className="text-gray-800">Johannesburg, Gauteng</p>
+                              <p className="text-gray-800">LinkedIn: linkedin.com/in/johnsmith</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 font-semibold">
+                          Education
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Before</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800 font-medium">Bachelor of Commerce</p>
+                              <p className="text-gray-700">University of Cape Town</p>
+                              <p className="text-gray-700">2015 - 2018</p>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">After</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800 font-medium">Bachelor of Commerce (NQF Level 7)</p>
+                              <p className="text-gray-700">University of Cape Town</p>
+                              <p className="text-gray-700">2015 - 2018</p>
+                              <p className="text-gray-700">Major: Accounting and Finance</p>
+                              <p className="text-gray-700">Relevant Coursework: Financial Management, Business Analysis, Tax Law</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 font-semibold">
+                          Professional Experience
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Before</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800 font-medium">Financial Analyst</p>
+                              <p className="text-gray-700">ABC Corporation</p>
+                              <p className="text-gray-700">2019 - Present</p>
+                              <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-700">
+                                <li>Prepared financial reports</li>
+                                <li>Analyzed business performance</li>
+                                <li>Worked on budget planning</li>
+                                <li>Collaborated with management team</li>
+                              </ul>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">After</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="text-gray-800 font-medium">Financial Analyst</p>
+                              <p className="text-gray-700">ABC Corporation, Johannesburg</p>
+                              <p className="text-gray-700">2019 - Present</p>
+                              <ul className="list-disc pl-5 mt-2 space-y-1 text-gray-700">
+                                <li>Prepared monthly financial reports, reducing reporting time by 35%</li>
+                                <li>Analyzed business performance metrics across 5 departments, identifying R2.5M in cost-saving opportunities</li>
+                                <li>Led budget planning process for R50M departmental budget</li>
+                                <li>Collaborated with management team to implement IFRS compliance procedures</li>
+                                <li>Developed financial models that improved forecast accuracy by 22%</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg">
+                        <div className="bg-gray-100 px-4 py-3 border-b border-gray-200 font-semibold">
+                          Skills Section
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">Before</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                                <li>Excel</li>
+                                <li>Financial Analysis</li>
+                                <li>Reporting</li>
+                                <li>Teamwork</li>
+                                <li>Communication</li>
+                              </ul>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-500 mb-2">After</h4>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <p className="font-medium mb-1">Technical Skills:</p>
+                              <ul className="list-disc pl-5 space-y-1 text-gray-700 mb-3">
+                                <li>Advanced Excel (VLOOKUP, Pivot Tables, Macros)</li>
+                                <li>SAP Financial Modules</li>
+                                <li>Power BI Dashboard Development</li>
+                                <li>Financial Modeling & Forecasting</li>
+                                <li>SQL Database Querying</li>
+                              </ul>
+                              <p className="font-medium mb-1">Industry Knowledge:</p>
+                              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+                                <li>IFRS Reporting Standards</li>
+                                <li>South African Tax Legislation</li>
+                                <li>JSE Listing Requirements</li>
+                                <li>FAIS Compliance</li>
+                                <li>B-BBEE Reporting & Compliance</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="visual" className="mt-6">
+                    <div className="mb-6 text-center text-gray-600">
+                      <p>This visual comparison shows how your CV layout and content have improved.</p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <h4 className="text-lg font-semibold mb-4 text-red-600">Before</h4>
+                        <div className="border border-gray-200 rounded-lg overflow-hidden">
+                          <img 
+                            src="/cv-before.jpg" 
+                            alt="CV Before Improvements" 
+                            className="w-full h-auto"
+                          />
+                        </div>
+                        <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                          <h5 className="font-semibold text-red-800 mb-2">Issues Identified</h5>
+                          <ul className="list-disc pl-5 space-y-1 text-gray-800">
+                            <li>Cluttered layout with excessive formatting</li>
+                            <li>Hard-to-read font choices</li>
+                            <li>Headers and footers that ATS can't process</li>
+                            <li>Graphics and tables disrupting text flow</li>
+                            <li>Missing section labels</li>
+                          </ul>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-lg font-semibold mb-4 text-green-600">After</h4>
+                        <div className="border border-gray-200 rounded-lg overflow-hidden">
+                          <img 
+                            src="/cv-after.jpg" 
+                            alt="CV After Improvements" 
+                            className="w-full h-auto"
+                          />
+                        </div>
+                        <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                          <h5 className="font-semibold text-green-800 mb-2">Improvements Made</h5>
+                          <ul className="list-disc pl-5 space-y-1 text-gray-800">
+                            <li>Clean, ATS-friendly layout</li>
+                            <li>Standard, readable fonts</li>
+                            <li>Clear section headings</li>
+                            <li>Proper formatting of achievements</li>
+                            <li>South African context and terminology</li>
+                            <li>NQF levels correctly displayed</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button onClick={() => setCurrentTab('preview')}>Return to Overview</Button>
-              </CardFooter>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
         
-        <div className="flex justify-center">
-          <Button size="lg" className="bg-amber-500 hover:bg-amber-600">
-            Analyze a New CV
-          </Button>
+        {/* Next Steps Card */}
+        <div className="mt-10">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recommended Next Steps</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col items-center p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Add Industry Keywords</h3>
+                  <p className="text-center text-gray-700 mb-4">
+                    Add more South African industry-specific keywords to further improve your ATS score.
+                  </p>
+                  <Button variant="outline" className="mt-auto">
+                    Browse Keywords <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Test With Job Descriptions</h3>
+                  <p className="text-center text-gray-700 mb-4">
+                    Test your CV against specific job descriptions to optimize for target roles.
+                  </p>
+                  <Button variant="outline" className="mt-auto">
+                    Job Matcher <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex flex-col items-center p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Prepare for Interviews</h3>
+                  <p className="text-center text-gray-700 mb-4">
+                    Prepare for interviews with our South African industry-specific guides.
+                  </p>
+                  <Button variant="outline" className="mt-auto">
+                    Interview Prep <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

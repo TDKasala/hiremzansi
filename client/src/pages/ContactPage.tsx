@@ -247,8 +247,8 @@ const ContactPage = () => {
                 <h3 className="font-semibold text-lg mb-2">How do I cancel my subscription?</h3>
                 <p className="text-gray-600">
                   You can cancel your subscription at any time from your account dashboard. 
-                  Go to "My Account" > "Subscriptions" and click on "Cancel Subscription". 
-                  You'll continue to have access until the end of your current billing cycle.
+                  Go to &quot;My Account&quot; &gt; &quot;Subscriptions&quot; and click on &quot;Cancel Subscription&quot;. 
+                  You&apos;ll continue to have access until the end of your current billing cycle.
                 </p>
               </CardContent>
             </Card>
