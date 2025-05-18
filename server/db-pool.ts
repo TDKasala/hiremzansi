@@ -1,11 +1,10 @@
-import { Pool, PoolConfig } from '@neondatabase/serverless';
-
-// Extend the pool config to include the webSocketConstructor property
-interface NeonPoolConfig extends PoolConfig {
-  webSocketConstructor?: any; // Using any for compatibility with ws package
-}
+import { Pool, PoolConfig, neonConfig } from '@neondatabase/serverless';
 import { log } from './vite';
+// Import the WebSocket implementation
 import ws from 'ws';
+
+// Configure Neon to use the WebSocket implementation directly
+neonConfig.webSocketConstructor = ws;
 
 // Global pool instance (singleton pattern)
 let globalPool: Pool | null = null;
@@ -21,10 +20,8 @@ const getPoolConfig = (): NeonPoolConfig => {
   }
   
   // Base configuration for all environments
-  const baseConfig: NeonPoolConfig = {
+  const baseConfig: PoolConfig = {
     connectionString: process.env.DATABASE_URL,
-    // Enable WebSocket for Neon Serverless
-    webSocketConstructor: ws,
     // Default max connections
     max: 10,
     // Connection timeout
