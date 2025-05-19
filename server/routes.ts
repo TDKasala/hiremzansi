@@ -304,55 +304,202 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       try {
-        // Enhanced detailed analysis with South African context
-        const saKeywords = ["B-BBEE", "NQF", "SETA", "South Africa", "Johannesburg", "Cape Town", "Durban", "Pretoria"];
-        const saContextPresent = saKeywords.some(keyword => 
-          textContent.toLowerCase().includes(keyword.toLowerCase())
-        );
+        // Comprehensive South African Context Detection (20% of total score)
+        // B-BBEE related terms (10 points per valid instance, max 20)
+        const bbbeeTerms = ["b-bbee", "bbbee", "broad based black economic empowerment", "bee", "black owned", "hdi", "transformation focused"];
+        let bbbeeScore = 0;
+        for (const term of bbbeeTerms) {
+          if (textContent.toLowerCase().includes(term)) {
+            bbbeeScore += 10;
+            if (bbbeeScore >= 20) break; // Cap at 20 points
+          }
+        }
         
-        // Extract skills from text - more comprehensive analysis
-        const techSkills = ["javascript", "python", "java", "react", "node", "typescript", "html", "css", "sql", "database", "aws", "cloud"];
-        const softSkills = ["leadership", "communication", "teamwork", "project management", "time management", "problem solving"];
-        const saSpecificSkills = ["bbbee", "employment equity", "popi", "compliance", "transformation", "stakeholder management"];
+        // NQF levels (5 points per correct level, max 10)
+        const nqfMatches = textContent.match(/nqf level \d+|national qualifications? framework level \d+|nqf \d+/gi) || [];
+        const nqfScore = Math.min(10, nqfMatches.length * 5);
         
-        // Count identified skills
-        const identifiedTechSkills = techSkills.filter(skill => 
-          textContent.toLowerCase().includes(skill.toLowerCase())
-        );
-        const identifiedSoftSkills = softSkills.filter(skill => 
-          textContent.toLowerCase().includes(skill.toLowerCase())
-        );
-        const identifiedSaSkills = saSpecificSkills.filter(skill => 
-          textContent.toLowerCase().includes(skill.toLowerCase())
-        );
+        // South African cities (2 points per entity, max 5)
+        const saCities = ["johannesburg", "cape town", "durban", "pretoria", "bloemfontein", "port elizabeth", "gqeberha", 
+                         "east london", "polokwane", "nelspruit", "mbombela", "kimberley", "pietermaritzburg", "stellenbosch", "potchefstroom"];
+        let citiesScore = 0;
+        for (const city of saCities) {
+          if (textContent.toLowerCase().includes(city)) {
+            citiesScore += 2;
+            if (citiesScore >= 5) break; // Cap at 5 points
+          }
+        }
         
-        // Calculate detailed scores
-        const skillScore = Math.min(100, 
-          (identifiedTechSkills.length * 8) + 
-          (identifiedSoftSkills.length * 5) + 
-          (identifiedSaSkills.length * 10)
-        );
+        // South African provinces (2 points per entity, max 5)
+        const saProvinces = ["gauteng", "western cape", "kwazulu natal", "eastern cape", "mpumalanga", 
+                            "limpopo", "north west", "free state", "northern cape"];
+        let provincesScore = 0;
+        for (const province of saProvinces) {
+          if (textContent.toLowerCase().includes(province)) {
+            provincesScore += 2;
+            if (provincesScore >= 5) break; // Cap at 5 points
+          }
+        }
         
-        // Calculate format score based on section headers, bullet points, etc.
-        const hasBulletPoints = textContent.includes("•") || textContent.includes("-");
+        // South African currencies (2 points per entity, max 5)
+        const currencyMatches = textContent.match(/r\d+|zar|rand/gi) || [];
+        const currencyScore = Math.min(5, currencyMatches.length * 2);
+        
+        // South African languages (3 points per instance, max 5)
+        const saLanguages = ["afrikaans", "xhosa", "zulu", "ndebele", "sepedi", "sesotho", "setswana", 
+                            "siswati", "tshivenda", "xitsonga", "isizulu", "isixhosa"];
+        let languagesScore = 0;
+        for (const language of saLanguages) {
+          if (textContent.toLowerCase().includes(language)) {
+            languagesScore += 3;
+            if (languagesScore >= 5) break; // Cap at 5 points
+          }
+        }
+        
+        // South African regulations (3 points per instance, max 5)
+        const saRegulations = ["popi act", "popia", "protection of personal information", "fais", "fica", 
+                              "national credit act", "consumer protection act", "employment equity act", 
+                              "skills development act", "labor relations act", "bcea"];
+        let regulationsScore = 0;
+        for (const regulation of saRegulations) {
+          if (textContent.toLowerCase().includes(regulation)) {
+            regulationsScore += 3;
+            if (regulationsScore >= 5) break; // Cap at 5 points
+          }
+        }
+        
+        // Calculate total SA context score (20% of total) - max 50 points
+        const saContextScore = Math.min(100, bbbeeScore + nqfScore + citiesScore + provincesScore + 
+                                        currencyScore + languagesScore + regulationsScore);
+        
+        // CV Format Evaluation (40% of total score)
+        // Section headers (15 points each, max 60)
+        const sectionPatterns = [
+          /^(professional|career|summary|profile|objective)s?:?$/im,  // Summary section
+          /^(skills|technical skills|competencies|core competencies|expertise|areas of expertise):?$/im, // Skills section
+          /^(experience|work experience|professional experience|employment history|work history):?$/im, // Experience section
+          /^(education|academic|qualifications|educational background|academic qualifications):?$/im, // Education section
+          /^(projects|portfolio|key projects|personal projects|major projects):?$/im, // Projects section
+          /^(certifications|certificates|professional certifications|accreditations):?$/im, // Certifications section
+          /^(languages|language proficiency|spoken languages):?$/im, // Languages section
+          /^(references|professional references):?$/im // References section
+        ];
+        
+        let sectionsScore = 0;
+        const detectedSections = [];
+        
+        for (const pattern of sectionPatterns) {
+          if (pattern.test(textContent)) {
+            sectionsScore += 15;
+            
+            // Add section name to detected sections based on which pattern matched
+            const index = sectionPatterns.indexOf(pattern);
+            switch (index) {
+              case 0: detectedSections.push("summary"); break;
+              case 1: detectedSections.push("skills"); break;
+              case 2: detectedSections.push("experience"); break;
+              case 3: detectedSections.push("education"); break;
+              case 4: detectedSections.push("projects"); break;
+              case 5: detectedSections.push("certifications"); break;
+              case 6: detectedSections.push("languages"); break;
+              case 7: detectedSections.push("references"); break;
+            }
+            
+            if (sectionsScore >= 60) break; // Cap at 60 points
+          }
+        }
+        
+        // Bullet points (10 points)
+        const hasBulletPoints = textContent.includes("•") || textContent.includes("-") || 
+                                /^\s*[-•]\s+/m.test(textContent);
+        const bulletPointsScore = hasBulletPoints ? 10 : 0;
+        
+        // Action verbs (10 points)
+        const actionVerbs = ["managed", "developed", "created", "implemented", "designed", 
+                           "led", "coordinated", "analyzed", "achieved", "increased"];
+        const hasActionVerbs = actionVerbs.some(verb => textContent.toLowerCase().includes(verb));
+        const actionVerbsScore = hasActionVerbs ? 10 : 0;
+        
+        // Dates (10 points)
         const hasDateRanges = /\d{4}\s*(-|to)\s*\d{4}|\d{4}\s*(-|to)\s*(present|current)/i.test(textContent);
-        const hasQuantifiedAchievements = /increased|improved|reduced|generated|achieved|by\s+\d+%/i.test(textContent);
+        const datesScore = hasDateRanges ? 10 : 0;
         
-        const formatScore = 50 + 
-          (hasBulletPoints ? 15 : 0) + 
-          (hasDateRanges ? 15 : 0) + 
-          (hasQuantifiedAchievements ? 20 : 0);
+        // Quantified achievements (10 points)
+        const hasQuantifiedAchievements = /increased|improved|reduced|generated|achieved|by\s+\d+%|\d+%|increased by \d+/i.test(textContent);
+        const achievementsScore = hasQuantifiedAchievements ? 10 : 0;
         
-        // Calculate SA context score
-        const saScore = 30 + 
-          (saContextPresent ? 30 : 0) + 
-          (identifiedSaSkills.length * 10);
+        // Word count optimal range (300-500 words)
+        const wordCount = textContent.split(/\s+/).length;
+        let wordCountScore = 0;
+        if (wordCount >= 300 && wordCount <= 500) {
+          wordCountScore = 10; // Optimal
+        } else if (wordCount > 500 && wordCount <= 700) {
+          wordCountScore = 5; // Slightly too long
+        } else if (wordCount >= 200 && wordCount < 300) {
+          wordCountScore = 5; // Slightly too short
+        } // Otherwise 0 (too short or too long)
         
-        // Calculate overall score with weighted components
+        // Calculate total format score (40% of total)
+        const formatScore = Math.min(100, sectionsScore + bulletPointsScore + actionVerbsScore + 
+                                   datesScore + achievementsScore + wordCountScore);
+        
+        // Skills Identification (40% of total score)
+        // High-demand SA skills in 2025 (weighting x1.5)
+        const highDemandSkills = [
+          "data analysis", "python", "machine learning", "artificial intelligence",
+          "cybersecurity", "cloud computing", "aws", "azure", 
+          "renewable energy", "sustainability", "solar energy",
+          "project management", "agile", "scrum", 
+          "digital marketing", "e-commerce", "user experience"
+        ];
+        
+        // Count high-demand skills (weighting x1.5)
+        const identifiedHighDemandSkills = highDemandSkills.filter(skill => 
+          textContent.toLowerCase().includes(skill.toLowerCase())
+        );
+        
+        // Regular skills
+        const regularSkills = [
+          "microsoft office", "excel", "word", "powerpoint", "outlook",
+          "team leadership", "problem solving", "communication",
+          "javascript", "java", "c#", "c++", "php", "typescript",
+          "html", "css", "react", "angular", "vue", "node.js", "express",
+          "sql", "postgresql", "mysql", "mongodb", "database management",
+          "google cloud", "docker", "kubernetes",
+          "kanban", "waterfall",
+          "customer service", "sales", "marketing", "seo", "social media",
+          "budgeting", "financial analysis", "accounting",
+          "research", "critical thinking", "strategic planning",
+          "writing", "editing", "content creation",
+          "adobe photoshop", "illustrator", "indesign", "ui/ux design",
+          "human resources", "recruitment", "training", "onboarding",
+          "logistics", "supply chain", "inventory management",
+          "quality assurance", "quality control", "testing"
+        ];
+        
+        // Count regular skills
+        const identifiedRegularSkills = regularSkills.filter(skill => 
+          textContent.toLowerCase().includes(skill.toLowerCase())
+        );
+        
+        // Calculate skills score (40% of total)
+        // High-demand skills get 12 points each (8 x 1.5), regular skills get 8 points each
+        const skillsScore = Math.min(100, 
+          (identifiedHighDemandSkills.length * 12) + 
+          (identifiedRegularSkills.length * 8)
+        );
+        
+        // All identified skills for display
+        const allIdentifiedSkills = [
+          ...identifiedHighDemandSkills, 
+          ...identifiedRegularSkills
+        ];
+        
+        // Calculate overall score with weighted components exactly as specified
         const overallScore = Math.round(
-          (skillScore * 0.4) +
-          (formatScore * 0.35) +
-          (saScore * 0.25)
+          (skillsScore * 0.4) +
+          (formatScore * 0.4) +
+          (saContextScore * 0.2)
         );
         
         // Determine rating based on score
