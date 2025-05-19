@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, Router } from "express";
 import { db } from "../db";
 import { users, cvs, atsScores, saProfiles, plans, subscriptions } from "@shared/schema";
 import { count, sql, and, eq, gte, desc } from "drizzle-orm";
+import { sendWeeklyCareerDigests } from "../services/recommendationService";
 
 const router = Router();
 
@@ -216,6 +217,23 @@ router.put("/users/:id", isAdmin, async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// Admin route to trigger career recommendation email digests
+router.post("/send-career-digests", isAdmin, async (req: Request, res: Response) => {
+  try {
+    // Send personalized career recommendation emails to eligible users
+    const sentCount = await sendWeeklyCareerDigests();
+    
+    res.json({
+      success: true,
+      message: `Successfully sent ${sentCount} career recommendation digest emails`,
+      sentCount
+    });
+  } catch (error) {
+    console.error("Error sending career digest emails:", error);
+    res.status(500).json({ error: "Failed to send career digest emails" });
   }
 });
 

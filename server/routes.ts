@@ -24,6 +24,8 @@ import { interviewSimulationService } from "./services/interviewSimulationServic
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
+import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
+import { sendCareerDigestEmail } from "./services/emailService";
 
 // File upload configuration
 const upload = multer({
