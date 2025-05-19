@@ -5,22 +5,10 @@ import CTASection from "@/components/CTASection";
 export default function AboutPage() {
   const teamMembers = [
     {
-      name: "Thandi Nkosi",
-      title: "Founder & CEO",
-      bio: "With 10+ years of HR experience at major South African corporations, Thandi founded ATSBoost to address the growing CV optimization needs in the local job market.",
-      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=400"
-    },
-    {
-      name: "Daniel Mbeki",
-      title: "CTO",
-      bio: "Daniel leads our technical team, bringing expertise in AI and natural language processing to build our ATS analysis algorithms specifically for the South African context.",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=400"
-    },
-    {
-      name: "Sarah van der Merwe",
-      title: "Head of Career Services",
-      bio: "A certified career coach with expertise in the South African job market, Sarah ensures our CV recommendations are aligned with local employment standards and practices.",
-      image: "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=400"
+      name: "Denis Kasala",
+      title: "Founder & Developer",
+      bio: "Passionate about addressing South Africa's unemployment crisis, Denis founded ATSBoost to empower job seekers with technology that overcomes ATS barriers in the hiring process. His expertise in AI and software development drives our platform's innovative features tailored for the South African job market.",
+      image: "https://images.unsplash.com/photo-1531891570158-e71b35a485bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=400"
     }
   ];
 
@@ -50,17 +38,18 @@ export default function AboutPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-secondary mb-6">Our Story</h2>
               <p className="text-neutral-700 mb-4">
-                ATSBoost was founded in 2023 with a clear mission: to help South African job seekers overcome 
+                ATSBoost was founded in 2023 by Denis Kasala with a clear mission: to help South African job seekers overcome 
                 the ATS barrier that prevents many qualified candidates from landing interviews.
               </p>
               <p className="text-neutral-700 mb-4">
-                In a country with 32% unemployment affecting nearly 15 million job seekers, we recognized that 
+                In a country with 32% unemployment affecting nearly 15 million job seekers, Denis recognized that 
                 the widespread use of Applicant Tracking Systems by employers was creating an additional hurdle. 
                 Many talented individuals were being filtered out before a human ever saw their CV.
               </p>
               <p className="text-neutral-700">
-                Our team combines expertise in HR, technology, and the unique requirements of the South African 
-                job market to build a platform that delivers real results for job seekers across the country.
+                Combining expertise in software development, AI technology, and the unique requirements of the South African 
+                job market, Denis built ATSBoost to deliver real results for job seekers across the country, with a particular 
+                focus on local context factors like B-BBEE status and NQF levels that other global CV tools overlook.
               </p>
             </div>
             
