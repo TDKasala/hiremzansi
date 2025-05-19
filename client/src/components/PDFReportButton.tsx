@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { generateATSReport, downloadPDF } from '@/utils/pdfGenerator';
 
+// Import ATSBoost logo for PDF report
+import atsBoostLogo from '@assets/logo.png';
+
 interface PDFReportButtonProps {
   score: number;
   strengths: string[];
@@ -110,8 +113,9 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
       }
 
       if (saContextScore !== undefined) {
+        // Create a more detailed South African context assessment
         reportData.sections.push({
-          title: 'South African Context Score',
+          title: 'South African Job Market Alignment',
           content: `Your CV's alignment with South African job market requirements is ${saContextScore}%. ${
             saContextScore >= 80
               ? 'This is excellent and shows strong localization for the South African job market.'
@@ -120,6 +124,21 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
               : 'This needs significant improvement to better target South African employers.'
           }`,
           type: 'text' as const,
+        });
+        
+        // Add South African specific recommendations table
+        reportData.sections.push({
+          title: 'South African Market Enhancement Guide',
+          content: [],
+          type: 'table' as const,
+          tableHeaders: ['Element', 'Recommendation', 'Impact'],
+          tableData: [
+            ['B-BBEE Status', 'Include your B-BBEE status or level (if applicable)', 'High - Required by many employers for procurement'],
+            ['NQF Levels', 'Add NQF level for each qualification', 'High - Standardizes qualification comparison'],
+            ['SAQA IDs', 'Include SAQA ID numbers for qualifications', 'Medium - Verifies qualification legitimacy'],
+            ['Professional Bodies', 'List memberships with SA professional bodies', 'Medium - Shows industry engagement'],
+            ['Local Regulations', 'Reference relevant SA regulations in your field', 'Medium - Demonstrates compliance knowledge'],
+          ],
         });
       }
 
@@ -139,13 +158,18 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
         });
       }
 
-      // Add actionable recommendations
+      // Add detailed actionable recommendations for South African job market
       reportData.recommendations = [
-        'Use a clean, ATS-friendly format with standard section headings',
+        'Use a clean, ATS-friendly format with standard section headings (Profile, Experience, Education, Skills)',
         'Include relevant keywords from the job description naturally throughout your CV',
-        'Quantify achievements with specific metrics where possible',
-        'Include South African specific qualifications (NQF levels) and professional body memberships',
-        'Mention B-BBEE status if applicable to your situation',
+        'Quantify achievements with specific metrics where possible (e.g., "Increased sales by 25%")',
+        'Add NQF levels for all qualifications (e.g., "Bachelor of Commerce, NQF Level 7")',
+        'Include your B-BBEE status if applicable (e.g., "B-BBEE Level 2 Contributor")',
+        'List South African professional body memberships (e.g., SAICA, ECSA, SAICA, HPCSA)',
+        'Mention familiarity with relevant South African regulations in your industry',
+        'Include South African languages you speak (especially if multilingual)',
+        'Reference local cities/provinces where you have worked to establish geographical context',
+        'Use South African spelling conventions (e.g., "organisation" not "organization")',
       ];
 
       // Generate and download the PDF
