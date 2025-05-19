@@ -5,8 +5,9 @@ import multer from "multer";
 import { z } from "zod";
 import { extractTextFromPDF } from "./services/pdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
-import { analyzeCV, performDeepAnalysis } from "./services/atsScoring";
+import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
+import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -544,11 +545,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Combine all skills for display
-        const allIdentifiedSkills = [
-          ...identifiedTechSkills, 
-          ...identifiedSoftSkills,
-          ...identifiedSaSkills
-        ];
         
         // Prepare the detailed analysis
         const detailedAnalysis = {
@@ -559,7 +555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rating: rating,
           strengths: strengths.slice(0, 5),
           improvements: improvements.slice(0, 5),
-          skills_identified: allIdentifiedSkills.slice(0, 8),
+          skills_identified: identifiedSkillsList.slice(0, 8),
           sa_relevance: saRelevance,
           sections_detected: [
             hasBulletPoints ? "bullet_points" : null,
