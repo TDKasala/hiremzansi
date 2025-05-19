@@ -23,6 +23,23 @@ interface PDFReportButtonProps {
   className?: string;
 }
 
+// PDF Report data structure to match the type in pdfGenerator
+interface ReportData {
+  title: string;
+  subtitle?: string;
+  date: string;
+  username?: string;
+  sections: {
+    title: string;
+    content: string | string[];
+    type?: 'text' | 'list';
+  }[];
+  score?: number;
+  recommendations?: string[];
+  footerText?: string;
+  companyLogo?: string;
+}
+
 const PDFReportButton: React.FC<PDFReportButtonProps> = ({
   score,
   strengths,
@@ -126,51 +143,49 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
           type: 'text' as const,
         });
         
-        // Add South African specific recommendations table
+        // Add South African specific recommendations section
         reportData.sections.push({
           title: 'South African Market Enhancement Guide',
-          content: [],
-          type: 'table' as const,
-          tableHeaders: ['Element', 'Recommendation', 'Impact'],
-          tableData: [
-            ['B-BBEE Status', 'Include your B-BBEE status or level (if applicable)', 'High - Required by many employers for procurement'],
-            ['NQF Levels', 'Add NQF level for each qualification', 'High - Standardizes qualification comparison'],
-            ['SAQA IDs', 'Include SAQA ID numbers for qualifications', 'Medium - Verifies qualification legitimacy'],
-            ['Professional Bodies', 'List memberships with SA professional bodies', 'Medium - Shows industry engagement'],
-            ['Local Regulations', 'Reference relevant SA regulations in your field', 'Medium - Demonstrates compliance knowledge'],
-          ],
+          content: 
+            'Key elements that will improve your CV for the South African job market:\n\n' +
+            '• B-BBEE Status: Include your B-BBEE status or level (if applicable) - High impact, required by many employers\n\n' +
+            '• NQF Levels: Add NQF level for each qualification - High impact, standardizes qualification comparison\n\n' +
+            '• SAQA IDs: Include SAQA ID numbers for qualifications - Medium impact, verifies qualification legitimacy\n\n' +
+            '• Professional Bodies: List memberships with SA professional bodies - Medium impact, shows industry engagement\n\n' +
+            '• Local Regulations: Reference relevant SA regulations in your field - Medium impact, demonstrates compliance knowledge',
+          type: 'text' as const,
         });
       }
 
       if (keywordRecommendations && keywordRecommendations.length > 0) {
+        // Add keyword recommendations as a text section 
+        const keywordContent = "The following keyword additions are recommended to improve your CV's ATS performance:\n\n" +
+          keywordRecommendations.map(([keyword, implementation]) => 
+            `• ${keyword}: ${implementation}`
+          ).join('\n\n');
+        
         reportData.sections.push({
           title: 'Keyword Recommendations',
-          content: "The following keyword additions are recommended to improve your CV's ATS performance:",
+          content: keywordContent,
           type: 'text' as const,
-        });
-
-        reportData.sections.push({
-          title: 'Suggested Keywords',
-          content: [],
-          type: 'table' as const,
-          tableHeaders: ['Missing Keyword', 'Suggested Implementation'],
-          tableData: keywordRecommendations,
         });
       }
 
       // Add detailed actionable recommendations for South African job market
-      reportData.recommendations = [
+      const saRecommendations = [
         'Use a clean, ATS-friendly format with standard section headings (Profile, Experience, Education, Skills)',
         'Include relevant keywords from the job description naturally throughout your CV',
         'Quantify achievements with specific metrics where possible (e.g., "Increased sales by 25%")',
         'Add NQF levels for all qualifications (e.g., "Bachelor of Commerce, NQF Level 7")',
         'Include your B-BBEE status if applicable (e.g., "B-BBEE Level 2 Contributor")',
-        'List South African professional body memberships (e.g., SAICA, ECSA, SAICA, HPCSA)',
+        'List South African professional body memberships (e.g., SAICA, ECSA, HPCSA)',
         'Mention familiarity with relevant South African regulations in your industry',
         'Include South African languages you speak (especially if multilingual)',
         'Reference local cities/provinces where you have worked to establish geographical context',
-        'Use South African spelling conventions (e.g., "organisation" not "organization")',
+        'Use South African spelling conventions (e.g., "organisation" not "organization")'
       ];
+      
+      reportData.recommendations = saRecommendations;
 
       // Generate and download the PDF
       const pdfBlob = await generateATSReport(reportData);
