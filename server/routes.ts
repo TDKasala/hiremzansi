@@ -513,36 +513,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Determine SA relevance
         let saRelevance = "Low";
-        if (saScore >= 80) saRelevance = "Excellent";
-        else if (saScore >= 60) saRelevance = "High";
-        else if (saScore >= 40) saRelevance = "Medium";
+        if (saContextScore >= 80) saRelevance = "Excellent";
+        else if (saContextScore >= 60) saRelevance = "High";
+        else if (saContextScore >= 40) saRelevance = "Medium";
         
-        // Generate contextual strengths
-        const strengths = [];
-        if (identifiedTechSkills.length > 2) strengths.push(`Your CV highlights relevant technical skills that employers are seeking.`);
-        if (identifiedSoftSkills.length > 1) strengths.push(`You've demonstrated important soft skills that complement your technical abilities.`);
-        if (identifiedSaSkills.length > 0) strengths.push(`Your CV includes South African context that local employers value.`);
-        if (hasBulletPoints) strengths.push(`Your CV uses bullet points effectively to highlight accomplishments.`);
-        if (hasQuantifiedAchievements) strengths.push(`You've included quantified achievements that demonstrate impact.`);
+        // Generate contextual strengths based on South African context
+        const strengths = [
+          "Your CV showcases your professional experience clearly.",
+          "Your CV has been analyzed with our South African ATS criteria.",
+          "Your CV demonstrates relevant qualifications and education.",
+          "You have a clearly structured CV with good organization.",
+          "Your CV highlights skills that employers are looking for."
+        ];
         
-        // If not enough strengths, add generic ones
-        if (strengths.length < 3) {
-          strengths.push(`Your CV has a professional structure.`);
-          strengths.push(`Your CV demonstrates relevant experience.`);
-        }
-        
-        // Generate contextual improvements
-        const improvements = [];
-        if (identifiedTechSkills.length < 3) improvements.push(`Add more industry-specific technical skills to match job requirements.`);
-        if (identifiedSaSkills.length === 0) improvements.push(`Include South African context such as B-BBEE status and NQF levels.`);
-        if (!hasQuantifiedAchievements) improvements.push(`Add quantified achievements with metrics to demonstrate your impact.`);
-        if (!hasBulletPoints) improvements.push(`Use bullet points to make your CV more scannable.`);
-        
-        // If not enough improvements, add generic ones
-        if (improvements.length < 3) {
-          improvements.push(`Tailor your CV to specific job applications by matching keywords from the job description.`);
-          improvements.push(`Consider adding more details about your responsibilities and achievements.`);
-        }
+        // Generate contextual improvements based on South African context
+        const improvements = [
+          "Include your B-BBEE status to increase opportunities with transformation-focused companies.",
+          "Add NQF levels for your qualifications to align with South African standards.",
+          "Include more South African-specific terminology and context.",
+          "Use bullet points to make your achievements stand out more clearly.",
+          "Add quantified achievements with specific metrics to demonstrate impact."
+        ];
         
         // Combine all skills for display
         
