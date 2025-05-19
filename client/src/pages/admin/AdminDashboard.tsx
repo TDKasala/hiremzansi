@@ -498,21 +498,819 @@ const AdminDashboard: React.FC = () => {
                     <CardTitle>Platform Settings</CardTitle>
                     <CardDescription>Configure platform settings and defaults</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="font-medium mb-2">AI Analysis Settings</h3>
-                        <div className="bg-muted/50 p-4 rounded-md">
-                          <p className="text-sm text-muted-foreground">
-                            The AI analysis settings control how the system evaluates CVs and generates recommendations.
-                          </p>
-                          <Button variant="outline" size="sm" className="mt-2">
-                            Configure AI Settings
-                          </Button>
+                  <CardContent className="pb-6">
+                    <Tabs defaultValue="ai-settings">
+                      <TabsList className="mb-4">
+                        <TabsTrigger value="ai-settings">ATS Analysis</TabsTrigger>
+                        <TabsTrigger value="plans">Subscription Plans</TabsTrigger>
+                        <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                        <TabsTrigger value="site">Site Settings</TabsTrigger>
+                        <TabsTrigger value="system">System</TabsTrigger>
+                      </TabsList>
+                    
+                      <TabsContent value="ai-settings" className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">ATS Score Analysis Weights</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <Card className="p-4">
+                              <h4 className="font-medium">Keywords Weight</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                How much importance to give to keywords matching
+                              </p>
+                              <div className="mb-3">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-sm font-medium">
+                                    Importance factor
+                                  </label>
+                                  <span className="font-medium text-amber-600">40%</span>
+                                </div>
+                                <input 
+                                  type="range" 
+                                  min="20" 
+                                  max="60" 
+                                  step="5"
+                                  defaultValue="40"
+                                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                />
+                              </div>
+                            </Card>
+                            
+                            <Card className="p-4">
+                              <h4 className="font-medium">Format Weight</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                How much importance to give to CV formatting
+                              </p>
+                              <div className="mb-3">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-sm font-medium">
+                                    Importance factor
+                                  </label>
+                                  <span className="font-medium text-amber-600">40%</span>
+                                </div>
+                                <input 
+                                  type="range" 
+                                  min="20" 
+                                  max="60"
+                                  step="5" 
+                                  defaultValue="40"
+                                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                />
+                              </div>
+                            </Card>
+                            
+                            <Card className="p-4">
+                              <h4 className="font-medium">SA Context Weight</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Importance of South African contextual elements
+                              </p>
+                              <div className="mb-3">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-sm font-medium">
+                                    Importance factor
+                                  </label>
+                                  <span className="font-medium text-amber-600">20%</span>
+                                </div>
+                                <input 
+                                  type="range" 
+                                  min="5" 
+                                  max="30"
+                                  step="5" 
+                                  defaultValue="20"
+                                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                />
+                              </div>
+                            </Card>
+                          </div>
+                          
+                          <h3 className="text-lg font-medium mb-4">South African Context Settings</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <Card className="p-4">
+                              <h4 className="font-medium">B-BBEE Detection</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Configure how B-BBEE mentions are scored
+                              </p>
+                              <div className="space-y-3">
+                                <div>
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">Points per mention</label>
+                                    <span className="font-medium text-amber-600">10</span>
+                                  </div>
+                                  <input 
+                                    type="range" 
+                                    min="5" 
+                                    max="15"
+                                    step="1" 
+                                    defaultValue="10"
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">Maximum score</label>
+                                    <span className="font-medium text-amber-600">20</span>
+                                  </div>
+                                  <input 
+                                    type="range" 
+                                    min="10" 
+                                    max="30"
+                                    step="5" 
+                                    defaultValue="20"
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                  />
+                                </div>
+                              </div>
+                            </Card>
+                            
+                            <Card className="p-4">
+                              <h4 className="font-medium">NQF Level Detection</h4>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Configure how NQF level mentions are scored
+                              </p>
+                              <div className="space-y-3">
+                                <div>
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">Points per mention</label>
+                                    <span className="font-medium text-amber-600">5</span>
+                                  </div>
+                                  <input 
+                                    type="range" 
+                                    min="1" 
+                                    max="10"
+                                    step="1" 
+                                    defaultValue="5"
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">Maximum score</label>
+                                    <span className="font-medium text-amber-600">10</span>
+                                  </div>
+                                  <input 
+                                    type="range" 
+                                    min="5" 
+                                    max="20"
+                                    step="5" 
+                                    defaultValue="10"
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+                                  />
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            <Button>Save ATS Analysis Settings</Button>
+                          </div>
                         </div>
-                      </div>
+                      </TabsContent>
                       
-                      <Separator />
+                      <TabsContent value="plans" className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">Subscription Plans</h3>
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+                            <Card className="p-5 border-primary">
+                              <div className="mb-4">
+                                <h4 className="text-lg font-medium">Basic Plan</h4>
+                                <p className="text-sm text-muted-foreground">Entry level subscription</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Price (ZAR)
+                                  </label>
+                                  <div className="flex">
+                                    <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-l-md border-gray-300">
+                                      R
+                                    </span>
+                                    <input 
+                                      type="number" 
+                                      defaultValue="30"
+                                      className="flex-1 rounded-none rounded-r-lg bg-white border border-gray-300 p-2 focus:ring-primary"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Monthly scan limit
+                                  </label>
+                                  <input 
+                                    type="number" 
+                                    defaultValue="5"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Features (comma separated)
+                                  </label>
+                                  <textarea 
+                                    defaultValue="Basic ATS Score, Format Analysis, 5 Scans/Month"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    rows={3}
+                                  />
+                                </div>
+                                
+                                <div className="pt-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox id="basic-active" defaultChecked />
+                                    <label 
+                                      htmlFor="basic-active"
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      Active
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                            
+                            <Card className="p-5 border-amber-500 relative bg-amber-50/50">
+                              <div className="absolute -top-3 right-3 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                POPULAR
+                              </div>
+                              <div className="mb-4">
+                                <h4 className="text-lg font-medium">Standard Plan</h4>
+                                <p className="text-sm text-muted-foreground">Most popular option</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Price (ZAR)
+                                  </label>
+                                  <div className="flex">
+                                    <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-l-md border-gray-300">
+                                      R
+                                    </span>
+                                    <input 
+                                      type="number" 
+                                      defaultValue="100"
+                                      className="flex-1 rounded-none rounded-r-lg bg-white border border-gray-300 p-2 focus:ring-primary"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Monthly scan limit
+                                  </label>
+                                  <input 
+                                    type="number" 
+                                    defaultValue="15"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Features (comma separated)
+                                  </label>
+                                  <textarea 
+                                    defaultValue="Full ATS Score, Detailed Format Analysis, Skills Gap Analysis, 15 Scans/Month, SA Context Analysis"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    rows={3}
+                                  />
+                                </div>
+                                
+                                <div className="pt-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox id="standard-active" defaultChecked />
+                                    <label 
+                                      htmlFor="standard-active"
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      Active
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                            
+                            <Card className="p-5 border-primary">
+                              <div className="mb-4">
+                                <h4 className="text-lg font-medium">Premium Plan</h4>
+                                <p className="text-sm text-muted-foreground">Full featured premium package</p>
+                              </div>
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Price (ZAR)
+                                  </label>
+                                  <div className="flex">
+                                    <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border rounded-l-md border-gray-300">
+                                      R
+                                    </span>
+                                    <input 
+                                      type="number" 
+                                      defaultValue="200"
+                                      className="flex-1 rounded-none rounded-r-lg bg-white border border-gray-300 p-2 focus:ring-primary"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Monthly scan limit
+                                  </label>
+                                  <input 
+                                    type="number" 
+                                    defaultValue="50"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Features (comma separated)
+                                  </label>
+                                  <textarea 
+                                    defaultValue="Full ATS Score, Advanced Format Analysis, Skills Gap Analysis, Interview Training, 50 Scans/Month, SA Context Analysis, Premium Support"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    rows={3}
+                                  />
+                                </div>
+                                
+                                <div className="pt-2">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox id="premium-active" defaultChecked />
+                                    <label 
+                                      htmlFor="premium-active"
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      Active
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </Card>
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            <Button>Save Subscription Plans</Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="notifications" className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">Notification Settings</h3>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">Email Notifications</CardTitle>
+                              <CardDescription>Configure system email notifications</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between border-b pb-2">
+                                  <div>
+                                    <h4 className="font-medium">Welcome Email</h4>
+                                    <p className="text-sm text-muted-foreground">Sent when a user creates a new account</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">Preview</Button>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                    <Switch defaultChecked />
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between border-b pb-2">
+                                  <div>
+                                    <h4 className="font-medium">CV Analysis Complete</h4>
+                                    <p className="text-sm text-muted-foreground">Sent when CV analysis is complete</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">Preview</Button>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                    <Switch defaultChecked />
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between border-b pb-2">
+                                  <div>
+                                    <h4 className="font-medium">Subscription Confirmation</h4>
+                                    <p className="text-sm text-muted-foreground">Sent when a user subscribes to a plan</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">Preview</Button>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                    <Switch defaultChecked />
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between border-b pb-2">
+                                  <div>
+                                    <h4 className="font-medium">Subscription Renewal Reminder</h4>
+                                    <p className="text-sm text-muted-foreground">Sent 3 days before subscription renewal</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">Preview</Button>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                    <Switch defaultChecked />
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h4 className="font-medium">Password Reset</h4>
+                                    <p className="text-sm text-muted-foreground">Sent when a user requests password reset</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm">Preview</Button>
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                    <Switch defaultChecked />
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">WhatsApp Notifications</CardTitle>
+                              <CardDescription>Configure WhatsApp Business integration</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div className="mb-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="font-medium">WhatsApp Business Integration</h4>
+                                    <Switch />
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Enable WhatsApp notifications for users who opt-in
+                                  </p>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 gap-4">
+                                  <div>
+                                    <label className="text-sm font-medium block mb-1">
+                                      WhatsApp Business API Token
+                                    </label>
+                                    <input 
+                                      type="password"
+                                      placeholder="Enter WhatsApp Business API Token" 
+                                      className="w-full p-2 border border-gray-300 rounded-md"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <label className="text-sm font-medium block mb-1">
+                                      WhatsApp Business Phone Number
+                                    </label>
+                                    <input 
+                                      type="text"
+                                      placeholder="+27XXXXXXXXX" 
+                                      className="w-full p-2 border border-gray-300 rounded-md"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <h4 className="font-medium mb-2">Active Notifications</h4>
+                                    <div className="space-y-2">
+                                      <div className="flex items-center space-x-2">
+                                        <Checkbox id="whatsapp-cv-analysis" defaultChecked />
+                                        <label 
+                                          htmlFor="whatsapp-cv-analysis"
+                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                          CV Analysis Complete
+                                        </label>
+                                      </div>
+                                      <div className="flex items-center space-x-2">
+                                        <Checkbox id="whatsapp-subscription" defaultChecked />
+                                        <label 
+                                          htmlFor="whatsapp-subscription"
+                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                          Subscription Confirmation
+                                        </label>
+                                      </div>
+                                      <div className="flex items-center space-x-2">
+                                        <Checkbox id="whatsapp-reminder" />
+                                        <label 
+                                          htmlFor="whatsapp-reminder"
+                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                          Renewal Reminder
+                                        </label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <div className="flex justify-end">
+                            <Button>Save Notification Settings</Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="site" className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">Site Configuration</h3>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">General Settings</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Site Name
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="ATSBoost"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Primary Domain
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="atsboost.co.za"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Support Email
+                                  </label>
+                                  <input 
+                                    type="email" 
+                                    defaultValue="support@atsboost.co.za"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Contact Phone
+                                  </label>
+                                  <input 
+                                    type="tel" 
+                                    defaultValue="+27 XXXX XXXX"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">Social Media Links</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Twitter/X Handle
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="@supportatsboost"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    LinkedIn URL
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="https://linkedin.com/company/atsboost"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Facebook URL
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="https://facebook.com/atsboost"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    WhatsApp Contact
+                                  </label>
+                                  <input 
+                                    type="text" 
+                                    defaultValue="+27 XXXX XXXX"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">Pre-Launch Banner</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="font-medium">Enable Pre-Launch Banner</h4>
+                                  <Switch defaultChecked />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Banner Text
+                                  </label>
+                                  <textarea 
+                                    defaultValue="🚀 We're launching soon! Join our waitlist for early access and exclusive benefits!"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    rows={2}
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Launch Date
+                                  </label>
+                                  <input 
+                                    type="date" 
+                                    defaultValue="2025-06-30"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <div className="flex justify-end">
+                            <Button>Save Site Settings</Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="system" className="space-y-6">
+                        <div>
+                          <h3 className="text-lg font-medium mb-4">System Settings</h3>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">Maintenance Mode</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h4 className="font-medium">Enable Maintenance Mode</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      Site will display a maintenance message to all non-admin users
+                                    </p>
+                                  </div>
+                                  <Switch />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Maintenance Message
+                                  </label>
+                                  <textarea 
+                                    defaultValue="We're currently performing scheduled maintenance to improve your experience. Please check back shortly."
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                    rows={3}
+                                  />
+                                </div>
+                                
+                                <div>
+                                  <label className="text-sm font-medium block mb-1">
+                                    Expected Completion
+                                  </label>
+                                  <input 
+                                    type="datetime-local"
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                  />
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">Database Management</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-6">
+                                <div className="bg-muted/50 p-4 rounded-md mb-4">
+                                  <h4 className="font-medium mb-2">Database Status</h4>
+                                  <div className="grid grid-cols-2 gap-y-2 text-sm">
+                                    <div>Connection Status:</div>
+                                    <div className="flex items-center">
+                                      <span className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></span>
+                                      <span className="font-medium">Connected</span>
+                                    </div>
+                                    
+                                    <div>Database Size:</div>
+                                    <div className="font-medium">9.4 MB</div>
+                                    
+                                    <div>Active Connections:</div>
+                                    <div className="font-medium">5</div>
+                                    
+                                    <div>PostgreSQL Version:</div>
+                                    <div className="font-medium">16.8</div>
+                                  </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                  <div>
+                                    <h4 className="font-medium mb-2">Backup & Maintenance</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      <Button variant="outline" className="justify-start">
+                                        <span className="mr-2">🔄</span> Run Health Check
+                                      </Button>
+                                      <Button variant="outline" className="justify-start">
+                                        <span className="mr-2">📦</span> Backup Database
+                                      </Button>
+                                      <Button variant="outline" className="justify-start">
+                                        <span className="mr-2">⚡</span> Optimize Database
+                                      </Button>
+                                      <Button variant="outline" className="justify-start text-amber-600">
+                                        <span className="mr-2">🧹</span> Clear Expired Sessions
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Card className="mb-6">
+                            <CardHeader>
+                              <CardTitle className="text-base">API Integration</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <div>
+                                  <h4 className="font-medium mb-2">Payment Gateway</h4>
+                                  <div className="flex items-center space-x-2 mb-2">
+                                    <select className="flex-1 p-2 border border-gray-300 rounded-md">
+                                      <option value="payfast">PayFast</option>
+                                      <option value="paygate">PayGate</option>
+                                      <option value="peach">Peach Payments</option>
+                                    </select>
+                                    <Button variant="outline" size="sm">Configure</Button>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <h4 className="font-medium mb-2">AI Service</h4>
+                                  <div className="flex items-center space-x-2 mb-2">
+                                    <select className="flex-1 p-2 border border-gray-300 rounded-md">
+                                      <option value="local">Local AI Model</option>
+                                      <option value="openai">OpenAI</option>
+                                      <option value="anthropic">Anthropic Claude</option>
+                                      <option value="minimax">MiniMax</option>
+                                    </select>
+                                    <Button variant="outline" size="sm">Configure</Button>
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <h4 className="font-medium mb-2">Email Service</h4>
+                                  <div className="flex items-center space-x-2 mb-2">
+                                    <select className="flex-1 p-2 border border-gray-300 rounded-md">
+                                      <option value="sendgrid">SendGrid</option>
+                                      <option value="mailgun">Mailgun</option>
+                                      <option value="ses">Amazon SES</option>
+                                      <option value="smtp">Custom SMTP</option>
+                                    </select>
+                                    <Button variant="outline" size="sm">Configure</Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <div className="flex justify-end">
+                            <Button>Save System Settings</Button>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </CardContent>
+                </Card>
+              )}
                       
                       <div>
                         <h3 className="font-medium mb-2">South African Market Settings</h3>
