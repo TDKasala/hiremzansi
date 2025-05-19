@@ -68,14 +68,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
       const res = await apiRequest("POST", "/api/login", credentials);
-      return await res.json();
+      const data = await res.json();
+      return data;
     },
     onSuccess: (user: SelectUser) => {
+      // Set the user data in the query cache
       queryClient.setQueryData(["/api/user"], user);
+      
+      // Immediately verify the session worked
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.name || user.username}!`,
       });
+      
+      // Force a reload after successful login to ensure session is applied
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
     },
     onError: (error: Error) => {
       toast({

@@ -318,7 +318,7 @@ export function setupAuth(app: Express) {
       }
       
       // Use regular passport authentication
-      passport.authenticate("local", (err, user, info) => {
+      passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string }) => {
         if (err) {
           console.error("Authentication error:", err);
           return next(err);
