@@ -23,6 +23,7 @@ import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
+import adminRoutes from "./routes/admin";
 
 // File upload configuration
 const upload = multer({

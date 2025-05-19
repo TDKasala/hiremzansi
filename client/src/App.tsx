@@ -36,6 +36,7 @@ import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import BlogPost1 from "@/pages/BlogPost1";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 // Import job search pages
@@ -127,15 +128,16 @@ function App() {
                   <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                   <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
                   <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
-                  <Route path="/ats-results" component={() => <ATSResultsPage />} />
-                  <Route path="/motivation-demo" component={() => <MotivationDemoPage />} />
-                  <Route path="/motivation-dashboard" component={() => <MotivationDashboard />} />
-                  <Route path="/local-ai-demo" component={() => <LocalAIDemoPage />} />
-                  <Route path="/sa-ai-demo" component={() => <SouthAfricanAIDemo />} />
+                  <Route path="/ats-results" component={ATSResultsPage} />
+                  <Route path="/motivation-demo" component={MotivationDemoPage} />
+                  <Route path="/motivation-dashboard" component={MotivationDashboard} />
+                  <Route path="/local-ai-demo" component={LocalAIDemoPage} />
+                  <Route path="/sa-ai-demo" component={SouthAfricanAIDemo} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />
+                  <ProtectedRoute path="/admin" component={AdminDashboard} />
                   
                   <Route component={NotFound} />
                 </Switch>

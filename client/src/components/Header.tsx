@@ -107,6 +107,18 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/skills/analyze">Skill Gap Analysis</Link>
                   </DropdownMenuItem>
+                  
+                  {user && user.role === 'admin' && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="font-semibold text-primary">
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => logoutMutation.mutate()}
