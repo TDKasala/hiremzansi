@@ -65,13 +65,14 @@ export function setupAuth(app: Express) {
   // Set up session middleware
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "ATSBoost-secret-key",
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: storage.sessionStore,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to false to ensure cookies work in development
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-      sameSite: "lax"
+      sameSite: "lax",
+      httpOnly: true
     }
   };
 
