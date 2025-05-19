@@ -498,15 +498,68 @@ const AdminDashboard: React.FC = () => {
                     <CardTitle>Platform Settings</CardTitle>
                     <CardDescription>Configure platform settings and defaults</CardDescription>
                   </CardHeader>
-                  <CardContent className="pb-6">
-                    <Tabs defaultValue="ai-settings">
-                      <TabsList className="mb-4">
-                        <TabsTrigger value="ai-settings">ATS Analysis</TabsTrigger>
-                        <TabsTrigger value="plans">Subscription Plans</TabsTrigger>
-                        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                        <TabsTrigger value="site">Site Settings</TabsTrigger>
-                        <TabsTrigger value="system">System</TabsTrigger>
-                      </TabsList>
+                  <CardContent>
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">ATS Analysis Settings</h3>
+                        <div className="bg-muted/50 p-4 rounded-md">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div>
+                              <h4 className="font-medium mb-2">Keywords Weight</h4>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm">Current value:</span>
+                                <span className="font-medium text-amber-600">40%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="20" 
+                                max="60" 
+                                step="5"
+                                defaultValue="40"
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                              />
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-medium mb-2">Format Weight</h4>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm">Current value:</span>
+                                <span className="font-medium text-amber-600">40%</span>
+                              </div>
+                              <input 
+                                type="range" 
+                                min="20" 
+                                max="60"
+                                step="5" 
+                                defaultValue="40"
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="mt-4">
+                            <h4 className="font-medium mb-2">SA Context Weight</h4>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm">Current value:</span>
+                              <span className="font-medium text-amber-600">20%</span>
+                            </div>
+                            <input 
+                              type="range" 
+                              min="5" 
+                              max="30"
+                              step="5" 
+                              defaultValue="20"
+                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            />
+                          </div>
+                          
+                          <div className="mt-4 flex justify-end">
+                            <Button>Save Analysis Settings</Button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator />
                     
                       <TabsContent value="ai-settings" className="space-y-6">
                         <div>
