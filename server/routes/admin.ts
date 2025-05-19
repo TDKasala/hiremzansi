@@ -40,9 +40,12 @@ router.get("/stats", isAdmin, async (req: Request, res: Response) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
+    // Use SQL for date comparison to avoid TypeScript errors
     const [activeUserCount] = await db.select({ count: count() })
       .from(users)
-      .where(users.lastLogin >= thirtyDaysAgo);
+      .where(
+        sql`${users.lastLogin} >= ${thirtyDaysAgo}`
+      );
     
     // Calculate average ATS score
     const avgScoreResult = await db.execute<{ avg: number }>(
@@ -60,7 +63,7 @@ router.get("/stats", isAdmin, async (req: Request, res: Response) => {
         role: users.role,
       })
       .from(users)
-      .orderBy(users.createdAt, 'desc')
+      .orderBy(desc(users.createdAt))
       .limit(5);
     
     // Get latest CVs

@@ -20,6 +20,46 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Define types for admin dashboard data
+interface AdminStats {
+  userCount: number;
+  activeUserCount: number;
+  cvCount: number;
+  atsCount: number;
+  subscriptionCount: number;
+  avgScore: number;
+  latestUsers: Array<{
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  }>;
+  latestCVs: Array<{
+    id: number;
+    fileName: string;
+    createdAt: string;
+  }>;
+}
+
+interface AdminUser {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface AdminCV {
+  id: number;
+  fileName: string;
+  userId: number;
+  username: string;
+  score: number;
+  createdAt: string;
+}
+
 const AdminDashboard: React.FC = () => {
   const { user, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
@@ -27,15 +67,21 @@ const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   
   // Fetch admin dashboard stats
-  const { data: statsData, isLoading: isStatsLoading } = useQuery({
+  const { data: statsData, isLoading: isStatsLoading } = useQuery<AdminStats>({
     queryKey: ['/api/admin/stats'],
     enabled: !!user && user.role === 'admin',
   });
   
   // Fetch users for management
-  const { data: usersData, isLoading: isUsersLoading } = useQuery({
+  const { data: usersData, isLoading: isUsersLoading } = useQuery<AdminUser[]>({
     queryKey: ['/api/admin/users'],
     enabled: !!user && user.role === 'admin' && activeTab === 'users',
+  });
+  
+  // Fetch CVs for management
+  const { data: cvsData, isLoading: isCvsLoading } = useQuery<AdminCV[]>({
+    queryKey: ['/api/admin/cvs'],
+    enabled: !!user && user.role === 'admin' && activeTab === 'cvs',
   });
 
   // Redirect if not admin
@@ -374,32 +420,74 @@ const AdminDashboard: React.FC = () => {
                     <CardDescription>Manage uploaded CVs and analysis results</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-3 px-2">ID</th>
-                            <th className="text-left py-3 px-2">Filename</th>
-                            <th className="text-left py-3 px-2">User</th>
-                            <th className="text-left py-3 px-2">Score</th>
-                            <th className="text-left py-3 px-2">Uploaded</th>
-                            <th className="text-left py-3 px-2">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b hover:bg-muted/50">
-                            <td className="py-3 px-2">40</td>
-                            <td className="py-3 px-2 font-medium">cv_1747651541622.pdf</td>
-                            <td className="py-3 px-2">deniskasala</td>
-                            <td className="py-3 px-2">12%</td>
-                            <td className="py-3 px-2 text-sm text-muted-foreground">May 19, 2025</td>
-                            <td className="py-3 px-2">
-                              <Button variant="ghost" size="sm">View</Button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    {isCvsLoading ? (
+                      <div className="flex justify-center py-10">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                      </div>
+                    ) : cvsData && cvsData.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left py-3 px-2">ID</th>
+                              <th className="text-left py-3 px-2">Filename</th>
+                              <th className="text-left py-3 px-2">User</th>
+                              <th className="text-left py-3 px-2">Score</th>
+                              <th className="text-left py-3 px-2">Uploaded</th>
+                              <th className="text-left py-3 px-2">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {cvsData.map((cv) => (
+                              <tr key={cv.id} className="border-b hover:bg-muted/50">
+                                <td className="py-3 px-2">{cv.id}</td>
+                                <td className="py-3 px-2 font-medium">{cv.fileName}</td>
+                                <td className="py-3 px-2">{cv.username}</td>
+                                <td className="py-3 px-2">
+                                  <span className={`inline-block px-2 py-1 text-xs rounded-full ${
+                                    cv.score > 70 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : cv.score > 40 
+                                        ? 'bg-amber-100 text-amber-800' 
+                                        : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {cv.score}%
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2 text-sm text-muted-foreground">
+                                  {new Date(cv.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="py-3 px-2">
+                                  <div className="flex space-x-2">
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      onClick={() => window.open(`/cv/${cv.id}`, '_blank')}
+                                    >
+                                      View
+                                    </Button>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="py-8 text-center">
+                        <p className="text-muted-foreground">No CVs found</p>
+                        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+                          Refresh
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
