@@ -19,6 +19,155 @@ if (sendgridApiKey) {
 
 // Email templates
 const EMAIL_TEMPLATES = {
+  CAREER_DIGEST: {
+    subject: 'Your Personalized Career Recommendations - ATSBoost Weekly Digest',
+    text: (name: string, recommendations: any) => `
+Hello ${name || 'there'},
+
+Here are your personalized career recommendations for this week:
+
+${recommendations.jobMatches ? `JOB MATCHES:
+${recommendations.jobMatches.map((job: any) => `- ${job.title} at ${job.company} (Match Score: ${job.matchScore}%)`).join('\n')}` : ''}
+
+${recommendations.skillGaps ? `SKILL GAPS TO FOCUS ON:
+${recommendations.skillGaps.map((skill: any) => `- ${skill}`).join('\n')}` : ''}
+
+${recommendations.courses ? `RECOMMENDED COURSES:
+${recommendations.courses.map((course: any) => `- ${course.title}: ${course.description}`).join('\n')}` : ''}
+
+${recommendations.industryTips ? `INDUSTRY INSIGHTS:
+${recommendations.industryTips}` : ''}
+
+Log in to your ATSBoost dashboard to see more details and take action on these recommendations.
+
+To manage your email preferences, visit your account settings.
+
+Best regards,
+The ATSBoost Team
+    `,
+    html: (name: string, recommendations: any) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Personalized Career Recommendations</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #FFCA28;
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px 5px 0 0;
+    }
+    .content {
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+    }
+    h1 { color: #0D6EFD; margin-top: 0; }
+    h2 { color: #333; font-size: 18px; margin-top: 20px; }
+    .job-match {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #0D6EFD;
+      border-radius: 3px;
+    }
+    .match-score {
+      font-weight: bold;
+      color: #0D6EFD;
+    }
+    .skill-gap {
+      padding: 5px 10px;
+      margin: 5px 0;
+      background-color: #f0f0f0;
+      border-radius: 15px;
+      display: inline-block;
+    }
+    .course {
+      margin-bottom: 15px;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #0D6EFD;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Your Weekly Career Digest</h1>
+  </div>
+  <div class="content">
+    <p>Hello ${name || 'there'},</p>
+    <p>Here are your personalized career recommendations based on your CV and profile:</p>
+    
+    ${recommendations.jobMatches && recommendations.jobMatches.length > 0 ? `
+    <h2>🔍 Job Matches</h2>
+    ${recommendations.jobMatches.map((job: any) => `
+    <div class="job-match">
+      <strong>${job.title}</strong> at ${job.company}<br/>
+      Location: ${job.location}<br/>
+      <span class="match-score">Match Score: ${job.matchScore}%</span>
+    </div>
+    `).join('')}
+    ` : ''}
+    
+    ${recommendations.skillGaps && recommendations.skillGaps.length > 0 ? `
+    <h2>🎯 Skills to Focus On</h2>
+    <p>Based on your CV and current job market trends, these skills would boost your employability:</p>
+    <p>
+      ${recommendations.skillGaps.map((skill: any) => `<span class="skill-gap">${skill}</span>`).join(' ')}
+    </p>
+    ` : ''}
+    
+    ${recommendations.courses && recommendations.courses.length > 0 ? `
+    <h2>📚 Recommended Courses</h2>
+    ${recommendations.courses.map((course: any) => `
+    <div class="course">
+      <strong>${course.title}</strong><br/>
+      ${course.description}
+    </div>
+    `).join('')}
+    ` : ''}
+    
+    ${recommendations.industryTips ? `
+    <h2>💡 Industry Insights</h2>
+    <p>${recommendations.industryTips}</p>
+    ` : ''}
+    
+    <a href="https://atsboost.co.za/dashboard" class="cta-button">View Details on Dashboard</a>
+    
+    <p class="footer">
+      To manage your email preferences, <a href="https://atsboost.co.za/profile/settings">visit your account settings</a>.<br/>
+      © 2025 ATSBoost. All rights reserved.
+    </p>
+  </div>
+</body>
+</html>
+    `,
+  },
   WELCOME: {
     subject: 'Welcome to ATSBoost - Let\'s Boost Your Career!',
     text: (name: string) => `
@@ -438,4 +587,30 @@ export async function sendVerificationEmail(
  */
 export function isEmailServiceEnabled(): boolean {
   return emailServiceEnabled;
+}
+
+/**
+ * Send a personalized career recommendation email digest
+ * 
+ * @param email User's email address
+ * @param name User's name or username
+ * @param recommendations Object containing personalized recommendations
+ * @returns Promise resolving to boolean indicating success
+ */
+export async function sendCareerDigestEmail(
+  email: string,
+  name: string,
+  recommendations: {
+    jobMatches?: Array<{title: string, company: string, location: string, matchScore: number}>,
+    skillGaps?: Array<string>,
+    courses?: Array<{title: string, description: string}>,
+    industryTips?: string
+  }
+): Promise<boolean> {
+  return sendEmail({
+    to: email,
+    subject: EMAIL_TEMPLATES.CAREER_DIGEST.subject,
+    text: EMAIL_TEMPLATES.CAREER_DIGEST.text(name, recommendations),
+    html: EMAIL_TEMPLATES.CAREER_DIGEST.html(name, recommendations)
+  });
 }

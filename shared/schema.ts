@@ -19,6 +19,8 @@ export const users = pgTable("users", {
   lastLogin: timestamp("last_login"),
   resetToken: text("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),
+  receiveEmailDigest: boolean("receive_email_digest").default(true),
+  lastEmailDigestSent: timestamp("last_email_digest_sent"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
