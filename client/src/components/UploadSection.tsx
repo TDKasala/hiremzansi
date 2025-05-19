@@ -15,12 +15,7 @@ export default function UploadSection() {
   return (
     <section id="upload" className="py-16 bg-neutral-100">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-8">
-          <h2 className="text-3xl font-bold mb-3">Analyze Your CV for Free</h2>
-          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-            Upload your CV to get instant ATS analysis and improve your chances of landing interviews with South African employers.
-          </p>
-        </div>
+
         
         <Card className="max-w-4xl mx-auto bg-white shadow-lg overflow-hidden">
           <CardContent className="p-0">
