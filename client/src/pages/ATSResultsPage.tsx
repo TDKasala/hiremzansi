@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { useLocation } from 'wouter';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import CVAnalysisResults from '@/components/CVAnalysisResults';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Printer, Download, Share2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Printer, Share2, FileText, AlertCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import PDFReportButton from '@/components/PDFReportButton';
 
 // Example placeholder data - in a real app this would come from the API
 const demoResults = {
