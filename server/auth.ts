@@ -222,12 +222,28 @@ export function setupAuth(app: Express) {
   // Login endpoint
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: Error, user: Express.User, info: { message: string }) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ error: info.message || "Authentication failed" });
+      if (err) {
+        console.error("Authentication error:", err);
+        return next(err);
+      }
       
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(200).json(user);
+      if (!user) {
+        console.log("Authentication failed:", info?.message || "Unknown reason");
+        return res.status(401).json({ error: info?.message || "Authentication failed" });
+      }
+      
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login error:", loginErr);
+          return next(loginErr);
+        }
+        
+        // Log successful login
+        console.log(`User ${user.username} logged in successfully`);
+        
+        // Return user without sensitive data
+        const { password, verificationToken, resetToken, ...safeUser } = user as any;
+        res.status(200).json(safeUser);
       });
     })(req, res, next);
   });
