@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
 import { checkDatabaseHealth } from "./db-utils";
 import { runMigrations } from "./db-migrate";
+import adminRoutes from "./routes/admin";
 import { closeDbConnection } from "./db";
 
 const app = express();
