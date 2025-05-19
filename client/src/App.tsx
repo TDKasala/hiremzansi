@@ -35,6 +35,7 @@ import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
 import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
+import SettingsPage from "@/pages/settings-page";
 import BlogPost1 from "@/pages/BlogPost1";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/not-found";
@@ -134,6 +135,7 @@ function App() {
                   <Route path="/local-ai-demo" component={LocalAIDemoPage} />
                   <Route path="/sa-ai-demo" component={SouthAfricanAIDemo} />
                   <ProtectedRoute path="/profile" component={ProfilePage} />
+                  <ProtectedRoute path="/settings" component={SettingsPage} />
                   <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                   <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
                   <ProtectedRoute path="/subscription" component={SubscriptionPage} />

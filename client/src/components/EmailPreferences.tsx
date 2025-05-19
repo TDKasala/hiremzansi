@@ -15,7 +15,7 @@ interface EmailPreferenceProps {
 const EmailPreferences: React.FC<EmailPreferenceProps> = ({ initialValue = true }) => {
   const { user } = useAuth();
   const [receiveEmailDigest, setReceiveEmailDigest] = useState(
-    user?.receiveEmailDigest !== undefined ? user.receiveEmailDigest : initialValue
+    user?.receiveEmailDigest === false ? false : initialValue
   );
   const { toast } = useToast();
   const queryClient = useQueryClient();

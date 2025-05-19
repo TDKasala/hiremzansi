@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { Helmet } from 'react-helmet';
-import { useRoute, Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import EmailPreferences from '@/components/EmailPreferences';
@@ -9,7 +9,7 @@ import { Loader2, ArrowLeft, Bell, Mail, Shield, User } from 'lucide-react';
 
 const SettingsPage = () => {
   const { user, isLoading } = useAuth();
-  const [, setLocation] = useRoute();
+  const [, setLocation] = useLocation();
 
   // If not logged in, redirect to auth page
   React.useEffect(() => {
