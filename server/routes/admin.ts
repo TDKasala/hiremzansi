@@ -75,7 +75,7 @@ router.get("/stats", isAdmin, async (req: Request, res: Response) => {
         createdAt: cvs.createdAt,
       })
       .from(cvs)
-      .orderBy(cvs.createdAt, 'desc')
+      .orderBy(desc(cvs.createdAt))
       .limit(5);
     
     res.json({
@@ -117,19 +117,13 @@ router.get("/users", isAdmin, async (req: Request, res: Response) => {
       .from(users)
       .limit(limit)
       .offset(offset)
-      .orderBy(users.createdAt, 'desc');
+      .orderBy(desc(users.createdAt));
     
     const [totalCount] = await db.select({ count: count() }).from(users);
     
-    res.json({
-      users: allUsers,
-      pagination: {
-        total: totalCount.count,
-        page,
-        limit,
-        totalPages: Math.ceil(totalCount.count / limit),
-      },
-    });
+    // Return just the users array instead of an object with pagination
+    // This matches what our frontend expects
+    res.json(allUsers);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ error: "Failed to fetch users" });
@@ -157,19 +151,36 @@ router.get("/cvs", isAdmin, async (req: Request, res: Response) => {
       .from(cvs)
       .limit(limit)
       .offset(offset)
-      .orderBy(cvs.createdAt, 'desc');
+      .orderBy(desc(cvs.createdAt));
     
     const [totalCount] = await db.select({ count: count() }).from(cvs);
     
-    res.json({
-      cvs: allCVs,
-      pagination: {
-        total: totalCount.count,
-        page,
-        limit,
-        totalPages: Math.ceil(totalCount.count / limit),
-      },
-    });
+    // Get usernames for each CV
+    const cvsWithUsername = await Promise.all(
+      allCVs.map(async (cv) => {
+        // Get user info for this CV
+        const [user] = await db
+          .select({ username: users.username })
+          .from(users)
+          .where(sql`${users.id} = ${cv.userId}`);
+          
+        // Get ATS score if available
+        const [atsScore] = await db
+          .select({ score: atsScores.score })
+          .from(atsScores)
+          .where(sql`${atsScores.cvId} = ${cv.id}`);
+        
+        return {
+          ...cv,
+          username: user?.username || 'Guest',
+          score: atsScore?.score || 0
+        };
+      })
+    );
+    
+    // Return just the CVs array instead of an object with pagination
+    // This matches what our frontend expects
+    res.json(cvsWithUsername);
   } catch (error) {
     console.error("Error fetching CVs:", error);
     res.status(500).json({ error: "Failed to fetch CVs" });
@@ -183,7 +194,7 @@ router.put("/users/:id", isAdmin, async (req: Request, res: Response) => {
     const { role, isActive } = req.body;
     
     // Prevent changing your own role (admin can't demote themselves)
-    if (req.user.id === userId && role && role !== 'admin') {
+    if (req.user && req.user.id === userId && role && role !== 'admin') {
       return res.status(403).json({ error: "You cannot change your own admin role" });
     }
     
@@ -194,7 +205,7 @@ router.put("/users/:id", isAdmin, async (req: Request, res: Response) => {
         isActive: isActive !== undefined ? isActive : undefined,
         updatedAt: new Date(),
       })
-      .where(users.id === userId)
+      .where(sql`${users.id} = ${userId}`)
       .returning();
     
     if (!updatedUser) {
