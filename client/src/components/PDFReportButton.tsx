@@ -35,7 +35,7 @@ interface ReportData {
     type?: 'text' | 'list';
   }[];
   score?: number;
-  recommendations?: string[];
+  recommendations: string[];
   footerText?: string;
   companyLogo?: string;
 }
@@ -77,7 +77,7 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
       const logoBase64 = canvas.toDataURL('image/png');
 
       // Prepare report data
-      const reportData = {
+      const reportData: ReportData = {
         title: 'ATS Optimization Report',
         subtitle: jobTitle ? `For: ${jobTitle} Position` : 'CV Analysis Results',
         date: new Date().toLocaleDateString(),
@@ -172,7 +172,7 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
       }
 
       // Add detailed actionable recommendations for South African job market
-      const saRecommendations = [
+      reportData.recommendations = [
         'Use a clean, ATS-friendly format with standard section headings (Profile, Experience, Education, Skills)',
         'Include relevant keywords from the job description naturally throughout your CV',
         'Quantify achievements with specific metrics where possible (e.g., "Increased sales by 25%")',
@@ -184,8 +184,6 @@ const PDFReportButton: React.FC<PDFReportButtonProps> = ({
         'Reference local cities/provinces where you have worked to establish geographical context',
         'Use South African spelling conventions (e.g., "organisation" not "organization")'
       ];
-      
-      reportData.recommendations = saRecommendations;
 
       // Generate and download the PDF
       const pdfBlob = await generateATSReport(reportData);
