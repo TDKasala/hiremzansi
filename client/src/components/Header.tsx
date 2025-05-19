@@ -219,6 +219,16 @@ export default function Header() {
                 >
                   Skill Gap Analysis
                 </Link>
+                
+                {user && user.role === 'admin' && (
+                  <Link 
+                    href="/admin"
+                    className="block px-4 py-2 border-2 border-amber-500 bg-amber-100 text-amber-700 font-medium text-center rounded-md hover:bg-amber-200 transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     logoutMutation.mutate();
