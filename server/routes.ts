@@ -304,52 +304,189 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       try {
-        // Simple version of analysis as a fallback
-        const basicAnalysis = {
-          overall_score: 65,
-          skill_score: 60,
-          format_score: 70,
-          sa_score: 60,
-          rating: "Average",
-          strengths: [
-            "Your CV has been successfully uploaded and processed.",
-            "We've detected some relevant skills in your CV.",
-            "Your CV has a basic professional structure."
-          ],
-          improvements: [
-            "Consider adding more South African context such as B-BBEE status.",
-            "Add more industry-specific keywords relevant to the job you're applying for.",
-            "Include quantifiable achievements to make your experience stand out."
-          ],
-          skills_identified: ["communication", "teamwork", "organization", "management"],
-          sa_relevance: "Medium",
-          sections_detected: ["experience", "education", "skills"]
+        // Enhanced detailed analysis with South African context
+        const saKeywords = ["B-BBEE", "NQF", "SETA", "South Africa", "Johannesburg", "Cape Town", "Durban", "Pretoria"];
+        const saContextPresent = saKeywords.some(keyword => 
+          textContent.toLowerCase().includes(keyword.toLowerCase())
+        );
+        
+        // Extract skills from text - more comprehensive analysis
+        const techSkills = ["javascript", "python", "java", "react", "node", "typescript", "html", "css", "sql", "database", "aws", "cloud"];
+        const softSkills = ["leadership", "communication", "teamwork", "project management", "time management", "problem solving"];
+        const saSpecificSkills = ["bbbee", "employment equity", "popi", "compliance", "transformation", "stakeholder management"];
+        
+        // Count identified skills
+        const identifiedTechSkills = techSkills.filter(skill => 
+          textContent.toLowerCase().includes(skill.toLowerCase())
+        );
+        const identifiedSoftSkills = softSkills.filter(skill => 
+          textContent.toLowerCase().includes(skill.toLowerCase())
+        );
+        const identifiedSaSkills = saSpecificSkills.filter(skill => 
+          textContent.toLowerCase().includes(skill.toLowerCase())
+        );
+        
+        // Calculate detailed scores
+        const skillScore = Math.min(100, 
+          (identifiedTechSkills.length * 8) + 
+          (identifiedSoftSkills.length * 5) + 
+          (identifiedSaSkills.length * 10)
+        );
+        
+        // Calculate format score based on section headers, bullet points, etc.
+        const hasBulletPoints = textContent.includes("•") || textContent.includes("-");
+        const hasDateRanges = /\d{4}\s*(-|to)\s*\d{4}|\d{4}\s*(-|to)\s*(present|current)/i.test(textContent);
+        const hasQuantifiedAchievements = /increased|improved|reduced|generated|achieved|by\s+\d+%/i.test(textContent);
+        
+        const formatScore = 50 + 
+          (hasBulletPoints ? 15 : 0) + 
+          (hasDateRanges ? 15 : 0) + 
+          (hasQuantifiedAchievements ? 20 : 0);
+        
+        // Calculate SA context score
+        const saScore = 30 + 
+          (saContextPresent ? 30 : 0) + 
+          (identifiedSaSkills.length * 10);
+        
+        // Calculate overall score with weighted components
+        const overallScore = Math.round(
+          (skillScore * 0.4) +
+          (formatScore * 0.35) +
+          (saScore * 0.25)
+        );
+        
+        // Determine rating based on score
+        let rating = "Needs Improvement";
+        if (overallScore >= 90) rating = "Excellent";
+        else if (overallScore >= 80) rating = "Very Good";
+        else if (overallScore >= 70) rating = "Good";
+        else if (overallScore >= 60) rating = "Above Average";
+        else if (overallScore >= 50) rating = "Average";
+        
+        // Determine SA relevance
+        let saRelevance = "Low";
+        if (saScore >= 80) saRelevance = "Excellent";
+        else if (saScore >= 60) saRelevance = "High";
+        else if (saScore >= 40) saRelevance = "Medium";
+        
+        // Generate contextual strengths
+        const strengths = [];
+        if (identifiedTechSkills.length > 2) strengths.push(`Your CV highlights relevant technical skills that employers are seeking.`);
+        if (identifiedSoftSkills.length > 1) strengths.push(`You've demonstrated important soft skills that complement your technical abilities.`);
+        if (identifiedSaSkills.length > 0) strengths.push(`Your CV includes South African context that local employers value.`);
+        if (hasBulletPoints) strengths.push(`Your CV uses bullet points effectively to highlight accomplishments.`);
+        if (hasQuantifiedAchievements) strengths.push(`You've included quantified achievements that demonstrate impact.`);
+        
+        // If not enough strengths, add generic ones
+        if (strengths.length < 3) {
+          strengths.push(`Your CV has a professional structure.`);
+          strengths.push(`Your CV demonstrates relevant experience.`);
+        }
+        
+        // Generate contextual improvements
+        const improvements = [];
+        if (identifiedTechSkills.length < 3) improvements.push(`Add more industry-specific technical skills to match job requirements.`);
+        if (identifiedSaSkills.length === 0) improvements.push(`Include South African context such as B-BBEE status and NQF levels.`);
+        if (!hasQuantifiedAchievements) improvements.push(`Add quantified achievements with metrics to demonstrate your impact.`);
+        if (!hasBulletPoints) improvements.push(`Use bullet points to make your CV more scannable.`);
+        
+        // If not enough improvements, add generic ones
+        if (improvements.length < 3) {
+          improvements.push(`Tailor your CV to specific job applications by matching keywords from the job description.`);
+          improvements.push(`Consider adding more details about your responsibilities and achievements.`);
+        }
+        
+        // Combine all skills for display
+        const allIdentifiedSkills = [
+          ...identifiedTechSkills, 
+          ...identifiedSoftSkills,
+          ...identifiedSaSkills
+        ];
+        
+        // Prepare the detailed analysis
+        const detailedAnalysis = {
+          overall_score: overallScore,
+          skill_score: skillScore,
+          format_score: formatScore,
+          sa_score: saScore,
+          rating: rating,
+          strengths: strengths.slice(0, 5),
+          improvements: improvements.slice(0, 5),
+          skills_identified: allIdentifiedSkills.slice(0, 8),
+          sa_relevance: saRelevance,
+          sections_detected: [
+            hasBulletPoints ? "bullet_points" : null,
+            hasDateRanges ? "date_ranges" : null,
+            hasQuantifiedAchievements ? "quantified_achievements" : null
+          ].filter(Boolean),
+          detailed_components: {
+            technical_skills: identifiedTechSkills,
+            soft_skills: identifiedSoftSkills,
+            sa_specific_skills: identifiedSaSkills,
+            format_elements: {
+              has_bullet_points: hasBulletPoints,
+              has_date_ranges: hasDateRanges,
+              has_quantified_achievements: hasQuantifiedAchievements
+            },
+            sa_elements: {
+              sa_context_present: saContextPresent,
+              sa_skills_count: identifiedSaSkills.length
+            }
+          }
         };
         
-        // Create an ATS score record
+        // Create an ATS score record with the detailed analysis
         const atsScore = await storage.createATSScore({
           cvId,
-          score: basicAnalysis.overall_score,
-          skillsScore: basicAnalysis.skill_score,
-          formatScore: basicAnalysis.format_score,
-          contextScore: basicAnalysis.sa_score,
-          strengths: basicAnalysis.strengths,
-          improvements: basicAnalysis.improvements,
+          score: detailedAnalysis.overall_score,
+          skillsScore: detailedAnalysis.skill_score,
+          formatScore: detailedAnalysis.format_score,
+          contextScore: detailedAnalysis.sa_score,
+          strengths: detailedAnalysis.strengths,
+          improvements: detailedAnalysis.improvements,
           issues: []
         });
         
-        console.log("Created basic ATS score:", atsScore.id);
+        console.log("Created detailed ATS score:", atsScore.id);
         
+        // Send the comprehensive analysis response
         res.json({
           success: true,
-          score: basicAnalysis.overall_score,
+          score: detailedAnalysis.overall_score,
           scoreId: atsScore.id,
-          rating: basicAnalysis.rating,
-          strengths: basicAnalysis.strengths,
-          improvements: basicAnalysis.improvements,
-          skills: basicAnalysis.skills_identified,
-          sa_score: basicAnalysis.sa_score,
-          sa_relevance: basicAnalysis.sa_relevance
+          rating: detailedAnalysis.rating,
+          strengths: detailedAnalysis.strengths,
+          improvements: detailedAnalysis.improvements,
+          skills: detailedAnalysis.skills_identified,
+          sa_score: detailedAnalysis.sa_score,
+          sa_relevance: detailedAnalysis.sa_relevance,
+          detailed_report: {
+            components: {
+              skills: {
+                score: detailedAnalysis.skill_score,
+                technical_skills: detailedAnalysis.detailed_components.technical_skills,
+                soft_skills: detailedAnalysis.detailed_components.soft_skills,
+                sa_specific_skills: detailedAnalysis.detailed_components.sa_specific_skills
+              },
+              format: {
+                score: detailedAnalysis.format_score,
+                has_bullet_points: detailedAnalysis.detailed_components.format_elements.has_bullet_points,
+                has_date_ranges: detailedAnalysis.detailed_components.format_elements.has_date_ranges,
+                has_quantified_achievements: detailedAnalysis.detailed_components.format_elements.has_quantified_achievements
+              },
+              south_african_context: {
+                score: detailedAnalysis.sa_score,
+                sa_context_present: detailedAnalysis.detailed_components.sa_elements.sa_context_present,
+                sa_skills_count: detailedAnalysis.detailed_components.sa_elements.sa_skills_count,
+                relevance: detailedAnalysis.sa_relevance
+              }
+            },
+            breakdown: {
+              skills_weight: "40%",
+              format_weight: "35%",
+              sa_context_weight: "25%"
+            }
+          }
         });
       } catch (error) {
         console.error("Error analyzing CV:", error);
