@@ -503,6 +503,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           (saContextScore * 0.2)
         );
         
+        // For references in later code
+        const skillScore = skillsScore;
+        const saScore = saContextScore;
+        
         // Determine rating based on score
         let rating = "Needs Improvement";
         if (overallScore >= 90) rating = "Excellent";
