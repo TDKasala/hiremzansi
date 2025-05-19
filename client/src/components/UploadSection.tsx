@@ -15,8 +15,6 @@ export default function UploadSection() {
   return (
     <section id="upload" className="py-16 bg-neutral-100">
       <div className="container mx-auto px-4">
-
-        
         <Card className="max-w-4xl mx-auto bg-white shadow-lg overflow-hidden">
           <CardContent className="p-0">
             <SimpleUploadForm onUploadComplete={handleUploadComplete} />

@@ -238,7 +238,7 @@ export default function SimpleUploadForm({
                       Uploading & Analyzing...
                     </>
                   ) : (
-                    'Upload & Analyze CV'
+                    'Analyze CV'
                   )}
                 </Button>
               </div>
