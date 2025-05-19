@@ -521,6 +521,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         else if (saContextScore >= 60) saRelevance = "High";
         else if (saContextScore >= 40) saRelevance = "Medium";
         
+        // SA Context detection elements
+        const saElementsDetected = [];
+        if (textContent.toLowerCase().includes("b-bbee") || textContent.toLowerCase().includes("bee")) {
+          saElementsDetected.push("B-BBEE Status");
+        }
+        if (textContent.toLowerCase().includes("nqf")) {
+          saElementsDetected.push("NQF Level");
+        }
+        if (textContent.toLowerCase().includes("south africa") || textContent.toLowerCase().includes("johannesburg") || 
+            textContent.toLowerCase().includes("cape town")) {
+          saElementsDetected.push("SA Location");
+        }
+        
         // Generate contextual strengths based on South African context
         const strengths = [
           "Your CV showcases your professional experience clearly.",
