@@ -273,24 +273,32 @@ const AdminDashboard: React.FC = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {usersData.map((user) => (
-                              <tr key={user.id} className="border-b hover:bg-muted/50">
-                                <td className="py-3 px-2 font-medium">{user.username}</td>
-                                <td className="py-3 px-2">{user.email || 'N/A'}</td>
-                                <td className="py-3 px-2">
-                                  <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                                    user.role === 'admin' 
-                                      ? 'bg-amber-100 text-amber-800' 
-                                      : 'bg-primary/20 text-primary'
-                                  }`}>
-                                    {user.role || 'user'}
-                                  </span>
-                                </td>
-                                <td className="py-3 px-2">
-                                  <Button variant="outline" size="sm">Edit</Button>
+                            {Array.isArray(usersData) && usersData.length > 0 ? (
+                              usersData.map((user) => (
+                                <tr key={user.id} className="border-b hover:bg-muted/50">
+                                  <td className="py-3 px-2 font-medium">{user.username}</td>
+                                  <td className="py-3 px-2">{user.email || 'N/A'}</td>
+                                  <td className="py-3 px-2">
+                                    <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
+                                      user.role === 'admin' 
+                                        ? 'bg-amber-100 text-amber-800' 
+                                        : 'bg-primary/20 text-primary'
+                                    }`}>
+                                      {user.role || 'user'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-2">
+                                    <Button variant="outline" size="sm">Edit</Button>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={4} className="py-8 text-center text-muted-foreground">
+                                  No users found or insufficient permissions
                                 </td>
                               </tr>
-                            ))}
+                            )}
                           </tbody>
                         </table>
                       </div>
