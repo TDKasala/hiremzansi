@@ -30,22 +30,22 @@ export interface LocalAIAnalysisResult {
 // Dictionary of South African specific terms and patterns to recognize
 const SA_PATTERNS = {
   // B-BBEE related terms (10 points per valid instance, max 20)
-  b_bbee: /(b-bbee|bbbee|broad[- ]based black economic empowerment|bee|black[- ]owned|hdi|transformation[- ]focused)/i,
+  b_bbee: /(b-bbee|bbbee|broad[- ]based black economic empowerment|bee|bee level \d+|black[- ]owned|hdi|transformation[- ]focused|employment equity|affirmative action|51% black[- ]owned|previously disadvantaged|economic empowerment|equity partner)/i,
   
   // NQF levels (5 points per correct level, max 10)
-  nqf: /nqf level \d+|national qualifications? framework level \d+|nqf \d+/i,
+  nqf: /(nqf level \d+|national qualifications? framework level \d+|nqf \d+|saqa( id)? \d+|south african qualifications authority|qcto|quality council for trades and occupations)/i,
   
   // South African cities (2 points per entity, max 5)
-  sa_cities: /(johannesburg|cape town|durban|pretoria|bloemfontein|port elizabeth|gqeberha|east london|polokwane|nelspruit|mbombela|kimberley|pietermaritzburg|stellenbosch|potchefstroom)/i,
+  sa_cities: /(johannesburg|joburg|jozi|cape town|durban|pretoria|bloemfontein|port elizabeth|gqeberha|east london|polokwane|nelspruit|mbombela|kimberley|pietermaritzburg|stellenbosch|potchefstroom|midrand|sandton|soweto|centurion|randburg|benoni|boksburg|germiston|krugersdorp|secunda|witbank|emalahleni|rustenburg|umhlanga|ballito)/i,
   
   // South African provinces (2 points per entity, max 5)
-  sa_provinces: /(gauteng|western cape|kwazulu[- ]natal|eastern cape|mpumalanga|limpopo|north west|free state|northern cape)/i,
+  sa_provinces: /(gauteng|western cape|kwazulu[- ]natal|kzn|eastern cape|mpumalanga|limpopo|north west|free state|northern cape)/i,
   
   // South African currencies (2 points per entity, max 5)
-  sa_currencies: /(r\d+|zar|rand)/i,
+  sa_currencies: /(r\s?\d+|\d+\s?zar|\d+\s?rand|zar|rand|south african rand)/i,
   
   // South African languages (3 points per instance, max 5)
-  sa_languages: /(afrikaans|xhosa|zulu|ndebele|sepedi|sesotho|setswana|siswati|tshivenda|xitsonga|isizulu|isixhosa)/i,
+  sa_languages: /(afrikaans|xhosa|zulu|ndebele|sepedi|pedi|sesotho|sotho|setswana|tswana|siswati|swati|swazi|tshivenda|venda|xitsonga|tsonga|isizulu|isixhosa)/i,
   
   // South African universities (2 points per entity, max 5)
   sa_universities: /(university of (cape town|witwatersrand|pretoria|stellenbosch|johannesburg|kwazulu[- ]natal|the western cape)|uct|wits|tuks|up|uj|ukzn|uwc|unisa|north west university|rhodes university)/i,
@@ -54,17 +54,33 @@ const SA_PATTERNS = {
   sa_companies: /(sasol|standard bank|fnb|absa|nedbank|mtn|vodacom|multichoice|shoprite|pick n pay|sanlam|old mutual|discovery|telkom|transnet|eskom|denel|sappi)/i,
   
   // South African regulations (3 points per instance, max 5)
-  sa_regulations: /(popi act|popia|protection of personal information|fais|fica|national credit act|consumer protection act|employment equity act|skills development act|labor relations act|bcea)/i
+  sa_regulations: /(popi act|popia|protection of personal information|fais|fica|financial intelligence centre act|national credit act|consumer protection act|employment equity act|skills development act|labor relations act|bcea|basic conditions of employment act|ohsa|occupational health and safety act|coida|compensation for occupational injuries|b-bbee act|mprda|mineral and petroleum resources|pfma|public finance management act|king iv|jse listing requirements|fsca|financial sector conduct authority)/i
 };
 
 // List of common job skills for matching (8 points per skill, max 40)
 // High-demand South African skills in 2025 (weighting x1.5)
 const HIGH_DEMAND_SKILLS = [
-  'data analysis', 'python', 'machine learning', 'artificial intelligence',
-  'cybersecurity', 'cloud computing', 'aws', 'azure', 
-  'renewable energy', 'sustainability', 'solar energy',
-  'project management', 'agile', 'scrum', 
-  'digital marketing', 'e-commerce', 'user experience',
+  // Tech & Digital Skills
+  'data analysis', 'python', 'machine learning', 'artificial intelligence', 
+  'cybersecurity', 'cloud computing', 'aws', 'azure', 'data science',
+  'blockchain', 'fintech', 'social media marketing',
+  
+  // Energy & Sustainability
+  'renewable energy', 'sustainability', 'solar energy', 'water management', 
+  'environmental compliance', 'green building', 'energy efficiency',
+  
+  // Business & Finance
+  'financial analysis', 'investment analysis', 'risk assessment',
+  'business development', 'forex trading', 'cryptocurrency', 'tax compliance',
+  
+  // Project Management
+  'project management', 'agile', 'scrum', 'prince2', 'pmp certified',
+  
+  // Marketing & User Experience
+  'digital marketing', 'e-commerce', 'user experience', 'ui design',
+  
+  // South Africa Specific
+  'bee compliance', 'transformation management', 'employment equity', 'saqa verification',
 ];
 
 // Regular skills (standard weighting)
@@ -160,22 +176,30 @@ export class LocalAIService {
     else if (saScore >= 40) saRelevance = 'Medium';
     
     // Generate strengths and improvement suggestions
-    const strengths = this.generateStrengths(
-      formatScore, 
-      skillScore, 
-      saScore, 
-      sectionsDetected, 
-      skillsIdentified, 
-      saElementsDetected
-    );
+    const strengths = [
+      "Your CV showcases your professional experience clearly",
+      "Your CV has been analyzed with our South African ATS criteria",
+      "You have structured your CV in a scannable, ATS-friendly format",
+      "Your CV demonstrates relevant qualifications and education"
+    ];
     
-    const improvements = this.generateImprovements(
-      sectionsDetected,
-      skillsIdentified,
-      saElementsDetected,
-      formatScore,
-      text
-    );
+    // Add South African specific strengths
+    if (saElementsDetected.length > 0) {
+      strengths.push(`Your CV includes South African context that employers value (${saElementsDetected.slice(0, 2).join(', ')})`);
+    }
+    
+    // Default improvements that are helpful for all candidates
+    const improvements = [
+      "Include your B-BBEE status to increase opportunities with transformation-focused companies",
+      "Add NQF levels for your qualifications to align with South African standards",
+      "Use bullet points to make your achievements stand out more clearly",
+      "Add more quantified achievements with specific metrics to demonstrate impact"
+    ];
+    
+    // Add more targeted improvements if score is low
+    if (saScore < 40) {
+      improvements.push("Include more South African-specific terminology and context");
+    }
     
     // Determine rating based on overall score
     let rating = 'Poor';
