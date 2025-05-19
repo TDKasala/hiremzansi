@@ -79,6 +79,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   setupAuth(app);
   
+  // Register admin routes
+  app.use('/api/admin', adminRoutes);
+  
   // Health check endpoint
   app.get("/api/health", async (_req: Request, res: Response, next: NextFunction) => {
     try {

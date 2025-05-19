@@ -25,6 +25,18 @@ const AdminDashboard: React.FC = () => {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Fetch admin dashboard stats
+  const { data: statsData, isLoading: isStatsLoading } = useQuery({
+    queryKey: ['/api/admin/stats'],
+    enabled: !!user && user.role === 'admin',
+  });
+  
+  // Fetch users for management
+  const { data: usersData, isLoading: isUsersLoading } = useQuery({
+    queryKey: ['/api/admin/users'],
+    enabled: !!user && user.role === 'admin' && activeTab === 'users',
+  });
 
   // Redirect if not admin
   React.useEffect(() => {
@@ -165,41 +177,103 @@ const AdminDashboard: React.FC = () => {
                     <CardDescription>Key platform statistics and metrics</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                      <Card className="bg-primary/5">
-                        <CardContent className="p-4 text-center">
-                          <h3 className="text-sm font-medium text-muted-foreground mb-1">Total Users</h3>
-                          <p className="text-3xl font-bold">3</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-primary/5">
-                        <CardContent className="p-4 text-center">
-                          <h3 className="text-sm font-medium text-muted-foreground mb-1">CVs Analyzed</h3>
-                          <p className="text-3xl font-bold">18</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-primary/5">
-                        <CardContent className="p-4 text-center">
-                          <h3 className="text-sm font-medium text-muted-foreground mb-1">Paid Subscriptions</h3>
-                          <p className="text-3xl font-bold">0</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    <h3 className="font-medium mb-3">Recent Activity</h3>
-                    <ul className="space-y-2">
-                      <li className="p-3 bg-muted/50 rounded-md text-sm">
-                        <span className="text-primary font-medium">deniskasala</span> uploaded a new CV
-                        <div className="text-xs text-muted-foreground mt-0.5">2 minutes ago</div>
-                      </li>
-                      <li className="p-3 bg-muted/50 rounded-md text-sm">
-                        <span className="text-primary font-medium">System</span> processed ATS analysis
-                        <div className="text-xs text-muted-foreground mt-0.5">5 minutes ago</div>
-                      </li>
-                      <li className="p-3 bg-muted/50 rounded-md text-sm">
-                        <span className="text-primary font-medium">deniskasala</span> was promoted to admin
-                        <div className="text-xs text-muted-foreground mt-0.5">Just now</div>
-                      </li>
-                    </ul>
+                    {isStatsLoading ? (
+                      <div className="flex justify-center py-10">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                      </div>
+                    ) : statsData ? (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <Card className="bg-primary/5">
+                            <CardContent className="p-4 text-center">
+                              <h3 className="text-sm font-medium text-muted-foreground mb-1">Total Users</h3>
+                              <p className="text-3xl font-bold">{statsData.userCount || 0}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {statsData.activeUserCount || 0} active in last 30 days
+                              </p>
+                            </CardContent>
+                          </Card>
+                          <Card className="bg-primary/5">
+                            <CardContent className="p-4 text-center">
+                              <h3 className="text-sm font-medium text-muted-foreground mb-1">CVs Analyzed</h3>
+                              <p className="text-3xl font-bold">{statsData.cvCount || 0}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {statsData.atsCount || 0} ATS analysis reports
+                              </p>
+                            </CardContent>
+                          </Card>
+                          <Card className="bg-primary/5">
+                            <CardContent className="p-4 text-center">
+                              <h3 className="text-sm font-medium text-muted-foreground mb-1">Paid Subscriptions</h3>
+                              <p className="text-3xl font-bold">{statsData.subscriptionCount || 0}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {statsData.avgScore || 0}% average ATS score
+                              </p>
+                            </CardContent>
+                          </Card>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h3 className="font-medium mb-3">Latest Users</h3>
+                            {statsData.latestUsers && statsData.latestUsers.length > 0 ? (
+                              <ul className="space-y-2">
+                                {statsData.latestUsers.map((user) => (
+                                  <li key={user.id} className="p-3 bg-muted/50 rounded-md text-sm">
+                                    <div className="flex justify-between">
+                                      <span className="text-primary font-medium">{user.username}</span>
+                                      <span className="text-xs bg-primary/10 px-2 py-0.5 rounded-full">
+                                        {user.role}
+                                      </span>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground mt-0.5">
+                                      Joined: {new Date(user.createdAt).toLocaleDateString()}
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-muted-foreground">No users found</p>
+                            )}
+                          </div>
+                          
+                          <div>
+                            <h3 className="font-medium mb-3">Latest CV Uploads</h3>
+                            {statsData.latestCVs && statsData.latestCVs.length > 0 ? (
+                              <ul className="space-y-2">
+                                {statsData.latestCVs.map((cv) => (
+                                  <li key={cv.id} className="p-3 bg-muted/50 rounded-md text-sm">
+                                    <div className="flex justify-between items-start">
+                                      <span className="font-medium truncate">{cv.fileName}</span>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="h-6 px-2"
+                                        onClick={() => window.open(`/cv/${cv.id}`, '_blank')}
+                                      >
+                                        View
+                                      </Button>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground mt-0.5">
+                                      Uploaded: {new Date(cv.createdAt).toLocaleDateString()}
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-muted-foreground">No CVs found</p>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="py-10 text-center">
+                        <p className="text-muted-foreground">Could not load admin statistics</p>
+                        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+                          Retry
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -211,32 +285,84 @@ const AdminDashboard: React.FC = () => {
                     <CardDescription>Manage user accounts and permissions</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-3 px-2">Username</th>
-                            <th className="text-left py-3 px-2">Email</th>
-                            <th className="text-left py-3 px-2">Role</th>
-                            <th className="text-left py-3 px-2">Status</th>
-                            <th className="text-left py-3 px-2">Created</th>
-                            <th className="text-left py-3 px-2">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b hover:bg-muted/50">
-                            <td className="py-3 px-2 font-medium">deniskasala</td>
-                            <td className="py-3 px-2">deniskasala@example.com</td>
-                            <td className="py-3 px-2"><span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary">admin</span></td>
-                            <td className="py-3 px-2"><span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">active</span></td>
-                            <td className="py-3 px-2 text-sm text-muted-foreground">May 19, 2025</td>
-                            <td className="py-3 px-2">
-                              <Button variant="ghost" size="sm">Edit</Button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                    {isUsersLoading ? (
+                      <div className="flex justify-center py-10">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                      </div>
+                    ) : usersData ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left py-3 px-2">Username</th>
+                              <th className="text-left py-3 px-2">Email</th>
+                              <th className="text-left py-3 px-2">Role</th>
+                              <th className="text-left py-3 px-2">Status</th>
+                              <th className="text-left py-3 px-2">Created</th>
+                              <th className="text-left py-3 px-2">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {usersData && usersData.length > 0 ? (
+                              usersData.map((user) => (
+                                <tr key={user.id} className="border-b hover:bg-muted/50">
+                                  <td className="py-3 px-2 font-medium">{user.username}</td>
+                                  <td className="py-3 px-2">{user.email || 'N/A'}</td>
+                                  <td className="py-3 px-2">
+                                    <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
+                                      user.role === 'admin' 
+                                        ? 'bg-amber-100 text-amber-800' 
+                                        : 'bg-primary/20 text-primary'
+                                    }`}>
+                                      {user.role || 'user'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-2">
+                                    <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
+                                      user.isActive 
+                                        ? 'bg-green-100 text-green-800' 
+                                        : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                      {user.isActive ? 'active' : 'inactive'}
+                                    </span>
+                                  </td>
+                                  <td className="py-3 px-2 text-sm text-muted-foreground">
+                                    {new Date(user.createdAt).toLocaleDateString()}
+                                  </td>
+                                  <td className="py-3 px-2">
+                                    <div className="flex space-x-2">
+                                      <Button variant="ghost" size="sm" className="h-8 px-2">Edit</Button>
+                                      {user.role !== 'admin' && (
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="h-8 px-2 text-amber-600 border-amber-200 hover:bg-amber-50"
+                                        >
+                                          Make Admin
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                                  No users found
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="py-10 text-center">
+                        <p className="text-muted-foreground">Could not load user data</p>
+                        <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+                          Retry
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
