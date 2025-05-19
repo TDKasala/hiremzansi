@@ -49,44 +49,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     data: user,
     error,
     isLoading,
+    refetch: refetchUser
   } = useQuery<SelectUser | null, Error>({
     queryKey: ["/api/user"],
     queryFn: async () => {
       try {
-        const res = await apiRequest("GET", "/api/user");
+        // Get the stored session cookie
+        const sessionCookie = localStorage.getItem('session_active');
+        console.log("Checking authentication status...", sessionCookie ? "Session token found" : "No session token");
+        
+        const res = await fetch("/api/user", {
+          credentials: "include",
+          headers: {
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache"
+          }
+        });
+        
+        if (!res.ok) {
+          if (res.status === 401) {
+            console.log("User not authenticated");
+            localStorage.removeItem('session_active');
+            return null;
+          }
+          throw new Error(`${res.status}: ${res.statusText}`);
+        }
+        
+        // User is authenticated
+        console.log("User authenticated successfully");
+        localStorage.setItem('session_active', 'true');
         return await res.json();
       } catch (error) {
         if (error instanceof Error && error.message.includes("401")) {
+          localStorage.removeItem('session_active');
           return null;
         }
         throw error;
       }
     },
+    refetchInterval: 300000, // Refresh auth status every 5 minutes
+    staleTime: 60000 // Consider data stale after 1 minute
   });
 
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      const res = await apiRequest("POST", "/api/login", credentials);
-      const data = await res.json();
-      return data;
+      // Use the browser fetch API directly with proper credentials
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(credentials)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Login failed");
+      }
+      
+      return await response.json();
     },
     onSuccess: (user: SelectUser) => {
+      console.log("Login successful, storing session");
+      // Mark session as active in localStorage
+      localStorage.setItem('session_active', 'true');
+      
       // Set the user data in the query cache
       queryClient.setQueryData(["/api/user"], user);
       
       // Immediately verify the session worked
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      refetchUser();
       
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.name || user.username}!`,
       });
       
-      // Force a reload after successful login to ensure session is applied
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 500);
+      // Force a page reload to ensure session is properly established
+      window.location.href = '/dashboard';
     },
     onError: (error: Error) => {
       toast({
