@@ -304,7 +304,25 @@ export default function SimpleUploadForm({
                         <Button
                           variant="outline"
                           className="ml-3"
-                          onClick={() => window.location.href = `/cv/${uploadedCvId}`}
+                          onClick={() => {
+                            // Check if user is authenticated before redirecting
+                            fetch('/api/user')
+                              .then(res => {
+                                if (res.ok) {
+                                  // User is logged in, go to details page
+                                  window.location.href = `/cv/${uploadedCvId}`;
+                                } else {
+                                  // User is not logged in, save CV ID to localStorage and redirect to auth with prompt
+                                  localStorage.setItem('pendingCvId', String(uploadedCvId));
+                                  window.location.href = `/auth?action=signup&message=signup-for-report`;
+                                }
+                              })
+                              .catch(() => {
+                                // Error checking auth status, default to auth page
+                                localStorage.setItem('pendingCvId', String(uploadedCvId));
+                                window.location.href = `/auth?action=signup&message=signup-for-report`;
+                              });
+                          }}
                         >
                           View Detailed Report
                         </Button>

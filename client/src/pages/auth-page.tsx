@@ -123,7 +123,32 @@ export default function AuthPage() {
     }
   }
   
-  // If the user is already logged in, redirect to dashboard
+  // Get URL parameters to check if we need to show a specific signup message
+  const [searchParams] = useState(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : ''));
+  const action = searchParams.get('action');
+  const message = searchParams.get('message');
+  
+  // If message is signup-for-report, show signup tab by default
+  useEffect(() => {
+    if (action === 'signup') {
+      setActiveTab('register');
+    }
+  }, [action]);
+  
+  // When user logs in or registers, check if there's a pending CV to view
+  useEffect(() => {
+    if (user) {
+      const pendingCvId = localStorage.getItem('pendingCvId');
+      if (pendingCvId) {
+        localStorage.removeItem('pendingCvId');
+        window.location.href = `/cv/${pendingCvId}`;
+      } else {
+        window.location.href = '/dashboard';
+      }
+    }
+  }, [user]);
+
+  // If the user is already logged in, but no pending actions, redirect to dashboard
   if (user) {
     return <Redirect to="/dashboard" />;
   }
@@ -137,6 +162,19 @@ export default function AuthPage() {
       
       <div className="container flex items-center justify-center min-h-[calc(100vh-200px)] py-8">
         <div className="flex flex-col md:flex-row w-full max-w-6xl gap-8">
+          {/* Notification for CV report signup */}
+          {message === 'signup-for-report' && (
+            <div className="w-full mb-4">
+              <Alert className="bg-amber-50 border-amber-200">
+                <Info className="h-5 w-5 text-amber-500" />
+                <AlertTitle className="text-amber-700">Your CV Analysis is Ready!</AlertTitle>
+                <AlertDescription className="text-amber-600">
+                  Create an account to access your detailed CV analysis report, save your results, and download your personalized recommendations.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+          
           {/* Left side - Auth forms */}
           <div className="w-full md:w-1/2">
             <Card className="w-full">
