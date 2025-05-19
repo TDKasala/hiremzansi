@@ -550,7 +550,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rating: rating,
           strengths: strengths.slice(0, 5),
           improvements: improvements.slice(0, 5),
-          skills_identified: identifiedSkillsList.slice(0, 8),
+          skills_identified: allIdentifiedSkills.slice(0, 8),
           sa_relevance: saRelevance,
           sections_detected: [
             hasBulletPoints ? "bullet_points" : null,
@@ -558,17 +558,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             hasQuantifiedAchievements ? "quantified_achievements" : null
           ].filter(Boolean),
           detailed_components: {
-            technical_skills: identifiedTechSkills,
-            soft_skills: identifiedSoftSkills,
-            sa_specific_skills: identifiedSaSkills,
+            technical_skills: allIdentifiedSkills.filter(s => s.includes("python") || s.includes("java") || s.includes("data") || s.includes("software")),
+            soft_skills: allIdentifiedSkills.filter(s => s.includes("communication") || s.includes("leadership") || s.includes("teamwork")),
+            sa_specific_skills: allIdentifiedSkills.filter(s => s.includes("bee") || s.includes("nqf") || s.includes("saqa")),
             format_elements: {
               has_bullet_points: hasBulletPoints,
               has_date_ranges: hasDateRanges,
               has_quantified_achievements: hasQuantifiedAchievements
             },
             sa_elements: {
-              sa_context_present: saContextPresent,
-              sa_skills_count: identifiedSaSkills.length
+              sa_context_present: saScore > 30,
+              sa_skills_count: allIdentifiedSkills.filter(s => s.includes("bee") || s.includes("nqf")).length
             }
           }
         };
