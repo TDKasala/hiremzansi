@@ -7,7 +7,7 @@ import { Printer, Share2, FileText, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import PDFReportButton from '@/components/PDFReportButton';
+import DownloadReportButton from '@/components/DownloadReportButton';
 
 const ATSResultsPage: React.FC = () => {
   const { cvId } = useParams();
@@ -115,13 +115,13 @@ const ATSResultsPage: React.FC = () => {
             
             {user ? (
               // PDF Report button for logged-in users
-              <PDFReportButton 
+              <DownloadReportButton 
                 score={analysisData?.score || 0}
                 strengths={analysisData?.strengths || []}
                 improvements={analysisData?.weaknesses || []}
-                issues={analysisData?.suggestions || []}
-                saContextScore={analysisData?.saScore}
-                saKeywordsFound={analysisData?.saElements}
+                suggestions={analysisData?.suggestions || []}
+                saScore={analysisData?.saScore}
+                saKeywords={analysisData?.saElements}
                 userName={user.username}
                 cvName={cv?.fileName}
                 variant="outline"

@@ -3,18 +3,17 @@ import { FileDown, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 interface DownloadReportButtonProps {
   score: number;
   strengths: string[];
   improvements: string[];
-  issues: string[];
-  keywordRecommendations?: string[][];
-  jobTitle?: string;
+  suggestions: string[];
+  saKeywords?: string[];
+  saScore?: number;
   userName?: string;
   cvName?: string;
-  saKeywordsFound?: string[];
-  saContextScore?: number;
   variant?: 'default' | 'outline' | 'secondary';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
@@ -24,13 +23,11 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
   score,
   strengths,
   improvements,
-  issues,
-  keywordRecommendations,
-  jobTitle,
+  suggestions,
+  saKeywords,
+  saScore,
   userName,
   cvName,
-  saKeywordsFound,
-  saContextScore,
   variant = 'default',
   size = 'default',
   className,
@@ -42,34 +39,36 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
     setIsGenerating(true);
 
     try {
-      // Create PDF document
+      // Create a new PDF document
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const margin = 15;
       let yPos = 20;
-      
-      // Title and header
-      doc.setFontSize(22);
+
+      // Title
+      doc.setFontSize(20);
       doc.setTextColor(33, 33, 33);
-      doc.text('ATS Compatibility Report', pageWidth / 2, yPos, { align: 'center' });
+      doc.text('ATS Optimization Report', pageWidth / 2, yPos, { align: 'center' });
       yPos += 10;
-      
-      if (cvName) {
-        doc.setFontSize(14);
-        doc.text(`CV: ${cvName}`, pageWidth / 2, yPos, { align: 'center' });
-        yPos += 10;
-      }
+
+      // Subtitle
+      doc.setFontSize(12);
+      doc.setTextColor(100, 100, 100);
+      const subtitleText = cvName ? `Analysis for: ${cvName}` : 'CV Analysis Results';
+      doc.text(subtitleText, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+
+      // Date and user
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      const dateText = `Generated on: ${new Date().toLocaleDateString()}`;
+      doc.text(dateText, pageWidth - margin, 15, { align: 'right' });
       
       if (userName) {
-        doc.setFontSize(12);
-        doc.text(`For: ${userName}`, pageWidth / 2, yPos, { align: 'center' });
-        yPos += 10;
+        doc.text(`For: ${userName}`, pageWidth - margin, 20, { align: 'right' });
       }
       
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, pageWidth - margin, 10, { align: 'right' });
-      
-      // Add score section
+      // Add ATS score
       yPos += 10;
       doc.setFillColor(245, 245, 245);
       doc.roundedRect(margin, yPos, pageWidth - margin * 2, 20, 3, 3, 'F');
@@ -78,22 +77,19 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       doc.setTextColor(80, 80, 80);
       doc.text('ATS Compatibility Score:', margin + 5, yPos + 8);
       
-      // Score
+      // Draw score
       const scoreText = `${score}%`;
       doc.setFontSize(16);
-      
-      // Set color based on score
       if (score >= 80) {
-        doc.setTextColor(46, 125, 50); // Green
+        doc.setTextColor(46, 125, 50); // Green for high scores
       } else if (score >= 60) {
-        doc.setTextColor(255, 153, 0); // Amber
+        doc.setTextColor(255, 153, 0); // Amber for medium scores
       } else {
-        doc.setTextColor(211, 47, 47); // Red
+        doc.setTextColor(211, 47, 47); // Red for low scores
       }
-      
       doc.text(scoreText, pageWidth - margin - 5, yPos + 8, { align: 'right' });
       
-      // Score interpretation
+      // Add score interpretation
       let scoreInterpretation = '';
       if (score >= 80) {
         scoreInterpretation = 'Excellent - Your CV is highly optimized for ATS systems';
@@ -102,22 +98,25 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       } else {
         scoreInterpretation = 'Needs Improvement - Your CV requires significant optimization';
       }
-      
       doc.setFontSize(10);
       doc.setTextColor(80, 80, 80);
       doc.text(scoreInterpretation, margin + 5, yPos + 15);
-      yPos += 30;
       
+      yPos += 30;
+
       // Strengths section
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
       doc.text('Key Strengths', margin, yPos);
-      yPos += 8;
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+      yPos += 10;
       
       doc.setFontSize(10);
       doc.setTextColor(60, 60, 60);
       
-      strengths.forEach((strength, index) => {
+      strengths.forEach(strength => {
         doc.text(`• ${strength}`, margin + 5, yPos);
         yPos += 7;
       });
@@ -128,109 +127,97 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       doc.setFontSize(14);
       doc.setTextColor(33, 33, 33);
       doc.text('Areas for Improvement', margin, yPos);
-      yPos += 8;
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+      yPos += 10;
       
       doc.setFontSize(10);
       doc.setTextColor(60, 60, 60);
       
-      improvements.forEach((improvement, index) => {
+      improvements.forEach(improvement => {
         doc.text(`• ${improvement}`, margin + 5, yPos);
         yPos += 7;
       });
       
-      // Critical issues (if any)
-      if (issues && issues.length > 0) {
-        yPos += 5;
-        doc.setFontSize(14);
-        doc.setTextColor(33, 33, 33);
-        doc.text('Critical Issues', margin, yPos);
-        yPos += 8;
-        
-        doc.setFontSize(10);
-        doc.setTextColor(60, 60, 60);
-        
-        issues.forEach((issue, index) => {
-          doc.text(`• ${issue}`, margin + 5, yPos);
-          yPos += 7;
-        });
+      yPos += 5;
+      
+      // Check if we need a new page
+      if (yPos > 240) {
+        doc.addPage();
+        yPos = 20;
       }
       
-      // South African Context (if provided)
-      if (saContextScore !== undefined && saKeywordsFound && saKeywordsFound.length > 0) {
-        yPos += 5;
+      // South African context section
+      if (saScore !== undefined && saKeywords && saKeywords.length > 0) {
         doc.setFontSize(14);
         doc.setTextColor(33, 33, 33);
         doc.text('South African Context Analysis', margin, yPos);
-        yPos += 8;
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+        yPos += 10;
         
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
         
-        doc.text(`Your South African context score: ${saContextScore}%`, margin + 5, yPos);
+        doc.text(`Your CV's alignment with South African job market: ${saScore}%`, margin + 5, yPos);
         yPos += 7;
         
-        doc.text('South African keywords found:', margin + 5, yPos);
+        doc.text('South African keywords detected:', margin + 5, yPos);
         yPos += 7;
         
-        let keywordLine = '';
-        saKeywordsFound.forEach((keyword, index) => {
-          if (keywordLine.length + keyword.length > 70) {
-            doc.text(keywordLine, margin + 5, yPos);
-            yPos += 7;
-            keywordLine = '';
-          }
-          keywordLine += (keywordLine ? ', ' : '') + keyword;
+        saKeywords.forEach(keyword => {
+          doc.text(`• ${keyword}`, margin + 10, yPos);
+          yPos += 7;
         });
         
-        if (keywordLine) {
-          doc.text(keywordLine, margin + 5, yPos);
-          yPos += 7;
-        }
+        yPos += 5;
       }
       
-      // Keyword recommendations (if provided)
-      if (keywordRecommendations && keywordRecommendations.length > 0) {
-        yPos += 5;
-        doc.setFontSize(14);
-        doc.setTextColor(33, 33, 33);
-        doc.text('Keyword Recommendations', margin, yPos);
-        yPos += 8;
-        
-        doc.setFontSize(10);
-        doc.setTextColor(60, 60, 60);
-        
-        keywordRecommendations.forEach(([keyword, implementation], index) => {
-          doc.text(`• ${keyword}: ${implementation}`, margin + 5, yPos);
-          yPos += 7;
-        });
-      }
+      // Add South African recommendations
+      doc.setFontSize(14);
+      doc.setTextColor(33, 33, 33);
+      doc.text('South African Job Market Tips', margin, yPos);
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPos + 2, pageWidth - margin, yPos + 2);
+      yPos += 10;
+      
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      
+      const saTips = [
+        'Include your B-BBEE status (e.g., "B-BBEE Level 2 Contributor")',
+        'Add NQF levels for all qualifications (e.g., "Bachelor of Commerce, NQF Level 7")',
+        'List South African professional body memberships (e.g., SAICA, ECSA, HPCSA)',
+        'Include South African languages you speak (especially if multilingual)',
+        'Reference local cities/provinces where you have worked'
+      ];
+      
+      saTips.forEach(tip => {
+        doc.text(`• ${tip}`, margin + 5, yPos);
+        yPos += 7;
+      });
       
       // Add footer
       const footerText = 'ATSBoost - South African CV Optimization Platform - www.atsboost.co.za';
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(footerText, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-
-      // Save the PDF
-      const pdfBlob = doc.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `ATSBoost_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      
+      // Save and download the PDF
+      doc.save(`ATSBoost_CV_Report_${new Date().toISOString().split('T')[0]}.pdf`);
 
       toast({
         title: 'Report Generated',
-        description: 'Your detailed ATS analysis report has been downloaded',
+        description: 'Your detailed CV analysis report has been downloaded',
       });
     } catch (error) {
       console.error('Error generating PDF report:', error);
       toast({
         title: 'Error',
-        description: 'Failed to generate PDF report. Please try again.',
+        description: 'Failed to generate the PDF report. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -240,21 +227,21 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
 
   return (
     <Button
-      variant={variant}
-      size={size}
       onClick={handleGenerateReport}
       disabled={isGenerating}
+      variant={variant}
+      size={size}
       className={className}
     >
       {isGenerating ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generating Report...
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          Generating...
         </>
       ) : (
         <>
-          <FileDown className="mr-2 h-4 w-4" />
-          Download Detailed Report
+          <FileDown className="h-4 w-4 mr-2" />
+          Download Report
         </>
       )}
     </Button>
