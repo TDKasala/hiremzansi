@@ -9,9 +9,13 @@ interface DownloadReportButtonProps {
   score: number;
   strengths: string[];
   improvements: string[];
-  suggestions: string[];
+  suggestions?: string[];
+  issues?: string[];
+  keywordRecommendations?: string[][];
   saKeywords?: string[];
+  saKeywordsFound?: string[];
   saScore?: number;
+  saContextScore?: number;
   userName?: string;
   cvName?: string;
   variant?: 'default' | 'outline' | 'secondary';
@@ -24,14 +28,21 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
   strengths,
   improvements,
   suggestions,
+  issues,
   saKeywords,
+  saKeywordsFound,
   saScore,
+  saContextScore,
   userName,
   cvName,
   variant = 'default',
   size = 'default',
   className,
 }) => {
+  // Use appropriate variables based on what was passed
+  const displaySuggestions = suggestions || issues || [];
+  const displaySaKeywords = saKeywords || saKeywordsFound || [];
+  const displaySaScore = saScore || saContextScore || 0;
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -149,7 +160,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       }
       
       // South African context section
-      if (saScore !== undefined && saKeywords && saKeywords.length > 0) {
+      if ((displaySaScore !== undefined) && displaySaKeywords && displaySaKeywords.length > 0) {
         doc.setFontSize(14);
         doc.setTextColor(33, 33, 33);
         doc.text('South African Context Analysis', margin, yPos);
@@ -161,13 +172,13 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
         doc.setFontSize(10);
         doc.setTextColor(60, 60, 60);
         
-        doc.text(`Your CV's alignment with South African job market: ${saScore}%`, margin + 5, yPos);
+        doc.text(`Your CV's alignment with South African job market: ${displaySaScore}%`, margin + 5, yPos);
         yPos += 7;
         
         doc.text('South African keywords detected:', margin + 5, yPos);
         yPos += 7;
         
-        saKeywords.forEach(keyword => {
+        displaySaKeywords.forEach(keyword => {
           doc.text(`• ${keyword}`, margin + 10, yPos);
           yPos += 7;
         });

@@ -65,6 +65,7 @@ const CVDetailsPage: React.FC = () => {
   const { data: atsScore, isLoading: scoreLoading } = useQuery<ATSScore>({
     queryKey: [`/api/ats-score/${cvId}`],
     enabled: !!cv?.isAnalyzed,
+    staleTime: 60000, // Cache for 1 minute to prevent unnecessary refetches
   });
 
   if (cvLoading || scoreLoading) {
@@ -90,7 +91,7 @@ const CVDetailsPage: React.FC = () => {
             <p>Please return to the dashboard and try again.</p>
           </CardContent>
           <CardFooter>
-            <Link href="/">
+            <Link href="/dashboard">
               <Button>Return to Dashboard</Button>
             </Link>
           </CardFooter>
@@ -134,7 +135,7 @@ const CVDetailsPage: React.FC = () => {
         </div>
         
         <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
-          <Link href="/">
+          <Link href="/dashboard">
             <Button variant="outline" className="flex items-center">
               <FileText className="mr-2 h-4 w-4" />
               View All CVs
@@ -146,10 +147,9 @@ const CVDetailsPage: React.FC = () => {
               score={atsScore.score}
               strengths={atsScore.strengths}
               improvements={atsScore.improvements}
-              issues={atsScore.issues}
-              keywordRecommendations={atsScore.keywordRecommendations}
-              saKeywordsFound={atsScore.saKeywordsFound}
-              saContextScore={atsScore.saContextScore}
+              suggestions={atsScore.issues || []}
+              saKeywords={atsScore.saKeywordsFound}
+              saScore={atsScore.saContextScore}
               cvName={cv.fileName}
             />
           )}
