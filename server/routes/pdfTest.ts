@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
-import { testExtractionQuality } from '../services/enhancedPdfParser';
+import { extractTextFromPDF } from '../services/simplePdfParser';
 
 const router = Router();
 
@@ -32,13 +32,24 @@ router.post('/test-pdf-extraction', upload.single('file'), async (req: Request, 
       });
     }
     
-    const result = await testExtractionQuality(req.file.buffer);
+    // Extract text from the PDF using our OCR-enhanced process
+    const extractedText = await extractTextFromPDF(req.file.buffer);
+    
+    // Calculate some basic statistics
+    const wordCount = extractedText.split(/\s+/).filter(Boolean).length;
+    const lineCount = extractedText.split('\n').length;
     
     return res.json({
       success: true,
       fileName: req.file.originalname,
       fileSize: req.file.size,
-      extractionResults: result
+      extractionStats: {
+        characterCount: extractedText.length,
+        wordCount,
+        lineCount,
+        quality: wordCount > 300 ? "Good" : wordCount > 100 ? "Fair" : "Poor"
+      },
+      extractedText: extractedText.substring(0, 1000) + (extractedText.length > 1000 ? "..." : "")
     });
   } catch (error: any) {
     console.error("Error testing PDF extraction:", error);

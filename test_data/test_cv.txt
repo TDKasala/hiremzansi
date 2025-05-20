@@ -1,0 +1,63 @@
+PROFESSIONAL RESUME
+
+John Developer
+Johannesburg, South Africa
+Phone: +27 71 234 5678 | Email: john.developer@email.co.za
+
+SUMMARY
+Experienced software developer with B-BBEE Level 1 Status and over 5 years of experience in full-stack development. Proficient in React, Node.js, and Python with strong problem-solving skills and attention to detail.
+
+EDUCATION
+University of Cape Town
+Bachelor of Science in Computer Science, NQF Level 7
+2015 - 2019
+
+SKILLS
+• Programming: JavaScript, TypeScript, Python, Java
+• Frontend: React, Angular, HTML5, CSS3, TailwindCSS
+• Backend: Node.js, Express, Django, Flask
+• Databases: PostgreSQL, MongoDB, MySQL
+• Tools: Git, Docker, AWS, Azure
+• Languages: English (Fluent), Zulu (Native), Afrikaans (Basic)
+
+WORK EXPERIENCE
+
+SENIOR DEVELOPER
+TechSA Solutions - Pretoria, Gauteng
+March 2021 - Present
+
+• Led development of POPIA-compliant customer management system
+• Designed and implemented RESTful APIs using Node.js and Express
+• Mentored junior developers on best practices and coding standards
+• Implemented CI/CD pipeline reducing deployment time by 40%
+• Collaborated with cross-functional teams to deliver projects on time
+
+SOFTWARE DEVELOPER
+InnovateTech - Cape Town, Western Cape
+June 2019 - February 2021
+
+• Developed responsive web applications using React and Redux
+• Implemented backend services compliant with FICA requirements
+• Optimized database queries improving performance by 30%
+• Worked within agile methodology participating in daily scrums
+• Contributed to open-source projects in the South African tech community
+
+PROJECTS
+
+E-COMMERCE PLATFORM (2022)
+• Built a scalable e-commerce platform using MERN stack
+• Implemented secure payment gateway integration
+• Ensured compliance with South African consumer protection laws
+
+HEALTH TRACKING APP (2020)
+• Developed mobile-first health tracking application
+• Integrated with wearable devices API
+• Implemented data visualization dashboards using D3.js
+
+CERTIFICATIONS
+• AWS Certified Developer Associate (2022)
+• React Advanced Concepts (2021)
+• MongoDB Developer Certification (2020)
+
+REFERENCES
+Available upon request

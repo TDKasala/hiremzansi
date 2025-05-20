@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
 import { z } from "zod";
-import { extractTextFromPDF } from "./services/enhancedPdfParser";
+import { extractTextFromPDF } from "./services/simplePdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
@@ -405,6 +405,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Mock CV analysis routes for demonstration
   app.use("/api", mockCvAnalysisRoutes);
+  
+  // PDF testing routes
+  app.use("/api", pdfTestRoutes);
   
   // Create HTTP server
   const httpServer = createServer(app);
