@@ -6,6 +6,7 @@ import { checkDatabaseHealth } from "./db-utils";
 import { runMigrations } from "./db-migrate";
 import adminRoutes from "./routes/admin";
 import { closeDbConnection } from "./db";
+import { setupScheduledTasks, cleanupScheduledTasks } from "./services/scheduledTasks";
 
 const app = express();
 app.use(express.json());
@@ -82,6 +83,9 @@ app.use((req, res, next) => {
       reusePort: true,
     }, () => {
       log(`serving on port ${port}`);
+      
+      // Initialize scheduled tasks for email digests
+      setupScheduledTasks();
     });
     
     // Set up graceful shutdown
