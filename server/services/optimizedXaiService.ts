@@ -102,39 +102,59 @@ export async function analyzeCV(
  */
 function createOptimizedPrompt(cvText: string, jobDescription?: string): string {
   return `
-Analyze this South African CV concisely:
+You are an expert ATS (Applicant Tracking System) analyzer specialized in the South African job market.
+
+Analyze the following CV text with thorough attention to detail while maintaining fast performance:
 
 ${cvText}
 
-${jobDescription ? `Job Description: ${jobDescription}` : ''}
+${jobDescription ? `Consider relevance to this job description: ${jobDescription}` : ''}
 
-Focus on:
-1. ATS score (0-100)
-2. Format score (0-40)
-3. Skills score (0-40) 
-4. SA context score (0-20)
-   - B-BBEE mentions (10pts each, max 20)
-   - NQF levels (5pts each, max 10)
-   - SA locations (2pts each, max 5)
-   - Regulations (3pts each, max 5)
-   - Languages (3pts each, max 5)
+Provide comprehensive analysis with these components:
 
-Return compact JSON:
+1. Overall ATS compatibility score (0-100 scale):
+   - Calculate based on format (40%), skills (40%), and South African context (20%)
+   - Provide detailed reasoning for the score
+
+2. Format evaluation (40% of total score):
+   - Professional layout and structure
+   - Consistent headers and sections
+   - Proper use of bullet points
+   - Appropriate date formats
+   - Readable font and spacing
+   - Clear organization of information
+
+3. Skills identification (40% of total score):
+   - Relevant technical skills
+   - Soft skills appropriate for position level
+   - Certifications and qualifications
+   - Work experience alignment
+   - High-demand skills in South Africa weighted 1.5x higher
+   - Keywords optimization for ATS systems
+
+4. South African context detection (20% of score):
+   - B-BBEE status mentions (e.g., Level 1, Level 2) - 10 points per mention (max 20)
+   - NQF levels in qualifications (5 points per correct level, max 10)
+   - South African cities/provinces (2 points each, max 5 per category)
+   - Local regulatory knowledge (POPIA, FICA, etc.) (3 points per mention, max 5)
+   - South African languages (3 points per language, max 5)
+
+Return a JSON response with these fields:
 {
-  "score": number,
-  "rating": "Excellent|Good|Average|Poor",
-  "skills_score": number,
-  "format_score": number,
-  "sa_score": number,
-  "strengths": [top 3 only],
-  "improvements": [top 3 only],
-  "skills": [key skills only],
-  "sa_context": {
-    "bbbee": [matches], 
-    "nqf": [matches],
-    "locations": [matches],
-    "regulations": [matches],
-    "languages": [matches]
+  "score": number (0-100),
+  "rating": string ('Excellent', 'Good', 'Average', 'Poor'),
+  "skill_score": number (0-40),
+  "format_score": number (0-40),
+  "sa_score": number (0-20),
+  "strengths": array of strings (3-5 key strengths with thorough descriptions),
+  "improvements": array of strings (3-5 detailed improvement suggestions),
+  "skills": array of strings (all identified skills, prioritized by relevance),
+  "south_african_context": {
+    "b_bbee_mentions": array of strings (any B-BBEE mentions found),
+    "nqf_levels": array of strings (any NQF levels mentioned),
+    "locations": array of strings (South African cities/provinces found),
+    "regulations": array of strings (South African regulations identified),
+    "languages": array of strings (South African languages found)
   }
 }
 `;
