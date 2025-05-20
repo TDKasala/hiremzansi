@@ -25,6 +25,7 @@ import { interviewSimulationService } from "./services/interviewSimulationServic
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
+import testXaiApiRoutes from "./routes/testXaiApi";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
@@ -396,6 +397,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Additional admin routes
   app.use("/api/admin", isAdmin, adminRoutes);
+  
+  // xAI API test routes
+  app.use("/api", testXaiApiRoutes);
   
   // Create HTTP server
   const httpServer = createServer(app);
