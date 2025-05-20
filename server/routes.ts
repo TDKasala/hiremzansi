@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import multer from "multer";
 import { z } from "zod";
-import { extractTextFromPDF } from "./services/pdfParser";
+import { extractTextFromPDF } from "./services/enhancedPdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
 import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
@@ -27,6 +27,7 @@ import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
 import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
+import pdfTestRoutes from "./routes/pdfTest";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
