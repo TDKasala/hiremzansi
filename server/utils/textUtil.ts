@@ -1,169 +1,147 @@
 /**
  * Text Utility Functions
  * 
- * Common text processing utilities used throughout the application
+ * Provides utility functions for text processing, especially for CV content
  */
 
 /**
  * Sanitize HTML content to extract plain text
  * 
- * @param html HTML string to sanitize
- * @returns Plain text version of the HTML content
+ * @param html HTML content to sanitize
+ * @returns Plain text extracted from HTML
  */
 export function sanitizeHtml(html: string): string {
-  if (!html) return '';
-  
-  return html
-    // Remove style tags and their content
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/g, '')
-    // Remove script tags and their content
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
-    // Remove head tags and their content
-    .replace(/<head[^>]*>[\s\S]*?<\/head>/g, '')
-    // Remove all remaining HTML tags
-    .replace(/<[^>]+>/g, ' ')
-    // Replace multiple spaces with a single space
-    .replace(/\s+/g, ' ')
-    // Replace HTML entities
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
+  // Basic HTML tag removal - for more complex needs, consider using a dedicated library
+  let text = html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove style tags and content
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove script tags and content
+    .replace(/<[^>]+>/g, ' ') // Replace any remaining tags with spaces
+    .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+    .replace(/&amp;/g, '&') // Replace HTML entities
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    // Trim the result
-    .trim();
+    .replace(/&#039;/g, "'");
+  
+  // Remove extra spaces and normalize whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  // Break into proper paragraphs for better readability
+  return text;
 }
 
 /**
- * Extract keywords from text based on frequency and common South African context
+ * Extract keywords from text
  * 
  * @param text Text to extract keywords from
- * @returns Array of keywords found in the text
+ * @returns Array of extracted keywords
  */
 export function extractKeywords(text: string): string[] {
-  if (!text) return [];
+  // Simple keyword extraction based on word frequency
+  // This is a basic implementation - consider using NLP libraries for production
+  const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+  const stopWords = new Set([
+    'the', 'and', 'that', 'have', 'for', 'not', 'with', 'you', 'this', 
+    'but', 'his', 'her', 'she', 'from', 'they', 'will', 'would', 'there',
+    'their', 'what', 'about', 'which', 'when', 'make', 'can', 'like', 
+    'time', 'just', 'him', 'know', 'take', 'people', 'into', 'year', 'your',
+    'some', 'could', 'them', 'see', 'other', 'than', 'then', 'now', 'only',
+    'come', 'its', 'over', 'also', 'back', 'after', 'use', 'two', 'how',
+    'our', 'work', 'well', 'way', 'even', 'new', 'want', 'because', 'any',
+    'these', 'day', 'most', 'all', 'was', 'were', 'been', 'has', 'had', 'did'
+  ]);
   
-  // South African specific terms to look for (B-BBEE, NQF levels, locations, etc.)
-  const saKeywords = [
-    'b-bbee', 'bbbee', 'nqf', 'johannesburg', 'pretoria', 'cape town', 'durban', 
-    'bloemfontein', 'port elizabeth', 'gqeberha', 'east london', 'polokwane', 
-    'nelspruit', 'mbombela', 'kimberley', 'gauteng', 'western cape', 'eastern cape',
-    'kwazulu-natal', 'kwazulu natal', 'free state', 'north west', 'limpopo', 'mpumalanga',
-    'northern cape', 'popia', 'fica', 'seta', 'saqa', 'zulu', 'xhosa', 'afrikaans',
-    'sotho', 'tswana', 'ndebele', 'swati', 'venda', 'tsonga'
-  ];
-  
-  // Convert text to lowercase for case-insensitive matching
-  const lowerText = text.toLowerCase();
-  
-  // Find all SA keywords in the text
-  const foundKeywords: string[] = [];
-  
-  for (const keyword of saKeywords) {
-    if (lowerText.includes(keyword)) {
-      // Extract the actual term as it appears in the text (with correct capitalization)
-      const regex = new RegExp(`\\b${keyword}\\b`, 'i');
-      const match = text.match(regex);
-      if (match) {
-        foundKeywords.push(match[0]);
-      }
+  // Filter out stop words and count occurrences
+  const wordCount: Record<string, number> = {};
+  for (const word of words) {
+    if (!stopWords.has(word)) {
+      wordCount[word] = (wordCount[word] || 0) + 1;
     }
   }
   
-  return foundKeywords;
+  // Convert to array of [word, count] pairs and sort by count (descending)
+  const sortedWords = Object.entries(wordCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20) // Take top 20 keywords
+    .map(([word]) => word);
+  
+  return sortedWords;
 }
 
 /**
- * Count occurrences of a term in text (case-insensitive)
+ * Find South African context-specific keywords in text
  * 
- * @param text Text to search in
- * @param term Term to search for
- * @returns Number of occurrences
+ * @param text Text to search for SA-specific keywords
+ * @returns Object with categorized SA context keywords
  */
-export function countOccurrences(text: string, term: string): number {
-  if (!text || !term) return 0;
-  
-  const regex = new RegExp(`\\b${term}\\b`, 'gi');
-  const matches = text.match(regex);
-  
-  return matches ? matches.length : 0;
-}
-
-/**
- * Check if a CV mentions specific South African elements
- * 
- * @param cvText CV text content
- * @returns Object with counts of different SA-specific elements
- */
-export function checkSouthAfricanContext(cvText: string): {
-  bbbeeCount: number;
-  nqfCount: number;
-  locationsCount: number;
-  languagesCount: number;
-  regulationsCount: number;
+export function findSouthAfricanContext(text: string): {
+  bbbee: string[],
+  nqf: string[],
+  locations: string[],
+  regulations: string[],
+  languages: string[]
 } {
-  if (!cvText) {
-    return {
-      bbbeeCount: 0,
-      nqfCount: 0,
-      locationsCount: 0,
-      languagesCount: 0,
-      regulationsCount: 0
-    };
-  }
+  const normalizedText = text.toLowerCase();
   
-  // Check for B-BBEE mentions
-  const bbbeeRegex = /\b(b-bbee|bbbee|broad.based.black.economic.empowerment|level \d)\b/gi;
-  const bbbeeMatches = cvText.match(bbbeeRegex);
-  const bbbeeCount = bbbeeMatches ? bbbeeMatches.length : 0;
-  
-  // Check for NQF level mentions
-  const nqfRegex = /\b(nqf|national qualifications framework) level \d+\b/gi;
-  const nqfMatches = cvText.match(nqfRegex);
-  const nqfCount = nqfMatches ? nqfMatches.length : 0;
-  
-  // Check for South African locations
-  const locations = [
-    'johannesburg', 'pretoria', 'cape town', 'durban', 'bloemfontein', 'port elizabeth',
-    'gqeberha', 'east london', 'polokwane', 'nelspruit', 'mbombela', 'kimberley',
-    'gauteng', 'western cape', 'eastern cape', 'kwazulu-natal', 'kwazulu natal',
-    'free state', 'north west', 'limpopo', 'mpumalanga', 'northern cape'
+  // B-BBEE related terms
+  const bbbeeTerms = [
+    'b-bbee', 'bbbee', 'bee', 'broad-based black economic empowerment',
+    'level 1', 'level 2', 'level 3', 'level 4', 'level 5', 
+    'level 6', 'level 7', 'level 8', 'level one', 'level two',
+    'level three', 'level four', 'level five', 'level six',
+    'level seven', 'level eight'
   ];
   
-  let locationsCount = 0;
-  for (const location of locations) {
-    locationsCount += countOccurrences(cvText.toLowerCase(), location);
-  }
+  // NQF levels and qualifications
+  const nqfTerms = [
+    'nqf', 'national qualifications framework', 
+    'nqf level 1', 'nqf level 2', 'nqf level 3', 'nqf level 4',
+    'nqf level 5', 'nqf level 6', 'nqf level 7', 'nqf level 8',
+    'nqf level 9', 'nqf level 10', 'saqa'
+  ];
   
-  // Check for South African languages
-  const languages = ['zulu', 'xhosa', 'afrikaans', 'sotho', 'tswana', 'ndebele', 'swati', 'venda', 'tsonga'];
+  // South African cities and provinces
+  const locationTerms = [
+    'johannesburg', 'cape town', 'durban', 'pretoria', 'bloemfontein',
+    'port elizabeth', 'gqeberha', 'east london', 'pietermaritzburg', 'nelspruit',
+    'kimberley', 'polokwane', 'mbombela', 'rustenburg', 'george',
+    'gauteng', 'western cape', 'eastern cape', 'kwazulu-natal', 'kzn',
+    'free state', 'north west', 'northern cape', 'limpopo', 'mpumalanga'
+  ];
   
-  let languagesCount = 0;
-  for (const language of languages) {
-    languagesCount += countOccurrences(cvText.toLowerCase(), language);
-  }
+  // South African regulations and legislation
+  const regulationTerms = [
+    'popia', 'fica', 'protection of personal information act',
+    'employment equity', 'ee', 'skills development', 'sda',
+    'national credit act', 'consumer protection act', 'basic conditions of employment',
+    'bcea', 'occupational health and safety', 'ohsa', 'coida',
+    'labour relations act', 'lra', 'financial intelligence centre act'
+  ];
   
-  // Check for South African regulations and compliance frameworks
-  const regulations = ['popia', 'fica', 'seta', 'saqa', 'bcea', 'lra', 'employment equity'];
+  // South African languages
+  const languageTerms = [
+    'afrikaans', 'zulu', 'isizulu', 'xhosa', 'isixhosa',
+    'setswana', 'tswana', 'sepedi', 'pedi', 'sesotho', 'sotho',
+    'venda', 'tshivenda', 'tsonga', 'xitsonga', 'ndebele', 'isindebele',
+    'swati', 'siswati', 'english'
+  ];
   
-  let regulationsCount = 0;
-  for (const regulation of regulations) {
-    regulationsCount += countOccurrences(cvText.toLowerCase(), regulation);
-  }
+  // Function to find matches in text
+  const findMatches = (terms: string[]): string[] => {
+    return terms.filter(term => normalizedText.includes(term.toLowerCase()));
+  };
   
   return {
-    bbbeeCount,
-    nqfCount,
-    locationsCount,
-    languagesCount,
-    regulationsCount
+    bbbee: findMatches(bbbeeTerms),
+    nqf: findMatches(nqfTerms),
+    locations: findMatches(locationTerms),
+    regulations: findMatches(regulationTerms),
+    languages: findMatches(languageTerms)
   };
 }
 
 export default {
   sanitizeHtml,
   extractKeywords,
-  countOccurrences,
-  checkSouthAfricanContext
+  findSouthAfricanContext
 };
