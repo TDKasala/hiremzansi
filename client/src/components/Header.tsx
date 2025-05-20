@@ -107,6 +107,9 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/skills/analyze">Skill Gap Analysis</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
                   
                   {user && user.role === 'admin' && (
                     <>
