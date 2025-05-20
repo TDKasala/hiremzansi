@@ -1,0 +1,69 @@
+THABO MOKOENA
+Johannesburg, Gauteng, South Africa
+Email: thabo.mokoena@email.co.za | Phone: +27 82 123 4567
+LinkedIn: linkedin.com/in/thabomokoena
+
+PROFESSIONAL SUMMARY
+Results-oriented B-BBEE Level 2 Professional with over 8 years of experience in software development and project management within South Africa's IT sector. Skilled in leading cross-functional teams and delivering complex projects on time and within budget. Fluent in English, isiZulu, and Afrikaans.
+
+EDUCATION
+Bachelor of Science in Computer Science, University of Cape Town
+NQF Level 7, 2014-2017
+• Dean's Merit List for academic excellence
+• Specialized in Software Engineering and Database Systems
+
+PROFESSIONAL CERTIFICATIONS
+• Project Management Professional (PMP), 2020
+• AWS Certified Solutions Architect, 2019
+• Agile Scrum Master Certification, 2018
+
+WORK EXPERIENCE
+
+SENIOR SOFTWARE DEVELOPER
+TechSolutions SA, Pretoria
+January 2020 - Present
+
+• Lead a team of 5 developers implementing POPIA-compliant software solutions
+• Developed enterprise applications using Java, Python, and React
+• Improved system performance by 35% through code optimization
+• Successfully delivered projects for clients in banking, retail, and government sectors
+• Implemented software solutions adhering to South African regulations including FICA and Consumer Protection Act requirements
+
+PROJECT MANAGER
+InnovateIT, Durban, KwaZulu-Natal
+March 2017 - December 2019
+
+• Managed multiple software development projects with budgets exceeding R1.5 million
+• Coordinated teams across Gauteng and Western Cape offices
+• Reduced project delivery time by 20% through implementation of agile methodologies
+• Ensured compliance with Employment Equity and Skills Development Act requirements
+• Successfully delivered 12 major projects for clients in telecommunications and finance
+
+TECHNICAL SKILLS
+• Programming Languages: Java, Python, JavaScript, TypeScript
+• Frameworks: Spring Boot, Django, React, Angular
+• Database Systems: Oracle, PostgreSQL, MongoDB
+• Cloud Platforms: AWS, Azure, Google Cloud
+• Project Management: JIRA, Confluence, MS Project
+• Version Control: Git, SVN
+
+SOFT SKILLS
+• Team Leadership
+• Problem-solving
+• Communication
+• Critical Thinking
+• Adaptability
+• Time Management
+
+LANGUAGES
+• English (Fluent)
+• isiZulu (Native)
+• Afrikaans (Conversational)
+• Sesotho (Basic)
+
+COMMUNITY INVOLVEMENT
+• Volunteer coding instructor for youth in Soweto, teaching programming skills
+• Participate in hackathons focused on solving South African socio-economic challenges
+
+REFERENCES
+Available upon request

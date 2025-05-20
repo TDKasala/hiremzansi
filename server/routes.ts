@@ -402,6 +402,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // xAI API test routes
   app.use("/api", testXaiApiRoutes);
   
+  // Mock CV analysis routes for demonstration
+  app.use("/api", mockCvAnalysisRoutes);
+  
   // Create HTTP server
   const httpServer = createServer(app);
   

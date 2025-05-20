@@ -47,14 +47,27 @@ export async function mockAnalyzeCV(
       cvText.toLowerCase().includes(skill.toLowerCase())
     );
     
-    // Calculate scores
-    const saScore = Math.min(20, [
-      ...saContext.bbbee.map(() => 10),
-      ...saContext.nqf.map(() => 5),
-      ...saContext.locations.map(() => 2),
-      ...saContext.regulations.map(() => 3),
-      ...saContext.languages.map(() => 3)
-    ].reduce((sum, val) => sum + val, 0));
+    // Calculate scores with better detection for South African context
+    const bbbeeScore = cvText.toLowerCase().includes('b-bbee') || cvText.toLowerCase().includes('bbbee') ? 
+      Math.min(20, 10) : 0;
+    
+    const nqfScore = cvText.toLowerCase().includes('nqf') ? 
+      Math.min(10, 5) : 0;
+    
+    const locationScore = ['johannesburg', 'pretoria', 'durban', 'cape town', 'gauteng', 'western cape', 'kwazulu-natal'].filter(
+      location => cvText.toLowerCase().includes(location.toLowerCase())
+    ).length * 2;
+    
+    const regulationScore = ['popia', 'fica', 'employment equity', 'skills development', 'consumer protection act'].filter(
+      reg => cvText.toLowerCase().includes(reg.toLowerCase())
+    ).length * 3;
+    
+    const languageScore = ['english', 'afrikaans', 'zulu', 'isizulu', 'xhosa', 'isixhosa', 'sesotho', 'sotho'].filter(
+      lang => cvText.toLowerCase().includes(lang.toLowerCase())
+    ).length * 3;
+    
+    const saScore = Math.min(20, bbbeeScore + nqfScore + Math.min(10, locationScore) + 
+      Math.min(9, regulationScore) + Math.min(9, languageScore));
     
     // Skills score based on number of skills found (max 40)
     const skillScore = Math.min(40, skills.length * 3);
