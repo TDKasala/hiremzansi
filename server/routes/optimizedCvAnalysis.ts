@@ -59,21 +59,16 @@ router.get('/ats-score/:cvId/optimize', async (req: Request, res: Response, next
             // Store the full detailed analysis in the database for future use
             await storage.createATSScore({
               cvId,
-              userId: req.user.id,
               score: analysis.result.score,
               skillsScore: analysis.result.skills_score,
               formatScore: analysis.result.format_score,
               contextScore: analysis.result.sa_score,
               strengths: analysis.result.strengths,
               improvements: analysis.result.improvements,
-              skills: analysis.result.skills,
-              saContext: {
-                bbbee: analysis.result.sa_context.bbbee || [],
-                nqf: analysis.result.sa_context.nqf || [],
-                locations: analysis.result.sa_context.locations || [],
-                regulations: analysis.result.sa_context.regulations || [],
-                languages: analysis.result.sa_context.languages || []
-              }
+              saKeywordsFound: analysis.result.skills,
+              // Store South African context metrics
+              saContextScore: analysis.result.sa_score,
+              bbbeeDetected: analysis.result.sa_context.bbbee && analysis.result.sa_context.bbbee.length > 0
             });
           } catch (err) {
             console.error("Failed to store ATS score:", err);
