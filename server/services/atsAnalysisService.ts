@@ -1,6 +1,6 @@
 import { analyzeCV as analyzeWithXAI } from './xaiService';
 import { CV } from '@shared/schema';
-import { sanitizeHtml } from '../utils/textUtils';
+import { sanitizeHtml } from '../utils/textUtil';
 
 /**
  * ATS Analysis Service
@@ -81,7 +81,7 @@ export async function analyzeCVContent(
         ...(result.south_african_context.languages || [])
       ] : []
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in ATS analysis service:', error);
     return {
       success: false,

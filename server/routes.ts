@@ -247,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Analyze CV endpoint - called after consent is given
+  // Analyze CV endpoint using xAI Grok API - called after consent is given
   app.post("/api/analyze-cv/:id", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const cvId = parseInt(req.params.id);
@@ -278,6 +278,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "You do not have permission to access this CV." 
         });
       }
+      
+      // Get optional job description if provided in the request
+      const { jobDescription } = req.body;
       
       // Process the CV content for analysis
       let textContent = cv.content || "";
