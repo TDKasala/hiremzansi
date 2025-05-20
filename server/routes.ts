@@ -26,6 +26,7 @@ import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
+import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
