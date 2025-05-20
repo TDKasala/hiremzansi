@@ -8,6 +8,7 @@ import { extractTextFromDOCX } from "./services/docxParser";
 import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
 import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
+import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnalysisService";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -282,34 +283,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get optional job description if provided in the request
       const { jobDescription } = req.body;
       
-      // Process the CV content for analysis
-      let textContent = cv.content || "";
+      console.log("Starting CV analysis with xAI service");
       
-      // Check and sanitize content if it's HTML
-      if (textContent.includes('<!DOCTYPE') || 
-          textContent.includes('<html') || 
-          textContent.includes('<body') ||
-          (textContent.includes('<') && textContent.includes('>'))) {
-        
-        console.log("Detected HTML content, sanitizing for analysis");
-        
-        // More thorough HTML stripping
-        textContent = textContent
-          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '') // Remove style tags and their content
-          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove script tags and their content
-          .replace(/<[^>]+>/g, ' ') // Replace all remaining HTML tags with spaces
-          .replace(/&[a-z]+;/gi, ' ') // Replace HTML entities
-          .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-          .trim();
-        
-        console.log("Sanitized content length:", textContent.length);
+      // Use our xAI-powered analysis service instead of local AI
+      const analysis = await analyzeCVContent(cv, jobDescription);
+      
+      if (!analysis.success) {
+        console.error("xAI analysis failed:", analysis.error);
+        return res.status(500).json({
+          error: "CV analysis failed",
+          message: analysis.error || "Failed to analyze CV with xAI service"
+        });
       }
       
-      if (textContent.length < 50) {
-        console.warn("CV content is very short after processing:", textContent);
+      // The content has already been sanitized by the xAI service
+      // So we don't need to process it again
+
+      // Prepare formatted response from xAI analysis result
+      const formattedAnalysis = formatAnalysisForResponse(analysis);
+      
+      // Check if we have enough meaningful data
+      if (!formattedAnalysis.skills || formattedAnalysis.skills.length === 0) {
+        console.warn("Analysis didn't identify any skills in the CV");
         return res.status(400).json({
-          error: "Invalid CV content",
-          message: "The CV doesn't contain enough text to analyze. Please upload a CV with more content."
+          error: "Insufficient CV content",
+          message: "The CV doesn't contain enough recognizable content to analyze. Please upload a CV with more relevant information."
         });
       }
       
