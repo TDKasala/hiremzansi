@@ -53,15 +53,47 @@ router.get('/ats-score/:cvId/optimize', async (req: Request, res: Response, next
       const analysis = await analyzeCV(cv.content);
       
       if (analysis.success && analysis.result) {
+        // Store complete analysis for authenticated users
+        if (req.isAuthenticated() && req.user?.id) {
+          try {
+            // Store the full detailed analysis in the database for future use
+            await storage.createATSScore({
+              cvId,
+              userId: req.user.id,
+              score: analysis.result.score,
+              skillsScore: analysis.result.skills_score,
+              formatScore: analysis.result.format_score,
+              contextScore: analysis.result.sa_score,
+              strengths: analysis.result.strengths,
+              improvements: analysis.result.improvements,
+              skills: analysis.result.skills,
+              saContext: {
+                bbbee: analysis.result.sa_context.bbbee || [],
+                nqf: analysis.result.sa_context.nqf || [],
+                locations: analysis.result.sa_context.locations || [],
+                regulations: analysis.result.sa_context.regulations || [],
+                languages: analysis.result.sa_context.languages || []
+              }
+            });
+          } catch (err) {
+            console.error("Failed to store ATS score:", err);
+            // Continue execution even if storage fails
+          }
+        }
+        
+        // Return initial data with progressive enhancement capabilities
         return res.json({
           score: analysis.result.score,
           rating: analysis.result.rating,
           skillsScore: analysis.result.skills_score,
           formatScore: analysis.result.format_score,
           contextScore: analysis.result.sa_score,
-          strengths: (analysis.result.strengths || []).slice(0, 3),
-          improvements: (analysis.result.improvements || []).slice(0, 3),
-          skills: (analysis.result.skills || []).slice(0, 10)
+          // Provide detailed analysis information
+          strengths: analysis.result.strengths,
+          improvements: analysis.result.improvements,
+          skills: analysis.result.skills,
+          // Include essential South African context data
+          saContext: analysis.result.sa_context
         });
       }
     }

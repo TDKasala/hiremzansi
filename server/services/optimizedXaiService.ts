@@ -76,13 +76,13 @@ export async function analyzeCV(
       temperature: 0.1 // Lower temperature for more consistent results
     });
     
-    // Parse and optimize the response
-    const rawResult = JSON.parse(response.choices[0].message.content);
-    const optimizedResult = optimizeResponseFormat(rawResult);
+    // Parse and retain comprehensive analysis while optimizing response structure
+    const rawResult = JSON.parse(response.choices[0].message.content || '{}');
+    const enhancedResult = optimizeResponseFormat(rawResult);
     
     return {
       success: true,
-      result: optimizedResult
+      result: enhancedResult
     };
   } catch (error: any) {
     console.error("Error in optimized xAI CV analysis:", error);
@@ -203,26 +203,35 @@ function summarizeCV(cvText: string): string {
  * @returns Optimized result structure
  */
 function optimizeResponseFormat(rawResult: any): any {
-  // Extract only the fields we need
-  const optimized = {
+  // Transform data structure while preserving comprehensive analysis
+  const enhanced = {
+    // Core scores for immediate display
     score: rawResult.overall_score || rawResult.score || 0,
     rating: rawResult.rating || 'Unknown',
     skills_score: rawResult.skill_score || rawResult.skills_score || 0,
     format_score: rawResult.format_score || 0,
     sa_score: rawResult.sa_score || rawResult.sa_context_score || 0,
-    strengths: (rawResult.strengths || []).slice(0, 3), // Limit to top 3
-    improvements: (rawResult.improvements || []).slice(0, 3), // Limit to top 3
-    skills: (rawResult.skills_identified || rawResult.skills || []).slice(0, 15), // Limit skills list
+    
+    // Preserve all strengths for detailed analysis
+    strengths: rawResult.strengths || [],
+    
+    // Keep all improvements for comprehensive feedback
+    improvements: rawResult.improvements || [],
+    
+    // Maintain full skills list for complete assessment
+    skills: rawResult.skills_identified || rawResult.skills || [],
+    
+    // Preserve all South African context data
     sa_context: {
-      bbbee: (rawResult.south_african_context?.b_bbee_mentions || []).slice(0, 5),
-      nqf: (rawResult.south_african_context?.nqf_levels || []).slice(0, 3),
-      locations: (rawResult.south_african_context?.locations || []).slice(0, 5),
-      regulations: (rawResult.south_african_context?.regulations || []).slice(0, 5),
-      languages: (rawResult.south_african_context?.languages || []).slice(0, 5)
+      bbbee: rawResult.south_african_context?.b_bbee_mentions || [],
+      nqf: rawResult.south_african_context?.nqf_levels || [],
+      locations: rawResult.south_african_context?.locations || [],
+      regulations: rawResult.south_african_context?.regulations || [],
+      languages: rawResult.south_african_context?.languages || []
     }
   };
   
-  return optimized;
+  return enhanced;
 }
 
 /**
@@ -240,7 +249,8 @@ export async function testConnectionLightweight(): Promise<boolean> {
       max_tokens: 5
     });
     
-    return response.choices[0].message.content.includes("OK");
+    const content = response.choices[0].message.content || '';
+    return content.includes("OK");
   } catch (error) {
     return false;
   }
