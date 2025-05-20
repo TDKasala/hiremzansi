@@ -6,40 +6,69 @@
  */
 
 import Tesseract from 'tesseract.js';
+import pdfParse from 'pdf-parse';
 
 /**
- * Extract text from PDF buffer
+ * Extract text from PDF buffer using multiple approaches for reliability
  * 
  * @param pdfBuffer PDF file buffer
  * @returns Extracted text content
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
   try {
-    console.log("Starting simple PDF text extraction");
+    console.log("Starting enhanced PDF text extraction");
     
-    // For PDF text extraction, we'll use a simplified approach
-    // Extract text directly from buffer
-    let extractedText = pdfBuffer.toString('utf-8');
+    // First attempt: Try pdf-parse extraction
+    let extractedText = "";
+    try {
+      const pdfData = await pdfParse(pdfBuffer);
+      extractedText = pdfData.text || "";
+      console.log("PDF-parse extraction completed with text length:", extractedText.length);
+    } catch (pdfError) {
+      console.error("PDF-parse extraction failed:", pdfError);
+    }
     
-    // Remove binary content and get only readable text
-    extractedText = extractedText
-      .replace(/[^\x20-\x7E\r\n]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+    // Second attempt: If pdf-parse failed or returned too little text, try simpler extraction
+    if (extractedText.length < 500) {
+      console.log("PDF-parse extraction insufficient, trying alternative extraction");
+      
+      // Simple text extraction from buffer
+      const simpleExtractedText = pdfBuffer.toString('utf-8')
+        .replace(/[^\x20-\x7E\r\n]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      // If simple extraction looks better, use it
+      if (simpleExtractedText.length > extractedText.length && 
+          hasProperTextContent(simpleExtractedText)) {
+        extractedText = simpleExtractedText;
+        console.log("Using alternative extraction with text length:", extractedText.length);
+      }
+    }
     
-    // If the extracted text is too short or doesn't look like proper content,
-    // attempt OCR extraction
+    // Final attempt: If both methods failed, try OCR
     if (extractedText.length < 500 || !hasProperTextContent(extractedText)) {
-      console.log("PDF appears to be scanned or has limited text layer, attempting OCR");
-      extractedText = await extractTextWithOCR(pdfBuffer);
+      console.log("Text extraction insufficient, attempting OCR");
+      try {
+        const ocrText = await extractTextWithOCR(pdfBuffer);
+        
+        // Only use OCR result if it's better than what we have
+        if (ocrText.length > extractedText.length) {
+          extractedText = ocrText;
+          console.log("Using OCR extracted text with length:", extractedText.length);
+        }
+      } catch (ocrError) {
+        console.error("OCR extraction failed:", ocrError);
+        // Continue with what we have if OCR fails
+      }
     }
     
     // Process and clean the extracted text
     return processExtractedText(extractedText);
     
   } catch (error: any) {
-    console.error("Error extracting text from PDF:", error);
-    throw new Error(`Failed to extract text from PDF: ${error.message}`);
+    console.error("All PDF extraction methods failed:", error);
+    return "Content extraction failed. For best results, please upload a PDF with selectable text.";
   }
 }
 
