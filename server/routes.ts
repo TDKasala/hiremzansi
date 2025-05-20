@@ -285,6 +285,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("Starting CV analysis with xAI service");
       
+      // Use our xAI-powered analysis service
+      const analysis = await analyzeCVContent(cv, jobDescription);
+      
+      if (!analysis.success) {
+        console.error("xAI analysis failed:", analysis.error);
+        return res.status(500).json({
+          error: "CV analysis failed",
+          message: analysis.error || "Failed to analyze CV with xAI service"
+        });
+      }
+      
+      // Format the xAI analysis for the response
+      const formattedAnalysis = formatAnalysisForResponse(analysis);
+      
+      // Save analysis result to database
+      try {
+        // Create an ATS score record with the detailed analysis from xAI
+        const atsScore = await storage.createATSScore({
+          cvId,
+          score: formattedAnalysis.score,
+          skillsScore: formattedAnalysis.skillsScore || 0,
+          formatScore: formattedAnalysis.formatScore || 0,
+          contextScore: formattedAnalysis.contextScore || 0,
+          strengths: formattedAnalysis.strengths || [],
+          improvements: formattedAnalysis.improvements || [],
+          issues: []
+        });
+        
+        // Add the ATS score ID to the response
+        formattedAnalysis.scoreId = atsScore.id;
+        
+        console.log("Successfully created ATS score record with ID:", atsScore.id);
+      } catch (error) {
+        console.error("Error creating ATS score:", error);
+        // Continue to send the analysis even if saving to DB fails
+      }
+      
+      // Send the comprehensive analysis response from xAI
+      return res.json(formattedAnalysis);
+      
+    } catch (error) {
+      console.error("Error analyzing CV:", error);
+      next(error);
+    }
+  });
+    try {
+      const cvId = parseInt(req.params.id);
+      
+      if (isNaN(cvId)) {
+        return res.status(400).json({ 
+          error: "Invalid CV ID", 
+          message: "Please provide a valid CV ID." 
+        });
+      }
+      
+      // Retrieve the CV from the database
+      const cv = await storage.getCV(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ 
+          error: "CV not found", 
+          message: "The CV with the specified ID was not found." 
+        });
+      }
+      
+      // Check if the CV belongs to the user (if authenticated)
+      const isGuest = !req.isAuthenticated();
+      
+      if (!isGuest && cv.userId && req.user && cv.userId !== req.user.id) {
+        return res.status(403).json({ 
+          error: "Access denied", 
+          message: "You do not have permission to access this CV." 
+        });
+      }
+      
+      // Get optional job description if provided in the request
+      const { jobDescription } = req.body;
+      
+      console.log("Starting CV analysis with xAI service");
+      
       // Use our xAI-powered analysis service instead of local AI
       const analysis = await analyzeCVContent(cv, jobDescription);
       
@@ -312,73 +392,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       try {
-        // Comprehensive South African Context Detection (20% of total score)
-        // B-BBEE related terms (10 points per valid instance, max 20)
-        const bbbeeTerms = ["b-bbee", "bbbee", "broad based black economic empowerment", "bee", "black owned", "hdi", "transformation focused"];
-        let bbbeeScore = 0;
-        for (const term of bbbeeTerms) {
-          if (textContent.toLowerCase().includes(term)) {
-            bbbeeScore += 10;
-            if (bbbeeScore >= 20) break; // Cap at 20 points
-          }
-        }
+        // Our xAI service has already processed and scored the CV content
+        // including South African context detection
         
-        // NQF levels (5 points per correct level, max 10)
-        const nqfMatches = textContent.match(/nqf level \d+|national qualifications? framework level \d+|nqf \d+/gi) || [];
-        const nqfScore = Math.min(10, nqfMatches.length * 5);
+        // The formattedAnalysis contains the structured results from xAI, including:
+        // - overall_score: The total ATS compatibility score
+        // - skillsScore: Score for skills identification (40% of total)
+        // - formatScore: Score for CV format and structure (40% of total)
+        // - contextScore: Score for South African context detection (20% of total)
         
-        // South African cities (2 points per entity, max 5)
-        const saCities = ["johannesburg", "cape town", "durban", "pretoria", "bloemfontein", "port elizabeth", "gqeberha", 
-                         "east london", "polokwane", "nelspruit", "mbombela", "kimberley", "pietermaritzburg", "stellenbosch", "potchefstroom"];
-        let citiesScore = 0;
-        for (const city of saCities) {
-          if (textContent.toLowerCase().includes(city)) {
-            citiesScore += 2;
-            if (citiesScore >= 5) break; // Cap at 5 points
-          }
-        }
+        console.log("xAI analysis successfully extracted CV information");
         
-        // South African provinces (2 points per entity, max 5)
-        const saProvinces = ["gauteng", "western cape", "kwazulu natal", "eastern cape", "mpumalanga", 
-                            "limpopo", "north west", "free state", "northern cape"];
-        let provincesScore = 0;
-        for (const province of saProvinces) {
-          if (textContent.toLowerCase().includes(province)) {
-            provincesScore += 2;
-            if (provincesScore >= 5) break; // Cap at 5 points
-          }
-        }
-        
-        // South African currencies (2 points per entity, max 5)
-        const currencyMatches = textContent.match(/r\d+|zar|rand/gi) || [];
-        const currencyScore = Math.min(5, currencyMatches.length * 2);
-        
-        // South African languages (3 points per instance, max 5)
-        const saLanguages = ["afrikaans", "xhosa", "zulu", "ndebele", "sepedi", "sesotho", "setswana", 
-                            "siswati", "tshivenda", "xitsonga", "isizulu", "isixhosa"];
-        let languagesScore = 0;
-        for (const language of saLanguages) {
-          if (textContent.toLowerCase().includes(language)) {
-            languagesScore += 3;
-            if (languagesScore >= 5) break; // Cap at 5 points
-          }
-        }
-        
-        // South African regulations (3 points per instance, max 5)
-        const saRegulations = ["popi act", "popia", "protection of personal information", "fais", "fica", 
-                              "national credit act", "consumer protection act", "employment equity act", 
-                              "skills development act", "labor relations act", "bcea"];
-        let regulationsScore = 0;
-        for (const regulation of saRegulations) {
-          if (textContent.toLowerCase().includes(regulation)) {
-            regulationsScore += 3;
-            if (regulationsScore >= 5) break; // Cap at 5 points
-          }
-        }
-        
-        // Calculate total SA context score (20% of total) - max 50 points
-        const saContextScore = Math.min(100, bbbeeScore + nqfScore + citiesScore + provincesScore + 
-                                        currencyScore + languagesScore + regulationsScore);
+        // All the scoring and content detection has been handled by xAI
         
         // CV Format Evaluation (40% of total score)
         // Section headers (15 points each, max 60)
