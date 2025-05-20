@@ -57,11 +57,28 @@ router.post('/test-cv-analysis/:id', async (req: Request, res: Response) => {
     }
     
     // Format the analysis for the response
-    const formattedAnalysis = formatAnalysisForResponse(analysis);
+    const formattedAnalysis = formatAnalysisForResponse({
+      success: true,
+      score: analysis.result.overall_score,
+      rating: analysis.result.rating,
+      strengths: analysis.result.strengths,
+      improvements: analysis.result.improvements,
+      skills: analysis.result.skills_identified,
+      skillsScore: analysis.result.skill_score,
+      formatScore: analysis.result.format_score,
+      contextScore: analysis.result.sa_score,
+      saKeywordsFound: [
+        ...(analysis.result.south_african_context.b_bbee_mentions || []),
+        ...(analysis.result.south_african_context.nqf_levels || []),
+        ...(analysis.result.south_african_context.locations || []),
+        ...(analysis.result.south_african_context.regulations || []),
+        ...(analysis.result.south_african_context.languages || [])
+      ]
+    });
     
     // Add demo notice
     formattedAnalysis.demo = true;
-    formattedAnalysis.notice = "This is a demonstration of the CV analysis with South African context";
+    formattedAnalysis.notice = "This is a demonstration of the CV analysis with South African context using xAI's Grok API";
     
     // Send the comprehensive analysis response
     return res.json(formattedAnalysis);
