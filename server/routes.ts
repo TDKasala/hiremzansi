@@ -28,6 +28,7 @@ import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
 import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
 import pdfTestRoutes from "./routes/pdfTest";
+import optimizedCvAnalysisRoutes from "./routes/optimizedCvAnalysis";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
@@ -408,6 +409,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // PDF testing routes
   app.use("/api", pdfTestRoutes);
+  
+  // Mobile-optimized CV analysis routes for fast performance (<2s on 3G)
+  app.use("/api", optimizedCvAnalysisRoutes);
   
   // Create HTTP server
   const httpServer = createServer(app);
