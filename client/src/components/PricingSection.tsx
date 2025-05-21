@@ -71,7 +71,7 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-16 bg-neutral-100">
+    <section id="pricing-section" className="py-16 bg-neutral-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-secondary mb-4">

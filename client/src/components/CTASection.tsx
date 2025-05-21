@@ -19,16 +19,28 @@ export default function CTASection() {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <Link href="#upload">
+            <a href="#upload-section" onClick={(e) => {
+              e.preventDefault();
+              const uploadSection = document.getElementById('upload-section');
+              if (uploadSection) {
+                uploadSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}>
               <Button size="lg" className="bg-primary text-white hover:bg-opacity-90 w-full sm:w-auto">
                 Get Your Free ATS Score
               </Button>
-            </Link>
-            <Link href="#pricing">
+            </a>
+            <a href="#pricing-section" onClick={(e) => {
+              e.preventDefault();
+              const pricingSection = document.getElementById('pricing-section');
+              if (pricingSection) {
+                pricingSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}>
               <Button variant="outline" size="lg" className="bg-white text-secondary hover:bg-opacity-90 w-full sm:w-auto">
                 View Pricing Plans
               </Button>
-            </Link>
+            </a>
           </div>
           
           <div className="mt-8 text-neutral-300 flex flex-col sm:flex-row items-center justify-center text-sm">
