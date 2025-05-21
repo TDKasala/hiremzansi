@@ -4,176 +4,180 @@ Thank you for your interest in contributing to ATSBoost! This document provides 
 
 ## Table of Contents
 
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [How to Contribute](#how-to-contribute)
-4. [Development Workflow](#development-workflow)
-5. [Pull Request Process](#pull-request-process)
-6. [Coding Standards](#coding-standards)
-7. [Testing](#testing)
-8. [Documentation](#documentation)
-9. [Community](#community)
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Branching Strategy](#branching-strategy)
+- [Pull Request Process](#pull-request-process)
+- [Coding Standards](#coding-standards)
+- [Testing Guidelines](#testing-guidelines)
+- [Documentation](#documentation)
+- [Reporting Bugs](#reporting-bugs)
+- [Feature Requests](#feature-requests)
+- [South African Context](#south-african-context)
 
 ## Code of Conduct
 
-We are committed to providing a welcoming and inclusive experience for everyone. Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating in our community.
+Our project is dedicated to providing a harassment-free experience for everyone. We expect all contributors to adhere to our Code of Conduct. By participating, you are expected to uphold this code.
+
+- Be respectful and inclusive
+- Be patient and welcoming
+- Be thoughtful
+- Be collaborative
+- When we disagree, try to understand why
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- PostgreSQL 16+
+- Node.js v18 or higher
+- PostgreSQL v14 or higher
 - Git
 
-### Setting Up Development Environment
+### Setup Local Environment
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/your-username/atsboost.git
+   git clone https://github.com/YOUR-USERNAME/atsboost.git
    cd atsboost
    ```
-3. Add the original repository as a remote:
-   ```bash
-   git remote add upstream https://github.com/original-owner/atsboost.git
-   ```
-4. Install dependencies:
+
+3. Set up your development environment:
    ```bash
    npm install
    ```
-5. Set up environment variables (see [QUICK-START.md](QUICK-START.md))
-6. Set up the database:
-   ```bash
-   npm run db:push
-   ```
-7. Start the development server:
+
+4. Create a `.env` file with the required environment variables (see README.md)
+
+5. Start the development server:
    ```bash
    npm run dev
    ```
 
-## How to Contribute
-
-### Reporting Bugs
-
-1. Check if the bug has already been reported in the [Issues](https://github.com/yourusername/atsboost/issues)
-2. If not, create a new issue with:
-   - A clear title
-   - Steps to reproduce
-   - Expected behavior
-   - Actual behavior
-   - Screenshots (if applicable)
-   - Environment details (OS, browser, etc.)
-
-### Suggesting Enhancements
-
-1. Check if the enhancement has already been suggested
-2. If not, create a new issue with:
-   - A clear title
-   - Detailed description of the enhancement
-   - Rationale (why this would be valuable)
-   - Possible implementation approach (optional)
-
-### Your First Contribution
-
-Look for issues labeled with `good-first-issue` or `help-wanted`. These are specifically curated for new contributors.
-
 ## Development Workflow
 
-1. Create a new branch for your contribution:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-   or
-   ```bash
-   git checkout -b fix/your-bug-fix
-   ```
+1. Create a branch for your work
+2. Make your changes
+3. Write or update tests
+4. Update documentation
+5. Submit a pull request
 
-2. Make your changes with clear, atomic commits:
-   ```bash
-   git commit -m "Clear description of your change"
-   ```
+## Branching Strategy
 
-3. Push your branch to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+- `main`: Production-ready code
+- `develop`: Development branch, contains features ready for the next release
+- `feature/*`: For new features
+- `bugfix/*`: For bug fixes
+- `hotfix/*`: For urgent fixes to production
+- `release/*`: For release preparation
 
-4. Create a pull request from your branch to the main repository
+Example: `feature/add-pdf-parsing-enhancement`
 
 ## Pull Request Process
 
-1. Ensure your code passes all tests
-2. Update documentation where necessary
-3. Add or update tests for your changes
-4. Fill in the pull request template with all required information
-5. Request review from maintainers
-6. Address any feedback from reviewers
-7. Once approved, a maintainer will merge your PR
+1. Update the README.md or relevant documentation with details of changes
+2. Ensure all tests pass locally
+3. Increase version numbers if applicable (following [SemVer](https://semver.org/))
+4. Submit a pull request to the `develop` branch
+5. A maintainer will review your PR and provide feedback
+6. Once approved, your changes will be merged
+
+### PR Title Format
+
+Please format your PR titles as:
+```
+[TYPE]: Short description
+```
+
+Types:
+- `FEAT`: A new feature
+- `FIX`: A bug fix
+- `DOCS`: Documentation changes
+- `STYLE`: Code style changes (formatting, semicolons)
+- `REFACTOR`: Code refactoring
+- `PERF`: Performance improvements
+- `TEST`: Adding or updating tests
+- `CHORE`: Maintenance tasks
+
+Example: `FEAT: Add support for Xhosa language translations`
 
 ## Coding Standards
 
+We follow these coding standards:
+
 ### TypeScript/JavaScript
 
-- Follow the existing code style (ESLint configuration)
-- Use meaningful variable and function names
-- Comment complex code sections
-- Use TypeScript interfaces and types for all data structures
-- Avoid any `any` types if possible
+- Use TypeScript for all new code
+- Follow the existing code style in the project
+- Use ESLint to ensure code quality
+- Format code with Prettier
 
 ### React
 
 - Use functional components with hooks
-- Keep components focused and small
-- Use TypeScript for props and state
-- Follow the component folder structure
+- Keep components small and focused
+- Use the shadcn/ui component library when possible
+- Follow the file structure of the project
 
 ### CSS/Styling
 
-- Use TailwindCSS utility classes
-- Follow mobile-first approach
-- Ensure accessibility (WCAG compliance)
+- Use Tailwind CSS for styling
+- Follow the design system and color palette
+- Ensure responsiveness for mobile devices
+- Keep accessibility in mind
 
-### South African Context
-
-- Be mindful of South African standards and terminology
-- Use appropriate South African examples where applicable
-- Follow local regulations references (POPIA, B-BBEE, etc.)
-
-## Testing
+## Testing Guidelines
 
 - Write tests for all new features
-- Ensure all tests pass before submitting a PR:
-  ```bash
-  npm run test
-  ```
-- Include both unit and integration tests where appropriate
-- For UI components, include visual regression tests
+- Ensure tests cover both success and failure cases
+- Make sure existing tests continue to pass
+- Tests should be located in the same directory as the code they test
 
 ## Documentation
 
-- Update documentation for all new features and changes
-- Document APIs with JSDoc comments
-- Keep the README.md up to date
-- Add examples for complex features
+- Update documentation for any changes to APIs, features, or behaviors
+- Document any South African specific context in your code
+- Include JSDoc comments for functions and components
+- Update the API.md file for any API changes
 
-## South African Specific Contributions
+## Reporting Bugs
 
-We especially welcome contributions that enhance the South African context detection and analysis:
+When reporting bugs, please include:
 
-- Improved B-BBEE recognition patterns
-- More comprehensive NQF level detection
-- Additional South African regulations and standards
-- Updates to location and language recognition
-- Improvements to South African job market insights
+1. A clear and descriptive title
+2. Steps to reproduce the bug
+3. Expected behavior
+4. Actual behavior
+5. Screenshots if applicable
+6. Your environment (OS, browser, etc.)
 
-## Community
+## Feature Requests
 
-- Join our [Slack/Discord] channel for discussions
-- Participate in issue discussions
-- Help answer questions from other contributors
-- Share the project with others who might be interested
+Feature requests are welcome. Please provide:
 
----
+1. A clear and descriptive title
+2. Detailed description of the feature
+3. Any relevant context or screenshots
+4. How this feature benefits the South African users of ATSBoost
 
-Thank you for contributing to ATSBoost, helping to address South Africa's unemployment crisis through better CV optimization!
+## South African Context
+
+ATSBoost is specifically designed for the South African job market. When contributing, please:
+
+1. Be aware of South African specific employment regulations and practices
+2. Consider B-BBEE (Broad-Based Black Economic Empowerment) requirements
+3. Understand the NQF (National Qualifications Framework) levels
+4. Be mindful of South Africa's diverse linguistic landscape
+5. Consider mobile-first approaches (many South African users access the internet primarily via mobile devices)
+6. Understand local job market challenges (32% unemployment rate)
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the project's license (see LICENSE file).
+
+## Questions?
+
+If you have any questions, please contact us at support@atsboost.co.za.
+
+Thank you for contributing to ATSBoost and helping South African job seekers improve their career opportunities!

@@ -1,178 +1,163 @@
-# ATSBoost: South African CV Optimization Platform
+# ATSBoost - South African CV Optimization Platform
 
-ATSBoost (https://atsboost.co.za) is a resume optimization platform tailored specifically for South African job seekers, addressing the unique requirements of the South African job market while helping to combat the 32% unemployment crisis affecting approximately 15 million people.
+![ATSBoost Logo](generated-icon.png)
 
 ## 🚀 Overview
 
-ATSBoost analyzes CVs using advanced AI to provide detailed scoring, recommendations, and improvements based on:
+ATSBoost is a cutting-edge platform designed to help South African job seekers optimize their CVs for Applicant Tracking Systems (ATS). With a 32% unemployment rate affecting approximately 15 million people in South Africa, our platform addresses the critical need for tools that increase job application success rates.
 
-- ATS (Applicant Tracking System) compatibility
-- Format and structure analysis 
-- Skills assessment
-- **South African context evaluation** (B-BBEE status, NQF levels, local regulations, etc.)
+Visit us at [ATSBoost.co.za](https://atsboost.co.za)
 
-The platform follows a freemium business model:
-- Free tier: Basic ATS score with minimal recommendations
-- Premium tiers: ZAR 30, ZAR 100, and ZAR 200 with increasingly detailed reports and features
+## ✨ Key Features
 
-## 📋 Key Features
+- **ATS Score Analysis**: Get a free ATS compatibility score for your CV
+- **Deep CV Analysis**: Receive detailed feedback with specific improvement suggestions
+- **South African Context Detection**: Identify B-BBEE status, NQF levels, and other SA-specific elements
+- **Real-time CV Editor**: Edit your CV and see your ATS score improve in real-time
+- **Multi-language Support**: Available in English, isiZulu, Sesotho, Afrikaans, and isiXhosa
+- **Skill Gap Analysis**: Identify missing skills based on your target job
+- **Interview Practice Tools**: Prepare for interviews with AI-powered practice questions
+- **Job Search Integration**: Find relevant job opportunities across top South African job boards
 
-- **CV Analysis**: AI-powered assessment of resume quality with detailed scoring
-- **South African Context Detection**: 
-  - B-BBEE status recognition (10 points per mention, max 20)
-  - NQF level identification (5 points per correct level, max 10)
-  - South African cities/provinces detection (2 points each, max 5 per category)
-  - Local regulatory knowledge assessment (3 points per mention, max 5)
-  - South African languages recognition (3 points per language, max 5)
-- **PDF Processing with OCR**: Extract text from scanned PDFs and images using Tesseract.js
-- **Personalized Recommendations**: Tailored suggestions to improve CV performance
-- **Career Email Digest**: Regular personalized career recommendations via email
-- **Job Matching**: AI-powered matching between CVs and job descriptions
-- **Mobile-First Design**: Optimized for the 70% of South African users who access via mobile devices
+## 💻 Tech Stack
 
-## 🛠️ Technology Stack
+- **Frontend**: React with TypeScript, Tailwind CSS, Shadcn UI components
+- **Backend**: Express.js with TypeScript
+- **Database**: PostgreSQL
+- **AI Services**: OpenAI (with gpt-4o model), xAI's Grok models
+- **Internationalization**: i18next for multi-language support
+- **Authentication**: Custom auth system with password protection
+- **Deployment**: Hosted on Replit
 
-### Frontend
-- React with TypeScript
-- TailwindCSS for styling
-- Responsive, mobile-first design
-
-### Backend
-- Express.js server
-- PostgreSQL database with Drizzle ORM
-- AI integration (xAI Grok API)
-
-### Infrastructure
-- Optimized for performance (<2s load on 3G, <500KB/page)
-- POPIA compliant for data privacy
-- PayFast integration for payments
-
-## 📊 CV Analysis Methodology
-
-ATSBoost uses a comprehensive scoring system broken down into three primary categories:
-
-1. **Format Evaluation (40% of total score)**
-   - Professional layout and structure
-   - Consistent headers and sections
-   - Proper use of bullet points
-   - Appropriate date formats
-   - Readable font and spacing
-
-2. **Skills Assessment (40% of total score)**
-   - Relevant technical skills
-   - Soft skills
-   - Certifications and qualifications
-   - Work experience alignment
-   - High-demand skills in South Africa weighted 1.5x
-
-3. **South African Context Detection (20% of score)**
-   - B-BBEE status mentions
-   - NQF levels in qualifications
-   - South African locations
-   - Local regulatory knowledge
-   - South African languages
-
-## 💻 Project Structure
+## 🔧 Project Structure
 
 ```
-/
-├── client/              # React frontend
-├── server/              # Express backend
-│   ├── routes/          # API endpoints
-│   ├── services/        # Business logic
-│   │   ├── xaiService.ts    # xAI Grok API integration
-│   │   ├── atsAnalysisService.ts  # CV analysis logic
-│   │   ├── simplePdfParser.ts    # PDF extraction with OCR
-│   │   ├── emailService.ts    # Email notifications
-│   │   └── recommendationService.ts    # Job recommendations
-│   └── utils/           # Utility functions
-├── shared/              # Shared types and schemas
-└── migrations/          # Database migrations
+├── client/                 # Frontend React application
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── i18n/           # Internationalization
+│   │   ├── lib/            # Utility functions
+│   │   ├── pages/          # Page components
+│   │   └── index.tsx       # Application entry point
+├── server/                 # Backend Express application
+│   ├── api/                # API routes
+│   ├── routes/             # Route handlers
+│   ├── services/           # Service layer
+│   ├── scripts/            # Utility scripts
+│   └── index.ts            # Server entry point
+├── shared/                 # Shared code between client and server
+│   └── schema.ts           # Database schema and types
+├── docs/                   # Documentation
+├── migrations/             # Database migrations
+└── test_data/              # Test data
 ```
 
-## 🧠 AI Integration
+## 📋 Prerequisites
 
-The platform uses xAI's Grok API for advanced CV analysis with special focus on South African context. The AI evaluates:
-
-- Overall ATS compatibility
-- Format and structure quality
-- Skills relevance and comprehensiveness
-- South African context markers (B-BBEE, NQF, etc.)
-
-The system includes robust PDF text extraction with OCR capabilities to ensure accurate analysis of all CV formats, including scanned documents.
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- API keys for OpenAI and/or xAI (for AI-powered features)
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 16+
-- xAI API key
-
 ### Installation
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/atsboost.git
+   cd atsboost
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   Create a `.env` file in the root directory with the following variables:
+   ```
+   DATABASE_URL=postgresql://username:password@localhost:5432/atsboost
+   OPENAI_API_KEY=your_openai_api_key
+   XAI_API_KEY=your_xai_api_key
+   SESSION_SECRET=random_secret_key
+   ```
+
+4. Initialize the database:
+   ```bash
+   npm run db:push
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🌐 Deployment
+
+### Production Setup
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Start the production server:
+   ```bash
+   npm start
+   ```
+
+## 🧪 Testing
+
+Run the test suite with:
 ```bash
-git clone https://github.com/yourusername/atsboost.git
-cd atsboost
+npm test
 ```
 
-2. Install dependencies
-```bash
-npm install
-```
+## 🔒 Security & Compliance
 
-3. Configure environment variables
-Create a `.env` file in the root directory with the following variables:
-```
-DATABASE_URL=postgresql://user:password@localhost:5432/atsboost
-XAI_API_KEY=your_xai_api_key
-```
+ATSBoost is fully compliant with:
+- **POPIA** (Protection of Personal Information Act)
+- **GDPR** (General Data Protection Regulation)
 
-4. Run database migrations
-```bash
-npm run db:push
-```
+We implement the following security measures:
+- Encrypted data storage
+- Secure authentication
+- Regular security audits
+- Privacy-focused data handling
 
-5. Start the development server
-```bash
-npm run dev
-```
+## 🌍 Internationalization
 
-## 📝 Usage
+ATSBoost supports the following languages:
+- English (en)
+- isiZulu (zu)
+- Sesotho (st)
+- Afrikaans (af)
+- isiXhosa (xh)
 
-### CV Upload and Analysis
-1. Users can upload their CV in PDF, DOCX, or TXT format
-2. The system extracts text (using OCR for scanned PDFs)
-3. The xAI-powered analysis provides a detailed score with breakdown
-4. Users receive actionable recommendations for improvement
+## 📊 Pricing Model
 
-### South African Context Enhancement
-The system specifically looks for South African context markers that can improve a CV's performance in the local job market:
-- B-BBEE status information
-- NQF qualification levels
-- Local regulations knowledge (POPIA, FICA, etc.)
-- South African cities and provinces
-- Local languages
+ATSBoost follows a freemium business model with the following tiers:
+- **Free**: Basic ATS score and limited recommendations
+- **Basic (R30)**: Deep CV analysis with detailed recommendations
+- **Premium (R100)**: Monthly subscription with unlimited CV analyses and premium tools
+- **Enterprise (R200)**: Advanced features for professional users and teams
 
-## 🔒 Privacy and Compliance
+## 👥 Contributing
 
-ATSBoost adheres to POPIA (Protection of Personal Information Act) compliance for data privacy:
-- All user data is securely stored
-- Personal information is protected
-- Users can request data deletion
-
-## 🤝 Contributing
-
-We welcome contributions to ATSBoost! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions to ATSBoost! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+## 📬 Contact
 
-- Denis Kasala - Founder and Lead Developer
+For any inquiries, please reach out to:
+- support@atsboost.co.za
 
-## 📧 Contact
+## 🙏 Acknowledgements
 
-For any inquiries, please contact us at support@atsboost.co.za
+- OpenAI for providing advanced AI capabilities
+- xAI for Grok models integration
+- All contributors and testers
