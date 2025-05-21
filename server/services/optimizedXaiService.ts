@@ -230,57 +230,61 @@ function createOptimizedPrompt(cvText: string, jobDescription?: string): string 
   return `
 You are an expert ATS (Applicant Tracking System) analyzer specialized in the South African job market.
 
-Analyze the following CV text with thorough attention to detail while maintaining fast performance:
+Analyze the provided CV text with thorough attention to detail while ensuring efficient processing. If no CV text is provided, return general ATS optimization guidelines for the South African job market. If a job description is provided, tailor the analysis to align with its requirements; otherwise, assume a general professional role in South Africa.
 
 ${cvText}
 
-${jobDescription ? `Consider relevance to this job description: ${jobDescription}` : ''}
+${jobDescription ? `${jobDescription}` : ''}
 
-Provide comprehensive analysis with these components:
+Provide a comprehensive analysis with the following components:
 
-1. Overall ATS compatibility score (0-100 scale):
-   - Calculate based on format (40%), skills (40%), and South African context (20%)
-   - Provide detailed reasoning for the score
+Overall ATS Compatibility Score (0-100 scale):
+Calculate based on format (40%), skills (40%), and South African context (20%).
+Format subcomponents (total 40 points): professional layout (10), consistent headers/sections (8), bullet point usage (8), date formats (e.g., YYYY-MM or MM/YYYY, 6), readable font/spacing (e.g., Arial 10-12pt, 8).
+Skills subcomponents (total 40 points): technical skills (10), soft skills (8), certifications/qualifications (8), work experience alignment (8), keyword optimization (6).
+South African context subcomponents (total 20 points): B-BBEE mentions (up to 6), NQF levels (up to 4), locations (up to 4), regulations (up to 3), languages (up to 3).
+Provide detailed reasoning for the score, including how each subcomponent contributes.
 
-2. Format evaluation (40% of total score):
-   - Professional layout and structure
-   - Consistent headers and sections
-   - Proper use of bullet points
-   - Appropriate date formats
-   - Readable font and spacing
-   - Clear organization of information
+Format Evaluation (40% of total score):
+Assess professional layout (e.g., clear section titles like "Work Experience," "Education").
+Check for consistent headers and sections (e.g., uniform formatting, no missing sections).
+Evaluate use of bullet points for readability and ATS compatibility.
+Verify date formats (e.g., YYYY-MM or MM/YYYY, no text-based months).
+Confirm readable font (e.g., Arial, Times New Roman, 10-12pt) and consistent spacing.
+Ensure no graphics, tables, or headers/footers that may disrupt ATS parsing.
+Flag missing standard sections (e.g., education, work experience) if applicable.
 
-3. Skills identification (40% of total score):
-   - Relevant technical skills
-   - Soft skills appropriate for position level
-   - Certifications and qualifications
-   - Work experience alignment
-   - High-demand skills in South Africa weighted 1.5x higher
-   - Keywords optimization for ATS systems
+Skills Identification (40% of total score):
+Identify relevant technical skills (e.g., Python, project management) and soft skills (e.g., teamwork, communication) based on job description or general South African market demands.
+Evaluate certifications and qualifications for relevance and clarity.
+Assess work experience alignment with job requirements or industry standards.
+Weight high-demand South African skills (e.g., cloud computing, data analysis, financial compliance) 1.5x higher, using real-time data from X posts or job market reports if needed.
+Optimize for ATS keywords by checking for industry-specific terms and repetition in context.
 
-4. South African context detection (20% of score):
-   - B-BBEE status mentions (e.g., Level 1, Level 2) - 10 points per mention (max 20)
-   - NQF levels in qualifications (5 points per correct level, max 10)
-   - South African cities/provinces (2 points each, max 5 per category)
-   - Local regulatory knowledge (POPIA, FICA, etc.) (3 points per mention, max 5)
-   - South African languages (3 points per language, max 5)
+South African Context Detection (20% of score):
+Detect B-BBEE status mentions (e.g., Level 1, Level 2) and assign up to 6 points based on relevance.
+Identify NQF levels in qualifications (e.g., NQF 7) and assign up to 4 points for correct usage.
+Recognize South African cities/provinces (e.g., Cape Town, Gauteng) and assign up to 4 points.
+Identify local regulations (e.g., POPIA, FICA, Labour Relations Act) and assign up to 3 points.
+Detect South African languages (e.g., isiZulu, Afrikaans, excluding English) and assign up to 3 points.
+If no context elements are detected, provide default suggestions for inclusion.
 
 Return a JSON response with these fields:
 {
   "score": number (0-100),
-  "rating": string ('Excellent', 'Good', 'Average', 'Poor'),
+  "rating": string ("Excellent" for 80-100, "Good" for 60-79, "Average" for 40-59, "Poor" for 0-39),
   "skill_score": number (0-40),
   "format_score": number (0-40),
   "sa_score": number (0-20),
-  "strengths": array of strings (3-5 key strengths with thorough descriptions),
-  "improvements": array of strings (3-5 detailed improvement suggestions),
-  "skills": array of strings (all identified skills, prioritized by relevance),
+  "strengths": array of strings (3-5 key strengths with detailed descriptions tied to ATS or South African market),
+  "improvements": array of strings (3-5 actionable suggestions linked to ATS optimization or South African context),
+  "skills": array of strings (all identified skills, prioritized by relevance to job or market),
   "south_african_context": {
-    "b_bbee_mentions": array of strings (any B-BBEE mentions found),
-    "nqf_levels": array of strings (any NQF levels mentioned),
-    "locations": array of strings (South African cities/provinces found),
-    "regulations": array of strings (South African regulations identified),
-    "languages": array of strings (South African languages found)
+    "b_bbee_mentions": array of strings (any B-BBEE mentions found or "None"),
+    "nqf_levels": array of strings (any NQF levels mentioned or "None"),
+    "locations": array of strings (South African cities/provinces found or "None"),
+    "regulations": array of strings (South African regulations identified or "None"),
+    "languages": array of strings (South African languages found, excluding English, or "None")
   }
 }
 `;
