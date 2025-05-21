@@ -4,12 +4,11 @@ import UploadSection from "@/components/UploadSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FeaturesSection from "@/components/FeaturesSection";
-import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import SkillQuizSection from "@/components/SkillQuizSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
 import CTASection from "@/components/CTASection";
+import DropdownFeaturesSection from "@/components/DropdownFeaturesSection";
 
 export default function HomePage() {
   return (
@@ -28,9 +27,8 @@ export default function HomePage() {
       <HowItWorksSection />
       <PricingSection />
       <FeaturesSection />
-      <SuccessStoriesSection />
+      <DropdownFeaturesSection />
       <TestimonialsSection />
-      <SkillQuizSection />
       <BlogPreviewSection />
       <ReferralSourceSection />
       <CTASection />

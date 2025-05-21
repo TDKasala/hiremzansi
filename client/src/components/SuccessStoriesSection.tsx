@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import successImagePath from "@assets/file_00000000a38861f9b9d4d1c35ef723d3.png";
 
+// Removing the outer section wrapper since we're embedding this in the DropdownFeaturesSection
 export default function SuccessStoriesSection() {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
