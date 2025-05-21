@@ -6,6 +6,7 @@ import PricingSection from "@/components/PricingSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import SkillQuizSection from "@/components/SkillQuizSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
 import CTASection from "@/components/CTASection";
@@ -29,6 +30,7 @@ export default function HomePage() {
       <FeaturesSection />
       <SuccessStoriesSection />
       <TestimonialsSection />
+      <SkillQuizSection />
       <BlogPreviewSection />
       <ReferralSourceSection />
       <CTASection />
