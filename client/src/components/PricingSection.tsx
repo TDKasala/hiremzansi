@@ -33,7 +33,7 @@ export default function PricingSection() {
         { name: "Premium Optimization", included: false },
       ],
       buttonText: "Get Started",
-      buttonLink: "/signup",
+      buttonLink: "/auth",
       buttonVariant: "outline",
     },
     {
@@ -49,7 +49,7 @@ export default function PricingSection() {
         { name: "Ongoing Optimization", included: false },
       ],
       buttonText: "Purchase Analysis",
-      buttonLink: "/signup",
+      buttonLink: "/auth",
       buttonVariant: "outline",
     },
     {
@@ -65,7 +65,7 @@ export default function PricingSection() {
         { name: "Priority Support", included: true },
       ],
       buttonText: "Subscribe",
-      buttonLink: "/signup",
+      buttonLink: "/auth",
       highlighted: true,
     },
   ];
@@ -141,7 +141,7 @@ export default function PricingSection() {
           <p className="text-neutral-600 mb-4">
             Are you an employer looking to streamline your hiring process and find the best South African talent?
           </p>
-          <Link href="/contact">
+          <Link href="/auth">
             <Button className="bg-secondary text-white hover:bg-opacity-90">
               Contact for Early Access
             </Button>
