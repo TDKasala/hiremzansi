@@ -97,40 +97,51 @@ export default function HeroSection() {
                 }}
               >
                 <div className="bg-white text-black p-6 rounded-lg shadow-lg">
-                  <div className="border-b border-gray-200 pb-4 mb-4">
-                    <h2 className="text-xl font-bold text-center mb-1">Your Name</h2>
-                    <p className="text-gray-600 text-sm text-center flex justify-center gap-3">
-                      <span>📧 your.email@example.com</span> 
-                      <span>📱 Your Phone Number</span>
-                    </p>
+                  <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold mb-1">Kulani Mathebula</h2>
+                      <p className="text-gray-600 text-sm">
+                        <span>📧 kulani.m@example.co.za</span><br /> 
+                        <span>📱 071 234 5678</span><br />
+                        <span>📍 Johannesburg, Gauteng</span>
+                      </p>
+                    </div>
+                    <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
+                      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                        <circle cx="100" cy="80" r="40" fill="#6B7280" />
+                        <rect x="60" y="120" width="80" height="80" fill="#6B7280" />
+                        <circle cx="100" cy="100" r="100" fill="none" />
+                      </svg>
+                    </div>
                   </div>
                   
                   <div className="mb-4">
                     <div className="bg-amber-400 text-black px-4 py-2 rounded-md font-bold mb-3">Key Skills</div>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Digital Marketing</span>
-                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">Analytics</span>
-                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">SETA-Certified</span>
-                      <span className="text-sm bg-pink-200 px-3 py-1 rounded-md">Project Management</span>
+                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Software Development</span>
+                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">Data Analysis</span>
+                      <span className="text-sm bg-pink-200 px-3 py-1 rounded-md">Team Leadership</span>
+                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Python</span>
+                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">SQL</span>
                     </div>
                     
                     <div className="bg-cyan-500 text-white px-4 py-2 rounded-md font-bold mb-3">Experience</div>
                     <div className="mb-4">
-                      <p className="font-bold">Marketing Manager</p>
-                      <p className="text-sm">Cape Town Media Group</p>
-                      <p className="text-sm text-gray-600">2020 - Present</p>
+                      <p className="font-bold">Senior Developer</p>
+                      <p className="text-sm">InnovaTech Solutions</p>
+                      <p className="text-sm text-gray-600">2022 - Present</p>
                       <ul className="list-disc ml-5 text-sm mt-2">
-                        <li>Leading digital marketing campaigns</li>
-                        <li>Overseeing project management</li>
-                        <li>Delivering results with analytics</li>
+                        <li>Led development team of 5 engineers</li>
+                        <li>Implemented data analytics platform</li>
+                        <li>Reduced system downtime by 35%</li>
                       </ul>
                     </div>
                     
-                    <div className="bg-purple-400 text-white px-4 py-2 rounded-md font-bold mb-3">Additional Information</div>
+                    <div className="bg-purple-400 text-white px-4 py-2 rounded-md font-bold mb-3">South African Qualifications</div>
                     <ul className="list-disc ml-5 text-sm">
-                      <li>SETA Certified</li>
-                      <li>B-BBEE information included</li>
-                      <li>NQF-levels specified</li>
+                      <li>BSc Computer Science (NQF Level 7)</li>
+                      <li>MICT SETA Python Certification</li>
+                      <li>B-BBEE Level 2 Contributor</li>
                     </ul>
                   </div>
                 </div>
