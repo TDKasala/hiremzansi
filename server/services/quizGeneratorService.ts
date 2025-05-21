@@ -1,9 +1,14 @@
 import OpenAI from "openai";
 
 // Initialize OpenAI with the xAI base URL and API key
-const openai = new OpenAI({
+const xaiClient = new OpenAI({
   baseURL: "https://api.x.ai/v1",
   apiKey: process.env.XAI_API_KEY
+});
+
+// Initialize regular OpenAI client for fallback
+const openaiClient = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 interface QuizQuestion {
@@ -17,20 +22,21 @@ export async function generateQuizQuestions(
   category: string,
   count: number = 5
 ): Promise<QuizQuestion[]> {
+  const prompt = buildPromptForCategory(category, count);
+  const systemPrompt = `You are a South African job market expert who creates educational content for job seekers. 
+  Create challenging but fair quiz questions with 4 multiple-choice options (a, b, c, d) for each question. 
+  One option must be correct. Include detailed explanations for why the correct answer is right.
+  Your output must be valid JSON.`;
+  
+  // First try xAI
   try {
-    const prompt = buildPromptForCategory(category, count);
+    console.log(`Generating ${count} quiz questions for category: ${category}`);
     
-    // Use the Grok model to generate questions
-    const response = await openai.chat.completions.create({
+    // Try using the Grok model to generate questions
+    const response = await xaiClient.chat.completions.create({
       model: "grok-2-1212",
       messages: [
-        {
-          role: "system",
-          content: `You are a South African job market expert who creates educational content for job seekers. 
-          Create challenging but fair quiz questions with 4 multiple-choice options (a, b, c, d) for each question. 
-          One option must be correct. Include detailed explanations for why the correct answer is right.
-          Your output must be valid JSON.`
-        },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
       response_format: { type: "json_object" }
@@ -40,10 +46,11 @@ export async function generateQuizQuestions(
     const result = JSON.parse(response.choices[0].message.content || "{}");
     
     if (!result.questions || !Array.isArray(result.questions)) {
-      console.error("Invalid response format from quiz generation");
-      return getFallbackQuestions(category, count);
+      throw new Error("Invalid response format from xAI quiz generation");
     }
 
+    console.log(`Successfully generated ${result.questions.length} questions using xAI`);
+    
     return result.questions.map((q: any) => ({
       text: q.text,
       options: q.options,
@@ -51,9 +58,38 @@ export async function generateQuizQuestions(
       explanation: q.explanation
     }));
   } catch (error) {
-    console.error("Error generating quiz questions:", error);
-    // Return fallback questions if API fails
-    return getFallbackQuestions(category, count);
+    console.log("xAI quiz generation failed, falling back to OpenAI:", error.message);
+    
+    // Try OpenAI as fallback
+    try {
+      const openaiResponse = await openaiClient.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" }
+      });
+      
+      const result = JSON.parse(openaiResponse.choices[0].message.content || "{}");
+      
+      if (!result.questions || !Array.isArray(result.questions)) {
+        throw new Error("Invalid response format from OpenAI quiz generation");
+      }
+      
+      console.log(`Successfully generated ${result.questions.length} questions using OpenAI fallback`);
+      
+      return result.questions.map((q: any) => ({
+        text: q.text,
+        options: q.options,
+        correctAnswer: q.correctAnswerIndex,
+        explanation: q.explanation
+      }));
+    } catch (openaiError) {
+      console.error("Both xAI and OpenAI failed for quiz generation:", openaiError);
+      // Fall back to static questions if both APIs fail
+      return getFallbackQuestions(category, count);
+    }
   }
 }
 
