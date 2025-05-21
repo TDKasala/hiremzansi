@@ -293,7 +293,7 @@ export default function ReferralPage() {
               
               <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
                 <p>
-                  <span className="font-medium">Payout Options:</span> Bank transfer, PayFast credit, or ATSBoost account credit. Minimum payout: R100.
+                  <span className="font-medium">Referral Benefits:</span> 3 friends = Free CV Deep Analysis, 10 friends = 1 month Premium account access.
                 </p>
               </div>
             </CardContent>
@@ -343,7 +343,7 @@ export default function ReferralPage() {
               <h3 className="font-bold mb-2">Is there a limit to how many rewards I can earn?</h3>
               <p className="text-muted-foreground">
                 No! You can earn multiple rewards. For every 3 referrals, you get another free CV Deep Analysis. 
-                At 5 referrals, you'll also unlock a free month of Premium access.
+                At 10 referrals, you'll unlock a free month of Premium account access.
               </p>
             </div>
           </div>
