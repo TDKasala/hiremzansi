@@ -36,6 +36,12 @@ export default function SkillQuizSection() {
   const [score, setScore] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [dynamicQuestions, setDynamicQuestions] = useState<Record<string, Question[]>>({
+    interview: [],
+    technical: [],
+    workplace: []
+  });
 
   const toggleCategoryExpansion = (categoryId: string) => {
     setExpandedCategories(prev => 
@@ -261,13 +267,51 @@ export default function SkillQuizSection() {
     setSelectedCategory(null);
   };
 
-  const handleCategorySelect = (categoryId: string) => {
+  // Function to fetch dynamic questions from our xAI-powered API
+  const fetchDynamicQuestions = async (categoryId: string) => {
+    setIsLoadingQuestions(true);
+    try {
+      const response = await fetch(`/api/quiz/${categoryId}?count=5`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch quiz questions');
+      }
+      
+      const data = await response.json();
+      
+      if (data.questions && Array.isArray(data.questions)) {
+        setDynamicQuestions(prev => ({
+          ...prev,
+          [categoryId]: data.questions
+        }));
+        
+        console.log(`Loaded ${data.questions.length} dynamic questions for ${categoryId}`);
+        return true;
+      } else {
+        throw new Error('Invalid question data received');
+      }
+    } catch (error) {
+      console.error('Error fetching quiz questions:', error);
+      toast({
+        title: "Couldn't load fresh questions",
+        description: "Using our pre-built questions for now.",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  };
+
+  const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setIsAnswerSubmitted(false);
     setScore(0);
     setQuizCompleted(false);
+    
+    // Try to fetch dynamic questions from our xAI API
+    await fetchDynamicQuestions(categoryId);
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -311,6 +355,16 @@ export default function SkillQuizSection() {
   };
 
   const getCurrentQuestion = (): Question | null => {
+    if (!selectedCategory) return null;
+    
+    // Check if we have dynamic questions for this category
+    const dynamicCategoryQuestions = dynamicQuestions[selectedCategory];
+    if (dynamicCategoryQuestions && dynamicCategoryQuestions.length > currentQuestionIndex) {
+      // Use dynamically generated questions from xAI
+      return dynamicCategoryQuestions[currentQuestionIndex];
+    }
+    
+    // Fall back to pre-built questions if dynamic ones aren't available
     const currentCategory = quizCategories.find(category => category.id === selectedCategory);
     if (!currentCategory) return null;
     return currentCategory.questions[currentQuestionIndex];

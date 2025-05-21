@@ -9,6 +9,7 @@ import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
 import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
 import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnalysisService";
+import { generateQuizQuestions } from "./services/quizGeneratorService";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -412,6 +413,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Mobile-optimized CV analysis routes for fast performance (<2s on 3G)
   app.use("/api", optimizedCvAnalysisRoutes);
+  
+  // Quiz Generator API using xAI
+  app.get("/api/quiz/:category", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { category } = req.params;
+      const count = req.query.count ? parseInt(req.query.count as string) : 5;
+      
+      // Validate category and count
+      const validCategories = ["interview", "technical", "workplace"];
+      const validCategory = validCategories.includes(category) ? category : "default";
+      const validCount = !isNaN(count) && count > 0 && count <= 10 ? count : 5;
+      
+      console.log(`Generating ${validCount} quiz questions for category: ${validCategory}`);
+      
+      // Generate quiz questions using xAI service
+      const questions = await generateQuizQuestions(validCategory, validCount);
+      
+      res.json({
+        category: validCategory,
+        questions
+      });
+    } catch (error) {
+      console.error("Error generating quiz questions:", error);
+      next(error);
+    }
+  });
   
   // Create HTTP server
   const httpServer = createServer(app);
