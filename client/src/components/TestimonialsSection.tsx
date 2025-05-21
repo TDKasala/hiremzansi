@@ -89,7 +89,7 @@ export default function TestimonialsSection() {
         </div>
         
         <div className="text-center mt-12">
-          <Link href="/signup">
+          <Link href="/auth">
             <Button className="bg-primary text-white hover:bg-opacity-90">
               Join Them Today
             </Button>
