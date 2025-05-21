@@ -14,10 +14,8 @@ const ATSSurvivalGuide2025: React.FC = () => {
       </Helmet>
       
       <div className="max-w-4xl mx-auto">
-        <Link href="/blog">
-          <a className="text-green-600 hover:underline mb-4 inline-block">
-            ← Back to Blog
-          </a>
+        <Link href="/blog" className="text-primary hover:underline mb-4 inline-block">
+          ← Back to Blog
         </Link>
         
         <div className="mb-8">
@@ -262,17 +260,13 @@ const ATSSurvivalGuide2025: React.FC = () => {
         <div className="mt-10 pt-10 border-t border-gray-200">
           <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/blog/ai-tools-resume-optimization">
-              <a className="p-6 border rounded-lg hover:shadow-md transition-all">
-                <h4 className="font-bold mb-2">AI Tools That Can Transform Your South African Resume</h4>
-                <p className="text-gray-600">Explore the best AI tools for South African job seekers.</p>
-              </a>
+            <Link href="/blog/ai-tools-resume-optimization" className="p-6 border rounded-lg hover:shadow-md transition-all block">
+              <h4 className="font-bold mb-2">AI Tools That Can Transform Your South African Resume</h4>
+              <p className="text-gray-600">Explore the best AI tools for South African job seekers.</p>
             </Link>
-            <Link href="/blog/industry-specific-cv-tips">
-              <a className="p-6 border rounded-lg hover:shadow-md transition-all">
-                <h4 className="font-bold mb-2">Industry-Specific CV Tips for South Africa's Growth Sectors</h4>
-                <p className="text-gray-600">Learn how to tailor your resume for South Africa's growing industries.</p>
-              </a>
+            <Link href="/blog/industry-specific-cv-tips" className="p-6 border rounded-lg hover:shadow-md transition-all block">
+              <h4 className="font-bold mb-2">Industry-Specific CV Tips for South Africa's Growth Sectors</h4>
+              <p className="text-gray-600">Learn how to tailor your resume for South Africa's growing industries.</p>
             </Link>
           </div>
         </div>

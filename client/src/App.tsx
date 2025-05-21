@@ -39,6 +39,7 @@ import SettingsPage from "@/pages/settings-page";
 import BlogPost1 from "@/pages/BlogPost1";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/not-found";
+import BlogDetailPage from "@/pages/BlogDetailPage";
 
 // Import job search pages
 import JobsPage from "@/pages/JobsPage";
@@ -98,6 +99,7 @@ function App() {
                   <Route path="/blog/b-bbee-impact-sa-resumes" component={BBBEEImpactSAResumes} />
                   <Route path="/blog/nqf-levels-explained" component={NQFLevelsExplained} />
                   <Route path="/blog/ats-survival-guide-2025" component={ATSSurvivalGuide2025} />
+                  <Route path="/blog/ATSSurvivalGuide2025" component={ATSSurvivalGuide2025} />
                   <Route path="/blog/remote-work-opportunities-sa" component={RemoteWorkOpportunitiesSA} />
                   <Route path="/blog/industry-specific-cv-tips" component={IndustrySpecificCVTips} />
                   <Route path="/blog/language-proficiency-cv" component={LanguageProficiencyCV} />
@@ -106,6 +108,9 @@ function App() {
                   <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
                   <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
                   <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
+                  
+                  {/* Generic blog detail page handler for dynamic paths */}
+                  <Route path="/blog/:slug" component={BlogDetailPage} />
                   
                   {/* Tool pages */}
                   <Route path="/tools/cover-letter" component={CoverLetterPage} />
