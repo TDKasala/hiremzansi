@@ -42,11 +42,11 @@ export default function HeroSection() {
                 {t('home.southAfricanFocused')}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                The South African Job Market Reality 
+                {t('home.marketReality')}
               </h1>
             </div>
             <p className="text-lg md:text-xl mb-6 text-white">
-              In today's competitive environment, your CV needs to stand out and pass through automated systems before it ever reaches human recruiters.
+              {t('home.marketDescription')}
             </p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
