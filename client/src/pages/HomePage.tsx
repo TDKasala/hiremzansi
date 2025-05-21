@@ -7,6 +7,7 @@ import FeaturesSection from "@/components/FeaturesSection";
 import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
+import ReferralSourceSection from "@/components/ReferralSourceSection";
 import CTASection from "@/components/CTASection";
 
 export default function HomePage() {
@@ -29,6 +30,7 @@ export default function HomePage() {
       <SuccessStoriesSection />
       <TestimonialsSection />
       <BlogPreviewSection />
+      <ReferralSourceSection />
       <CTASection />
     </>
   );
