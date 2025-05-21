@@ -4,6 +4,7 @@ import UploadSection from "@/components/UploadSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import PricingSection from "@/components/PricingSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import CTASection from "@/components/CTASection";
@@ -25,6 +26,7 @@ export default function HomePage() {
       <HowItWorksSection />
       <PricingSection />
       <FeaturesSection />
+      <SuccessStoriesSection />
       <TestimonialsSection />
       <BlogPreviewSection />
       <CTASection />
