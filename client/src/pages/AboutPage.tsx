@@ -89,20 +89,26 @@ export default function AboutPage() {
             </div>
             
             <div className="mb-12">
-              <h2 className="text-2xl font-bold text-secondary mb-6">Our Team</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                {teamMembers.map((member, index) => (
-                  <div key={index} className="text-center">
-                    <img 
-                      src={member.image} 
-                      alt={member.name} 
-                      className="w-40 h-40 rounded-full object-cover mx-auto mb-4"
-                    />
-                    <h3 className="font-bold text-lg">{member.name}</h3>
-                    <p className="text-primary mb-2">{member.title}</p>
-                    <p className="text-neutral-600 text-sm">{member.bio}</p>
+              <h2 className="text-2xl font-bold text-secondary mb-6 text-center">Our Team</h2>
+              <div className="max-w-3xl mx-auto bg-neutral-50 p-8 rounded-lg border border-neutral-200 shadow-sm">
+                <div className="text-center">
+                  <h3 className="font-bold text-2xl mb-2">Denis Kasala</h3>
+                  <p className="text-primary font-semibold mb-4">Founder & Lead Developer</p>
+                  <div className="text-neutral-700 space-y-4">
+                    <p>
+                      Denis founded ATSBoost in 2023 after witnessing South Africa's growing unemployment crisis and the technical barriers job seekers face in the modern hiring process.
+                    </p>
+                    <p>
+                      With over 5 years of experience in software development and AI technologies, Denis combines technical expertise with a deep understanding of South Africa's unique job market challenges.
+                    </p>
+                    <p>
+                      Prior to ATSBoost, Denis worked as a solutions architect developing enterprise applications for several South African companies. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.
+                    </p>
+                    <p>
+                      Denis holds a BSc in Computer Science from University of Cape Town and is an active advocate for technology education initiatives across South Africa.
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
             
