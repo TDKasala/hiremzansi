@@ -1,335 +1,425 @@
 import twilio from 'twilio';
-import { storage } from '../storage';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-import { v4 as uuidv4 } from 'uuid';
+import { storage } from '../storage';
 import { aiService } from './aiService';
+import crypto from 'crypto';
 
 const writeFileAsync = promisify(fs.writeFile);
 const mkdirAsync = promisify(fs.mkdir);
 
+// Check if required environment variables are set
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+// Initialize Twilio client if credentials are available
+let twilioClient: twilio.Twilio | null = null;
+if (accountSid && authToken) {
+  twilioClient = twilio(accountSid, authToken);
+} else {
+  console.warn('WhatsApp service not configured. Missing environment variables.');
+}
+
 /**
- * WhatsApp Notification Service for ATSBoost
- * 
- * This service handles sending notifications to users via WhatsApp
- * Uses the WhatsApp Business API through Twilio
+ * Service for handling WhatsApp interactions
  */
-export class WhatsAppService {
-  private client: twilio.Twilio | null = null;
-  private config: WhatsAppConfig = {
-    enabled: false
-  };
-
-  constructor() {
-    this.initializeClient();
-  }
-
-  private initializeClient() {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const phoneNumber = process.env.TWILIO_WHATSAPP_NUMBER;
-
-    if (accountSid && authToken && phoneNumber) {
-      this.client = twilio(accountSid, authToken);
-      this.config = {
-        enabled: true,
-        accountSid,
-        authToken,
-        phoneNumber
-      };
-      console.log('WhatsApp service initialized successfully');
-    } else {
-      console.warn('WhatsApp service not configured. Missing environment variables.');
-      this.config.enabled = false;
-      this.client = null;
+class WhatsAppService {
+  /**
+   * Process incoming webhook from WhatsApp
+   */
+  async processWebhook(payload: any): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('Processing WhatsApp webhook:', JSON.stringify(payload, null, 2));
+      
+      // Check if this is a media message (CV upload)
+      if (payload.NumMedia && parseInt(payload.NumMedia) > 0) {
+        return await this.handleMediaMessage(payload);
+      } 
+      
+      // Handle text message
+      if (payload.Body) {
+        return await this.handleTextMessage(payload);
+      }
+      
+      return { success: true, message: 'Webhook received, but no actionable content' };
+    } catch (error) {
+      console.error('Error processing WhatsApp webhook:', error);
+      return { success: false, message: 'Error processing webhook' };
     }
   }
-
+  
   /**
-   * Send a message to a WhatsApp number
+   * Handle media messages (CV uploads)
    */
-  async sendMessage(to: string, body: string): Promise<boolean> {
-    if (!this.client || !this.config.enabled || !this.config.phoneNumber) {
-      console.warn('WhatsApp service not configured or disabled');
+  private async handleMediaMessage(payload: any): Promise<{ success: boolean; message: string }> {
+    const from = payload.From;
+    const numMedia = parseInt(payload.NumMedia);
+    
+    // Only process the first media item if multiple are sent
+    if (numMedia > 0) {
+      const mediaUrl = payload.MediaUrl0;
+      const contentType = payload.MediaContentType0;
+      
+      // Check if media type is supported (PDF, DOC, DOCX)
+      if (this.isSupportedFileType(contentType)) {
+        try {
+          // Download the file
+          const filePath = await this.downloadFile(mediaUrl, contentType);
+          
+          // Find or create user by phone number
+          const user = await this.findOrCreateUserByPhone(from);
+          
+          if (user) {
+            // Save the CV to the database
+            const cv = await this.saveCV(user.id, filePath, contentType);
+            
+            // Analyze the CV
+            const analysis = await this.analyzeCV(cv.id);
+            
+            // Send the analysis results back via WhatsApp
+            await this.sendAnalysisResults(from, analysis);
+            
+            return { 
+              success: true, 
+              message: 'CV received, analyzed, and results sent' 
+            };
+          }
+          
+          return { 
+            success: false, 
+            message: 'Error finding or creating user' 
+          };
+        } catch (err) {
+          console.error('Error processing media file:', err);
+          this.sendSimpleMessage(from, 'Sorry, we had an issue processing your CV. Please try again or upload in a different format.');
+          return { success: false, message: 'Error processing media file' };
+        }
+      } else {
+        // Unsupported file type
+        this.sendSimpleMessage(from, 
+          'Sorry, we only support CV files in PDF, DOC, or DOCX format. Please upload your CV in one of these formats.'
+        );
+        return { 
+          success: false, 
+          message: 'Unsupported file type' 
+        };
+      }
+    }
+    
+    return { success: false, message: 'No media found' };
+  }
+  
+  /**
+   * Handle text messages
+   */
+  private async handleTextMessage(payload: any): Promise<{ success: boolean; message: string }> {
+    const from = payload.From;
+    const message = payload.Body.trim().toLowerCase();
+    
+    // Basic command handling
+    if (message === 'help') {
+      this.sendSimpleMessage(from, 
+        'Welcome to ATSBoost! To get your CV analyzed, simply send your CV as a file attachment. ' +
+        'We support PDF, DOC, and DOCX formats. For more information, visit our website at atsboost.co.za'
+      );
+      return { success: true, message: 'Help message sent' };
+    } 
+    else if (message === 'feedback') {
+      this.sendSimpleMessage(from, 
+        'Thanks for using ATSBoost! We'd love to hear your feedback. ' +
+        'Please let us know how our service has helped with your job search journey.'
+      );
+      return { success: true, message: 'Feedback request sent' };
+    }
+    else {
+      // Default response for other text messages
+      this.sendSimpleMessage(from, 
+        'To get your CV analyzed, please send your CV as a file attachment (PDF, DOC, or DOCX). ' +
+        'Type "help" for more information.'
+      );
+      return { success: true, message: 'Default instruction sent' };
+    }
+  }
+  
+  /**
+   * Check if a file type is supported
+   */
+  private isSupportedFileType(contentType: string): boolean {
+    const supportedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    return supportedTypes.includes(contentType);
+  }
+  
+  /**
+   * Download file from media URL
+   */
+  private async downloadFile(url: string, contentType: string): Promise<string> {
+    // Create uploads directory if it doesn't exist
+    const uploadsDir = path.join(process.cwd(), 'uploads');
+    try {
+      await mkdirAsync(uploadsDir, { recursive: true });
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
+    
+    // Generate a unique filename
+    const fileExt = this.getFileExtension(contentType);
+    const fileName = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${fileExt}`;
+    const filePath = path.join(uploadsDir, fileName);
+    
+    // Fetch and save the file
+    // Simplified version - in a real app we'd use another package like axios/node-fetch
+    const response = await fetch(url);
+    const buffer = await response.arrayBuffer();
+    await writeFileAsync(filePath, Buffer.from(buffer));
+    
+    return filePath;
+  }
+  
+  /**
+   * Get file extension based on content type
+   */
+  private getFileExtension(contentType: string): string {
+    switch (contentType) {
+      case 'application/pdf':
+        return '.pdf';
+      case 'application/msword':
+        return '.doc';
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return '.docx';
+      default:
+        return '.txt';
+    }
+  }
+  
+  /**
+   * Find or create a user by phone number
+   */
+  private async findOrCreateUserByPhone(phoneNumber: string): Promise<any> {
+    // Clean phone number
+    const cleanedNumber = this.cleanPhoneNumber(phoneNumber);
+    
+    // Check if user with this phone number already exists
+    const existingUser = await storage.getUserByPhoneNumber(cleanedNumber);
+    
+    if (existingUser) {
+      return existingUser;
+    }
+    
+    // Create a new temporary user
+    const username = `whatsapp_${Date.now()}`;
+    const password = crypto.randomBytes(16).toString('hex');
+    
+    const newUser = await storage.createUser({
+      username, 
+      password, 
+      email: 'placeholder@example.com', 
+      phoneNumber: cleanedNumber,
+      phoneVerified: true,
+      isTemporary: true
+    });
+    
+    return newUser;
+  }
+  
+  /**
+   * Save CV to database
+   */
+  private async saveCV(userId: number, filePath: string, contentType: string): Promise<any> {
+    // Get filename from path
+    const fileName = path.basename(filePath);
+    
+    // Get file size
+    const stats = fs.statSync(filePath);
+    const fileSize = stats.size;
+    
+    // Create CV record
+    const cv = await storage.createCV({
+      userId,
+      fileName,
+      filePath,
+      fileType: contentType,
+      fileSize,
+      uploadMethod: 'whatsapp',
+      content: 'CV content will be extracted later',
+      title: 'CV uploaded via WhatsApp'
+    });
+    
+    return cv;
+  }
+  
+  /**
+   * Analyze CV and generate ATS score
+   */
+  private async analyzeCV(cvId: number): Promise<any> {
+    // Get CV details
+    const cv = await storage.getCV(cvId);
+    
+    if (!cv) {
+      throw new Error('CV not found');
+    }
+    
+    // Extract text from CV file
+    const text = await aiService.extractTextFromCV(cv.filePath || '');
+    
+    // Update CV with extracted text
+    await storage.updateCV(cv.id, { content: text });
+    
+    // Analyze the CV text
+    const analysis = await aiService.analyzeCVText(text);
+    
+    // Create ATS score record
+    const atsScore = await storage.createATSScore({
+      cvId: cv.id,
+      score: analysis.score,
+      skillsScore: analysis.skillsScore,
+      contextScore: analysis.contextScore,
+      formatScore: analysis.formatScore,
+      issues: analysis.issues,
+      strengths: analysis.strengths,
+      improvements: analysis.improvements,
+      breakdown: analysis.breakdown
+    });
+    
+    return {
+      cv,
+      atsScore,
+      recommendations: analysis.improvements
+    };
+  }
+  
+  /**
+   * Send analysis results via WhatsApp
+   */
+  private async sendAnalysisResults(to: string, analysis: any): Promise<boolean> {
+    if (!twilioClient || !twilioPhoneNumber) {
+      console.error('Cannot send analysis results: Twilio not configured');
       return false;
     }
-
+    
+    const { cv, atsScore } = analysis;
+    
+    // Build a message with the ATS score and recommendations
+    let message = `📄 *ATS Score Analysis* 📄\n\n`;
+    message += `Your CV scored *${atsScore.score}/100* on our ATS compatibility check.\n\n`;
+    message += `*Breakdown:*\n`;
+    message += `• Format: ${atsScore.formatScore}/40\n`;
+    message += `• Skills: ${atsScore.skillsScore}/40\n`;
+    message += `• SA Context: ${atsScore.contextScore}/20\n\n`;
+    
+    message += `*Top Recommendations:*\n`;
+    if (analysis.recommendations && analysis.recommendations.length > 0) {
+      analysis.recommendations.slice(0, 3).forEach((rec, i) => {
+        message += `${i + 1}. ${rec}\n`;
+      });
+    } else {
+      message += `No specific recommendations at this time.\n`;
+    }
+    
+    message += `\n📱 Get your complete analysis at atsboost.co.za\n`;
+    
     try {
-      // Format the 'to' number to WhatsApp format if it's not already
-      let formattedTo = to;
-      if (!to.startsWith('whatsapp:')) {
-        // Remove any non-digit characters and ensure proper format
-        const digitsOnly = to.replace(/\D/g, '');
-        
-        // Add country code if it's missing (assuming South African number)
-        if (digitsOnly.startsWith('0')) {
-          formattedTo = `whatsapp:+27${digitsOnly.substring(1)}`;
-        } else if (!digitsOnly.startsWith('27') && !digitsOnly.startsWith('+27')) {
-          formattedTo = `whatsapp:+27${digitsOnly}`;
-        } else {
-          formattedTo = `whatsapp:+${digitsOnly.replace(/^\+/, '')}`;
-        }
-      }
-
-      await this.client.messages.create({
-        from: `whatsapp:${this.config.phoneNumber}`,
-        to: formattedTo,
-        body
+      await twilioClient.messages.create({
+        body: message,
+        from: twilioPhoneNumber,
+        to: to
       });
       
       return true;
     } catch (error) {
-      console.error('Failed to send WhatsApp message:', error);
+      console.error('Error sending WhatsApp analysis:', error);
       return false;
     }
   }
-
+  
   /**
-   * Send a verification code to a WhatsApp number
+   * Send a simple WhatsApp message
    */
-  async sendVerificationCode(phoneNumber: string, code: string): Promise<boolean> {
-    const message = `Your ATSBoost verification code is: ${code}. This code will expire in 10 minutes.`;
-    return this.sendMessage(phoneNumber, message);
-  }
-
-  /**
-   * Send CV analysis results via WhatsApp
-   */
-  async sendATSScoreResults(phoneNumber: string, score: number, recommendations: string[]): Promise<boolean> {
-    let message = `📊 Your ATSBoost CV Score: ${score}/100\n\n`;
+  private async sendSimpleMessage(to: string, message: string): Promise<boolean> {
+    if (!twilioClient || !twilioPhoneNumber) {
+      console.error('Cannot send message: Twilio not configured');
+      return false;
+    }
     
-    if (recommendations.length > 0) {
-      message += '🔍 Top Recommendations:\n';
-      
-      // Include up to 3 recommendations to keep the message manageable
-      recommendations.slice(0, 3).forEach((rec, index) => {
-        message += `${index + 1}. ${rec}\n`;
+    try {
+      await twilioClient.messages.create({
+        body: message,
+        from: twilioPhoneNumber,
+        to: to
       });
       
-      message += '\n';
-    }
-    
-    message += '🌐 View your full analysis at: https://atsboost.co.za/dashboard\n\n';
-    message += 'Reply with "HELP" for assistance or "STOP" to unsubscribe.';
-    
-    return this.sendMessage(phoneNumber, message);
-  }
-
-  /**
-   * Process a WhatsApp webhook for uploaded documents
-   * This handles incoming files (CV uploads) via WhatsApp
-   */
-  async processWebhook(payload: any): Promise<any> {
-    if (!this.client || !this.config.enabled) {
-      console.warn('WhatsApp service not configured or disabled');
-      return { success: false, error: 'Service not available' };
-    }
-
-    try {
-      // Extract the necessary information from the webhook payload
-      const numMedia = parseInt(payload.NumMedia || '0');
-      const from = payload.From; // WhatsApp number in format 'whatsapp:+1234567890'
-      const cleanedFrom = from.replace('whatsapp:', '');
-      
-      // Check if there's any media (document) attached
-      if (numMedia > 0) {
-        // Get first media item (assuming it's a CV)
-        const mediaUrl = payload.MediaUrl0;
-        const contentType = payload.MediaContentType0;
-        
-        // Verify if it's a document (PDF or DOCX)
-        if (contentType === 'application/pdf' || 
-            contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-            contentType === 'application/msword') {
-          
-          // Download the document
-          const response = await fetch(mediaUrl);
-          const buffer = await response.arrayBuffer();
-          
-          // Create uploads directory if it doesn't exist
-          const uploadsDir = path.join(process.cwd(), 'uploads');
-          try {
-            await mkdirAsync(uploadsDir, { recursive: true });
-          } catch (err) {
-            if (err.code !== 'EEXIST') throw err;
-          }
-          
-          // Generate a unique filename
-          const fileExtension = contentType === 'application/pdf' ? '.pdf' : 
-                               (contentType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? '.docx' : '.doc');
-          const filename = `whatsapp_cv_${uuidv4()}${fileExtension}`;
-          const filePath = path.join(uploadsDir, filename);
-          
-          // Save the file
-          await writeFileAsync(filePath, Buffer.from(buffer));
-          
-          // Find user by WhatsApp number or create a temporary user
-          let user = await storage.getUserByPhoneNumber(cleanedFrom);
-          
-          if (!user) {
-            // Create a temporary user for this WhatsApp number
-            const tempUser = {
-              username: `whatsapp_${uuidv4().substring(0, 8)}`,
-              password: uuidv4(), // Random password, user can reset later
-              email: null,
-              phoneNumber: cleanedFrom,
-              isTemporary: true
-            };
-            
-            user = await storage.createUser(tempUser);
-          }
-          
-          // Create CV record in database
-          const cv = await storage.createCV({
-            userId: user.id,
-            fileName: filename,
-            filePath: filePath,
-            fileType: contentType,
-            fileSize: buffer.byteLength,
-            uploadMethod: 'whatsapp'
-          });
-          
-          // Process the CV and get ATS score
-          await this.processAndAnalyzeCV(cv.id, cleanedFrom);
-          
-          // Send confirmation message
-          await this.sendMessage(from, 
-            "✅ Your CV has been received! We're analyzing it now and will send you the results shortly. " +
-            "This usually takes 1-2 minutes."
-          );
-          
-          return { 
-            success: true, 
-            message: 'CV received and being processed',
-            userId: user.id,
-            cvId: cv.id
-          };
-        } else {
-          // Not a supported document type
-          await this.sendMessage(from, 
-            "❌ Sorry, we only accept CV files in PDF, DOCX, or DOC format. Please send your CV in one of these formats."
-          );
-          
-          return { 
-            success: false, 
-            error: 'Unsupported file type' 
-          };
-        }
-      } else {
-        // Handle text messages - provide instructions
-        const message = payload.Body?.trim().toLowerCase();
-        
-        if (message === 'help') {
-          await this.sendMessage(from, 
-            "📋 *ATSBoost Help*\n\n" +
-            "To analyze your CV, simply send it as a PDF or DOCX file.\n\n" +
-            "Commands:\n" +
-            "- Send CV file: Upload your CV for analysis\n" +
-            "- HELP: Show this help message\n" +
-            "- STOP: Unsubscribe from notifications\n\n" +
-            "Visit https://atsboost.co.za for more information."
-          );
-        } else {
-          await this.sendMessage(from, 
-            "👋 Welcome to ATSBoost!\n\n" +
-            "To analyze your CV, please send it as a PDF or DOCX file.\n\n" +
-            "Once analyzed, we'll send you your ATS score and recommendations to improve your CV for the South African job market."
-          );
-        }
-        
-        return { 
-          success: true, 
-          message: 'Instructions sent' 
-        };
-      }
+      return true;
     } catch (error) {
-      console.error('Error processing WhatsApp webhook:', error);
-      return { 
-        success: false, 
-        error: 'Failed to process request' 
-      };
+      console.error('Error sending WhatsApp message:', error);
+      return false;
     }
   }
-
+  
   /**
-   * Process and analyze the uploaded CV
-   */
-  private async processAndAnalyzeCV(cvId: number, phoneNumber: string): Promise<void> {
-    try {
-      // Start analysis in the background
-      setTimeout(async () => {
-        try {
-          // Get CV details
-          const cv = await storage.getCV(cvId);
-          if (!cv) {
-            console.error(`CV with ID ${cvId} not found`);
-            return;
-          }
-
-          // Check if CV has already been analyzed
-          let atsScore = await storage.getATSScoreByCV(cvId);
-          
-          // If not, analyze it
-          if (!atsScore) {
-            // Extract text from CV
-            const cvText = await aiService.extractTextFromCV(cv.filePath);
-            
-            // Analyze the CV
-            const analysisResult = await aiService.analyzeCVText(cvText);
-            
-            // Save ATS score and recommendations
-            atsScore = await storage.createATSScore({
-              cvId,
-              score: analysisResult.score,
-              breakdown: analysisResult.breakdown,
-              recommendations: analysisResult.recommendations
-            });
-          }
-          
-          // Format recommendations for WhatsApp
-          const formattedRecommendations = atsScore.recommendations
-            .map(rec => rec.suggestion)
-            .slice(0, 5); // Take top 5 recommendations
-          
-          // Send results via WhatsApp
-          await this.sendATSScoreResults(phoneNumber, atsScore.score, formattedRecommendations);
-          
-        } catch (error) {
-          console.error('Error in background CV analysis:', error);
-          // Send error message to user
-          this.sendMessage(phoneNumber, 
-            "❌ Sorry, we encountered an error while analyzing your CV. Please try again or visit our website at https://atsboost.co.za for assistance."
-          );
-        }
-      }, 100); // Start processing immediately but don't block the response
-    } catch (error) {
-      console.error('Failed to process CV:', error);
-    }
-  }
-
-  /**
-   * Send WhatsApp upload instructions to a user
+   * Send upload instructions via WhatsApp
    */
   async sendUploadInstructions(phoneNumber: string): Promise<boolean> {
     const message = 
-      "📄 *Upload Your CV via WhatsApp*\n\n" +
-      "To analyze your CV using ATSBoost, please:\n\n" +
-      "1️⃣ Save your CV as a PDF or DOCX file\n" +
-      "2️⃣ Send that file to this WhatsApp number\n" +
-      "3️⃣ Wait for your analysis (typically 1-2 minutes)\n\n" +
-      "We'll send your ATS score and personalized recommendations to improve your CV for the South African job market.";
+      `📄 *Upload Your CV via WhatsApp* 📄\n\n` +
+      `Thanks for using ATSBoost! You can now upload your CV directly through WhatsApp for instant ATS scoring.\n\n` +
+      `*How to upload:*\n` +
+      `1. Find your CV file (PDF or Word document)\n` +
+      `2. Send it as an attachment to this chat\n` +
+      `3. Wait for your ATS score and recommendations\n\n` +
+      `Your CV will be automatically analyzed by our AI system to maximize your chances of getting past Applicant Tracking Systems.`;
     
-    return this.sendMessage(phoneNumber, message);
+    // Format phone number properly
+    const formattedNumber = this.cleanPhoneNumber(phoneNumber);
+    
+    return await this.sendSimpleMessage(formattedNumber, message);
+  }
+  
+  /**
+   * Send verification code via WhatsApp
+   */
+  async sendVerificationCode(phoneNumber: string, code: string): Promise<boolean> {
+    const message = 
+      `📱 *Your ATSBoost Verification Code* 📱\n\n` +
+      `Your verification code is: *${code}*\n\n` +
+      `This code will expire in 10 minutes.\n\n` +
+      `If you didn't request this code, please ignore this message.`;
+    
+    // Format phone number properly
+    const formattedNumber = this.cleanPhoneNumber(phoneNumber);
+    
+    return await this.sendSimpleMessage(formattedNumber, message);
+  }
+  
+  /**
+   * Clean phone number to standard format
+   */
+  private cleanPhoneNumber(phoneNumber: string): string {
+    // Remove any non-digits
+    let digits = phoneNumber.replace(/\D/g, '');
+    
+    // For WhatsApp numbers with standard format "whatsapp:+27712345678"
+    if (phoneNumber.startsWith('whatsapp:')) {
+      return phoneNumber;
+    }
+    
+    // If it's a South African number starting with 0, replace with +27
+    if (digits.startsWith('0') && digits.length === 10) {
+      digits = `27${digits.substring(1)}`;
+    }
+    
+    // Ensure it has the whatsapp: prefix and + for the country code
+    if (!digits.startsWith('27') && digits.length === 9) {
+      digits = `27${digits}`;
+    }
+    
+    return `whatsapp:+${digits}`;
   }
 }
 
-interface WhatsAppConfig {
-  enabled: boolean;
-  accountSid?: string; 
-  authToken?: string;
-  phoneNumber?: string;
-}
-
-// Singleton instance
 export const whatsappService = new WhatsAppService();

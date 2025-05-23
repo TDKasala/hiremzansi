@@ -86,7 +86,7 @@ const WhatsAppUploadPage: React.FC = () => {
           
           <div className="space-y-2">
             <h3 className="font-medium">{t('How long does the analysis take?')}</h3>
-            <p className="text-muted-foreground">{t('You'll receive your ATS score and key recommendations within 2 minutes.')}</p>
+            <p className="text-muted-foreground">{t('You will receive your ATS score and key recommendations within 2 minutes.')}</p>
           </div>
           
           <div className="space-y-2">

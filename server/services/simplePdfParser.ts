@@ -1,145 +1,88 @@
-/**
- * Simple PDF Parser Service with OCR Support
- * 
- * This service provides PDF text extraction for CV analysis with OCR support
- * using Tesseract.js when needed
- */
+import fs from 'fs';
+import { promisify } from 'util';
+import { exec as execCallback } from 'child_process';
 
-import Tesseract from 'tesseract.js';
+const exec = promisify(execCallback);
+const readFileAsync = promisify(fs.readFile);
 
 /**
- * Extract text from PDF buffer with fallbacks for reliability
+ * Extracts text from a PDF file using a simple, reliable approach
+ * This function serves as a fallback when other PDF parsing methods fail
  * 
- * @param pdfBuffer PDF file buffer
- * @returns Extracted text content
+ * @param filePath Path to the PDF file
+ * @returns Extracted text from the PDF
  */
-export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<string> {
+export async function extractTextFromPDF(filePath: string): Promise<string> {
   try {
-    console.log("Starting resilient PDF text extraction");
-    
-    // Simple direct text extraction - fastest method for mobile optimization
-    let extractedText = "";
+    // First try using a basic extraction approach
     try {
-      extractedText = pdfBuffer.toString('utf-8')
-        .replace(/[^\x20-\x7E\r\n]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+      // Read first 5 pages only for quick processing
+      const { stdout } = await exec(`pdftotext -f 1 -l 5 -layout "${filePath}" -`);
       
-      console.log("Simple extraction completed with text length:", extractedText.length);
-    } catch (err) {
-      console.error("Simple extraction failed:", err);
-      extractedText = "";
-    }
-    
-    // If simple extraction didn't get enough text, try to extract more content
-    if (extractedText.length < 500 || !hasProperTextContent(extractedText)) {
-      console.log("Simple extraction insufficient, extracting additional content");
-      
-      // Extract key resume sections using regex patterns
-      try {
-        // Try to extract key CV sections
-        const experienceMatch = extractedText.match(/experience|work history|employment|career|professional background/i);
-        const educationMatch = extractedText.match(/education|qualifications|training|academic|schooling/i);
-        const skillsMatch = extractedText.match(/skills|abilities|competencies|expertise|proficiencies/i);
-        
-        if (experienceMatch || educationMatch || skillsMatch) {
-          console.log("Found key CV sections in the text");
-        } else {
-          console.log("Key CV sections not found, using available text");
-        }
-        
-        // Add common South African keywords to help the analysis
-        extractedText += "\n\nSOUTH AFRICAN CV KEYWORDS:\n";
-        extractedText += "South Africa\nJohannesburg\nPretoria\nCape Town\nDurban\n";
-        extractedText += "B-BBEE\nNQF Level\nMatric\nSAQA\nEnglish\nAfrikaans\nZulu\nXhosa\n";
-      } catch (err) {
-        console.error("Error extracting additional content:", err);
+      if (stdout.trim().length > 100) {
+        console.log('PDF text extracted successfully using pdftotext');
+        return stdout;
       }
+    } catch (err) {
+      console.log('pdftotext extraction failed, trying fallback method');
     }
     
-    // If we still don't have enough content, create a sample response
-    if (extractedText.length < 200) {
-      console.log("Text extraction produced insufficient results");
-      extractedText = "This appears to be a scanned PDF. For better results, please upload a PDF with selectable text or try another document.";
+    // Fallback method - read raw binary and attempt to extract text
+    const data = await readFileAsync(filePath);
+    let text = data.toString('utf8', 0, data.length);
+    
+    // Clean up text by removing non-printable characters and decode some common PDF encodings
+    text = text.replace(/[^\x20-\x7E\n\r\t]/g, ' ')
+               .replace(/\\(\d{3})/g, (match, octal) => String.fromCharCode(parseInt(octal, 8)))
+               .replace(/\\n/g, '\n')
+               .replace(/\\r/g, '\r')
+               .replace(/\\t/g, '\t');
+    
+    // Extract text between common PDF text markers
+    const textBlocks: string[] = [];
+    
+    // Look for PDF text objects
+    const textMatches = text.match(/BT\s+([^]*)ET/g);
+    if (textMatches && textMatches.length > 0) {
+      textMatches.forEach(block => {
+        // Extract text strings from PDF commands
+        const stringMatches = block.match(/\(([^)]+)\)/g);
+        if (stringMatches) {
+          stringMatches.forEach(str => {
+            textBlocks.push(str.replace(/^\(|\)$/g, ''));
+          });
+        }
+      });
     }
     
-    // Process and clean the extracted text
-    return processExtractedText(extractedText);
+    // If we found text blocks, join them
+    if (textBlocks.length > 0) {
+      return textBlocks.join(' ');
+    }
     
-  } catch (error: any) {
-    console.error("PDF extraction failed:", error);
-    return "PDF text extraction failed. Please try another document format.";
-  }
-}
-
-/**
- * Check if the extracted text appears to have proper content
- * 
- * @param text Extracted text to check
- * @returns Boolean indicating if text appears to be proper content
- */
-function hasProperTextContent(text: string): boolean {
-  // Check for common CV section headers
-  const cvSectionHeaders = [
-    'experience', 'education', 'skills', 'profile', 'summary', 'objective',
-    'work', 'employment', 'qualifications', 'projects', 'references'
-  ];
-  
-  // Convert to lowercase for case-insensitive matching
-  const lowerText = text.toLowerCase();
-  
-  // Check if at least 2 section headers are present
-  const foundHeaders = cvSectionHeaders.filter(header => lowerText.includes(header));
-  
-  return foundHeaders.length >= 2;
-}
-
-/**
- * Extract text from PDF using OCR
- * 
- * @param pdfBuffer PDF file buffer
- * @returns OCR extracted text
- */
-async function extractTextWithOCR(pdfBuffer: Buffer): Promise<string> {
-  try {
-    console.log("Starting OCR text extraction with Tesseract.js");
+    // Fallback to a simple filter of content between parentheses which often contains text in PDFs
+    const parenMatches = text.match(/\(([^)]+)\)/g);
+    if (parenMatches && parenMatches.length > 0) {
+      return parenMatches
+        .map(m => m.replace(/^\(|\)$/g, ''))
+        .filter(s => s.length > 3)  // Filter out very short strings
+        .join(' ');
+    }
     
-    // Initialize Tesseract worker with English language
-    const worker = await Tesseract.createWorker('eng');
+    // Worst case, return whatever text we have after cleaning
+    const cleanedText = text
+      .replace(/[\x00-\x1F\x7F-\xFF]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+      
+    if (cleanedText.length > 100) {
+      return cleanedText;
+    }
     
-    // Recognize text from the buffer
-    const { data } = await worker.recognize(pdfBuffer);
-    
-    // Terminate the worker
-    await worker.terminate();
-    
-    return data.text;
+    // If all else fails, return a message
+    return "PDF text extraction failed. This PDF may be image-based or heavily encrypted. Please try a different file format.";
   } catch (error) {
-    console.error("OCR extraction failed:", error);
-    return "OCR text extraction failed. Please upload a PDF with text content.";
+    console.error('Error in PDF text extraction:', error);
+    return "PDF text extraction error. Please try uploading in another format.";
   }
 }
-
-/**
- * Process and clean up extracted text
- * 
- * @param text Raw extracted text
- * @returns Processed text
- */
-function processExtractedText(text: string): string {
-  if (!text) return "";
-  
-  // Remove excessive whitespace and normalize line breaks
-  let processed = text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-  
-  return processed;
-}
-
-export default {
-  extractTextFromPDF
-};
