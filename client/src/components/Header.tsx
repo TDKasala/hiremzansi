@@ -30,6 +30,7 @@ export default function Header() {
 
   const navLinks = [
     { href: "/", label: t('common.home') },
+    { href: "/templates", label: "CV Templates" },
     { href: "/job-sites", label: "Job Board" },
     { href: "/pricing", label: t('common.pricing') },
     { href: "/refer", label: t('common.refer') },
