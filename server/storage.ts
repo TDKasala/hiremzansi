@@ -131,6 +131,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
   
+  async getUserByPhoneNumber(phoneNumber: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
+    return user;
+  }
+  
   async getUserByResetToken(token: string): Promise<User | undefined> {
     try {
       // Now that resetToken is part of our schema, we can use it directly

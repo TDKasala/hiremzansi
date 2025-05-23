@@ -414,6 +414,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mobile-optimized CV analysis routes for fast performance (<2s on 3G)
   app.use("/api", optimizedCvAnalysisRoutes);
   
+  // WhatsApp Integration Routes
+  
+  // Endpoint to handle WhatsApp webhook - for receiving messages and CV files
+  app.post("/api/whatsapp/webhook", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await whatsappService.processWebhook(req.body);
+      res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+      console.error('Error processing WhatsApp webhook:', error);
+      next(error);
+    }
+  });
+
+  // Endpoint to send WhatsApp upload instructions to a user
+  app.post("/api/whatsapp/send-instructions", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { phoneNumber } = req.body;
+      
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
+      }
+      
+      const success = await whatsappService.sendUploadInstructions(phoneNumber);
+      
+      if (success) {
+        // If the user has a phone number saved, update it
+        if (req.user && (!req.user.phoneNumber || req.user.phoneNumber !== phoneNumber)) {
+          await storage.updateUser(req.user.id, { phoneNumber });
+        }
+        
+        res.status(200).json({ message: "Instructions sent successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to send instructions" });
+      }
+    } catch (error) {
+      console.error('Error sending WhatsApp instructions:', error);
+      next(error);
+    }
+  });
+
+  // Endpoint to verify WhatsApp number
+  app.post("/api/whatsapp/verify", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { phoneNumber } = req.body;
+      
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
+      }
+      
+      // Generate a random 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Store the verification code
+      const tokenExpiry = new Date();
+      tokenExpiry.setMinutes(tokenExpiry.getMinutes() + 10); // 10 minutes expiry
+      
+      await storage.updateUser(req.user.id, { 
+        verificationToken: verificationCode,
+        verificationTokenExpiry: tokenExpiry
+      });
+      
+      // Send the verification code via WhatsApp
+      const success = await whatsappService.sendVerificationCode(phoneNumber, verificationCode);
+      
+      if (success) {
+        res.status(200).json({ message: "Verification code sent" });
+      } else {
+        res.status(500).json({ error: "Failed to send verification code" });
+      }
+    } catch (error) {
+      console.error('Error sending verification code:', error);
+      next(error);
+    }
+  });
+
+  // Endpoint to confirm WhatsApp verification
+  app.post("/api/whatsapp/confirm", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { code, phoneNumber } = req.body;
+      
+      if (!code || !phoneNumber) {
+        return res.status(400).json({ error: "Verification code and phone number are required" });
+      }
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if the verification code matches and hasn't expired
+      if (user.verificationToken !== code) {
+        return res.status(400).json({ error: "Invalid verification code" });
+      }
+      
+      const now = new Date();
+      if (!user.verificationTokenExpiry || now > user.verificationTokenExpiry) {
+        return res.status(400).json({ error: "Verification code has expired" });
+      }
+      
+      // Verification successful, update the user's phone information
+      await storage.updateUser(user.id, {
+        phoneNumber,
+        phoneVerified: true,
+        verificationToken: null,
+        verificationTokenExpiry: null
+      });
+      
+      // If the user has a South African profile, update the WhatsApp settings there too
+      const saProfile = await storage.getSaProfileByUserId(user.id);
+      if (saProfile) {
+        await storage.updateSaProfile(saProfile.id, {
+          whatsappNumber: phoneNumber,
+          whatsappVerified: true,
+          whatsappEnabled: true
+        });
+      }
+      
+      res.status(200).json({ message: "WhatsApp number verified successfully" });
+    } catch (error) {
+      console.error('Error confirming verification:', error);
+      next(error);
+    }
+  });
+
+  // Endpoint to get WhatsApp settings
+  app.get("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if the user has a South African profile
+      const saProfile = await storage.getSaProfileByUserId(user.id);
+      
+      let settings = {
+        enabled: false,
+        phoneNumber: user.phoneNumber || null,
+        verified: user.phoneVerified || false
+      };
+      
+      // If the user has a South African profile, use those settings
+      if (saProfile) {
+        settings = {
+          enabled: saProfile.whatsappEnabled || false,
+          phoneNumber: saProfile.whatsappNumber || user.phoneNumber || null,
+          verified: saProfile.whatsappVerified || user.phoneVerified || false
+        };
+      }
+      
+      res.status(200).json(settings);
+    } catch (error) {
+      console.error('Error getting WhatsApp settings:', error);
+      next(error);
+    }
+  });
+
+  // Endpoint to update WhatsApp settings
+  app.post("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { enabled, phoneNumber } = req.body;
+      
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Check if the user has a South African profile
+      const saProfile = await storage.getSaProfileByUserId(user.id);
+      
+      if (saProfile) {
+        // Update the SA profile with the new settings
+        await storage.updateSaProfile(saProfile.id, {
+          whatsappEnabled: enabled,
+          whatsappNumber: phoneNumber
+        });
+      }
+      
+      // Always update the user record too
+      await storage.updateUser(user.id, {
+        phoneNumber
+      });
+      
+      res.status(200).json({
+        enabled,
+        phoneNumber,
+        verified: user.phoneVerified || (saProfile?.whatsappVerified || false)
+      });
+    } catch (error) {
+      console.error('Error updating WhatsApp settings:', error);
+      next(error);
+    }
+  });
+  
   // Quiz Generator API using xAI
   app.get("/api/quiz/:category", async (req: Request, res: Response, next: NextFunction) => {
     try {

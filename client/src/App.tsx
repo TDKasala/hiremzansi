@@ -35,6 +35,7 @@ import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
 import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
+import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
 import SettingsPage from "@/pages/settings-page";
 import BlogPost1 from "@/pages/BlogPost1";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -91,6 +92,7 @@ function App() {
                   <Route path="/auth" component={AuthPage} />
                   <Route path="/realtime-ats" component={RealtimeATSPage} />
                   <Route path="/refer" component={ReferralPage} />
+                  <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                   
                   {/* Original blog post */}
                   <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />

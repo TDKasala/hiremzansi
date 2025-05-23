@@ -1,144 +1,321 @@
-import fetch from 'node-fetch';
+import fs from 'fs';
+import { promisify } from 'util';
+import path from 'path';
+import mammoth from 'mammoth';
 
-// Define interfaces for strong typing
-interface MinimaxResponse {
-  choices?: {
-    message: {
-      content: string;
-    };
-  }[];
-  usage?: {
-    total_tokens: number;
-  };
-  error?: {
-    message: string;
-  };
-  [key: string]: any;
-}
-
-// Configuration for API access
-const AI_CONFIG = {
-  API_KEY: process.env.MINIMAX_API_KEY,
-  GROUP_ID: "1923793763893777283", // Extracted from your API key
-  API_BASE_URL: 'https://api.minimax.chat/v1',
-  
-  // Default model for CV analysis
-  DEFAULT_MODEL: "abab5.5-chat",
-  
-  // API limits and parameters
-  MAX_TOKENS: 2048,
-  TEMPERATURE: 0.2,
-};
+const readFileAsync = promisify(fs.readFile);
 
 /**
- * Generate text using the AI service
+ * AI Service for ATSBoost
+ * Handles CV text extraction and analysis
  */
-export async function generateText(prompt: string, systemPrompt: string = ''): Promise<string> {
-  try {
-    console.log('Generating text with AI service...');
+class AIService {
+  /**
+   * Extract text content from CV file
+   */
+  async extractTextFromCV(filePath: string): Promise<string> {
+    try {
+      const fileExtension = path.extname(filePath).toLowerCase();
+      
+      if (fileExtension === '.pdf') {
+        return this.extractFromPdf(filePath);
+      } else if (fileExtension === '.docx') {
+        return this.extractFromDocx(filePath);
+      } else if (fileExtension === '.doc') {
+        // For .doc files, we'll need conversion or a different library
+        return this.extractFromDoc(filePath);
+      } else {
+        throw new Error(`Unsupported file type: ${fileExtension}`);
+      }
+    } catch (error) {
+      console.error('Error extracting text from CV:', error);
+      throw new Error('Failed to extract text from CV');
+    }
+  }
+
+  /**
+   * Extract text from PDF file
+   */
+  private async extractFromPdf(filePath: string): Promise<string> {
+    try {
+      // Import PDF text extraction service dynamically to avoid startup issues
+      const { extractTextFromPDF } = await import('./simplePdfParser');
+      return await extractTextFromPDF(filePath);
+    } catch (error) {
+      console.error('Error extracting text from PDF:', error);
+      return 'PDF text extraction failed. Please check the file format.';
+    }
+  }
+
+  /**
+   * Extract text from DOCX file
+   */
+  private async extractFromDocx(filePath: string): Promise<string> {
+    try {
+      const result = await mammoth.extractRawText({ path: filePath });
+      return result.value;
+    } catch (error) {
+      console.error('Error extracting text from DOCX:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Extract text from DOC file
+   * This is more challenging as it requires external tools or conversion
+   */
+  private async extractFromDoc(filePath: string): Promise<string> {
+    // For now, we'll use a simple approach with a warning
+    // In a production environment, you might want to use LibreOffice
+    // or another tool to convert DOC to DOCX first
+    try {
+      const result = await mammoth.extractRawText({ path: filePath });
+      return result.value;
+    } catch (error) {
+      console.error('Error extracting text from DOC:', error);
+      // Fallback to a default message
+      return 'Could not extract content. Please convert your DOC file to DOCX or PDF and try again.';
+    }
+  }
+
+  /**
+   * Analyze CV text content to generate ATS score and recommendations
+   */
+  async analyzeCVText(text: string): Promise<{
+    score: number;
+    breakdown: {
+      format: number;
+      skills: number;
+      context: number;
+    };
+    recommendations: { category: string; suggestion: string }[];
+  }> {
+    // For demo purposes, we're using simplified analysis
+    // In production, this would call your AI model (OpenAI, xAI, etc.)
     
-    // Minimax expects messages in a different format
-    const messages = [];
+    // Simple keyword-based analysis
+    const formatScore = this.calculateFormatScore(text);
+    const skillsScore = this.calculateSkillsScore(text);
+    const contextScore = this.calculateContextScore(text);
     
-    if (systemPrompt) {
-      messages.push({
-        role: "USER",
-        content: systemPrompt
+    // Calculate overall score (weighted average)
+    const score = Math.round(
+      (formatScore * 0.4) + (skillsScore * 0.4) + (contextScore * 0.2)
+    );
+    
+    // Generate recommendations
+    const recommendations = this.generateRecommendations(
+      formatScore, skillsScore, contextScore, text
+    );
+    
+    return {
+      score,
+      breakdown: {
+        format: formatScore,
+        skills: skillsScore,
+        context: contextScore
+      },
+      recommendations
+    };
+  }
+
+  /**
+   * Calculate format score
+   */
+  private calculateFormatScore(text: string): number {
+    // Basic format scoring logic
+    let score = 50; // Start with a base score
+    
+    // Check for clear section headers
+    const hasHeaders = /education|experience|skills|objective|summary/i.test(text);
+    if (hasHeaders) score += 15;
+    
+    // Check for bullet points
+    const hasBullets = /•|\*|-|→|✓/.test(text);
+    if (hasBullets) score += 10;
+    
+    // Check for consistent date formats
+    const hasConsistentDates = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\s+\d{4}|\s+\d{2})\b/i.test(text) || 
+                               /\b\d{2}\/\d{2}\/\d{4}\b/.test(text) ||
+                               /\b\d{4}\s*-\s*\d{4}\b|\b\d{4}\s*-\s*Present\b/i.test(text);
+    if (hasConsistentDates) score += 10;
+    
+    // Check for good spacing (crude approximation)
+    const lines = text.split('\n');
+    const hasGoodSpacing = lines.some(line => line.trim() === '');
+    if (hasGoodSpacing) score += 15;
+    
+    return Math.min(Math.max(score, 0), 100);
+  }
+
+  /**
+   * Calculate skills score
+   */
+  private calculateSkillsScore(text: string): number {
+    let score = 40; // Start with base score
+    
+    // Technical skills check
+    const technicalSkills = [
+      'python', 'java', 'javascript', 'typescript', 'react', 'angular', 'vue', 
+      'node', 'express', 'django', 'flask', 'spring', 'html', 'css', 'sql',
+      'aws', 'azure', 'gcp', 'docker', 'kubernetes', 'jenkins', 'git', 'devops',
+      'excel', 'word', 'powerpoint', 'data analysis', 'project management',
+      'sales', 'marketing', 'customer service', 'accounting', 'finance'
+    ];
+    
+    const technicalMatches = technicalSkills.filter(skill => 
+      new RegExp(`\\b${skill}\\b`, 'i').test(text)
+    );
+    
+    score += Math.min(technicalMatches.length * 5, 25);
+    
+    // Soft skills check
+    const softSkills = [
+      'communication', 'leadership', 'teamwork', 'problem solving', 'critical thinking',
+      'time management', 'adaptability', 'creativity', 'collaboration', 'attention to detail',
+      'organization', 'interpersonal', 'analytical', 'negotiation', 'presentation',
+      'conflict resolution', 'decision making', 'strategy', 'innovation'
+    ];
+    
+    const softMatches = softSkills.filter(skill => 
+      new RegExp(`\\b${skill}\\b`, 'i').test(text)
+    );
+    
+    score += Math.min(softMatches.length * 3, 20);
+    
+    // Qualifications check
+    const hasQualifications = /degree|diploma|bachelor|master|phd|certification|certified|license|nqf level/i.test(text);
+    if (hasQualifications) score += 15;
+    
+    return Math.min(Math.max(score, 0), 100);
+  }
+
+  /**
+   * Calculate South African context score
+   */
+  private calculateContextScore(text: string): number {
+    let score = 30; // Start with base score
+    
+    // Check for B-BBEE information
+    const hasBBBEE = /b-bbee|bbbee|broad.based black economic empowerment|black economic empowerment|bee score|bee level|bee certificate/i.test(text);
+    if (hasBBBEE) score += 30;
+    
+    // Check for NQF levels
+    const hasNQF = /nqf\s+level|nqf\s+\d|saqa|south african qualifications authority/i.test(text);
+    if (hasNQF) score += 20;
+    
+    // Check for South African locations
+    const saLocations = [
+      'johannesburg', 'cape town', 'durban', 'pretoria', 'bloemfontein', 'port elizabeth', 'gqeberha',
+      'east london', 'kimberley', 'polokwane', 'nelspruit', 'mbombela', 'pietermaritzburg', 'stellenbosch',
+      'gauteng', 'western cape', 'kwazulu-natal', 'kzn', 'eastern cape', 'free state', 'limpopo',
+      'mpumalanga', 'north west', 'northern cape'
+    ];
+    
+    const locationMatches = saLocations.filter(location => 
+      new RegExp(`\\b${location}\\b`, 'i').test(text)
+    );
+    
+    if (locationMatches.length > 0) score += 15;
+    
+    // Check for South African languages
+    const saLanguages = [
+      'afrikaans', 'zulu', 'isizulu', 'xhosa', 'isixhosa', 'setswana', 'tswana', 'sesotho', 'sotho',
+      'sepedi', 'ndebele', 'swati', 'siswati', 'venda', 'tshivenda', 'tsonga', 'xitsonga'
+    ];
+    
+    const languageMatches = saLanguages.filter(language => 
+      new RegExp(`\\b${language}\\b`, 'i').test(text)
+    );
+    
+    if (languageMatches.length > 0) score += 5;
+    
+    return Math.min(Math.max(score, 0), 100);
+  }
+
+  /**
+   * Generate personalized recommendations based on scores
+   */
+  private generateRecommendations(
+    formatScore: number, 
+    skillsScore: number, 
+    contextScore: number, 
+    text: string
+  ): { category: string; suggestion: string }[] {
+    const recommendations: { category: string; suggestion: string }[] = [];
+    
+    // Format recommendations
+    if (formatScore < 70) {
+      if (!(/education|experience|skills|objective|summary/i.test(text))) {
+        recommendations.push({ 
+          category: 'Format', 
+          suggestion: 'Add clear section headers (e.g., Experience, Education, Skills) to organize your CV.' 
+        });
+      }
+      
+      if (!(/•|\*|-|→|✓/.test(text))) {
+        recommendations.push({ 
+          category: 'Format', 
+          suggestion: 'Use bullet points to highlight achievements and responsibilities for better readability.' 
+        });
+      }
+      
+      if (recommendations.length < 2) {
+        recommendations.push({ 
+          category: 'Format', 
+          suggestion: 'Ensure consistent spacing and alignment throughout your CV.' 
+        });
+      }
+    }
+    
+    // Skills recommendations
+    if (skillsScore < 70) {
+      recommendations.push({ 
+        category: 'Skills', 
+        suggestion: 'Quantify your achievements with specific metrics and numbers.' 
+      });
+      
+      recommendations.push({ 
+        category: 'Skills', 
+        suggestion: 'Include a dedicated Skills section that highlights both technical and soft skills.' 
       });
     }
     
-    messages.push({
-      role: "USER", 
-      content: prompt
-    });
-    
-    const response = await fetch(`${AI_CONFIG.API_BASE_URL}/text/chatcompletion?GroupId=${AI_CONFIG.GROUP_ID}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AI_CONFIG.API_KEY}`
-      },
-      body: JSON.stringify({
-        model: AI_CONFIG.DEFAULT_MODEL,
-        messages: messages,
-        temperature: AI_CONFIG.TEMPERATURE,
-        max_tokens: AI_CONFIG.MAX_TOKENS,
-        stream: false,
-        prompt_parameters: {
-          system: "You are a helpful assistant specializing in CV analysis for South African job market."
-        }
-      })
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('AI service error:', errorText);
-      throw new Error(`AI service error: ${response.status} ${response.statusText}`);
+    // South African context recommendations
+    if (contextScore < 70) {
+      if (!(/b-bbee|bbbee|broad.based black economic empowerment/i.test(text))) {
+        recommendations.push({ 
+          category: 'South African Context', 
+          suggestion: 'Add your B-BBEE status if applicable to improve eligibility for certain positions.' 
+        });
+      }
+      
+      if (!(/nqf\s+level|nqf\s+\d|saqa/i.test(text))) {
+        recommendations.push({ 
+          category: 'South African Context', 
+          suggestion: 'Include NQF levels for your qualifications to align with South African standards.' 
+        });
+      }
     }
     
-    const data = await response.json() as MinimaxResponse;
-    
-    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-      return data.choices[0].message.content;
-    } else {
-      console.error('Unexpected response format:', JSON.stringify(data, null, 2));
-      return "Sorry, I couldn't generate a response at this time.";
+    // General recommendations
+    if (recommendations.length < 3) {
+      recommendations.push({ 
+        category: 'General', 
+        suggestion: 'Tailor your CV keywords to match the specific job descriptions you\'re applying for.' 
+      });
     }
-  } catch (error) {
-    console.error('Error generating text:', error);
-    return "There was an error processing your request. Please try again later.";
-  }
-}
-
-/**
- * Analyze CV text and return structured results
- */
-export async function analyzeCV(cvText: string): Promise<any> {
-  try {
-    const systemPrompt = `
-      You are an expert CV analyzer for the South African job market.
-      Analyze the CV text and provide:
-      1. A list of key skills identified
-      2. An assessment of strengths
-      3. Suggestions for improvement
-      4. An evaluation of how well it would perform with ATS systems
-      Return your analysis in a clear, structured format.
-    `;
     
-    const result = await generateText(cvText, systemPrompt);
+    if (recommendations.length < 3) {
+      recommendations.push({ 
+        category: 'General', 
+        suggestion: 'Keep your CV concise and limit it to 2-3 pages maximum.' 
+      });
+    }
     
-    // Create a structured object from the text response
-    // This is a simple parsing, you might want to implement more sophisticated extraction
-    return {
-      analysis: result,
-      success: true,
-      timestamp: new Date().toISOString()
-    };
-  } catch (error) {
-    console.error('Error analyzing CV:', error);
-    return {
-      success: false, 
-      error: "Failed to analyze the CV",
-      timestamp: new Date().toISOString()
-    };
+    return recommendations;
   }
 }
 
-/**
- * Test connection to AI service
- */
-export async function testConnection(): Promise<boolean> {
-  try {
-    const result = await generateText("Please respond with the word 'connected' if you can hear me.");
-    return result.toLowerCase().includes('connected');
-  } catch (error) {
-    console.error('Connection test failed:', error);
-    return false;
-  }
-}
-
-export default {
-  generateText,
-  analyzeCV,
-  testConnection
-};
+// Export singleton instance
+export const aiService = new AIService();

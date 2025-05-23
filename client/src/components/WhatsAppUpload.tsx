@@ -1,42 +1,43 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Phone, Check, ArrowRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Send, MessageSquare, Check, Phone } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { useAuth } from '@/hooks/use-auth';
-import { useMotivation } from '@/hooks/use-motivation';
 
-export function WhatsAppUpload() {
+const WhatsAppUpload: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const { triggerAchievement } = useMotivation();
-  
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationStep, setVerificationStep] = useState<'input' | 'verify' | 'success'>('input');
-  
-  const validatePhoneNumber = (number: string): boolean => {
-    // Basic validation for South African phone numbers
-    const saPhoneRegex = /^(\+27|0)[6-8][0-9]{8}$/;
-    return saPhoneRegex.test(number.trim());
-  };
-  
-  const handleSubmitPhone = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Format the phone number to South African format
+  const formatPhoneNumber = (number: string) => {
+    // Remove non-digit characters
+    let digitsOnly = number.replace(/\D/g, '');
     
-    if (!validatePhoneNumber(phoneNumber)) {
+    // Add country code if it's missing (assuming South African number)
+    if (digitsOnly.startsWith('0')) {
+      digitsOnly = `27${digitsOnly.substring(1)}`;
+    } else if (!digitsOnly.startsWith('27') && !digitsOnly.startsWith('+27')) {
+      digitsOnly = `27${digitsOnly}`;
+    } else if (digitsOnly.startsWith('+')) {
+      digitsOnly = digitsOnly.substring(1);
+    }
+    
+    return digitsOnly;
+  };
+
+  const handleSendVerification = async () => {
+    if (!whatsappNumber) {
       toast({
-        title: t('Invalid Phone Number'),
-        description: t('Please enter a valid South African phone number'),
+        title: t('Error'),
+        description: t('Please enter your WhatsApp number'),
         variant: 'destructive',
       });
       return;
@@ -45,14 +46,10 @@ export function WhatsAppUpload() {
     setIsLoading(true);
     
     try {
-      // Format phone number to international format if needed
-      let formattedPhone = phoneNumber;
-      if (phoneNumber.startsWith('0')) {
-        formattedPhone = '+27' + phoneNumber.substring(1);
-      }
+      const formattedNumber = formatPhoneNumber(whatsappNumber);
       
-      const response = await apiRequest('POST', '/api/whatsapp-verify-request', {
-        phoneNumber: formattedPhone
+      const response = await apiRequest('POST', '/api/whatsapp/verify', {
+        phoneNumber: formattedNumber
       });
       
       if (response.ok) {
@@ -63,27 +60,24 @@ export function WhatsAppUpload() {
         });
       } else {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to send verification code');
+        throw new Error(error.error || t('Failed to send verification code'));
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t('Could not send verification code. Please try again.');
       toast({
-        title: t('Verification Failed'),
-        description: errorMessage,
+        title: t('Error'),
+        description: error.message || t('Something went wrong'),
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const handleVerifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!verificationCode || verificationCode.length < 4) {
+
+  const handleVerifyCode = async () => {
+    if (!verificationCode) {
       toast({
-        title: t('Invalid Code'),
-        description: t('Please enter the verification code sent to your phone'),
+        title: t('Error'),
+        description: t('Please enter the verification code'),
         variant: 'destructive',
       });
       return;
@@ -92,148 +86,139 @@ export function WhatsAppUpload() {
     setIsLoading(true);
     
     try {
-      const response = await apiRequest('POST', '/api/whatsapp-verify-code', {
-        phoneNumber: phoneNumber.startsWith('0') ? '+27' + phoneNumber.substring(1) : phoneNumber,
-        code: verificationCode
+      const formattedNumber = formatPhoneNumber(whatsappNumber);
+      
+      const response = await apiRequest('POST', '/api/whatsapp/confirm', {
+        code: verificationCode,
+        phoneNumber: formattedNumber
       });
       
       if (response.ok) {
-        setIsVerified(true);
         setVerificationStep('success');
-        
-        // Trigger achievement for setting up WhatsApp
-        triggerAchievement('milestone:whatsapp_setup');
-        
         toast({
-          title: t('WhatsApp Verified'),
-          description: t('You can now upload CVs via WhatsApp'),
+          title: t('Success'),
+          description: t('Your WhatsApp number has been verified'),
+        });
+        
+        // Send upload instructions
+        await apiRequest('POST', '/api/whatsapp/send-instructions', {
+          phoneNumber: formattedNumber
         });
       } else {
         const error = await response.json();
-        throw new Error(error.message || 'Verification failed');
+        throw new Error(error.error || t('Invalid verification code'));
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t('Could not verify code. Please try again.');
       toast({
-        title: t('Verification Failed'),
-        description: errorMessage,
+        title: t('Error'),
+        description: error.message || t('Something went wrong'),
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const resetVerification = () => {
     setVerificationStep('input');
-    setIsVerified(false);
     setVerificationCode('');
   };
-  
+
   return (
-    <Card className="border-primary/20">
-      <CardHeader className="bg-primary/5 p-4 sm:p-6">
-        <CardTitle className="flex items-center text-base sm:text-lg">
-          <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
-          {t('WhatsApp CV Upload')}
+    <Card className="max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold">
+          {t('Upload CV via WhatsApp')}
         </CardTitle>
-        <CardDescription className="text-xs sm:text-sm">
-          {t('Send your CV via WhatsApp for easy scanning')}
+        <CardDescription>
+          {t('Easily upload and analyze your CV using WhatsApp')}
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="p-4 sm:p-6">
+      <CardContent className="space-y-4">
         {verificationStep === 'input' && (
-          <form onSubmit={handleSubmitPhone} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp-number">{t('Your WhatsApp Number')}</Label>
-              <div className="flex space-x-2">
-                <Input
-                  id="whatsapp-number"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="0712345678"
-                  className="flex-1"
-                  disabled={isLoading}
-                />
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Phone className="h-8 w-8 text-primary" />
               </div>
+              <h3 className="text-xl font-semibold mb-2">{t('Enter Your WhatsApp Number')}</h3>
+              <p className="text-center text-muted-foreground">
+                {t('We\'ll send you a verification code on WhatsApp')}
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                {t('WhatsApp Number')} (South African format)
+              </label>
+              <Input
+                type="tel"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="e.g. 071 234 5678"
+                className="w-full"
+              />
               <p className="text-xs text-muted-foreground">
-                {t('Example: 0712345678 or +27712345678')}
+                {t('Enter your number in South African format (e.g. 071 234 5678)')}
               </p>
             </div>
             
             <Button 
-              type="submit" 
-              className="w-full text-xs sm:text-sm py-1.5 sm:py-2" 
-              disabled={isLoading || !phoneNumber}
+              onClick={handleSendVerification}
+              disabled={isLoading || !whatsappNumber}
+              className="w-full"
             >
-              {isLoading ? (
-                <>
-                  <span className="h-4 w-4 animate-spin mr-2 border-2 border-current border-t-transparent rounded-full" />
-                  {t('Sending...')}
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  {t('Send Verification Code')}
-                </>
-              )}
+              {isLoading ? t('Sending...') : t('Send Verification Code')}
+              {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
             </Button>
-          </form>
+          </div>
         )}
         
         {verificationStep === 'verify' && (
-          <form onSubmit={handleVerifyCode} className="space-y-4">
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t('Verification Code Sent')}</AlertTitle>
-              <AlertDescription>
-                {t('We sent a verification code to')} <strong>{phoneNumber}</strong>
-              </AlertDescription>
-            </Alert>
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <div className="font-bold text-xl text-primary">6</div>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{t('Enter Verification Code')}</h3>
+              <p className="text-center text-muted-foreground">
+                {t('We\'ve sent a 6-digit code to your WhatsApp')}
+              </p>
+            </div>
             
             <div className="space-y-2">
-              <Label htmlFor="verification-code">{t('Enter Verification Code')}</Label>
+              <label className="block text-sm font-medium">
+                {t('Verification Code')}
+              </label>
               <Input
-                id="verification-code"
+                type="text"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
-                placeholder="1234"
-                className="text-center text-lg font-medium letter-spacing-wide"
+                placeholder="000000"
+                className="w-full text-center text-lg tracking-widest"
                 maxLength={6}
-                disabled={isLoading}
               />
             </div>
             
             <div className="flex space-x-2">
               <Button 
-                type="button" 
-                variant="outline" 
-                className="flex-1" 
+                variant="outline"
                 onClick={resetVerification}
+                className="flex-1"
                 disabled={isLoading}
               >
                 {t('Back')}
               </Button>
               <Button 
-                type="submit" 
-                className="flex-1" 
-                disabled={isLoading || !verificationCode}
+                onClick={handleVerifyCode}
+                disabled={isLoading || verificationCode.length !== 6}
+                className="flex-1"
               >
-                {isLoading ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin mr-2 border-2 border-current border-t-transparent rounded-full" />
-                    {t('Verifying...')}
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    {t('Verify')}
-                  </>
-                )}
+                {isLoading ? t('Verifying...') : t('Verify')}
               </Button>
             </div>
-          </form>
+          </div>
         )}
         
         {verificationStep === 'success' && (
@@ -270,7 +255,10 @@ export function WhatsAppUpload() {
       
       <CardFooter className="bg-primary/5 p-4 sm:p-6 flex flex-col space-y-2 text-xs sm:text-sm text-muted-foreground">
         <p className="text-xs">{t('By registering, you agree to receive occasional job-related notifications via WhatsApp.')}</p>
+        <p className="text-xs">{t('Standard messaging rates may apply. You can opt out at any time.')}</p>
       </CardFooter>
     </Card>
   );
-}
+};
+
+export default WhatsAppUpload;
