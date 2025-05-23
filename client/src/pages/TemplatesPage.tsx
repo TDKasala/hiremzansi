@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { 
   Bot, 
   Building, 
@@ -16,7 +17,8 @@ import {
   Sparkles,
   Target,
   Globe,
-  Users
+  Users,
+  Crown
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +31,64 @@ export default function TemplatesPage() {
 
   // Check if user has premium access
   const hasPremium = user?.subscription?.status === 'active' || user?.subscription?.plan === 'premium';
+
+  // Handle button clicks
+  const handleCreateAITemplate = () => {
+    if (!user) {
+      window.location.href = '/auth';
+      return;
+    }
+    if (!hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Navigate to AI template creator (to be implemented)
+    console.log('Creating AI template...');
+  };
+
+  const handleCreateIndustryTemplate = (industry: string) => {
+    if (!user) {
+      window.location.href = '/auth';
+      return;
+    }
+    if (!hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Navigate to industry template creator
+    console.log(`Creating ${industry} template...`);
+  };
+
+  const handleCreateCoverLetter = () => {
+    if (!user) {
+      window.location.href = '/auth';
+      return;
+    }
+    if (!hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Navigate to cover letter creator
+    console.log('Creating cover letter...');
+  };
+
+  const handleStartDynamicBuilder = () => {
+    if (!user) {
+      window.location.href = '/auth';
+      return;
+    }
+    if (!hasPremium) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    // Navigate to dynamic builder
+    console.log('Starting dynamic builder...');
+  };
+
+  const handleViewExamples = (type: string) => {
+    // Show examples modal or navigate to examples page
+    console.log(`Viewing ${type} examples...`);
+  };
 
   // Fetch template categories
   const { data: categories } = useQuery({
@@ -195,11 +255,11 @@ export default function TemplatesPage() {
                     </div>
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-primary hover:bg-primary/90">
+                    <Button size="lg" className="bg-primary hover:bg-primary/90" onClick={handleCreateAITemplate}>
                       <Bot className="h-4 w-4 mr-2" />
-                      Create AI Template
+                      {hasPremium ? 'Create AI Template' : 'Upgrade for AI Templates'}
                     </Button>
-                    <Button variant="outline" size="lg">
+                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('ai-powered')}>
                       <Eye className="h-4 w-4 mr-2" />
                       View Examples
                     </Button>
@@ -233,13 +293,13 @@ export default function TemplatesPage() {
                               Optimized for {industry.toLowerCase()} sector requirements
                             </p>
                             <div className="flex gap-2">
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" onClick={() => handleViewExamples(industry)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 Preview
                               </Button>
-                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleCreateIndustryTemplate(industry)}>
                                 <Download className="h-3 w-3 mr-1" />
-                                Use Template
+                                {hasPremium ? 'Use Template' : 'Upgrade to Use'}
                               </Button>
                             </div>
                           </CardContent>
@@ -314,11 +374,11 @@ export default function TemplatesPage() {
                     </div>
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={handleCreateCoverLetter}>
                       <FileText className="h-4 w-4 mr-2" />
-                      Create Cover Letter
+                      {hasPremium ? 'Create Cover Letter' : 'Upgrade for Cover Letters'}
                     </Button>
-                    <Button variant="outline" size="lg">
+                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('cover-letter')}>
                       <Users className="h-4 w-4 mr-2" />
                       Browse Examples
                     </Button>
@@ -399,11 +459,11 @@ export default function TemplatesPage() {
                     </div>
                   </div>
                   <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+                    <Button size="lg" className="bg-purple-600 hover:bg-purple-700" onClick={handleStartDynamicBuilder}>
                       <Wrench className="h-4 w-4 mr-2" />
-                      Start Building
+                      {hasPremium ? 'Start Building' : 'Upgrade to Build'}
                     </Button>
-                    <Button variant="outline" size="lg">
+                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('dynamic-builder')}>
                       <Eye className="h-4 w-4 mr-2" />
                       Watch Demo
                     </Button>
@@ -435,6 +495,43 @@ export default function TemplatesPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Upgrade Modal */}
+          <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-[#FFCA28]" />
+                  Upgrade to Premium
+                </DialogTitle>
+                <DialogDescription>
+                  Unlock AI-powered CV and cover letter templates to boost your job search success.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-[#FFCA28] to-[#FFB000] p-4 rounded-lg text-black">
+                  <h4 className="font-semibold mb-2">Premium Features Include:</h4>
+                  <ul className="space-y-1 text-sm">
+                    <li>✓ AI-powered CV templates</li>
+                    <li>✓ Industry-specific templates</li>
+                    <li>✓ Cover letter generation</li>
+                    <li>✓ Dynamic template builder</li>
+                    <li>✓ Real-time ATS scoring</li>
+                  </ul>
+                </div>
+                <div className="flex gap-3">
+                  <Link href="/pricing" className="flex-1">
+                    <Button className="w-full bg-[#FFCA28] hover:bg-[#FFB000] text-black font-semibold">
+                      View Pricing
+                    </Button>
+                  </Link>
+                  <Button variant="outline" onClick={() => setShowUpgradeModal(false)}>
+                    Later
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </>
