@@ -238,7 +238,9 @@ export const subscriptions = pgTable("subscriptions", {
   cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
   paymentMethod: text("payment_method"),
   scansUsed: integer("scans_used").default(0), // Track how many scans have been used in current period
+  templatesUsed: integer("templates_used").default(0), // Track how many template generations have been used
   lastScanReset: timestamp("last_scan_reset"), // Date when the scan count was last reset
+  lastTemplateReset: timestamp("last_template_reset"), // Date when the template generation count was last reset
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -272,6 +274,8 @@ export type InsertDeepAnalysisReport = z.infer<typeof insertDeepAnalysisReportSc
 
 export type Plan = typeof plans.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
+
+
 
 // Analysis Report - used for responses
 export const employers = pgTable("employers", {
@@ -400,6 +404,23 @@ export const payments = pgTable("payments", {
   relatedEntityId: integer("related_entity_id"), // ID of job, match, etc.
   relatedEntityType: text("related_entity_type"), // job, match, etc.
   metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Generated Templates tracking
+export const generatedTemplates = pgTable("generated_templates", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // 'cv', 'cover-letter'
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  watermarkId: text("watermark_id").notNull(), // Unique watermark identifier
+  generatedFor: text("generated_for").notNull(), // The purpose/recipient of the template
+  deviceInfo: text("device_info"), // Client device information
+  ipAddress: text("ip_address"), // Client IP address for security tracking
+  metaData: json("meta_data"), // Additional data about the generated template
+  isRevoked: boolean("is_revoked").default(false), // Flag to revoke/invalidate the template
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

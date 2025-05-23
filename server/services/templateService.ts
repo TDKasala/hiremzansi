@@ -1,8 +1,18 @@
 import { xaiService } from './xaiService';
+import { db } from '../db';
+import { generatedTemplates, subscriptions, plans, users } from '../../shared/schema';
+import { eq, lte, and, desc } from 'drizzle-orm';
+import { randomBytes, createHash } from 'crypto';
 
 /**
  * Template Generation Service for ATSBoost
  * Provides AI-powered CV and cover letter templates optimized for South African job market
+ * 
+ * SECURITY FEATURES:
+ * 1. Usage tracking - Monitors template generation to prevent abuse
+ * 2. Digital watermarking - Embeds tracking codes in templates to detect unauthorized sharing
+ * 3. Rate limiting - Restricts generation based on subscription level
+ * 4. Misuse prevention - Implements security measures to prevent commercial exploitation
  */
 
 export interface UserProfile {
