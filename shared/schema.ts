@@ -21,6 +21,9 @@ export const users = pgTable("users", {
   resetTokenExpiry: timestamp("reset_token_expiry"),
   receiveEmailDigest: boolean("receive_email_digest").default(true),
   lastEmailDigestSent: timestamp("last_email_digest_sent"),
+  phoneNumber: text("phone_number"),
+  phoneVerified: boolean("phone_verified").default(false),
+  isTemporary: boolean("is_temporary").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -87,6 +90,7 @@ export const cvs = pgTable("cvs", {
   fileType: text("file_type").notNull(),
   fileSize: integer("file_size").notNull(),
   content: text("content").notNull(),
+  filePath: text("file_path"), // Path to the file on disk
   title: text("title").default("My CV"),
   description: text("description"),
   isDefault: boolean("is_default").default(false),
@@ -94,6 +98,7 @@ export const cvs = pgTable("cvs", {
   targetIndustry: text("target_industry"),
   jobDescription: text("job_description"),
   isGuest: boolean("is_guest").default(false), // Flag for guest uploads
+  uploadMethod: text("upload_method").default("web"), // web, whatsapp, email
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -112,6 +117,7 @@ export const insertCvSchema = createInsertSchema(cvs).pick({
   fileType: true,
   fileSize: true,
   content: true,
+  filePath: true,
   title: true,
   description: true,
   isDefault: true,
@@ -119,6 +125,7 @@ export const insertCvSchema = createInsertSchema(cvs).pick({
   targetIndustry: true,
   jobDescription: true,
   isGuest: true,
+  uploadMethod: true,
 });
 
 // ATS Score schema with enhanced South African context
