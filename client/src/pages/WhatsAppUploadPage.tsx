@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import WhatsAppUpload from '@/components/WhatsAppUpload';
+import { WhatsAppUpload } from '@/components/WhatsAppUpload';
 import { Helmet } from 'react-helmet';
 
 const WhatsAppUploadPage: React.FC = () => {

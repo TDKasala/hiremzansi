@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Shield, CheckCircle, Star, LineChart, BarChart, Zap } from "lucide-react";
+import { Shield, CheckCircle, Star, LineChart, BarChart, Zap, ArrowRight, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 

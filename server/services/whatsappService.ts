@@ -128,7 +128,7 @@ class WhatsAppService {
     } 
     else if (message === 'feedback') {
       this.sendSimpleMessage(from, 
-        'Thanks for using ATSBoost! We'd love to hear your feedback. ' +
+        'Thanks for using ATSBoost! We would love to hear your feedback. ' +
         'Please let us know how our service has helped with your job search journey.'
       );
       return { success: true, message: 'Feedback request sent' };

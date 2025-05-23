@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-const WhatsAppUpload: React.FC = () => {
+export const WhatsAppUpload: React.FC = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [whatsappNumber, setWhatsappNumber] = useState('');
