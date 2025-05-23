@@ -611,6 +611,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Template Generation API Routes
+  app.post("/api/templates/ai-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userProfile, jobDescription } = req.body;
+      const { templateService } = await import('./services/templateService');
+      
+      const template = await templateService.generateAIPoweredTemplate(userProfile, jobDescription);
+      
+      res.json({
+        success: true,
+        template
+      });
+    } catch (error: any) {
+      console.error('Error generating AI CV template:', error);
+      res.status(500).json({ 
+        error: "Failed to generate AI-powered CV template",
+        details: error.message 
+      });
+    }
+  });
+
+  app.post("/api/templates/industry-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { industry, experienceLevel } = req.body;
+      const { templateService } = await import('./services/templateService');
+      
+      const template = await templateService.generateIndustryTemplate(industry, experienceLevel);
+      
+      res.json({
+        success: true,
+        template
+      });
+    } catch (error: any) {
+      console.error('Error generating industry CV template:', error);
+      res.status(500).json({ 
+        error: "Failed to generate industry-specific CV template",
+        details: error.message 
+      });
+    }
+  });
+
+  app.post("/api/templates/cover-letter", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userProfile, company, position, jobDescription } = req.body;
+      const { templateService } = await import('./services/templateService');
+      
+      const template = await templateService.generateCoverLetterTemplate(userProfile, company, position, jobDescription);
+      
+      res.json({
+        success: true,
+        template
+      });
+    } catch (error: any) {
+      console.error('Error generating cover letter template:', error);
+      res.status(500).json({ 
+        error: "Failed to generate cover letter template",
+        details: error.message 
+      });
+    }
+  });
+
+  app.post("/api/templates/dynamic-build", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userProfile, selectedSections, customContent } = req.body;
+      const { templateService } = await import('./services/templateService');
+      
+      const result = await templateService.buildDynamicTemplate(userProfile, selectedSections, customContent);
+      
+      res.json({
+        success: true,
+        template: result.template,
+        previewScore: result.previewScore
+      });
+    } catch (error: any) {
+      console.error('Error building dynamic template:', error);
+      res.status(500).json({ 
+        error: "Failed to build dynamic template",
+        details: error.message 
+      });
+    }
+  });
+
+  app.get("/api/templates/categories", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { templateService } = await import('./services/templateService');
+      
+      const categories = templateService.getTemplateCategories();
+      
+      res.json({
+        success: true,
+        categories
+      });
+    } catch (error: any) {
+      console.error('Error getting template categories:', error);
+      res.status(500).json({ 
+        error: "Failed to get template categories",
+        details: error.message 
+      });
+    }
+  });
+
   // Quiz Generator API using xAI
   app.get("/api/quiz/:category", async (req: Request, res: Response, next: NextFunction) => {
     try {
