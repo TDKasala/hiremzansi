@@ -25,6 +25,10 @@ import { Link } from "wouter";
 export default function TemplatesPage() {
   const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState("ai-powered");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Check if user has premium access
+  const hasPremium = user?.subscription?.status === 'active' || user?.subscription?.plan === 'premium';
 
   // Fetch template categories
   const { data: categories } = useQuery({

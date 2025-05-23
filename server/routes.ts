@@ -612,7 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Template Generation API Routes
-  app.post("/api/templates/ai-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/templates/ai-cv", isAuthenticated, hasActiveSubscription, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userProfile, jobDescription } = req.body;
       const { templateService } = await import('./services/templateService');
@@ -652,7 +652,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/templates/cover-letter", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/templates/cover-letter", isAuthenticated, hasActiveSubscription, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userProfile, company, position, jobDescription } = req.body;
       const { templateService } = await import('./services/templateService');
@@ -672,7 +672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/templates/dynamic-build", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/templates/dynamic-build", isAuthenticated, hasActiveSubscription, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userProfile, selectedSections, customContent } = req.body;
       const { templateService } = await import('./services/templateService');
