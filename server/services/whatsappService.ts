@@ -13,7 +13,12 @@ const mkdirAsync = promisify(fs.mkdir);
 // Check if required environment variables are set
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+// Make sure the phone number has the WhatsApp prefix
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER 
+  ? process.env.TWILIO_PHONE_NUMBER.startsWith('whatsapp:') 
+    ? process.env.TWILIO_PHONE_NUMBER 
+    : `whatsapp:${process.env.TWILIO_PHONE_NUMBER}` 
+  : null;
 
 // Initialize Twilio client if credentials are available
 let twilioClient: twilio.Twilio | null = null;
@@ -412,27 +417,28 @@ class WhatsAppService {
   }
   
   /**
-   * Clean phone number to standard format
+   * Clean phone number to standard format for WhatsApp messaging via Twilio
    */
   private cleanPhoneNumber(phoneNumber: string): string {
-    // Remove any non-digits
-    let digits = phoneNumber.replace(/\D/g, '');
-    
-    // For WhatsApp numbers with standard format "whatsapp:+27712345678"
+    // If it's already in whatsapp: format, return as is
     if (phoneNumber.startsWith('whatsapp:')) {
       return phoneNumber;
     }
     
-    // If it's a South African number starting with 0, replace with +27
-    if (digits.startsWith('0') && digits.length === 10) {
+    // Remove any non-digits, spaces, parentheses, and other characters
+    let digits = phoneNumber.replace(/\D/g, '');
+    
+    // If it's a South African number starting with 0, replace with 27
+    if (digits.startsWith('0') && (digits.length === 10 || digits.length === 9)) {
       digits = `27${digits.substring(1)}`;
     }
     
-    // Ensure it has the whatsapp: prefix and + for the country code
-    if (!digits.startsWith('27') && digits.length === 9) {
+    // If it doesn't have country code (not starting with 27)
+    if (!digits.startsWith('27') && (digits.length === 9 || digits.length === 10)) {
       digits = `27${digits}`;
     }
     
+    // Format for Twilio WhatsApp: must be in format "whatsapp:+XXXXXXXXXX"
     return `whatsapp:+${digits}`;
   }
 }
