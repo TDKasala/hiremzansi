@@ -9,6 +9,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import SkillQuizSection from "@/components/SkillQuizSection";
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
+import WhatsAppPromoSection from "@/components/WhatsAppPromoSection";
 import CTASection from "@/components/CTASection";
 
 export default function HomePage() {
@@ -25,6 +26,7 @@ export default function HomePage() {
       
       <HeroSection />
       <UploadSection />
+      <WhatsAppPromoSection />
       <HowItWorksSection />
       <PricingSection />
       <FeaturesSection />
