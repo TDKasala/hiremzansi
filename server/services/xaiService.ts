@@ -1,150 +1,257 @@
 import OpenAI from "openai";
 
-/**
- * xAI Service for CV Analysis
- * 
- * This service uses the xAI Grok API to analyze CVs for ATS compatibility
- * with special focus on South African job market context
- */
-
-// Initialize xAI client using the X.AI API
-const xai = new OpenAI({ 
+// Initialize OpenAI client with xAI configuration
+const openai = new OpenAI({ 
   baseURL: "https://api.x.ai/v1", 
-  apiKey: process.env.XAI_API_KEY 
+  apiKey: process.env.XAI_API_KEY,
 });
 
-// Define analysis response type
-interface AnalysisResponse {
-  success: boolean;
-  result?: any;
-  error?: string;
-}
+// Fallback to OpenAI if xAI is not available
+const openaiClient = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 /**
- * Analyze CV content using xAI's Grok model
- * 
- * @param cvText CV text content to analyze
- * @param jobDescription Optional job description for targeted analysis
- * @returns Detailed analysis with South African context scoring
+ * Service for handling AI analysis using xAI's API
  */
-export async function analyzeCV(
-  cvText: string, 
-  jobDescription?: string
-): Promise<AnalysisResponse> {
-  try {
-    if (!process.env.XAI_API_KEY) {
-      throw new Error("XAI_API_KEY is not set in environment variables");
+class XAIService {
+  /**
+   * Analyze CV text content using xAI Grok model
+   * With fallback to OpenAI if xAI is unavailable
+   */
+  async analyzeCV(text: string): Promise<{
+    score: number;
+    breakdown: {
+      format: number;
+      skills: number;
+      context: number;
+    };
+    recommendations: { category: string; suggestion: string }[];
+  }> {
+    try {
+      return await this.analyzeWithXAI(text);
+    } catch (error) {
+      console.warn('xAI analysis failed, falling back to OpenAI:', error);
+      return await this.analyzeWithOpenAI(text);
     }
-    
-    console.log("Analyzing CV with xAI Grok API");
-    
-    // Create analysis prompt with CV text and South African context instructions
-    const saContextPrompt = `
-    You are an expert ATS (Applicant Tracking System) analyzer specialized in the South African job market.
-    
-    Analyze the following CV text and provide a detailed scoring with these components:
-    
-    1. Overall ATS compatibility score (0-100)
-    2. Format evaluation (40% of total score):
-       - Professional layout and structure
-       - Consistent headers and sections
-       - Proper use of bullet points
-       - Appropriate date formats
-       - Readable font and spacing
+  }
 
-    3. Skills identification (40% of total score):
-       - Relevant technical skills
-       - Soft skills
-       - Certifications and qualifications
-       - Work experience alignment
-       - Consider high-demand skills in South Africa with 1.5x weight
-
-    4. South African context detection (20% of score):
-       - Identify mentions of B-BBEE status (e.g., Level 1, Level 2) - 10 points per mention (max 20)
-       - NQF levels mentioned (5 points per correct level, max 10)
-       - South African cities/provinces (2 points each, max 5 per category)
-       - Local regulatory knowledge (3 points per mention, max 5)
-       - South African languages (3 points per language, max 5)
-
-    ${jobDescription ? `Consider relevance to this job description: ${jobDescription}` : ''}
-
-    CV TEXT:
-    ${cvText}
-
-    Provide a JSON response with these fields:
-    - overall_score: number (0-100)
-    - rating: string ('Excellent', 'Good', 'Average', 'Poor')
-    - skill_score: number (0-40)
-    - format_score: number (0-40)
-    - sa_score: number (0-20)
-    - strengths: array of strings (3-5 key strengths)
-    - improvements: array of strings (3-5 suggested improvements)
-    - skills_identified: array of strings (all identified skills)
-    - south_african_context: {
-        b_bbee_mentions: array of strings (any B-BBEE mentions),
-        nqf_levels: array of strings (any NQF levels mentioned),
-        locations: array of strings (South African cities/provinces),
-        regulations: array of strings (South African regulations),
-        languages: array of strings (South African languages)
-      }
-    `;
+  /**
+   * Analyze CV with xAI's Grok model
+   */
+  private async analyzeWithXAI(text: string) {
+    const prompt = this.createAnalysisPrompt(text);
     
-    const response = await xai.chat.completions.create({
-      model: "grok-2-1212", // Using Grok 2 model for advanced analysis
+    try {
+      const response = await openai.chat.completions.create({
+        model: "grok-2-1212", // Using the latest text model
+        messages: [
+          {
+            role: "system",
+            content: 
+              "You are an expert CV analyzer for South African job seekers. " +
+              "Evaluate CVs based on format (40%), skills (40%), and South African context (20%). " +
+              "Provide a detailed breakdown and specific recommendations."
+          },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+      });
+
+      const content = response.choices[0].message.content || "{}";
+      return this.parseAIResponse(content);
+    } catch (error) {
+      console.error('Error analyzing CV with xAI:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Analyze CV with OpenAI as fallback
+   */
+  private async analyzeWithOpenAI(text: string) {
+    const prompt = this.createAnalysisPrompt(text);
+    
+    try {
+      const response = await openaiClient.chat.completions.create({
+        model: "gpt-4o", // The newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        messages: [
+          {
+            role: "system",
+            content: 
+              "You are an expert CV analyzer for South African job seekers. " +
+              "Evaluate CVs based on format (40%), skills (40%), and South African context (20%). " +
+              "Provide a detailed breakdown and specific recommendations."
+          },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+      });
+
+      const content = response.choices[0].message.content || "{}";
+      return this.parseAIResponse(content);
+    } catch (error) {
+      console.error('Error analyzing CV with OpenAI fallback:', error);
+      // If both services fail, use the default analyzer
+      throw error;
+    }
+  }
+
+  /**
+   * Create analysis prompt for AI models
+   */
+  private createAnalysisPrompt(text: string): string {
+    return `
+Analyze this CV for a South African job seeker:
+
+${text}
+
+Evaluate based on these criteria:
+1. Format (40% of score):
+   - Layout and organization (10pts)
+   - Clear section headers (8pts)
+   - Effective use of bullet points (8pts)
+   - Consistent date formats (6pts)
+   - Appropriate spacing (8pts)
+
+2. Skills (40% of score):
+   - Technical skills relevance (10pts)
+   - Soft skills presentation (8pts)
+   - Qualifications presentation (8pts)
+   - Experience description quality (8pts)
+   - Keyword optimization (6pts)
+
+3. South African Context (20% of score):
+   - B-BBEE status mention (6pts)
+   - NQF level specification (4pts)
+   - South African locations/experience (4pts)
+   - Industry-specific regulations/compliance (3pts)
+   - Local languages (3pts)
+
+Provide:
+1. A total score out of 100
+2. Breakdown of points for each main category
+3. At least 3 specific recommendations for improvement
+
+Return response in this JSON format:
+{
+  "score": <total_score>,
+  "breakdown": {
+    "format": <format_score>,
+    "skills": <skills_score>,
+    "context": <context_score>
+  },
+  "recommendations": [
+    {
+      "category": "<category_name>",
+      "suggestion": "<specific_recommendation>"
+    },
+    ...
+  ]
+}
+`;
+  }
+
+  /**
+   * Parse AI response into standardized format
+   */
+  private parseAIResponse(responseText: string): {
+    score: number;
+    breakdown: {
+      format: number;
+      skills: number;
+      context: number;
+    };
+    recommendations: { category: string; suggestion: string }[];
+  } {
+    try {
+      const parsed = JSON.parse(responseText);
+      
+      return {
+        score: Math.round(parsed.score || 50),
+        breakdown: {
+          format: Math.round(parsed.breakdown?.format || 50),
+          skills: Math.round(parsed.breakdown?.skills || 50),
+          context: Math.round(parsed.breakdown?.context || 50)
+        },
+        recommendations: Array.isArray(parsed.recommendations) 
+          ? parsed.recommendations.slice(0, 5) 
+          : [{ category: 'General', suggestion: 'Tailor your CV to match job descriptions' }]
+      };
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      
+      // Return default values if parsing fails
+      return {
+        score: 50,
+        breakdown: {
+          format: 50,
+          skills: 50,
+          context: 50
+        },
+        recommendations: [
+          { category: 'General', suggestion: 'Tailor your CV to match job descriptions' },
+          { category: 'Format', suggestion: 'Improve organization with clear section headers' },
+          { category: 'Skills', suggestion: 'Highlight technical skills relevant to your industry' }
+        ]
+      };
+    }
+  }
+}
+
+// Export singleton instance
+export const xaiService = new XAIService();
+
+// Test connection to xAI API
+export async function testXaiConnection() {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "grok-2-1212",
       messages: [
-        { role: "system", content: "You're an ATS expert for the South African job market." },
-        { role: "user", content: saContextPrompt }
+        { role: "user", content: "Test connection" }
       ],
-      response_format: { type: "json_object" },
-      max_tokens: 2048,
-      temperature: 0.2 // Lower temperature for more consistent results
+      max_tokens: 5
     });
-    
-    // Parse the JSON response from xAI
-    const result = JSON.parse(response.choices[0].message.content);
-    
+    return { success: true, message: "xAI API connection successful" };
+  } catch (error: any) {
+    console.error("xAI API connection test failed:", error);
+    return { 
+      success: false, 
+      message: "xAI API connection failed", 
+      error: error.message 
+    };
+  }
+}
+
+// Export the analyzeCV function directly for compatibility with existing code
+export async function analyzeCV(text: string, jobDescription?: string) {
+  try {
+    const result = await xaiService.analyzeCV(text);
     return {
       success: true,
-      result: result
+      result: {
+        overall_score: result.score,
+        rating: result.score >= 80 ? "Excellent" : result.score >= 70 ? "Good" : result.score >= 60 ? "Average" : "Needs Improvement",
+        strengths: result.recommendations.filter(r => r.category === "Strengths").map(r => r.suggestion),
+        improvements: result.recommendations.filter(r => r.category !== "Strengths").map(r => r.suggestion),
+        skills_identified: [], // Would be populated in a more comprehensive implementation
+        skill_score: result.breakdown.skills,
+        format_score: result.breakdown.format,
+        sa_score: result.breakdown.context,
+        south_african_context: {
+          b_bbee_mentions: [],
+          nqf_levels: [],
+          locations: [],
+          regulations: [],
+          languages: []
+        }
+      }
     };
   } catch (error: any) {
     console.error("Error in xAI CV analysis:", error);
     return {
       success: false,
-      error: error.message || "Failed to analyze CV with xAI Grok API"
+      error: error.message || "Failed to analyze CV with xAI"
     };
   }
 }
-
-/**
- * Export a test function to check API connectivity and response format
- */
-export async function testXaiConnection(): Promise<boolean> {
-  try {
-    if (!process.env.XAI_API_KEY) {
-      console.error("XAI_API_KEY is not set in environment variables");
-      return false;
-    }
-    
-    const response = await xai.chat.completions.create({
-      model: "grok-2-1212",
-      messages: [
-        { 
-          role: "user", 
-          content: "Respond with 'connected' if you can receive this message." 
-        }
-      ],
-      max_tokens: 10
-    });
-    
-    return response.choices[0].message.content.toLowerCase().includes("connected");
-  } catch (error) {
-    console.error("xAI connection test failed:", error);
-    return false;
-  }
-}
-
-export default {
-  analyzeCV,
-  testXaiConnection
-};

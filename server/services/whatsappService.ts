@@ -4,6 +4,7 @@ import path from 'path';
 import { promisify } from 'util';
 import { storage } from '../storage';
 import { aiService } from './aiService';
+import { xaiService } from './xaiService';
 import crypto from 'crypto';
 
 const writeFileAsync = promisify(fs.writeFile);
@@ -271,26 +272,40 @@ class WhatsAppService {
     // Update CV with extracted text
     await storage.updateCV(cv.id, { content: text });
     
-    // Analyze the CV text
-    const analysis = await aiService.analyzeCVText(text);
+    // Analyze the CV text using xAI with OpenAI fallback
+    let analysis;
+    try {
+      // First try with xAI service for advanced analysis
+      analysis = await xaiService.analyzeCV(text);
+      console.log('CV analyzed successfully with xAI');
+    } catch (error) {
+      // Fall back to basic analysis if both xAI and OpenAI fail
+      console.warn('xAI analysis failed, using basic analysis:', error);
+      analysis = await aiService.analyzeCVText(text);
+    }
     
     // Create ATS score record
     const atsScore = await storage.createATSScore({
       cvId: cv.id,
       score: analysis.score,
-      skillsScore: analysis.skillsScore,
-      contextScore: analysis.contextScore,
-      formatScore: analysis.formatScore,
-      issues: analysis.issues,
-      strengths: analysis.strengths,
-      improvements: analysis.improvements,
-      breakdown: analysis.breakdown
+      formatScore: analysis.breakdown.format,
+      skillsScore: analysis.breakdown.skills,
+      contextScore: analysis.breakdown.context,
+      breakdown: {
+        format: analysis.breakdown.format,
+        skills: analysis.breakdown.skills,
+        context: analysis.breakdown.context
+      },
+      recommendations: analysis.recommendations.map(rec => ({
+        category: rec.category,
+        suggestion: rec.suggestion
+      }))
     });
     
     return {
       cv,
       atsScore,
-      recommendations: analysis.improvements
+      recommendations: analysis.recommendations
     };
   }
   
