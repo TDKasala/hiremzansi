@@ -47,6 +47,7 @@ import BlogDetailPage from "@/pages/BlogDetailPage";
 import JobsPage from "@/pages/JobsPage";
 import JobDetailsPage from "@/pages/JobDetailsPage";
 import JobSitesPage from "@/pages/JobSitesPage";
+import JobRecommendationsPage from "@/pages/JobRecommendationsPage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
 import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
 
