@@ -30,6 +30,7 @@ import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
+import { saJobMatchingService } from "./services/saJobMatchingService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
@@ -874,6 +875,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const notification = await employerStorage.markNotificationAsRead(notificationId);
       
       res.json(notification);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // South African Job Market Routes
+  
+  // Get personalized job recommendations based on CV with South African context
+  app.get("/api/sa-job-recommendations", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      const { cvId, limit, includeApplied, province, industries, experienceLevel } = req.query;
+      
+      if (!cvId) {
+        return res.status(400).json({ error: "CV ID is required" });
+      }
+      
+      const parsedCvId = parseInt(cvId as string);
+      
+      if (isNaN(parsedCvId)) {
+        return res.status(400).json({ error: "Invalid CV ID" });
+      }
+      
+      // Get personalized recommendations using the South African job matching service
+      const recommendations = await saJobMatchingService.getPersonalizedJobRecommendations(
+        userId,
+        parsedCvId,
+        {
+          limit: limit ? parseInt(limit as string) : undefined,
+          includeApplied: includeApplied === 'true',
+          provincePreference: province as string,
+          industryPreferences: industries ? (industries as string).split(',') : undefined,
+          experienceLevelPreference: experienceLevel as string
+        }
+      );
+      
+      res.json({
+        recommendations,
+        metadata: {
+          count: recommendations.length,
+          filters: {
+            province: province || null,
+            industries: industries ? (industries as string).split(',') : null,
+            experienceLevel: experienceLevel || null
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error getting job recommendations:", error);
+      next(error);
+    }
+  });
+  
+  // Get industry-specific search template for South African sectors
+  app.get("/api/sa-industry-template/:industry", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { industry } = req.params;
+      
+      if (!industry) {
+        return res.status(400).json({ error: "Industry is required" });
+      }
+      
+      // Get the industry search template
+      const template = saJobMatchingService.getIndustrySearchTemplate(industry);
+      
+      res.json({
+        industry,
+        template,
+        metadata: {
+          isCustomTemplate: template.searchTerms.length > 0,
+          supportedIndustries: [
+            "Mining & Minerals",
+            "Financial Services",
+            "Information Technology",
+            "Government & Public Sector",
+            "Healthcare & Medical",
+            "Retail & Consumer Goods",
+            "Construction & Engineering",
+            "Agriculture & Farming"
+          ]
+        }
+      });
+    } catch (error) {
+      console.error("Error getting industry template:", error);
+      next(error);
+    }
+  });
+  
+  // Get South African reference data
+  app.get("/api/sa-reference-data", async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      // South African provinces
+      const provinces = [
+        { code: "GP", name: "Gauteng" },
+        { code: "WC", name: "Western Cape" },
+        { code: "KZN", name: "KwaZulu-Natal" },
+        { code: "EC", name: "Eastern Cape" },
+        { code: "FS", name: "Free State" },
+        { code: "NW", name: "North West" },
+        { code: "MP", name: "Mpumalanga" },
+        { code: "LP", name: "Limpopo" },
+        { code: "NC", name: "Northern Cape" }
+      ];
+      
+      // Major South African industries
+      const industries = [
+        { code: "AGRI", name: "Agriculture & Farming" },
+        { code: "MINING", name: "Mining & Minerals" },
+        { code: "MANUF", name: "Manufacturing" },
+        { code: "FINANCE", name: "Financial Services" },
+        { code: "TECH", name: "Information Technology" },
+        { code: "RETAIL", name: "Retail & Consumer Goods" },
+        { code: "HEALTH", name: "Healthcare & Medical" },
+        { code: "EDU", name: "Education & Training" },
+        { code: "TOURISM", name: "Tourism & Hospitality" },
+        { code: "CONST", name: "Construction & Engineering" },
+        { code: "ENERGY", name: "Energy & Utilities" },
+        { code: "TELCO", name: "Telecommunications" },
+        { code: "LEGAL", name: "Legal Services" },
+        { code: "GOVT", name: "Government & Public Sector" },
+        { code: "TRANS", name: "Transport & Logistics" },
+        { code: "MEDIA", name: "Media & Communications" }
+      ];
+      
+      // B-BBEE levels
+      const bbbeeLevels = [
+        { level: 1, points: "≥ 100 points", description: "135% recognition" },
+        { level: 2, points: "≥ 95 points", description: "125% recognition" },
+        { level: 3, points: "≥ 90 points", description: "110% recognition" },
+        { level: 4, points: "≥ 80 points", description: "100% recognition" },
+        { level: 5, points: "≥ 75 points", description: "80% recognition" },
+        { level: 6, points: "≥ 70 points", description: "60% recognition" },
+        { level: 7, points: "≥ 55 points", description: "50% recognition" },
+        { level: 8, points: "≥ 40 points", description: "10% recognition" },
+        { level: "Non-Compliant", points: "< 40 points", description: "0% recognition" }
+      ];
+      
+      // NQF levels
+      const nqfLevels = [
+        { level: 1, description: "General Certificate (Grade 9)" },
+        { level: 2, description: "Elementary Certificate (Grade 10)" },
+        { level: 3, description: "Intermediate Certificate (Grade 11)" },
+        { level: 4, description: "National Certificate (Grade 12)" },
+        { level: 5, description: "Higher Certificate or National Certificate" },
+        { level: 6, description: "Diploma or Advanced Certificate" },
+        { level: 7, description: "Bachelor's Degree or Advanced Diploma" },
+        { level: 8, description: "Honours Degree or Postgraduate Diploma" },
+        { level: 9, description: "Master's Degree" },
+        { level: 10, description: "Doctoral Degree" }
+      ];
+      
+      // Employment types
+      const employmentTypes = [
+        { code: "FULL", name: "Full-time" },
+        { code: "PART", name: "Part-time" },
+        { code: "CONTRACT", name: "Contract" },
+        { code: "TEMP", name: "Temporary" },
+        { code: "CASUAL", name: "Casual" },
+        { code: "REMOTE", name: "Remote" },
+        { code: "HYBRID", name: "Hybrid" },
+        { code: "FREELANCE", name: "Freelance" },
+        { code: "INTERN", name: "Internship" },
+        { code: "LEARNERSHIP", name: "Learnership" },
+        { code: "VOLUNTEER", name: "Volunteer" }
+      ];
+      
+      // Return all reference data
+      res.json({
+        provinces,
+        industries,
+        bbbeeLevels,
+        nqfLevels,
+        employmentTypes
+      });
     } catch (error) {
       next(error);
     }
