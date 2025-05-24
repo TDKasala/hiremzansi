@@ -99,14 +99,49 @@ export default function HeroSection() {
                 <div className="bg-white text-black p-6 rounded-lg shadow-lg">
                   <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
                     <div>
-                      <h2 className="text-xl font-bold mb-1">Kulani Mathebula</h2>
-                      <p className="text-gray-600 text-sm">
+                      <div className="overflow-hidden">
+                        <h2 
+                          className={`text-xl font-bold mb-1 transform ${isAnimated ? 'animate-name-slide-in' : ''}`}
+                          style={{ 
+                            animation: isAnimated ? 'name-slide-in 1.2s ease-out forwards' : 'none',
+                            opacity: 0,
+                            transform: 'translateY(100%)'
+                          }}
+                        >
+                          Kulani Mathebula
+                        </h2>
+                      </div>
+                      <div className="overflow-hidden">
+                        <h3 
+                          className={`text-amber-500 font-semibold text-sm mb-2 ${isAnimated ? 'animate-position-fade-in' : ''}`}
+                          style={{ 
+                            animation: isAnimated ? 'position-fade-in 1.5s ease-out forwards 0.6s' : 'none',
+                            opacity: 0
+                          }}
+                        >
+                          Senior Software Developer
+                        </h3>
+                      </div>
+                      <div 
+                        className={`text-gray-600 text-sm ${isAnimated ? 'animate-contact-fade-in' : ''}`}
+                        style={{ 
+                          animation: isAnimated ? 'contact-fade-in 1.8s ease-out forwards 1s' : 'none',
+                          opacity: 0
+                        }}
+                      >
                         <span>📧 kulani.m@example.co.za</span><br /> 
                         <span>📱 071 234 5678</span><br />
                         <span>📍 Johannesburg, Gauteng</span>
-                      </p>
+                      </div>
                     </div>
-                    <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
+                    <div 
+                      className={`w-20 h-20 rounded-full bg-gray-200 overflow-hidden ${isAnimated ? 'animate-photo-pop' : ''}`}
+                      style={{ 
+                        animation: isAnimated ? 'photo-pop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s' : 'none',
+                        opacity: 0,
+                        transform: 'scale(0.8)'
+                      }}
+                    >
                       <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                         <circle cx="100" cy="80" r="40" fill="#6B7280" />
                         <rect x="60" y="120" width="80" height="80" fill="#6B7280" />
