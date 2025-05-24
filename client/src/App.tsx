@@ -48,6 +48,7 @@ import JobsPage from "@/pages/JobsPage";
 import JobDetailsPage from "@/pages/JobDetailsPage";
 import JobSitesPage from "@/pages/JobSitesPage";
 import JobRecommendationsPage from "@/pages/JobRecommendationsPage";
+import IndustryTemplatesPage from "@/pages/IndustryTemplatesPage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
 import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
 
@@ -130,6 +131,8 @@ function App() {
                   <Route path="/jobs" component={JobsPage} />
                   <Route path="/job/:id" component={JobDetailsPage} />
                   <Route path="/job-sites" component={JobSitesPage} />
+                  <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
+                  <Route path="/industry-templates" component={IndustryTemplatesPage} />
                   <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
                   <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
                   
