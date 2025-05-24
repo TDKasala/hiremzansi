@@ -107,6 +107,526 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Employer Routes
+  
+  // Get current user's employer profile
+  app.get("/api/employers/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ 
+          error: "Employer profile not found", 
+          message: "You don't have an employer profile yet." 
+        });
+      }
+      
+      res.json(employer);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Create employer profile
+  app.post("/api/employers", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Check if employer profile already exists
+      const existingEmployer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (existingEmployer) {
+        return res.status(400).json({ 
+          error: "Employer profile already exists", 
+          message: "You already have an employer profile." 
+        });
+      }
+      
+      // Prepare employer data
+      const employerData = {
+        ...req.body,
+        userId
+      };
+      
+      // Validate data
+      const validatedData = insertEmployerSchema.parse(employerData);
+      
+      // Create employer profile
+      const employer = await employerStorage.createEmployer(validatedData);
+      
+      res.status(201).json(employer);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Update employer profile
+  app.put("/api/employers/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ 
+          error: "Employer profile not found", 
+          message: "You don't have an employer profile yet." 
+        });
+      }
+      
+      // Update employer profile
+      const updatedEmployer = await employerStorage.updateEmployer(employer.id, req.body);
+      
+      res.json(updatedEmployer);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Job Posting Routes
+  
+  // Get job postings for current employer
+  app.get("/api/job-postings/my", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ 
+          error: "Employer profile not found", 
+          message: "You don't have an employer profile yet." 
+        });
+      }
+      
+      // Get job postings
+      const jobPostings = await employerStorage.getJobPostingsByEmployer(employer.id);
+      
+      res.json(jobPostings);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get all job postings with filters
+  app.get("/api/job-postings", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { title, location, industry, employmentType, limit } = req.query;
+      
+      // Prepare query parameters
+      const queryParams: any = {};
+      
+      if (title) queryParams.title = title as string;
+      if (location) queryParams.location = location as string;
+      if (industry) queryParams.industry = industry as string;
+      if (employmentType) queryParams.employmentType = employmentType as string;
+      if (limit) queryParams.limit = parseInt(limit as string);
+      
+      // Get job postings
+      const jobPostings = await employerStorage.getJobPostings(queryParams);
+      
+      res.json(jobPostings);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get job posting by ID
+  app.get("/api/job-postings/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      // Get job posting
+      const jobPosting = await employerStorage.getJobPosting(jobId);
+      
+      if (!jobPosting) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      res.json(jobPosting);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Create job posting
+  app.post("/api/job-postings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ 
+          error: "Employer profile not found", 
+          message: "You need to create an employer profile first." 
+        });
+      }
+      
+      // Prepare job posting data
+      const jobPostingData = {
+        ...req.body,
+        employerId: employer.id
+      };
+      
+      // Validate data
+      const validatedData = insertJobPostingSchema.parse(jobPostingData);
+      
+      // Create job posting
+      const jobPosting = await employerStorage.createJobPosting(validatedData);
+      
+      res.status(201).json(jobPosting);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Update job posting
+  app.patch("/api/job-postings/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+      
+      // Get job posting
+      const jobPosting = await employerStorage.getJobPosting(jobId);
+      
+      if (!jobPosting) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Check if job posting belongs to employer
+      if (jobPosting.employerId !== employer.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Update job posting
+      const updatedJobPosting = await employerStorage.updateJobPosting(jobId, req.body);
+      
+      res.json(updatedJobPosting);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Delete job posting
+  app.delete("/api/job-postings/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+      
+      // Get job posting
+      const jobPosting = await employerStorage.getJobPosting(jobId);
+      
+      if (!jobPosting) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Check if job posting belongs to employer
+      if (jobPosting.employerId !== employer.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Delete job posting
+      await employerStorage.deleteJobPosting(jobId);
+      
+      res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Job Matching Routes
+  
+  // Get job matches for a specific job posting
+  app.get("/api/job-postings/:id/candidates", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job posting ID" });
+      }
+      
+      // Get employer profile
+      const employer = await employerStorage.getEmployerByUserId(userId);
+      
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+      
+      // Get job posting
+      const jobPosting = await employerStorage.getJobPosting(jobId);
+      
+      if (!jobPosting) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Check if job posting belongs to employer
+      if (jobPosting.employerId !== employer.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get job matches
+      const matches = await employerStorage.getJobMatchesForJob(jobId);
+      
+      res.json(matches);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get job matches for a specific CV
+  app.get("/api/cv/:id/job-matches", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cvId = parseInt(req.params.id);
+      const userId = req.user.id;
+      
+      if (isNaN(cvId)) {
+        return res.status(400).json({ error: "Invalid CV ID" });
+      }
+      
+      // Get CV
+      const cv = await storage.getCV(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ error: "CV not found" });
+      }
+      
+      // Check if CV belongs to user
+      if (cv.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get job matches
+      const matches = await employerStorage.getJobMatchesForCV(cvId);
+      
+      res.json(matches);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Create job match (run matching algorithm between a CV and job posting)
+  app.post("/api/job-matches", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { cvId, jobId } = req.body;
+      const userId = req.user.id;
+      
+      if (!cvId || !jobId) {
+        return res.status(400).json({ error: "CV ID and Job ID are required" });
+      }
+      
+      // Get CV
+      const cv = await storage.getCV(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ error: "CV not found" });
+      }
+      
+      // Check if CV belongs to user
+      if (cv.userId !== userId) {
+        return res.status(403).json({ error: "Access denied to this CV" });
+      }
+      
+      // Get job posting
+      const jobPosting = await employerStorage.getJobPosting(jobId);
+      
+      if (!jobPosting) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+      
+      // Check if job is active
+      if (!jobPosting.isActive) {
+        return res.status(400).json({ error: "Job posting is not active" });
+      }
+      
+      // Use AI service to calculate match score
+      const { skillGapAnalyzerService } = await import('./services/skillGapAnalyzerService');
+      const analysisResult = await skillGapAnalyzerService.analyzeMatch(cv.content, jobPosting.description, jobPosting.requiredSkills);
+      
+      // Create job match record
+      const matchData = {
+        cvId,
+        jobId,
+        userId,
+        matchScore: analysisResult.overallScore || 0,
+        skillsMatched: analysisResult.matchedSkills || []
+      };
+      
+      const jobMatch = await employerStorage.createJobMatch(matchData);
+      
+      // Create notification for the employer
+      await employerStorage.createNotification({
+        userId: jobPosting.employerId,
+        title: "New Job Application",
+        message: `A new candidate has applied for your "${jobPosting.title}" job posting.`,
+        type: "job-match",
+        relatedEntityId: jobMatch.id,
+        relatedEntityType: "job-match"
+      });
+      
+      res.status(201).json({
+        ...jobMatch,
+        analysisDetails: analysisResult
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Skills Management Routes
+  
+  // Get all skills by category
+  app.get("/api/skills", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { category } = req.query;
+      
+      // Get all skills using the employer storage functions
+      let skillsList;
+      if (category) {
+        // Filter by category if provided
+        skillsList = await db.select().from(skills)
+          .where(eq(skills.category, category as string));
+      } else {
+        // Get all skills
+        skillsList = await db.select().from(skills);
+      }
+      
+      res.json(skillsList);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Get user skills
+  app.get("/api/user/skills", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get user skills
+      const userSkills = await employerStorage.getUserSkills(userId);
+      
+      res.json(userSkills);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Add user skill
+  app.post("/api/user/skills", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      const { skillId, proficiency, yearsExperience } = req.body;
+      
+      if (!skillId || !proficiency) {
+        return res.status(400).json({ error: "Skill ID and proficiency are required" });
+      }
+      
+      // Check if skill exists
+      const skill = await employerStorage.getSkill(skillId);
+      
+      if (!skill) {
+        return res.status(404).json({ error: "Skill not found" });
+      }
+      
+      // Add user skill
+      const userSkill = await employerStorage.addUserSkill({
+        userId,
+        skillId,
+        proficiency,
+        yearsExperience: yearsExperience || 0
+      });
+      
+      res.status(201).json(userSkill);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Remove user skill
+  app.delete("/api/user/skills/:skillId", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      const skillId = parseInt(req.params.skillId);
+      
+      if (isNaN(skillId)) {
+        return res.status(400).json({ error: "Invalid skill ID" });
+      }
+      
+      // Remove user skill
+      await employerStorage.removeUserSkill(userId, skillId);
+      
+      res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Notification Routes
+  
+  // Get notifications for the authenticated user
+  app.get("/api/notifications", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      
+      // Get notifications
+      const notifications = await employerStorage.getNotificationsForUser(userId, limit);
+      
+      res.json(notifications);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Mark notification as read
+  app.patch("/api/notifications/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const notificationId = parseInt(req.params.id);
+      
+      if (isNaN(notificationId)) {
+        return res.status(400).json({ error: "Invalid notification ID" });
+      }
+      
+      // Mark notification as read
+      const notification = await employerStorage.markNotificationAsRead(notificationId);
+      
+      res.json(notification);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
   // Get all CVs for the authenticated user
   app.get("/api/cvs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
