@@ -16,8 +16,12 @@ import {
   insertAtsScoreSchema, 
   insertDeepAnalysisReportSchema,
   insertEmployerSchema,
-  insertJobPostingSchema
+  insertJobPostingSchema,
+  skills,
+  insertJobMatchSchema
 } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
@@ -471,8 +475,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use AI service to calculate match score
-      const { skillGapAnalyzerService } = await import('./services/skillGapAnalyzerService');
-      const analysisResult = await skillGapAnalyzerService.analyzeMatch(cv.content, jobPosting.description, jobPosting.requiredSkills);
+      // For now, we'll implement a simple matching algorithm without AI
+      // This can be enhanced later with more sophisticated AI matching
+      const matchedSkills = [];
+      const jobSkills = jobPosting.requiredSkills || [];
+      const cvContent = cv.content.toLowerCase();
+      
+      // Simple keyword matching for skills
+      for (const skill of jobSkills) {
+        if (cvContent.includes(skill.toLowerCase())) {
+          matchedSkills.push(skill);
+        }
+      }
+      
+      // Calculate match score based on percentage of matched skills
+      const matchPercentage = jobSkills.length > 0 
+        ? Math.round((matchedSkills.length / jobSkills.length) * 100)
+        : 50; // Default score if no skills are specified
+      
+      const analysisResult = {
+        overallScore: matchPercentage,
+        matchedSkills: matchedSkills,
+        unmatchedSkills: jobSkills.filter(skill => !matchedSkills.includes(skill)),
+        jobTitle: jobPosting.title,
+        industry: jobPosting.industry
+      };
       
       // Create job match record
       const matchData = {
