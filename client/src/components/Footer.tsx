@@ -6,7 +6,9 @@ import {
   FaLinkedinIn, 
   FaInstagram, 
   FaEnvelope, 
-  FaMapMarkerAlt 
+  FaMapMarkerAlt,
+  FaFacebook,
+  FaLinkedin
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -120,17 +122,16 @@ export default function Footer() {
                 <span className="text-neutral-400">Cape Town, South Africa</span>
               </li>
             </ul>
-            <div className="mt-4">
-              <form className="flex flex-col space-y-2">
-                <Input 
-                  type="email" 
-                  placeholder="Your email" 
-                  className="px-3 py-2 bg-neutral-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary" 
-                />
-                <Button type="submit" className="bg-primary text-white hover:bg-opacity-90">
-                  Subscribe to Newsletter
-                </Button>
-              </form>
+            <div className="mt-4 flex space-x-4">
+              <a href="https://twitter.com/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+                <FaTwitter className="text-xl" />
+              </a>
+              <a href="https://linkedin.com/company/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+                <FaLinkedinIn className="text-xl" />
+              </a>
+              <a href="https://facebook.com/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+                <FaFacebookF className="text-xl" />
+              </a>
             </div>
           </div>
         </div>
