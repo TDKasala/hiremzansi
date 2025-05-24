@@ -116,16 +116,29 @@ class TemplateSecurityService {
     securityInfo: TemplateSecurityInfo,
     metadata: any
   ): Promise<void> {
-    // In a real implementation, we would store this in the database
-    console.log(`Template generated for user ${userId}:`, {
-      templateType,
-      watermarkId: securityInfo.watermarkId,
-      timestamp: new Date(),
-      metadata
-    });
-    
-    // Increment user's usage count in their subscription
-    // This is a placeholder for when we have the proper schema
+    try {
+      // Log template generation for audit purposes
+      const templateInfo = {
+        userId,
+        templateType,
+        watermarkId: securityInfo.watermarkId,
+        securityCode: securityInfo.securityCode,
+        timestamp: new Date(),
+        metadata
+      };
+      
+      // Use proper production logging
+      if (process.env.NODE_ENV === 'production') {
+        console.info('Template generated:', JSON.stringify(templateInfo));
+      } else {
+        console.log(`Template generated for user ${userId}:`, templateInfo);
+      }
+      
+      // TODO: Implement database storage when template_usage table is created
+      // For now, we'll continue tracking via logs
+    } catch (error) {
+      console.error('Error recording template generation:', error);
+    }
   }
   
   /**
