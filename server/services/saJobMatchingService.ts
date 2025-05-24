@@ -78,26 +78,28 @@ const WEIGHT_FACTORS = {
 };
 
 // Interface for job recommendations
+export interface JobMatchDetails {
+  skillsMatch: number;
+  skillsMatched: string[];
+  industryMatch: number;
+  locationMatch: number;
+  saContextMatch: number;
+  experienceMatch: number;
+  bbbeeRelevance: number;
+  nqfMatch: number;
+}
+
 export interface JobRecommendation {
   jobId: number;
   title: string;
   company: string;
-  location: string;
+  location: string | null;
   matchScore: number;
-  matchDetails: {
-    skillsMatch: number;
-    skillsMatched: string[];
-    industryMatch: number;
-    locationMatch: number;
-    saContextMatch: number;
-    experienceMatch: number;
-    bbbeeRelevance: number;
-    nqfMatch: number;
-  };
+  matchDetails: JobMatchDetails;
   postedAt: Date;
-  applicationDeadline?: Date;
-  salary?: string;
-  employmentType: string;
+  applicationDeadline?: Date | null;
+  salary?: string | null;
+  employmentType: string | null;
 }
 
 /**
@@ -286,7 +288,7 @@ async function calculateJobMatchScore(
     } else {
       // Partial industry match (check if parts of the industry name appear)
       const industryWords = job.industry.toLowerCase().split(/\\s+/);
-      const matchingWords = industryWords.filter(word => 
+      const matchingWords = industryWords.filter((word: string) => 
         word.length > 3 && cvContent.includes(word)
       );
       
