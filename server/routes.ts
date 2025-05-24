@@ -18,9 +18,11 @@ import {
   insertEmployerSchema,
   insertJobPostingSchema,
   skills,
-  insertJobMatchSchema
+  insertJobMatchSchema,
+  saProfiles,
+  employers,
 } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
@@ -234,6 +236,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(jobPostings);
     } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Advanced South African job search with province and BBBEE filters
+  app.get("/api/sa-job-search", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { 
+        province, 
+        bbbeeLevel, 
+        nqfLevel, 
+        industry, 
+        jobType,
+        skills,
+        limit,
+        offset
+      } = req.query;
+      
+      // Create base query for job postings
+      let baseQuery = db.select({
+        job: jobPostings,
+        employer: employers
+      })
+      .from(jobPostings)
+      .innerJoin(employers, eq(jobPostings.employerId, employers.id))
+      .where(eq(jobPostings.isActive, true));
+      
+      // Apply South African specific filters
+      if (province) {
+        baseQuery = baseQuery.where(eq(employers.location, province as string));
+      }
+      
+      if (bbbeeLevel) {
+        baseQuery = baseQuery.where(eq(employers.bbbeeLevel, bbbeeLevel as string));
+      }
+      
+      if (industry) {
+        baseQuery = baseQuery.where(eq(jobPostings.industry, industry as string));
+      }
+      
+      if (jobType) {
+        baseQuery = baseQuery.where(eq(jobPostings.employmentType, jobType as string));
+      }
+      
+      // Prepare skills filter
+      if (skills) {
+        const skillsList = (skills as string).split(',');
+        
+        // For each skill, check if it's in the required skills array
+        skillsList.forEach(skill => {
+          // Using SQL like to check array contents (simple approach)
+          baseQuery = baseQuery.where(
+            sql`${jobPostings.requiredSkills}::text LIKE ${'%' + skill.trim() + '%'}`
+          );
+        });
+      }
+      
+      // Apply pagination
+      if (limit) {
+        baseQuery = baseQuery.limit(parseInt(limit as string));
+      } else {
+        baseQuery = baseQuery.limit(20); // Default limit
+      }
+      
+      if (offset) {
+        baseQuery = baseQuery.offset(parseInt(offset as string));
+      }
+      
+      // Order by newest first
+      baseQuery = baseQuery.orderBy(desc(jobPostings.createdAt));
+      
+      // Execute query
+      const results = await baseQuery;
+      
+      // Format response
+      const formattedResults = results.map(({ job, employer }) => ({
+        id: job.id,
+        title: job.title,
+        company: employer.companyName,
+        location: employer.location,
+        description: job.description,
+        employmentType: job.employmentType,
+        salary: job.salaryRange,
+        requiredSkills: job.requiredSkills,
+        bbbeeLevel: employer.bbbeeLevel,
+        industry: job.industry,
+        experienceLevel: job.experienceLevel,
+        deadline: job.deadline,
+        createdAt: job.createdAt,
+        companyLogo: employer.logo
+      }));
+      
+      res.json({
+        results: formattedResults,
+        count: formattedResults.length,
+        filters: {
+          province,
+          bbbeeLevel,
+          industry,
+          jobType,
+          skills
+        }
+      });
+    } catch (error) {
+      console.error("Error in SA job search:", error);
       next(error);
     }
   });
@@ -614,6 +721,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await employerStorage.removeUserSkill(userId, skillId);
       
       res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // South African Profile Routes
+  
+  // Get current user's South African profile details
+  app.get("/api/sa-profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Query the saProfiles table directly
+      const [profile] = await db.select().from(saProfiles).where(eq(saProfiles.userId, userId));
+      
+      if (!profile) {
+        return res.status(404).json({ 
+          error: "SA profile not found", 
+          message: "You don't have a South African profile yet." 
+        });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // Create or update South African profile
+  app.post("/api/sa-profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Check if profile already exists
+      const [existingProfile] = await db.select().from(saProfiles).where(eq(saProfiles.userId, userId));
+      
+      if (existingProfile) {
+        // Update existing profile
+        const [updatedProfile] = await db
+          .update(saProfiles)
+          .set({
+            ...req.body,
+            updatedAt: new Date()
+          })
+          .where(eq(saProfiles.userId, userId))
+          .returning();
+        
+        return res.json(updatedProfile);
+      }
+      
+      // Create new profile
+      const [newProfile] = await db.insert(saProfiles)
+        .values({
+          ...req.body,
+          userId
+        })
+        .returning();
+      
+      res.status(201).json(newProfile);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  // B-BBEE Verification Routes
+  
+  // Submit B-BBEE certificate for verification
+  app.post("/api/sa-profile/bbbee-verification", isAuthenticated, upload.single("certificate"), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      if (!req.file) {
+        return res.status(400).json({ 
+          error: "No file uploaded", 
+          message: "Please upload your B-BBEE certificate" 
+        });
+      }
+      
+      // Get user's SA profile
+      const [profile] = await db.select().from(saProfiles).where(eq(saProfiles.userId, userId));
+      
+      if (!profile) {
+        return res.status(404).json({ 
+          error: "SA profile not found", 
+          message: "Please create your South African profile first" 
+        });
+      }
+      
+      // In a real implementation, we would:
+      // 1. Save the certificate file
+      // 2. Submit it for verification (manual or automated)
+      // 3. Update the profile status
+      
+      // For now, we'll mock the verification process
+      const [updatedProfile] = await db
+        .update(saProfiles)
+        .set({
+          bbbeeVerificationStatus: "pending",
+          bbbeeVerificationDate: new Date(),
+          updatedAt: new Date()
+        })
+        .where(eq(saProfiles.userId, userId))
+        .returning();
+      
+      // Create a notification for the user
+      await employerStorage.createNotification({
+        userId,
+        title: "B-BBEE Verification Submitted",
+        message: "Your B-BBEE certificate has been submitted for verification. You will be notified once the verification is complete.",
+        type: "bbbee-verification",
+        relatedEntityId: profile.id,
+        relatedEntityType: "sa-profile"
+      });
+      
+      res.json({
+        message: "B-BBEE certificate submitted for verification",
+        profile: updatedProfile
+      });
     } catch (error) {
       next(error);
     }
