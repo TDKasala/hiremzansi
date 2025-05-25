@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase, signIn, signUp, signOut } from '../../../shared/supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import { supabase } from '../../../shared/supabase';
+import type { User, Session, UserResponse, SignInWithPasswordCredentials } from '@supabase/supabase-js';
 
 // Define the shape of our auth context
 type AuthContextType = {
@@ -65,6 +65,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     checkSession();
   }, []);
+
+  // Sign up with email and password
+  const signUp = async (email: string, password: string, userData: any = {}) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData,
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined
+        }
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error signing up:', error);
+      return { data: null, error };
+    }
+  };
+
+  // Sign in with email and password
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error signing in:', error);
+      return { data: null, error };
+    }
+  };
+
+  // Sign out
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      console.error('Error signing out:', error);
+      return { error };
+    }
+  };
 
   // AuthContext value
   const value = {

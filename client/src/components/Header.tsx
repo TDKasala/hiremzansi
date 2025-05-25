@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { Menu, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../context/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,8 @@ import atsBoostLogo from "@/assets/atsboost-logo.png";
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  const { user, signOut } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { t } = useTranslation();
 
   const toggleMobileMenu = () => {
@@ -85,7 +86,7 @@ export default function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <div className="px-2 py-1.5 text-sm font-medium">
-                    {user.name || user.username}
+                    {user.email}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
@@ -125,11 +126,15 @@ export default function Header() {
                   
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => logoutMutation.mutate()}
-                    disabled={logoutMutation.isPending}
+                    onClick={async () => {
+                      setIsLoggingOut(true);
+                      await signOut();
+                      setIsLoggingOut(false);
+                    }}
+                    disabled={isLoggingOut}
                     className="text-red-500 focus:text-red-500"
                   >
-                    {logoutMutation.isPending ? "Logging out..." : (
+                    {isLoggingOut ? "Logging out..." : (
                       <>
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>{t('common.logout')}</span>
@@ -234,14 +239,16 @@ export default function Header() {
                   </Link>
                 )}
                 <button
-                  onClick={() => {
-                    logoutMutation.mutate();
+                  onClick={async () => {
+                    setIsLoggingOut(true);
+                    await signOut();
+                    setIsLoggingOut(false);
                     closeMobileMenu();
                   }}
-                  disabled={logoutMutation.isPending}
+                  disabled={isLoggingOut}
                   className="w-full px-4 py-2 bg-red-500 text-white text-center rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
                 >
-                  {logoutMutation.isPending ? "Logging out..." : (
+                  {isLoggingOut ? "Logging out..." : (
                     <>
                       <LogOut className="h-4 w-4" />
                       <span>{t('common.logout')}</span>
