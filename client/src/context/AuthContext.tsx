@@ -74,7 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: {
           data: userData,
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined
+          emailRedirectTo: typeof window !== 'undefined' 
+            ? `${window.location.origin}/auth/callback` 
+            : 'https://www.atsboost.co.za/auth/callback'
         }
       });
 
