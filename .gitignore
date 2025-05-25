@@ -65,3 +65,13 @@ tmp/
 # Application generated files
 test_results/
 pdf_cache/
+
+node_modules/
+.env
+.replit
+.upm/
+.config/
+.cache/
+.npm/
+dist/
+.DS_Store
