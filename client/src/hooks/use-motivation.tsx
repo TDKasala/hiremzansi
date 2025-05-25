@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
+import { useContext as useReactContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 type MotivationType = 'general' | 'upload' | 'analysis' | 'improvement' | 'application';
 
