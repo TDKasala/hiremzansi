@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./context/AuthContext";
-import { MotivationProvider } from "@/hooks/use-motivation";
+// Temporarily remove motivation provider to fix auth issues
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
 
@@ -83,87 +83,85 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
         <TooltipProvider>
           <AuthProvider>
-            <MotivationProvider>
-              <Layout>
-                <ScrollToTop />
-                <Switch>
-                  <Route path="/" component={HomePage} />
-                  <Route path="/how-it-works" component={HowItWorksPage} />
-                  <Route path="/pricing" component={PricingPage} />
-                  <Route path="/blog" component={BlogPage} />
-                  <Route path="/about" component={AboutPage} />
-                  <Route path="/privacy" component={PrivacyPage} />
-                  <Route path="/terms" component={TermsPage} />
-                  <Route path="/contact" component={ContactPage} />
-                  <Route path="/login" component={LoginPage} />
-                  <Route path="/signup" component={SignUpPage} />
-                  <Route path="/auth" component={AuthPage} />
-                  <Route path="/realtime-ats" component={RealtimeATSPage} />
-                  <Route path="/refer" component={ReferralPage} />
-                  <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
-                  <Route path="/templates" component={TemplatesPage} />
-                  
-                  {/* Original blog post */}
-                  <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
-                  
-                  {/* New SEO-optimized blog posts */}
-                  <Route path="/blog/b-bbee-impact-sa-resumes" component={BBBEEImpactSAResumes} />
-                  <Route path="/blog/nqf-levels-explained" component={NQFLevelsExplained} />
-                  <Route path="/blog/ats-survival-guide-2025" component={ATSSurvivalGuide2025} />
-                  <Route path="/blog/ATSSurvivalGuide2025" component={ATSSurvivalGuide2025} />
-                  <Route path="/blog/remote-work-opportunities-sa" component={RemoteWorkOpportunitiesSA} />
-                  <Route path="/blog/industry-specific-cv-tips" component={IndustrySpecificCVTips} />
-                  <Route path="/blog/language-proficiency-cv" component={LanguageProficiencyCV} />
-                  <Route path="/blog/linkedin-optimization-sa-professionals" component={LinkedInOptimizationSAProfessionals} />
-                  <Route path="/blog/graduate-cv-templates" component={GraduateCVTemplates} />
-                  <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
-                  <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
-                  <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
-                  
-                  {/* Generic blog detail page handler for dynamic paths */}
-                  <Route path="/blog/:slug" component={BlogDetailPage} />
-                  
-                  {/* Tool pages */}
-                  <Route path="/tools/cover-letter" component={CoverLetterPage} />
-                  <Route path="/tools/cv-templates" component={CVTemplatesPage} />
-                  <Route path="/tools/ats-keywords" component={ATSKeywordsPage} />
-                  <Route path="/tools/cover-letter-ideas" component={CoverLetterIdeasPage} />
-                  <Route path="/tools/cv-checklist" component={CVChecklistPage} />
-                  <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
-                  <Route path="/tools/interview-guide" component={InterviewGuidePage} />
-                  
-                  {/* Job search and career advancement pages */}
-                  <Route path="/jobs" component={JobsPage} />
-                  <Route path="/job/:id" component={JobDetailsPage} />
-                  <Route path="/job-sites" component={JobSitesPage} />
-                  <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
-                  <Route path="/industry-templates" component={IndustryTemplatesPage} />
-                  <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
-                  <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
-                  
-                  {/* Protected routes requiring authentication */}
-                  <ProtectedRoute path="/dashboard" component={DashboardPage} />
-                  <ProtectedRoute path="/upload" component={UploadPage} />
-                  <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
-                  <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
-                  <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
-                  <Route path="/ats-results" component={ATSResultsPage} />
-                  <Route path="/motivation-demo" component={MotivationDemoPage} />
-                  <Route path="/motivation-dashboard" component={MotivationDashboard} />
-                  <Route path="/local-ai-demo" component={LocalAIDemoPage} />
-                  <Route path="/sa-ai-demo" component={SouthAfricanAIDemo} />
-                  <ProtectedRoute path="/profile" component={ProfilePage} />
-                  <ProtectedRoute path="/settings" component={SettingsPage} />
-                  <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
-                  <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
-                  <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-                  <ProtectedRoute path="/admin" component={AdminDashboard} />
-                  
-                  <Route component={NotFound} />
-                </Switch>
-                <Toaster />
-              </Layout>
-            </MotivationProvider>
+            <Layout>
+              <ScrollToTop />
+              <Switch>
+                <Route path="/" component={HomePage} />
+                <Route path="/how-it-works" component={HowItWorksPage} />
+                <Route path="/pricing" component={PricingPage} />
+                <Route path="/blog" component={BlogPage} />
+                <Route path="/about" component={AboutPage} />
+                <Route path="/privacy" component={PrivacyPage} />
+                <Route path="/terms" component={TermsPage} />
+                <Route path="/contact" component={ContactPage} />
+                <Route path="/login" component={LoginPage} />
+                <Route path="/signup" component={SignUpPage} />
+                <Route path="/auth" component={AuthPage} />
+                <Route path="/realtime-ats" component={RealtimeATSPage} />
+                <Route path="/refer" component={ReferralPage} />
+                <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
+                <Route path="/templates" component={TemplatesPage} />
+                
+                {/* Original blog post */}
+                <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
+                
+                {/* New SEO-optimized blog posts */}
+                <Route path="/blog/b-bbee-impact-sa-resumes" component={BBBEEImpactSAResumes} />
+                <Route path="/blog/nqf-levels-explained" component={NQFLevelsExplained} />
+                <Route path="/blog/ats-survival-guide-2025" component={ATSSurvivalGuide2025} />
+                <Route path="/blog/ATSSurvivalGuide2025" component={ATSSurvivalGuide2025} />
+                <Route path="/blog/remote-work-opportunities-sa" component={RemoteWorkOpportunitiesSA} />
+                <Route path="/blog/industry-specific-cv-tips" component={IndustrySpecificCVTips} />
+                <Route path="/blog/language-proficiency-cv" component={LanguageProficiencyCV} />
+                <Route path="/blog/linkedin-optimization-sa-professionals" component={LinkedInOptimizationSAProfessionals} />
+                <Route path="/blog/graduate-cv-templates" component={GraduateCVTemplates} />
+                <Route path="/blog/personal-branding-job-search" component={PersonalBrandingJobSearch} />
+                <Route path="/blog/ai-tools-resume-optimization" component={AIToolsResumeOptimization} />
+                <Route path="/blog/south-african-cv-guide" component={SouthAfricanCVGuide} />
+                
+                {/* Generic blog detail page handler for dynamic paths */}
+                <Route path="/blog/:slug" component={BlogDetailPage} />
+                
+                {/* Tool pages */}
+                <Route path="/tools/cover-letter" component={CoverLetterPage} />
+                <Route path="/tools/cv-templates" component={CVTemplatesPage} />
+                <Route path="/tools/ats-keywords" component={ATSKeywordsPage} />
+                <Route path="/tools/cover-letter-ideas" component={CoverLetterIdeasPage} />
+                <Route path="/tools/cv-checklist" component={CVChecklistPage} />
+                <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
+                <Route path="/tools/interview-guide" component={InterviewGuidePage} />
+                
+                {/* Job search and career advancement pages */}
+                <Route path="/jobs" component={JobsPage} />
+                <Route path="/job/:id" component={JobDetailsPage} />
+                <Route path="/job-sites" component={JobSitesPage} />
+                <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
+                <Route path="/industry-templates" component={IndustryTemplatesPage} />
+                <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
+                <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
+                
+                {/* Protected routes requiring authentication */}
+                <ProtectedRoute path="/dashboard" component={DashboardPage} />
+                <ProtectedRoute path="/upload" component={UploadPage} />
+                <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
+                <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
+                <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
+                <Route path="/ats-results" component={ATSResultsPage} />
+                <Route path="/motivation-demo" component={MotivationDemoPage} />
+                <Route path="/motivation-dashboard" component={MotivationDashboard} />
+                <Route path="/local-ai-demo" component={LocalAIDemoPage} />
+                <Route path="/sa-ai-demo" component={SouthAfricanAIDemo} />
+                <ProtectedRoute path="/profile" component={ProfilePage} />
+                <ProtectedRoute path="/settings" component={SettingsPage} />
+                <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
+                <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
+                <ProtectedRoute path="/subscription" component={SubscriptionPage} />
+                <ProtectedRoute path="/admin" component={AdminDashboard} />
+                
+                <Route component={NotFound} />
+              </Switch>
+              <Toaster />
+            </Layout>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

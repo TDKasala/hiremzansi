@@ -67,7 +67,8 @@ const SA_MOTIVATIONAL_MESSAGES = [
 export const MotivationProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const [motivationEnabled, setMotivationEnabled] = useState<boolean>(true);
-  const { user } = useAuth();
+  const authContext = useReactContext(AuthContext);
+  const user = authContext?.user || null;
   
   // Track motivation state
   const [motivationState, setMotivationState] = useState<{

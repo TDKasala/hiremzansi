@@ -14,7 +14,7 @@ type AuthContextType = {
 };
 
 // Create the context
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Custom hook to use the auth context
 export function useAuth() {
