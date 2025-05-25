@@ -1,34 +1,35 @@
 import React from 'react';
-import { useLocation } from 'wouter';
+import { Route, useLocation } from 'wouter';
 import { useAuth } from '../../context/AuthContext';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+// This component wraps a Route to provide authentication protection
+export function ProtectedRoute({ component: Component, ...rest }: any) {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
   
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-  
-  // Redirect to login if not authenticated
-  if (!user) {
-    // Use React.useEffect to avoid issues with redirecting during render
-    React.useEffect(() => {
-      setLocation('/login');
-    }, [setLocation]);
+  // Create a wrapper component that handles the auth logic
+  const ProtectedComponent = (props: any) => {
+    // Show loading state while checking authentication
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      );
+    }
     
-    return null;
-  }
+    // Redirect to login if not authenticated
+    if (!user) {
+      React.useEffect(() => {
+        setLocation('/login');
+      }, []);
+      return null;
+    }
+    
+    // Render the protected component if authenticated
+    return <Component {...props} />;
+  };
   
-  // Render children if authenticated
-  return <>{children}</>;
+  // Return a Route with the protected component
+  return <Route {...rest} component={ProtectedComponent} />;
 }

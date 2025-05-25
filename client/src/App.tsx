@@ -4,9 +4,9 @@ import { queryClient } from "./lib/queryClient";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider } from "./context/AuthContext";
 import { MotivationProvider } from "@/hooks/use-motivation";
-import { ProtectedRoute } from "@/lib/protected-route";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
 
 import Layout from "@/components/Layout";
@@ -20,11 +20,14 @@ import TermsPage from "@/pages/TermsPage";
 import ContactPage from "@/pages/ContactPage";
 import AuthPage from "@/pages/auth-page";
 import DashboardPage from "@/pages/dashboard-page";
+import { LoginPage } from "./pages/LoginPage";
+import { SignUpPage } from "./pages/SignUpPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
 import LatestCVPage from "@/pages/LatestCVPage";
 import DeepAnalysisPage from "@/pages/DeepAnalysisPage";
-import ProfilePage from "@/pages/ProfilePage";
+// Using our new ProfilePage with Supabase integration
 import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import JobSeekerToolsPage from "@/pages/JobSeekerToolsPage";
@@ -92,6 +95,8 @@ function App() {
                   <Route path="/privacy" component={PrivacyPage} />
                   <Route path="/terms" component={TermsPage} />
                   <Route path="/contact" component={ContactPage} />
+                  <Route path="/login" component={LoginPage} />
+                  <Route path="/signup" component={SignUpPage} />
                   <Route path="/auth" component={AuthPage} />
                   <Route path="/realtime-ats" component={RealtimeATSPage} />
                   <Route path="/refer" component={ReferralPage} />
