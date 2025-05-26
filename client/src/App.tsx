@@ -98,6 +98,7 @@ function App() {
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signup" component={SignUpPage} />
                 <Route path="/auth" component={AuthPage} />
+                <Route path="/auth/callback" component={AuthCallback} />
                 <Route path="/realtime-ats" component={RealtimeATSPage} />
                 <Route path="/refer" component={ReferralPage} />
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
