@@ -10,7 +10,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 });
 
@@ -22,7 +23,7 @@ export const signUp = async (email: string, password: string, userData: any = {}
       password,
       options: {
         data: userData,
-        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
+        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'https://www.atsboost.co.za/auth/callback'
       }
     });
 

@@ -23,6 +23,7 @@ import DashboardPage from "@/pages/dashboard-page";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import AuthCallback from "./pages/AuthCallback";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
 import LatestCVPage from "@/pages/LatestCVPage";
