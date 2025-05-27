@@ -27,10 +27,12 @@ function AccordionItem({ title, content, isOpen, toggleAccordion, id }: Accordio
         )}
       </div>
       <div 
-        className={`mt-2 text-neutral-600 ${isOpen ? "block" : "hidden"}`} 
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-96 opacity-100 mt-2" : "max-h-0 opacity-0"
+        }`}
         id={id}
       >
-        <p>{content}</p>
+        <p className="text-neutral-600 pb-2">{content}</p>
       </div>
     </div>
   );

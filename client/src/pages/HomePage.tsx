@@ -27,8 +27,8 @@ export default function HomePage() {
       
       <HeroSection />
       <UploadSection />
-      <PremiumMatchingSection />
       <WhatsAppPromoSection />
+      <PremiumMatchingSection />
       <HowItWorksSection />
       <PricingSection />
       <FeaturesSection />

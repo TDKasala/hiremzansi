@@ -30,16 +30,17 @@ export default function PremiumMatchingSection() {
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Our advanced AI analyzes CVs and job requirements to create high-quality matches. 
-            Both recruiters and job seekers only pay when they find someone worth connecting with.
+            Different pricing reflects value: recruiters get pre-screened, qualified talent (R200), 
+            while job seekers access vetted opportunities (R50).
           </p>
         </div>
 
         {/* How It Works */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          <Card className="text-center border-2 hover:border-blue-200 transition-colors">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 animate-fade-in-up">
+          <Card className="text-center border-2 hover:border-blue-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
             <CardHeader>
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Bot className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Bot className="w-8 h-8 text-blue-600 animate-pulse" />
               </div>
               <CardTitle className="text-xl">AI Analysis</CardTitle>
             </CardHeader>
@@ -51,10 +52,10 @@ export default function PremiumMatchingSection() {
             </CardContent>
           </Card>
 
-          <Card className="text-center border-2 hover:border-green-200 transition-colors">
+          <Card className="text-center border-2 hover:border-green-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
             <CardHeader>
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300 hover:scale-110">
+                <Heart className="w-8 h-8 text-green-600 animate-bounce" />
               </div>
               <CardTitle className="text-xl">Quality Matches</CardTitle>
             </CardHeader>
@@ -107,7 +108,7 @@ export default function PremiumMatchingSection() {
                 </li>
                 <li className="flex items-start">
                   <Zap className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <span>Only pay R99 when you find a job you're excited about</span>
+                  <span>Only pay R50 when you find a job you're excited about</span>
                 </li>
                 <li className="flex items-start">
                   <DollarSign className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
@@ -145,7 +146,7 @@ export default function PremiumMatchingSection() {
                 </li>
                 <li className="flex items-start">
                   <Zap className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                  <span>Only pay R99 per contact for candidates you want to interview</span>
+                  <span>Only pay R200 per contact for verified, qualified candidates</span>
                 </li>
                 <li className="flex items-start">
                   <DollarSign className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
