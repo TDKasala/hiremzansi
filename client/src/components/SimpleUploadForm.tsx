@@ -247,9 +247,9 @@ export default function SimpleUploadForm({
                 <div className="flex flex-col md:flex-row items-start mb-6">
                   <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
                     <div 
-                      className="h-24 w-24 rounded-full border-4 border-primary flex items-center justify-center"
+                      className="h-16 w-16 rounded-full border-4 border-primary flex items-center justify-center animate-pulse"
                     >
-                      <span className="text-3xl font-bold">{score || 0}</span>
+                      <span className="text-xl font-bold">{score || 0}</span>
                     </div>
                   </div>
                   <div className="flex-grow">

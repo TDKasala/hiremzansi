@@ -40,6 +40,7 @@ function AccordionItem({ title, content, isOpen, toggleAccordion, id }: Accordio
 
 export default function HowItWorksSection() {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+  const [sectionOpen, setSectionOpen] = useState(false);
 
   const toggleAccordion = (id: string) => {
     setOpenAccordion(openAccordion === id ? null : id);
@@ -84,43 +85,59 @@ export default function HowItWorksSection() {
   return (
     <section id="how-it-works" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-secondary mb-4">How ATSBoost Works</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <div 
+            className="cursor-pointer flex items-center justify-center gap-3 hover:bg-gray-50 rounded-lg p-4 transition-colors duration-200"
+            onClick={() => setSectionOpen(!sectionOpen)}
+          >
+            <h2 className="text-3xl font-bold text-secondary">How ATSBoost Works</h2>
+            {sectionOpen ? (
+              <ChevronUp className="h-8 w-8 text-primary animate-bounce" />
+            ) : (
+              <ChevronDown className="h-8 w-8 text-primary animate-pulse" />
+            )}
+          </div>
+          <p className="text-neutral-600 max-w-2xl mx-auto mt-2">
             Our simple 3-step process helps you optimize your CV for Applicant Tracking Systems 
             used by South African employers.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {steps.map((step, index) => (
-            <div key={index} className="bg-neutral-100 rounded-lg p-6 text-center">
-              <div className="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                {step.icon}
+        <div 
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            sectionOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-fade-in-up">
+            {steps.map((step, index) => (
+              <div key={index} className="bg-neutral-100 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                <div className="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                <p className="text-neutral-600">{step.description}</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-              <p className="text-neutral-600">{step.description}</p>
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-12 max-w-4xl mx-auto">
-          <div className="bg-neutral-100 rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-4">
-              Why ATS Optimization Matters in South Africa
-            </h3>
-            
-            <div className="space-y-4">
-              {accordionItems.map((item) => (
-                <AccordionItem
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  content={item.content}
-                  isOpen={openAccordion === item.id}
-                  toggleAccordion={() => toggleAccordion(item.id)}
-                />
-              ))}
+            ))}
+          </div>
+          
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="bg-neutral-100 rounded-lg p-6 hover:shadow-lg transition-shadow duration-300">
+              <h3 className="text-xl font-semibold mb-4">
+                Why ATS Optimization Matters in South Africa
+              </h3>
+              
+              <div className="space-y-4">
+                {accordionItems.map((item) => (
+                  <AccordionItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    content={item.content}
+                    isOpen={openAccordion === item.id}
+                    toggleAccordion={() => toggleAccordion(item.id)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
