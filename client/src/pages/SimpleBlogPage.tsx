@@ -339,6 +339,7 @@ Experience cutting-edge AI optimization technology at https://atsboost.co.za - d
 export default function SimpleBlogPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
   
@@ -349,6 +350,82 @@ export default function SimpleBlogPage() {
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // If a post is selected, show the full article view
+  if (selectedPost) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        {/* Article Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="container mx-auto px-4 py-6">
+            <Button 
+              onClick={() => setSelectedPost(null)}
+              variant="outline" 
+              className="gap-2"
+            >
+              <ArrowRight className="h-4 w-4 rotate-180" />
+              Back to Blog
+            </Button>
+          </div>
+        </div>
+
+        {/* Article Content */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+              <div className="flex items-center gap-4 mb-6">
+                <Badge variant="secondary">{selectedPost.category}</Badge>
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {selectedPost.publishDate}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {selectedPost.readTime}
+                  </span>
+                </div>
+              </div>
+              
+              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                {selectedPost.title}
+              </h1>
+              
+              <div className="prose prose-lg max-w-none">
+                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+                  {selectedPost.summary}
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Section */}
+            <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+              <CardContent className="p-8 text-center">
+                <h2 className="text-2xl font-bold mb-4">Ready to Transform Your Career?</h2>
+                <p className="text-lg mb-6 opacity-90">
+                  Experience AI-powered CV optimization and intelligent job matching at ATSBoost.co.za
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
+                    <Button size="lg" variant="secondary" className="gap-2">
+                      Get Started Free
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </a>
+                  <a href="https://atsboost.co.za/premium-job-seeker" target="_blank" rel="noopener noreferrer">
+                    <Button size="lg" variant="outline" className="gap-2 text-white border-white hover:bg-white hover:text-blue-600">
+                      Premium Matching
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const featuredPosts = filteredPosts.filter(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
@@ -452,12 +529,13 @@ export default function SimpleBlogPage() {
                         </Badge>
                       ))}
                     </div>
-                    <Link href={`/blog/${post.id}`}>
-                      <Button className="w-full group-hover:bg-blue-600 transition-colors gap-2">
-                        Read Article
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <Button 
+                      onClick={() => setSelectedPost(post)}
+                      className="w-full group-hover:bg-blue-600 transition-colors gap-2"
+                    >
+                      Read Article
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -507,12 +585,14 @@ export default function SimpleBlogPage() {
                         </Badge>
                       ))}
                     </div>
-                    <Link href={`/blog/${post.id}`}>
-                      <Button variant="outline" className="w-full group-hover:bg-blue-50 transition-colors gap-2">
-                        Read More
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <Button 
+                      onClick={() => setSelectedPost(post)}
+                      variant="outline" 
+                      className="w-full group-hover:bg-blue-50 transition-colors gap-2"
+                    >
+                      Read More
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
