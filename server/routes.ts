@@ -15,12 +15,7 @@ import {
   insertCvSchema, 
   insertAtsScoreSchema, 
   insertDeepAnalysisReportSchema,
-  insertEmployerSchema,
-  insertJobPostingSchema,
-  skills,
-  insertJobMatchSchema,
   saProfiles,
-  employers,
 } from "@shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
@@ -39,6 +34,8 @@ import pdfTestRoutes from "./routes/pdfTest";
 import optimizedCvAnalysisRoutes from "./routes/optimizedCvAnalysis";
 import paymentRoutes from "./routes/paymentRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import candidateScoringRoutes from "./routes/candidateScoringRoutes";
+import gamificationRoutes from "./routes/gamificationRoutes";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
@@ -1370,6 +1367,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Payment and notification routes for premium matching system
   app.use("/api/payment", paymentRoutes);
   app.use("/api/notifications", notificationRoutes);
+  
+  // Advanced features for recruiter success and job seeker engagement
+  app.use("/api/candidate-scoring", candidateScoringRoutes);
+  app.use("/api/gamification", gamificationRoutes);
   
   // WhatsApp Integration Routes
   
