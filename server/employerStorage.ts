@@ -1,13 +1,8 @@
 import { db } from "./db";
 import { 
-  employers, 
-  jobPostings,
-  jobMatches,
-  skills,
-  userSkills,
   notifications,
-  type Employer, 
-  type InsertEmployer,
+  users,
+  cvs,
   type JobPosting, 
   type InsertJobPosting,
   type JobMatch,
