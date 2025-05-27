@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./context/AuthContext";
-// Temporarily remove motivation provider to fix auth issues
+import { MotivationProvider } from "./hooks/use-motivation";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
 
@@ -47,6 +47,10 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import NotFound from "@/pages/not-found";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 
+// Import premium matching pages
+import PremiumJobSeekerPage from "@/pages/PremiumJobSeekerPage";
+import PremiumRecruiterPage from "@/pages/PremiumRecruiterPage";
+
 // Import job search pages
 import JobsPage from "@/pages/JobsPage";
 import JobDetailsPage from "@/pages/JobDetailsPage";
@@ -84,7 +88,8 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light">
         <TooltipProvider>
           <AuthProvider>
-            <Layout>
+            <MotivationProvider>
+              <Layout>
               <ScrollToTop />
               <Switch>
                 <Route path="/" component={HomePage} />
@@ -103,6 +108,10 @@ function App() {
                 <Route path="/refer" component={ReferralPage} />
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                 <Route path="/templates" component={TemplatesPage} />
+                
+                {/* Premium matching routes */}
+                <Route path="/premium-matching/jobseeker" component={PremiumJobSeekerPage} />
+                <Route path="/premium-matching/recruiter" component={PremiumRecruiterPage} />
                 
                 {/* Original blog post */}
                 <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
@@ -162,8 +171,9 @@ function App() {
                 
                 <Route component={NotFound} />
               </Switch>
-              <Toaster />
-            </Layout>
+                <Toaster />
+              </Layout>
+            </MotivationProvider>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>
