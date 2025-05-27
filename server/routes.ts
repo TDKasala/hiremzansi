@@ -37,6 +37,8 @@ import testXaiApiRoutes from "./routes/testXaiApi";
 import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
 import pdfTestRoutes from "./routes/pdfTest";
 import optimizedCvAnalysisRoutes from "./routes/optimizedCvAnalysis";
+import paymentRoutes from "./routes/paymentRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 
@@ -1364,6 +1366,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Mobile-optimized CV analysis routes for fast performance (<2s on 3G)
   app.use("/api", optimizedCvAnalysisRoutes);
+  
+  // Payment and notification routes for premium matching system
+  app.use("/api/payment", paymentRoutes);
+  app.use("/api/notifications", notificationRoutes);
   
   // WhatsApp Integration Routes
   
