@@ -13,7 +13,7 @@ import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import HowItWorksPage from "@/pages/HowItWorksPage";
 import PricingPage from "@/pages/PricingPage";
-import BlogPage from "@/pages/BlogPage";
+import SimpleBlogPage from "@/pages/SimpleBlogPage";
 import AboutPage from "@/pages/AboutPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import TermsPage from "@/pages/TermsPage";
@@ -95,7 +95,7 @@ function App() {
                 <Route path="/" component={HomePage} />
                 <Route path="/how-it-works" component={HowItWorksPage} />
                 <Route path="/pricing" component={PricingPage} />
-                <Route path="/blog" component={BlogPage} />
+                <Route path="/blog" component={SimpleBlogPage} />
                 <Route path="/about" component={AboutPage} />
                 <Route path="/privacy" component={PrivacyPage} />
                 <Route path="/terms" component={TermsPage} />
