@@ -375,8 +375,8 @@ export class PremiumMatchingService {
         availabilityScore: analysis.availabilityScore,
         matchReasons: analysis.matchReasons
       },
-      skillsMatched: analysis.skillsMatched,
-      skillsGap: analysis.skillsGap,
+      skillsMatched: analysis.skillsMatched as string[],
+      skillsGap: analysis.skillsGap as string[],
       salaryMatch: analysis.salaryScore >= 70,
       locationMatch: analysis.locationScore >= 70,
       experienceMatch: analysis.experienceScore >= 70,
