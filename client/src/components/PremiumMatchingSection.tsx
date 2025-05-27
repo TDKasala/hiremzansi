@@ -67,16 +67,16 @@ export default function PremiumMatchingSection() {
             </CardContent>
           </Card>
 
-          <Card className="text-center border-2 hover:border-purple-200 transition-colors">
+          <Card className="text-center border-2 hover:border-purple-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
             <CardHeader>
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-300 hover:scale-110">
+                <Users className="w-8 h-8 text-purple-600 hover:animate-spin" />
               </div>
               <CardTitle className="text-xl">Mutual Connection</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Both parties pay R99 to unlock contact details. This ensures serious, 
+                Both parties pay to unlock contact details (R50 for job seekers, R200 for recruiters). This ensures serious, 
                 committed connections and eliminates time-wasters.
               </p>
             </CardContent>
