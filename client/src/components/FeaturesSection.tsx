@@ -110,34 +110,35 @@ export default function FeaturesSection() {
                     </Button>
                   </Link>
                 </div>
-              <div className="md:w-1/2 bg-white p-6">
-                <div className="border rounded-lg p-4 h-full">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-medium">CV Editor</h4>
-                    <div className="text-sm bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">
-                      ATS Score: 82/100
+                <div className="md:w-1/2 bg-white p-6">
+                  <div className="border rounded-lg p-4 h-full">
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="font-medium">CV Editor</h4>
+                      <div className="text-sm bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">
+                        ATS Score: 82/100
+                      </div>
                     </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="font-semibold mb-1">Professional Summary</div>
-                    <div className="border rounded p-2 text-sm bg-neutral-50">
-                      <span className="bg-green-100">Experienced marketing professional</span> with 5+ years in <span className="bg-green-100">digital marketing</span> and <span className="bg-green-100">campaign management</span>. Proven track record of increasing engagement and <span className="bg-yellow-100">ROI</span> through strategic <span className="bg-green-100">social media</span> initiatives.
+                    <div className="mb-4">
+                      <div className="font-semibold mb-1">Professional Summary</div>
+                      <div className="border rounded p-2 text-sm bg-neutral-50">
+                        <span className="bg-green-100">Experienced marketing professional</span> with 5+ years in <span className="bg-green-100">digital marketing</span> and <span className="bg-green-100">campaign management</span>. Proven track record of increasing engagement and <span className="bg-yellow-100">ROI</span> through strategic <span className="bg-green-100">social media</span> initiatives.
+                      </div>
                     </div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="font-semibold mb-1">Skills</div>
-                    <div className="border rounded p-2 text-sm bg-neutral-50">
-                      <span className="bg-green-100">Social Media Marketing</span>, <span className="bg-green-100">Content Creation</span>, <span className="bg-green-100">Analytics</span>, <span className="bg-yellow-100">SEO</span>, <span className="bg-green-100">Campaign Management</span>, <span className="bg-green-100">Adobe Creative Suite</span>
+                    <div className="mb-4">
+                      <div className="font-semibold mb-1">Skills</div>
+                      <div className="border rounded p-2 text-sm bg-neutral-50">
+                        <span className="bg-green-100">Social Media Marketing</span>, <span className="bg-green-100">Content Creation</span>, <span className="bg-green-100">Analytics</span>, <span className="bg-yellow-100">SEO</span>, <span className="bg-green-100">Campaign Management</span>, <span className="bg-green-100">Adobe Creative Suite</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-sm text-neutral-600 mt-2">
-                    <div className="flex items-center mb-1">
-                      <span className="w-3 h-3 inline-block bg-green-100 mr-2"></span>
-                      <span>Matched keywords</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="w-3 h-3 inline-block bg-yellow-100 mr-2"></span>
-                      <span>Suggested additions</span>
+                    <div className="text-sm text-neutral-600 mt-2">
+                      <div className="flex items-center mb-1">
+                        <span className="w-3 h-3 inline-block bg-green-100 mr-2"></span>
+                        <span>Matched keywords</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="w-3 h-3 inline-block bg-yellow-100 mr-2"></span>
+                        <span>Suggested additions</span>
+                      </div>
                     </div>
                   </div>
                 </div>

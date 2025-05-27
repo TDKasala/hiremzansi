@@ -384,7 +384,7 @@ export class PremiumMatchingService {
       status: 'pending'
     };
     
-    await db.insert(premiumJobMatches).values(matchData);
+    await db.insert(premiumJobMatches).values([matchData]);
     
     // Update job posting match count
     await db
