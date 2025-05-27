@@ -1,10 +1,7 @@
 import { db } from "../db";
 import { 
   cvs, 
-  jobPostings, 
-  employers, 
   jobMatches, 
-  skills as skillsTable, 
   saProfiles 
 } from "@shared/schema";
 import { eq, desc, and, sql, asc, gte, lte, inArray } from "drizzle-orm";
