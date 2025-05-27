@@ -11,6 +11,7 @@ import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
 import WhatsAppPromoSection from "@/components/WhatsAppPromoSection";
 import CTASection from "@/components/CTASection";
+import PremiumMatchingSection from "@/components/PremiumMatchingSection";
 
 export default function HomePage() {
   return (
@@ -26,6 +27,7 @@ export default function HomePage() {
       
       <HeroSection />
       <UploadSection />
+      <PremiumMatchingSection />
       <WhatsAppPromoSection />
       <HowItWorksSection />
       <PricingSection />
