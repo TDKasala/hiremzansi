@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Star, StarHalf } from "lucide-react";
+import { Star, StarHalf, ChevronDown, ChevronUp } from "lucide-react";
 
 type Testimonial = {
   rating: number;
@@ -13,6 +14,8 @@ type Testimonial = {
 };
 
 export default function TestimonialsSection() {
+  const [sectionOpen, setSectionOpen] = useState(false);
+  
   const testimonials: Testimonial[] = [
     {
       rating: 5,
@@ -63,37 +66,53 @@ export default function TestimonialsSection() {
   return (
     <section className="py-16 bg-neutral-100">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-secondary mb-4">Success Stories</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <div 
+            className="cursor-pointer flex items-center justify-center gap-3 hover:bg-gray-50 rounded-lg p-4 transition-colors duration-200"
+            onClick={() => setSectionOpen(!sectionOpen)}
+          >
+            <h2 className="text-3xl font-bold text-secondary">Success Stories</h2>
+            {sectionOpen ? (
+              <ChevronUp className="h-8 w-8 text-primary animate-bounce" />
+            ) : (
+              <ChevronDown className="h-8 w-8 text-primary animate-pulse" />
+            )}
+          </div>
+          <p className="text-neutral-600 max-w-2xl mx-auto mt-2">
             See how ATSBoost has helped South African job seekers land interviews and secure jobs.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center mb-4">
-                <div className="text-yellow-400 flex">
-                  {renderRatingStars(testimonial.rating)}
+        <div 
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            sectionOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto animate-fade-in-up">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex items-center mb-4">
+                  <div className="text-yellow-400 flex">
+                    {renderRatingStars(testimonial.rating)}
+                  </div>
+                  <span className="ml-2 text-neutral-600">{testimonial.rating.toFixed(1)}</span>
                 </div>
-                <span className="ml-2 text-neutral-600">{testimonial.rating.toFixed(1)}</span>
+                <p className="text-neutral-700 mb-4">{testimonial.text}</p>
+                <div>
+                  <div className="font-semibold">{testimonial.author.name}</div>
+                  <div className="text-sm text-neutral-600">{testimonial.author.title}</div>
+                </div>
               </div>
-              <p className="text-neutral-700 mb-4">{testimonial.text}</p>
-              <div>
-                <div className="font-semibold">{testimonial.author.name}</div>
-                <div className="text-sm text-neutral-600">{testimonial.author.title}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="text-center mt-12">
-          <Link href="/auth">
-            <Button className="bg-primary text-white hover:bg-opacity-90">
-              Join Them Today
-            </Button>
-          </Link>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Link href="/auth">
+              <Button className="bg-primary text-white hover:bg-opacity-90 transform hover:scale-105 transition-transform duration-200">
+                Join Them Today
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

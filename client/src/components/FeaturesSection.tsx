@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { 
   Edit, 
   Search, 
   Bell, 
   FileText,
-  CheckCircle
+  CheckCircle,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +18,8 @@ type Feature = {
 };
 
 export default function FeaturesSection() {
+  const [sectionOpen, setSectionOpen] = useState(false);
+  
   const features: Feature[] = [
     {
       icon: <Edit className="text-xl text-primary" />,
@@ -47,49 +52,64 @@ export default function FeaturesSection() {
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-secondary mb-4">Premium Features</h2>
-          <p className="text-neutral-600 max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <div 
+            className="cursor-pointer flex items-center justify-center gap-3 hover:bg-gray-50 rounded-lg p-4 transition-colors duration-200"
+            onClick={() => setSectionOpen(!sectionOpen)}
+          >
+            <h2 className="text-3xl font-bold text-secondary">Premium Features</h2>
+            {sectionOpen ? (
+              <ChevronUp className="h-8 w-8 text-primary animate-bounce" />
+            ) : (
+              <ChevronDown className="h-8 w-8 text-primary animate-pulse" />
+            )}
+          </div>
+          <p className="text-neutral-600 max-w-2xl mx-auto mt-2">
             Explore our advanced tools designed specifically for the South African job market.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {features.map((feature, index) => (
-            <div key={index} className="flex flex-col md:flex-row md:items-start">
-              <div className="flex-shrink-0 bg-primary bg-opacity-10 w-12 h-12 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-4">
-                {feature.icon}
+        <div 
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            sectionOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up">
+            {features.map((feature, index) => (
+              <div key={index} className="flex flex-col md:flex-row md:items-start hover:shadow-lg p-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1">
+                <div className="flex-shrink-0 bg-primary bg-opacity-10 w-12 h-12 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-4 hover:scale-110 transition-transform duration-300">
+                  {feature.icon}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-neutral-600">{feature.description}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-neutral-600">{feature.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="mt-16 max-w-4xl mx-auto">
-          <div className="bg-neutral-100 rounded-lg overflow-hidden shadow-lg">
-            <div className="md:flex">
-              <div className="md:w-1/2 p-8">
-                <h3 className="text-2xl font-bold text-secondary mb-4">Real-time CV Editor Demo</h3>
-                <p className="text-neutral-600 mb-4">
-                  Our premium editor analyzes your CV as you type, providing instant feedback and suggestions.
-                </p>
-                <ul className="space-y-3 mb-6">
-                  {editorBenefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle className="text-success mt-1 mr-2 h-5 w-5" />
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/signup">
-                  <Button className="bg-primary text-white hover:bg-opacity-90">
-                    Try Premium Editor
-                  </Button>
-                </Link>
-              </div>
+            ))}
+          </div>
+          
+          <div className="mt-16 max-w-4xl mx-auto">
+            <div className="bg-neutral-100 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="md:flex">
+                <div className="md:w-1/2 p-8">
+                  <h3 className="text-2xl font-bold text-secondary mb-4">Real-time CV Editor Demo</h3>
+                  <p className="text-neutral-600 mb-4">
+                    Our premium editor analyzes your CV as you type, providing instant feedback and suggestions.
+                  </p>
+                  <ul className="space-y-3 mb-6">
+                    {editorBenefits.map((benefit, index) => (
+                      <li key={index} className="flex items-start">
+                        <CheckCircle className="text-success mt-1 mr-2 h-5 w-5" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/signup">
+                    <Button className="bg-primary text-white hover:bg-opacity-90 transform hover:scale-105 transition-transform duration-200">
+                      Try Premium Editor
+                    </Button>
+                  </Link>
+                </div>
               <div className="md:w-1/2 bg-white p-6">
                 <div className="border rounded-lg p-4 h-full">
                   <div className="flex justify-between items-center mb-4">
