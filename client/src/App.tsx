@@ -102,7 +102,7 @@ function App() {
                 <Route path="/contact" component={ContactPage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signup" component={SignUpPage} />
-                <Route path="/auth" component={AuthPage} />
+                <Route path="/auth" component={LoginPage} />
                 <Route path="/auth/callback" component={AuthCallback} />
                 <Route path="/realtime-ats" component={RealtimeATSPage} />
                 <Route path="/refer" component={ReferralPage} />
