@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, json, real, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, json, real, doublePrecision, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -563,3 +563,294 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+// ====================================
+// MATCHING SERVICE SCHEMA (Separate Service)
+// ====================================
+
+// Recruiter profiles for the matching service
+export const recruiterProfiles = pgTable("recruiter_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id).unique(),
+  companyName: text("company_name").notNull(),
+  companySize: text("company_size"), // "1-10", "11-50", "51-200", "201-500", "500+"
+  industry: text("industry").notNull(),
+  companyDescription: text("company_description"),
+  companyWebsite: text("company_website"),
+  companyLogo: text("company_logo"),
+  location: text("location"),
+  province: text("province"),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  isVerified: boolean("is_verified").default(false),
+  verificationDocuments: json("verification_documents"),
+  subscriptionTier: text("subscription_tier").default("basic"), // "basic", "premium", "enterprise"
+  creditsRemaining: integer("credits_remaining").default(0),
+  totalJobsPosted: integer("total_jobs_posted").default(0),
+  successfulHires: integer("successful_hires").default(0),
+  averageTimeToHire: integer("average_time_to_hire"), // in days
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Premium job postings for the matching service
+export const premiumJobPostings = pgTable("premium_job_postings", {
+  id: serial("id").primaryKey(),
+  recruiterId: integer("recruiter_id").notNull().references(() => recruiterProfiles.id),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  requiredSkills: json("required_skills").$type<string[]>().default([]),
+  preferredSkills: json("preferred_skills").$type<string[]>().default([]),
+  industry: text("industry").notNull(),
+  employmentType: text("employment_type").notNull(), // "full-time", "part-time", "contract", "internship"
+  experienceLevel: text("experience_level").notNull(), // "entry", "mid", "senior", "executive"
+  salaryMin: decimal("salary_min"),
+  salaryMax: decimal("salary_max"),
+  salaryCurrency: text("salary_currency").default("ZAR"),
+  location: text("location"),
+  province: text("province"),
+  isRemote: boolean("is_remote").default(false),
+  nqfLevelRequired: integer("nqf_level_required"),
+  bbbeeRequirement: text("bbbee_requirement"), // "required", "preferred", "not_specified"
+  applicationDeadline: timestamp("application_deadline"),
+  maxCandidates: integer("max_candidates").default(100),
+  priority: text("priority").default("standard"), // "standard", "urgent", "featured"
+  budget: decimal("budget"), // Cost recruiter paid for this posting
+  status: text("status").default("active"), // "draft", "active", "paused", "closed", "expired"
+  totalViews: integer("total_views").default(0),
+  totalMatches: integer("total_matches").default(0),
+  totalApplications: integer("total_applications").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Job seeker premium profiles for enhanced matching
+export const premiumJobSeekerProfiles = pgTable("premium_job_seeker_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id).unique(),
+  cvId: integer("cv_id").references(() => cvs.id),
+  profileTitle: text("profile_title"), // Professional headline
+  profileSummary: text("profile_summary"),
+  desiredSalaryMin: decimal("desired_salary_min"),
+  desiredSalaryMax: decimal("desired_salary_max"),
+  salaryCurrency: text("salary_currency").default("ZAR"),
+  preferredLocations: json("preferred_locations").$type<string[]>().default([]),
+  preferredIndustries: json("preferred_industries").$type<string[]>().default([]),
+  preferredEmploymentTypes: json("preferred_employment_types").$type<string[]>().default([]),
+  experienceLevel: text("experience_level"), // "entry", "mid", "senior", "executive"
+  openToRemote: boolean("open_to_remote").default(false),
+  openToRelocation: boolean("open_to_relocation").default(false),
+  availabilityDate: timestamp("availability_date"),
+  noticePeriod: text("notice_period"), // "immediate", "1_week", "2_weeks", "1_month", "2_months", "3_months"
+  subscriptionTier: text("subscription_tier").default("basic"), // "basic", "premium", "pro"
+  creditsRemaining: integer("credits_remaining").default(0),
+  profileVisibility: text("profile_visibility").default("visible"), // "visible", "hidden", "recruiter_only"
+  totalProfileViews: integer("total_profile_views").default(0),
+  totalMatches: integer("total_matches").default(0),
+  totalApplications: integer("total_applications").default(0),
+  responseRate: decimal("response_rate"), // Percentage of recruiter messages responded to
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// AI-powered job matches between recruiters and job seekers
+export const premiumJobMatches = pgTable("premium_job_matches", {
+  id: serial("id").primaryKey(),
+  jobPostingId: integer("job_posting_id").notNull().references(() => premiumJobPostings.id),
+  jobSeekerId: integer("job_seeker_id").notNull().references(() => premiumJobSeekerProfiles.id),
+  recruiterId: integer("recruiter_id").notNull().references(() => recruiterProfiles.id),
+  matchScore: integer("match_score").notNull(), // 0-100 percentage
+  matchDetails: json("match_details"), // Detailed breakdown of match factors
+  skillsMatched: json("skills_matched").$type<string[]>().default([]),
+  skillsGap: json("skills_gap").$type<string[]>().default([]),
+  salaryMatch: boolean("salary_match").default(false),
+  locationMatch: boolean("location_match").default(false),
+  experienceMatch: boolean("experience_match").default(false),
+  industryMatch: boolean("industry_match").default(false),
+  // Notification and contact status
+  recruiterNotified: boolean("recruiter_notified").default(false),
+  jobSeekerNotified: boolean("job_seeker_notified").default(false),
+  recruiterViewed: boolean("recruiter_viewed").default(false),
+  jobSeekerViewed: boolean("job_seeker_viewed").default(false),
+  recruiterInterested: boolean("recruiter_interested").default(false),
+  jobSeekerInterested: boolean("job_seeker_interested").default(false),
+  // Payment and contact unlock status
+  recruiterPaidToContact: boolean("recruiter_paid_to_contact").default(false),
+  jobSeekerPaidToContact: boolean("job_seeker_paid_to_contact").default(false),
+  contactUnlocked: boolean("contact_unlocked").default(false),
+  contactUnlockedAt: timestamp("contact_unlocked_at"),
+  status: text("status").default("pending"), // "pending", "mutual_interest", "contacted", "applied", "rejected", "hired"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment transactions for the matching service
+export const matchingServicePayments = pgTable("matching_service_payments", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  userType: text("user_type").notNull(), // "recruiter", "job_seeker"
+  paymentType: text("payment_type").notNull(), // "subscription", "credits", "job_posting", "contact_unlock"
+  amount: decimal("amount").notNull(),
+  currency: text("currency").default("ZAR"),
+  description: text("description").notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  status: text("status").default("pending"), // "pending", "completed", "failed", "refunded"
+  creditsGranted: integer("credits_granted").default(0),
+  relatedEntityId: integer("related_entity_id"), // Job posting ID, match ID, etc.
+  relatedEntityType: text("related_entity_type"), // "job_posting", "match", "subscription"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Subscription plans for the matching service
+export const matchingServicePlans = pgTable("matching_service_plans", {
+  id: serial("id").primaryKey(),
+  planType: text("plan_type").notNull(), // "recruiter", "job_seeker"
+  planName: text("plan_name").notNull(),
+  planTier: text("plan_tier").notNull(), // "basic", "premium", "pro", "enterprise"
+  monthlyPrice: decimal("monthly_price").notNull(),
+  yearlyPrice: decimal("yearly_price"),
+  creditsPerMonth: integer("credits_per_month").default(0),
+  maxJobPostings: integer("max_job_postings").default(0), // For recruiters
+  maxContactsPerMonth: integer("max_contacts_per_month").default(0),
+  featuredListings: boolean("featured_listings").default(false),
+  prioritySupport: boolean("priority_support").default(false),
+  advancedFilters: boolean("advanced_filters").default(false),
+  analyticsAccess: boolean("analytics_access").default(false),
+  features: json("features").$type<string[]>().default([]),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User subscriptions to matching service plans
+export const matchingServiceSubscriptions = pgTable("matching_service_subscriptions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  planId: integer("plan_id").notNull().references(() => matchingServicePlans.id),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  status: text("status").default("active"), // "active", "cancelled", "expired", "past_due"
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  creditsUsed: integer("credits_used").default(0),
+  lastBillingDate: timestamp("last_billing_date"),
+  nextBillingDate: timestamp("next_billing_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Relations for matching service
+export const recruiterProfilesRelations = relations(recruiterProfiles, ({ one, many }) => ({
+  user: one(users, {
+    fields: [recruiterProfiles.userId],
+    references: [users.id],
+  }),
+  jobPostings: many(premiumJobPostings),
+  matches: many(premiumJobMatches),
+}));
+
+export const premiumJobPostingsRelations = relations(premiumJobPostings, ({ one, many }) => ({
+  recruiter: one(recruiterProfiles, {
+    fields: [premiumJobPostings.recruiterId],
+    references: [recruiterProfiles.id],
+  }),
+  matches: many(premiumJobMatches),
+}));
+
+export const premiumJobSeekerProfilesRelations = relations(premiumJobSeekerProfiles, ({ one, many }) => ({
+  user: one(users, {
+    fields: [premiumJobSeekerProfiles.userId],
+    references: [users.id],
+  }),
+  cv: one(cvs, {
+    fields: [premiumJobSeekerProfiles.cvId],
+    references: [cvs.id],
+  }),
+  matches: many(premiumJobMatches),
+}));
+
+export const premiumJobMatchesRelations = relations(premiumJobMatches, ({ one }) => ({
+  jobPosting: one(premiumJobPostings, {
+    fields: [premiumJobMatches.jobPostingId],
+    references: [premiumJobPostings.id],
+  }),
+  jobSeeker: one(premiumJobSeekerProfiles, {
+    fields: [premiumJobMatches.jobSeekerId],
+    references: [premiumJobSeekerProfiles.id],
+  }),
+  recruiter: one(recruiterProfiles, {
+    fields: [premiumJobMatches.recruiterId],
+    references: [recruiterProfiles.id],
+  }),
+}));
+
+// Insert schemas for matching service
+export const insertRecruiterProfileSchema = createInsertSchema(recruiterProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPremiumJobPostingSchema = createInsertSchema(premiumJobPostings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPremiumJobSeekerProfileSchema = createInsertSchema(premiumJobSeekerProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPremiumJobMatchSchema = createInsertSchema(premiumJobMatches).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMatchingServicePaymentSchema = createInsertSchema(matchingServicePayments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMatchingServicePlanSchema = createInsertSchema(matchingServicePlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMatchingServiceSubscriptionSchema = createInsertSchema(matchingServiceSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types for matching service
+export type RecruiterProfile = typeof recruiterProfiles.$inferSelect;
+export type InsertRecruiterProfile = z.infer<typeof insertRecruiterProfileSchema>;
+
+export type PremiumJobPosting = typeof premiumJobPostings.$inferSelect;
+export type InsertPremiumJobPosting = z.infer<typeof insertPremiumJobPostingSchema>;
+
+export type PremiumJobSeekerProfile = typeof premiumJobSeekerProfiles.$inferSelect;
+export type InsertPremiumJobSeekerProfile = z.infer<typeof insertPremiumJobSeekerProfileSchema>;
+
+export type PremiumJobMatch = typeof premiumJobMatches.$inferSelect;
+export type InsertPremiumJobMatch = z.infer<typeof insertPremiumJobMatchSchema>;
+
+export type MatchingServicePayment = typeof matchingServicePayments.$inferSelect;
+export type InsertMatchingServicePayment = z.infer<typeof insertMatchingServicePaymentSchema>;
+
+export type MatchingServicePlan = typeof matchingServicePlans.$inferSelect;
+export type InsertMatchingServicePlan = z.infer<typeof insertMatchingServicePlanSchema>;
+
+export type MatchingServiceSubscription = typeof matchingServiceSubscriptions.$inferSelect;
+export type InsertMatchingServiceSubscription = z.infer<typeof insertMatchingServiceSubscriptionSchema>;
