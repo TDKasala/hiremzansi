@@ -10,6 +10,7 @@ import {
   type InsertPremiumJobMatch
 } from "../../shared/schema";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
+import { aiMatchingService } from "./aiMatchingService";
 
 // Weight factors for premium matching algorithm
 const PREMIUM_MATCH_WEIGHTS = {
