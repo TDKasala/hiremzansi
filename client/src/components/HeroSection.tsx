@@ -96,12 +96,12 @@ export default function HeroSection() {
                   animation: isAnimated ? 'float 6s ease-in-out infinite' : 'none',
                 }}
               >
-                <div className="bg-white text-black p-6 rounded-lg shadow-lg">
+                <div className="bg-white text-black p-4 rounded-lg shadow-lg">
                   <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
                     <div>
                       <div className="overflow-hidden">
                         <h2 
-                          className={`text-xl font-bold mb-1 transform ${isAnimated ? 'animate-name-slide-in' : ''}`}
+                          className={`text-lg font-bold mb-1 transform ${isAnimated ? 'animate-name-slide-in' : ''}`}
                           style={{ 
                             animation: isAnimated ? 'name-slide-in 1.2s ease-out forwards' : 'none',
                             opacity: 0,
@@ -135,7 +135,7 @@ export default function HeroSection() {
                       </div>
                     </div>
                     <div 
-                      className={`w-20 h-20 rounded-full bg-gray-200 overflow-hidden ${isAnimated ? 'animate-photo-pop' : ''}`}
+                      className={`w-16 h-16 rounded-full bg-gray-200 overflow-hidden ${isAnimated ? 'animate-photo-pop' : ''}`}
                       style={{ 
                         animation: isAnimated ? 'photo-pop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s' : 'none',
                         opacity: 0,
@@ -150,30 +150,30 @@ export default function HeroSection() {
                     </div>
                   </div>
                   
-                  <div className="mb-4">
-                    <div className="bg-amber-400 text-black px-4 py-2 rounded-md font-bold mb-3">Key Skills</div>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Software Development</span>
-                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">Data Analysis</span>
-                      <span className="text-sm bg-pink-200 px-3 py-1 rounded-md">Team Leadership</span>
-                      <span className="text-sm bg-cyan-200 px-3 py-1 rounded-md">Python</span>
-                      <span className="text-sm bg-purple-200 px-3 py-1 rounded-md">SQL</span>
+                  <div className="mb-3">
+                    <div className="bg-amber-400 text-black px-3 py-1 rounded-md font-bold mb-2 text-sm">Key Skills</div>
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      <span className="text-xs bg-cyan-200 px-2 py-1 rounded-md">Software Development</span>
+                      <span className="text-xs bg-purple-200 px-2 py-1 rounded-md">Data Analysis</span>
+                      <span className="text-xs bg-pink-200 px-2 py-1 rounded-md">Team Leadership</span>
+                      <span className="text-xs bg-cyan-200 px-2 py-1 rounded-md">Python</span>
+                      <span className="text-xs bg-purple-200 px-2 py-1 rounded-md">SQL</span>
                     </div>
                     
-                    <div className="bg-cyan-500 text-white px-4 py-2 rounded-md font-bold mb-3">Experience</div>
-                    <div className="mb-4">
-                      <p className="font-bold">Senior Developer</p>
-                      <p className="text-sm">InnovaTech Solutions</p>
-                      <p className="text-sm text-gray-600">2022 - Present</p>
-                      <ul className="list-disc ml-5 text-sm mt-2">
+                    <div className="bg-cyan-500 text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Experience</div>
+                    <div className="mb-3">
+                      <p className="font-bold text-sm">Senior Developer</p>
+                      <p className="text-xs">InnovaTech Solutions</p>
+                      <p className="text-xs text-gray-600">2022 - Present</p>
+                      <ul className="list-disc ml-4 text-xs mt-1">
                         <li>Led development team of 5 engineers</li>
                         <li>Implemented data analytics platform</li>
                         <li>Reduced system downtime by 35%</li>
                       </ul>
                     </div>
                     
-                    <div className="bg-purple-400 text-white px-4 py-2 rounded-md font-bold mb-3">South African Qualifications</div>
-                    <ul className="list-disc ml-5 text-sm">
+                    <div className="bg-purple-400 text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">SA Qualifications</div>
+                    <ul className="list-disc ml-4 text-xs">
                       <li>BSc Computer Science (NQF Level 7)</li>
                       <li>MICT SETA Python Certification</li>
                       <li>B-BBEE Level 2 Contributor</li>
@@ -209,13 +209,13 @@ export default function HeroSection() {
               
               {/* Floating 92% score that appears with a bounce effect */}
               <div 
-                className={`absolute bottom-5 right-8 w-20 h-20 rounded-full bg-green-400 flex items-center justify-center opacity-0
+                className={`absolute bottom-3 right-6 w-16 h-16 rounded-full bg-green-400 flex items-center justify-center opacity-0
                   ${isAnimated ? 'animate-score-appear' : ''}`}
                 style={{ 
                   animation: isAnimated ? 'score-appear 1s forwards 3s, float 3s ease-in-out infinite 4s' : 'none',
                 }}
               >
-                <span className="text-3xl font-bold text-white">92%</span>
+                <span className="text-2xl font-bold text-white">92%</span>
               </div>
               
               {/* Animated scan effect */}
