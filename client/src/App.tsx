@@ -43,7 +43,7 @@ import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
 import TemplatesPage from "@/pages/TemplatesPage";
 import SettingsPage from "@/pages/settings-page";
 import BlogPost1 from "@/pages/BlogPost1";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
+import { AdminDashboard } from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 

@@ -1920,6 +1920,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
+  // Admin Routes
+  
+  // Get platform statistics
+  app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Get comprehensive platform statistics
+      const stats = {
+        total_users: await db.select({ count: sql<number>`count(*)` }).from(users).then(r => r[0]?.count || 0),
+        total_cvs: await db.select({ count: sql<number>`count(*)` }).from(cvs).then(r => r[0]?.count || 0),
+        total_job_postings: await db.select({ count: sql<number>`count(*)` }).from(jobPostings).where(eq(jobPostings.isActive, true)).then(r => r[0]?.count || 0),
+        total_job_matches: await db.select({ count: sql<number>`count(*)` }).from(jobMatches).then(r => r[0]?.count || 0),
+        active_subscriptions: await db.select({ count: sql<number>`count(*)` }).from(subscriptions).where(eq(subscriptions.status, 'active')).then(r => r[0]?.count || 0),
+        revenue_this_month: await db.select({ 
+          revenue: sql<number>`COALESCE(SUM(${plans.price}), 0)` 
+        })
+        .from(subscriptions)
+        .leftJoin(plans, eq(subscriptions.planId, plans.id))
+        .where(eq(subscriptions.status, 'active'))
+        .then(r => r[0]?.revenue || 0)
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting admin stats:", error);
+      next(error);
+    }
+  });
+
+  // Get all users for admin management
+  app.get("/api/admin/users", isAuthenticated, isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userList = await db.select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        name: users.name,
+        role: users.role,
+        is_active: users.isActive,
+        email_verified: users.emailVerified,
+        created_at: users.createdAt
+      })
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(100);
+
+      res.json(userList);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Update user (admin only)
+  app.patch("/api/admin/users/:id", isAuthenticated, isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      // Prevent admin from deactivating themselves
+      if (userId === req.user.id && updates.is_active === false) {
+        return res.status(400).json({ error: "Cannot deactivate your own account" });
+      }
+
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          isActive: updates.is_active,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId))
+        .returning();
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Get all job postings for admin management
+  app.get("/api/admin/job-postings", isAuthenticated, isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobs = await db.select({
+        id: jobPostings.id,
+        title: jobPostings.title,
+        location: jobPostings.location,
+        employment_type: jobPostings.employmentType,
+        is_active: jobPostings.isActive,
+        views: jobPostings.views,
+        applications: jobPostings.applications,
+        created_at: jobPostings.createdAt,
+        company_name: employers.companyName
+      })
+      .from(jobPostings)
+      .leftJoin(employers, eq(jobPostings.employerId, employers.id))
+      .orderBy(desc(jobPostings.createdAt))
+      .limit(100);
+
+      res.json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Update job posting (admin only)
+  app.patch("/api/admin/job-postings/:id", isAuthenticated, isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const updates = req.body;
+
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job ID" });
+      }
+
+      const [updatedJob] = await db
+        .update(jobPostings)
+        .set({
+          isActive: updates.is_active,
+          updatedAt: new Date()
+        })
+        .where(eq(jobPostings.id, jobId))
+        .returning();
+
+      if (!updatedJob) {
+        return res.status(404).json({ error: "Job posting not found" });
+      }
+
+      res.json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  });
   
   // Create HTTP server
   const httpServer = createServer(app);
