@@ -45,97 +45,26 @@ export function SignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex">
-      {/* Left Side - Branding & Benefits */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-green-600 p-12 flex-col justify-between text-white relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-white/5"></div>
-        </div>
-        
-        {/* Logo & Header */}
-        <div className="relative z-10">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3">
-              <TrendingUp className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold">ATSBoost</h1>
-              <p className="text-blue-100">South Africa's #1 CV Optimization Platform</p>
-            </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center space-x-2 mb-4">
+            <TrendingUp className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold text-gray-900">ATSBoost</span>
           </div>
-          
-          <div className="space-y-6">
-            <h2 className="text-4xl font-bold leading-tight">
-              Transform Your Career<br />
-              <span className="text-yellow-300">in South Africa</span>
-            </h2>
-            <p className="text-xl text-blue-100">
-              Get past ATS systems, land interviews, and secure your dream job with AI-powered CV optimization designed for the South African market.
-            </p>
-          </div>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Welcome back</h1>
+          <p className="text-gray-600">Sign in to your account</p>
         </div>
 
-        {/* Features */}
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center space-x-3">
-            <div className="bg-white/20 rounded-lg p-2">
-              <Briefcase className="h-5 w-5" />
-            </div>
-            <span className="text-lg">85% higher interview rate with optimized CVs</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-white/20 rounded-lg p-2">
-              <Users className="h-5 w-5" />
-            </div>
-            <span className="text-lg">50,000+ South African professionals trust us</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-white/20 rounded-lg p-2">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-            <span className="text-lg">B-BBEE & NQF compliant analysis</span>
-          </div>
-        </div>
-
-        {/* Success Quote */}
-        <div className="relative z-10 bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-          <p className="text-lg italic mb-3">
-            "ATSBoost helped me land my dream job at a top JSE company in just 2 weeks. The B-BBEE optimization was game-changing!"
-          </p>
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-              T
-            </div>
-            <div>
-              <div className="font-semibold">Thabo M.</div>
-              <div className="text-sm text-blue-200">Senior Analyst, Johannesburg</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Sign In Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center">
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="bg-gradient-to-br from-blue-600 to-green-600 rounded-xl p-3">
-                <TrendingUp className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">ATSBoost</h1>
-                <p className="text-sm text-gray-600">CV Optimization Platform</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Header */}
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to continue optimizing your career success</p>
-          </div>
+        {/* Form Card */}
+        <div className="bg-white rounded-lg shadow-md p-8 w-full">
+          {/* Error Alert */}
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
           {/* Error Alert */}
           {error && (
