@@ -149,10 +149,7 @@ export default function SimpleUploadForm({
               Upload Your CV for Free ATS Analysis
             </h2>
             
-            <p className="text-neutral-600 mb-4">
-              Our AI-powered tool analyzes your CV against Applicant Tracking Systems 
-              used by South African employers. Get a free score and improve your chances of landing interviews.
-            </p>
+
             
             <div className="flex items-center mb-8 p-3 bg-primary/5 border border-primary/20 rounded-md">
               <Lightbulb className="h-5 w-5 text-primary shrink-0 mr-3" />
@@ -180,6 +177,26 @@ export default function SimpleUploadForm({
                     </p>
                   </div>
                 )}
+
+                {/* Job Description Input */}
+                <div className="mb-6">
+                  <label htmlFor="job-description" className="block text-sm font-medium text-gray-700 mb-2">
+                    Job Description (Optional)
+                  </label>
+                  <textarea
+                    id="job-description"
+                    rows={4}
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                    placeholder="Paste the job description here for targeted CV analysis..."
+                  />
+                  {jobDescription && (
+                    <p className="mt-2 text-xs text-green-600">
+                      ✓ Job description added - your CV will be analyzed specifically for this position
+                    </p>
+                  )}
+                </div>
 
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   <CloudUpload className="h-16 w-16 text-primary mb-4 mx-auto" />
