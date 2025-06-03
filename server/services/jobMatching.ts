@@ -1,7 +1,7 @@
-import { CV, JobPosting, cvs, jobPostings } from "@shared/schema";
+import { CV, JobPosting, JobMatch, InsertJobMatch, cvs, jobPostings, jobMatches } from "@shared/schema";
 import { db } from "../db";
-import { eq } from "drizzle-orm";
-import { openai } from "../services/openai";
+import { eq, desc, and } from "drizzle-orm";
+import { openai } from "../services/openAI";
 
 // Extract skills from CV content
 export async function extractSkillsFromCV(cvContent: string): Promise<string[]> {
@@ -196,6 +196,172 @@ export async function findMatchingJobs(
     console.error("Error finding matching jobs:", error);
     return [];
   }
+}
+
+// Store job match in database
+export async function createJobMatch(
+  cvId: number,
+  jobPostingId: number,
+  userId: number,
+  matchScore: number,
+  matchedSkills: string[] = [],
+  missingSkills: string[] = [],
+  matchReasons: string[] = []
+): Promise<JobMatch> {
+  try {
+    const jobMatchData: InsertJobMatch = {
+      cvId,
+      jobPostingId,
+      userId,
+      matchScore,
+      skillsMatchScore: Math.round(matchScore * 0.7), // Skills contribute 70% to overall score
+      experienceMatchScore: Math.round(matchScore * 0.2), // Experience 20%
+      locationMatchScore: Math.round(matchScore * 0.1), // Location 10%
+      saContextScore: Math.round(matchScore * 0.15), // South African context bonus
+      matchedSkills,
+      missingSkills,
+      matchReasons,
+      improvementSuggestions: generateImprovementSuggestions(missingSkills, matchScore),
+      status: "matched"
+    };
+
+    const [result] = await db.insert(jobMatches).values(jobMatchData).returning();
+    return result;
+  } catch (error) {
+    console.error("Error creating job match:", error);
+    throw error;
+  }
+}
+
+// Get job matches for a specific CV
+export async function getJobMatchesForCV(cvId: number): Promise<JobMatch[]> {
+  try {
+    const matches = await db
+      .select()
+      .from(jobMatches)
+      .where(eq(jobMatches.cvId, cvId))
+      .orderBy(desc(jobMatches.matchScore));
+    
+    return matches;
+  } catch (error) {
+    console.error("Error getting job matches for CV:", error);
+    return [];
+  }
+}
+
+// Get job matches for a specific job posting
+export async function getJobMatchesForJob(jobPostingId: number): Promise<JobMatch[]> {
+  try {
+    const matches = await db
+      .select()
+      .from(jobMatches)
+      .where(eq(jobMatches.jobPostingId, jobPostingId))
+      .orderBy(desc(jobMatches.matchScore));
+    
+    return matches;
+  } catch (error) {
+    console.error("Error getting job matches for job posting:", error);
+    return [];
+  }
+}
+
+// Find and create matches for a CV
+export async function findAndCreateMatches(cvId: number, userId: number): Promise<JobMatch[]> {
+  try {
+    // Find matching jobs
+    const matchingJobs = await findMatchingJobs(cvId, 20); // Get top 20 matches
+    
+    // Filter out jobs with low scores (below 30%)
+    const goodMatches = matchingJobs.filter(match => match.score >= 30);
+    
+    // Create job match records for good matches
+    const createdMatches: JobMatch[] = [];
+    
+    for (const match of goodMatches) {
+      // Check if match already exists
+      const existingMatch = await db
+        .select()
+        .from(jobMatches)
+        .where(
+          and(
+            eq(jobMatches.cvId, cvId),
+            eq(jobMatches.jobPostingId, match.job.id)
+          )
+        )
+        .limit(1);
+      
+      if (existingMatch.length === 0) {
+        // Create new match if it doesn't exist
+        const jobMatch = await createJobMatch(
+          cvId,
+          match.job.id,
+          userId,
+          match.score,
+          match.matchedSkills,
+          calculateMissingSkills(match.job, match.matchedSkills),
+          generateMatchReasons(match.score, match.matchedSkills)
+        );
+        createdMatches.push(jobMatch);
+      }
+    }
+    
+    return createdMatches;
+  } catch (error) {
+    console.error("Error finding and creating matches:", error);
+    return [];
+  }
+}
+
+// Calculate missing skills for improvement suggestions
+function calculateMissingSkills(job: JobPosting, matchedSkills: string[]): string[] {
+  const requiredSkills = job.requiredSkills || [];
+  const preferredSkills = job.preferredSkills || [];
+  const allJobSkills = [...requiredSkills, ...preferredSkills];
+  
+  return allJobSkills.filter(skill => 
+    !matchedSkills.some(matched => 
+      matched.toLowerCase() === skill.toLowerCase()
+    )
+  );
+}
+
+// Generate improvement suggestions based on missing skills
+function generateImprovementSuggestions(missingSkills: string[], matchScore: number): string[] {
+  const suggestions: string[] = [];
+  
+  if (matchScore < 50) {
+    suggestions.push("Consider gaining experience in the core requirements for this role");
+  }
+  
+  if (missingSkills.length > 0) {
+    const topMissing = missingSkills.slice(0, 3);
+    suggestions.push(`Focus on developing skills in: ${topMissing.join(", ")}`);
+  }
+  
+  if (matchScore >= 70) {
+    suggestions.push("You're a strong candidate! Consider highlighting relevant experience more prominently");
+  }
+  
+  return suggestions;
+}
+
+// Generate match reasons for user understanding
+function generateMatchReasons(matchScore: number, matchedSkills: string[]): string[] {
+  const reasons: string[] = [];
+  
+  if (matchedSkills.length > 0) {
+    reasons.push(`Matched ${matchedSkills.length} key skills: ${matchedSkills.slice(0, 3).join(", ")}`);
+  }
+  
+  if (matchScore >= 80) {
+    reasons.push("Excellent overall match with job requirements");
+  } else if (matchScore >= 60) {
+    reasons.push("Good match with most job requirements");
+  } else if (matchScore >= 40) {
+    reasons.push("Partial match with some development needed");
+  }
+  
+  return reasons;
 }
 
 // Find matching CVs for a job posting

@@ -280,6 +280,219 @@ export const insertPremiumJobMatchSchema = createInsertSchema(premiumJobMatches)
   expiresAt: true,
 });
 
+// Employers schema
+export const employers = pgTable("employers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull().unique(),
+  companyName: text("company_name").notNull(),
+  industry: text("industry"),
+  companySize: text("company_size"),
+  website: text("website"),
+  description: text("description"),
+  location: text("location"),
+  province: text("province"),
+  city: text("city"),
+  logo: text("logo"),
+  bbbeeLevel: integer("bbbee_level"),
+  bbbeeScore: real("bbbee_score"),
+  isVerified: boolean("is_verified").default(false),
+  verificationDocuments: text("verification_documents").array(),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const employersRelations = relations(employers, ({ one, many }) => ({
+  user: one(users, {
+    fields: [employers.userId],
+    references: [users.id],
+  }),
+  jobPostings: many(jobPostings),
+}));
+
+export const insertEmployerSchema = createInsertSchema(employers).pick({
+  userId: true,
+  companyName: true,
+  industry: true,
+  companySize: true,
+  website: true,
+  description: true,
+  location: true,
+  province: true,
+  city: true,
+  logo: true,
+  bbbeeLevel: true,
+  bbbeeScore: true,
+  contactEmail: true,
+  contactPhone: true,
+});
+
+// Job postings schema
+export const jobPostings = pgTable("job_postings", {
+  id: serial("id").primaryKey(),
+  employerId: integer("employer_id").references(() => employers.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  location: text("location"),
+  province: text("province"),
+  city: text("city"),
+  employmentType: text("employment_type"), // Full-time, Part-time, Contract, etc.
+  experienceLevel: text("experience_level"),
+  salaryRange: text("salary_range"),
+  requiredSkills: text("required_skills").array(),
+  preferredSkills: text("preferred_skills").array(),
+  industry: text("industry"),
+  department: text("department"),
+  bbbeePreference: boolean("bbbee_preference").default(false),
+  nqfRequirement: integer("nqf_requirement"),
+  languageRequirements: text("language_requirements").array(),
+  deadline: timestamp("deadline"),
+  isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
+  isRemote: boolean("is_remote").default(false),
+  views: integer("views").default(0),
+  applications: integer("applications").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobPostingsRelations = relations(jobPostings, ({ one, many }) => ({
+  employer: one(employers, {
+    fields: [jobPostings.employerId],
+    references: [employers.id],
+  }),
+  matches: many(jobMatches),
+}));
+
+export const insertJobPostingSchema = createInsertSchema(jobPostings).pick({
+  employerId: true,
+  title: true,
+  description: true,
+  location: true,
+  province: true,
+  city: true,
+  employmentType: true,
+  experienceLevel: true,
+  salaryRange: true,
+  requiredSkills: true,
+  preferredSkills: true,
+  industry: true,
+  department: true,
+  bbbeePreference: true,
+  nqfRequirement: true,
+  languageRequirements: true,
+  deadline: true,
+  isRemote: true,
+});
+
+// Job matches schema
+export const jobMatches = pgTable("job_matches", {
+  id: serial("id").primaryKey(),
+  cvId: integer("cv_id").references(() => cvs.id).notNull(),
+  jobPostingId: integer("job_posting_id").references(() => jobPostings.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  matchScore: integer("match_score").notNull(),
+  skillsMatchScore: integer("skills_match_score"),
+  experienceMatchScore: integer("experience_match_score"),
+  locationMatchScore: integer("location_match_score"),
+  saContextScore: integer("sa_context_score"),
+  matchedSkills: text("matched_skills").array(),
+  missingSkills: text("missing_skills").array(),
+  matchReasons: text("match_reasons").array(),
+  improvementSuggestions: text("improvement_suggestions").array(),
+  isViewed: boolean("is_viewed").default(false),
+  isApplied: boolean("is_applied").default(false),
+  applicationDate: timestamp("application_date"),
+  status: text("status").default("matched"), // matched, applied, rejected, interview, hired
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobMatchesRelations = relations(jobMatches, ({ one }) => ({
+  cv: one(cvs, {
+    fields: [jobMatches.cvId],
+    references: [cvs.id],
+  }),
+  jobPosting: one(jobPostings, {
+    fields: [jobMatches.jobPostingId],
+    references: [jobPostings.id],
+  }),
+  user: one(users, {
+    fields: [jobMatches.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertJobMatchSchema = createInsertSchema(jobMatches).pick({
+  cvId: true,
+  jobPostingId: true,
+  userId: true,
+  matchScore: true,
+  skillsMatchScore: true,
+  experienceMatchScore: true,
+  locationMatchScore: true,
+  saContextScore: true,
+  matchedSkills: true,
+  missingSkills: true,
+  matchReasons: true,
+  improvementSuggestions: true,
+  status: true,
+  notes: true,
+});
+
+// Skills schema
+export const skills = pgTable("skills", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  category: text("category"),
+  saRelevant: boolean("sa_relevant").default(false),
+  industryRelevant: text("industry_relevant").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const skillsRelations = relations(skills, ({ many }) => ({
+  userSkills: many(userSkills),
+}));
+
+export const insertSkillSchema = createInsertSchema(skills).pick({
+  name: true,
+  category: true,
+  saRelevant: true,
+  industryRelevant: true,
+});
+
+// User skills schema
+export const userSkills = pgTable("user_skills", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  skillId: integer("skill_id").references(() => skills.id).notNull(),
+  proficiencyLevel: text("proficiency_level"), // Beginner, Intermediate, Advanced, Expert
+  yearsOfExperience: integer("years_of_experience"),
+  isEndorsed: boolean("is_endorsed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userSkillsRelations = relations(userSkills, ({ one }) => ({
+  user: one(users, {
+    fields: [userSkills.userId],
+    references: [users.id],
+  }),
+  skill: one(skills, {
+    fields: [userSkills.skillId],
+    references: [skills.id],
+  }),
+}));
+
+export const insertUserSkillSchema = createInsertSchema(userSkills).pick({
+  userId: true,
+  skillId: true,
+  proficiencyLevel: true,
+  yearsOfExperience: true,
+  isEndorsed: true,
+});
+
 // ATS Score schema
 export const atsScores = pgTable("ats_scores", {
   id: serial("id").primaryKey(),
@@ -435,6 +648,21 @@ export type InsertPaymentTransaction = z.infer<typeof insertPaymentTransactionSc
 
 export type PremiumJobMatch = typeof premiumJobMatches.$inferSelect;
 export type InsertPremiumJobMatch = z.infer<typeof insertPremiumJobMatchSchema>;
+
+export type Employer = typeof employers.$inferSelect;
+export type InsertEmployer = z.infer<typeof insertEmployerSchema>;
+
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type InsertJobPosting = z.infer<typeof insertJobPostingSchema>;
+
+export type JobMatch = typeof jobMatches.$inferSelect;
+export type InsertJobMatch = z.infer<typeof insertJobMatchSchema>;
+
+export type Skill = typeof skills.$inferSelect;
+export type InsertSkill = z.infer<typeof insertSkillSchema>;
+
+export type UserSkill = typeof userSkills.$inferSelect;
+export type InsertUserSkill = z.infer<typeof insertUserSkillSchema>;
 
 export type AnalysisReport = {
   score: number;

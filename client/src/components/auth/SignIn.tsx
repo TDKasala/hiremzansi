@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useLocation } from 'wouter';
-import { Briefcase, TrendingUp, Users, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { TrendingUp, Eye, EyeOff } from 'lucide-react';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
@@ -34,7 +34,6 @@ export function SignIn() {
         throw error;
       }
       
-      // Redirect to dashboard on successful login
       setLocation('/dashboard');
     } catch (err: any) {
       console.error('Sign in error:', err);
@@ -58,7 +57,7 @@ export function SignIn() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-lg shadow-md p-8 w-full">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full">
           {/* Error Alert */}
           {error && (
             <Alert variant="destructive" className="mb-6">
@@ -66,15 +65,8 @@ export function SignIn() {
             </Alert>
           )}
 
-          {/* Error Alert */}
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
           {/* Sign In Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email Address
@@ -87,23 +79,14 @@ export function SignIn() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 required
-                className="h-12 text-base"
+                className="h-11"
               />
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                  Password
-                </Label>
-                <button
-                  type="button"
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                  onClick={() => setLocation('/forgot-password')}
-                >
-                  Forgot password?
-                </button>
-              </div>
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Password
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -112,64 +95,55 @@ export function SignIn() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   required
-                  className="h-12 text-base pr-12"
+                  className="h-11 pr-10"
                 />
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
-            
+
             <Button 
               type="submit" 
-              className="w-full h-12 text-base bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 transition-all duration-200 shadow-lg"
+              className="w-full h-11 text-base font-medium"
               disabled={loading}
             >
-              {loading ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Signing in...</span>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <span>Sign In to ATSBoost</span>
-                  <ChevronRight className="h-4 w-4" />
-                </div>
-              )}
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
 
-          {/* Sign Up Link */}
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-gray-600">
-              New to ATSBoost?{' '}
+          {/* Footer Links */}
+          <div className="mt-6 text-center space-y-3">
+            <button
+              type="button"
+              className="text-sm text-primary hover:text-primary/80 hover:underline"
+              onClick={() => setLocation('/forgot-password')}
+            >
+              Forgot your password?
+            </button>
+            
+            <div className="text-sm text-gray-600">
+              Don't have an account?{' '}
               <button
+                type="button"
+                className="text-primary hover:text-primary/80 hover:underline font-medium"
                 onClick={() => setLocation('/signup')}
-                className="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors"
               >
-                Create your free account
+                Sign up
               </button>
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              Join thousands of South African professionals advancing their careers
-            </p>
+            </div>
           </div>
+        </div>
 
-          {/* Quick Stats */}
-          <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-            <div className="text-center text-sm text-gray-600">
-              <span className="font-semibold text-green-600">Free to get started</span> • No credit card required
-            </div>
-            <div className="flex justify-center space-x-6 text-xs text-gray-500">
-              <span>✓ Instant CV Analysis</span>
-              <span>✓ ATS Optimization</span>
-              <span>✓ SA Market Insights</span>
-            </div>
-          </div>
+        {/* Trust Badge */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            Trusted by 50,000+ South African professionals
+          </p>
         </div>
       </div>
     </div>
