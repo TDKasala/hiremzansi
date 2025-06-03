@@ -1,7 +1,7 @@
 import { CV, JobPosting, JobMatch, InsertJobMatch, cvs, jobPostings, jobMatches } from "@shared/schema";
 import { db } from "../db";
 import { eq, desc, and } from "drizzle-orm";
-import { openai } from "../services/openAI";
+import openai from "../services/openAI";
 
 // Extract skills from CV content
 export async function extractSkillsFromCV(cvContent: string): Promise<string[]> {
