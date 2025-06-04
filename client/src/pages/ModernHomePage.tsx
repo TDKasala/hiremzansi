@@ -149,7 +149,7 @@ export function ModernHomePage() {
           <FloatingElement>
             <Badge className="mb-6 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
               <Sparkles className="w-4 h-4 mr-2" />
-              South Africa's #1 CV Optimization Platform
+              South Africa's #1 Job Marketplace Platform
             </Badge>
           </FloatingElement>
 
@@ -165,8 +165,8 @@ export function ModernHomePage() {
 
           <FloatingElement delay={0.4}>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Get past ATS systems, land interviews, and secure your dream job with 
-              AI-powered CV optimization designed for the South African market.
+              Connect with top employers, land interviews, and secure your dream job with 
+              AI-powered career tools designed for the South African market.
             </p>
           </FloatingElement>
 
@@ -227,7 +227,7 @@ export function ModernHomePage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose ATSBoost?
+              Why Choose Hire Mzansi?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Designed specifically for the South African job market with cutting-edge AI technology

@@ -86,9 +86,9 @@ export function ModernNavbar() {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                ATSBoost
+                Hire Mzansi
               </h1>
-              <p className="text-xs text-gray-500">South Africa's #1 CV Platform</p>
+              <p className="text-xs text-gray-500">South Africa's #1 Job Platform</p>
             </div>
           </motion.div>
 
@@ -263,7 +263,7 @@ export function ModernNavbar() {
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-1.5">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold text-gray-900">ATSBoost</span>
+                  <span className="text-lg font-bold text-gray-900">Hire Mzansi</span>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
