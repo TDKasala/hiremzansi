@@ -33,6 +33,7 @@ export function ModernNavbar() {
   const navItems = [
     { label: 'Home', path: '/' },
     { label: 'How It Works', path: '/how-it-works' },
+    { label: 'Mock Interview', path: '/mock-interview' },
     { label: 'Features', path: '/features' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'About', path: '/about' }

@@ -152,6 +152,7 @@ function App() {
                 <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
                 <Route path="/industry-templates" component={IndustryTemplatesPage} />
                 <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
+                <ProtectedRoute path="/mock-interview" component={MockInterviewPage} />
                 <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
                 
                 {/* Protected routes requiring authentication */}
