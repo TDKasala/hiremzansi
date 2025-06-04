@@ -5,7 +5,7 @@ export default function JobsPage() {
   return (
     <div>
       <Helmet>
-        <title>South African Job Search | ATSBoost</title>
+        <title>South African Job Search | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Find job opportunities across South Africa. Search through hundreds of jobs and find your perfect match." 

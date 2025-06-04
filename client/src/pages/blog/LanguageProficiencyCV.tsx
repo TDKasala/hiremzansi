@@ -6,7 +6,7 @@ const LanguageProficiencyCV: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>The Importance of Language Proficiency on Your South African CV | ATSBoost</title>
+        <title>The Importance of Language Proficiency on Your South African CV | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to effectively present your language skills on your CV to stand out in South Africa's multilingual job market and improve your employment prospects." 
@@ -129,7 +129,7 @@ const LanguageProficiencyCV: React.FC = () => {
           <h2>How to Present Language Skills on Your South African CV</h2>
           
           <p>
-            According to <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, there are several effective ways to showcase your language abilities:
+            According to <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, there are several effective ways to showcase your language abilities:
           </p>
           
           <h3>1. Create a Dedicated Language Section</h3>
@@ -212,7 +212,7 @@ const LanguageProficiencyCV: React.FC = () => {
           </ol>
           
           <p>
-            Our <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost ATS Score tool</a> can analyze your CV to ensure your language skills are presented in an ATS-friendly format.
+            Our <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi ATS Score tool</a> can analyze your CV to ensure your language skills are presented in an ATS-friendly format.
           </p>
           
           <h2>Regional Language Considerations</h2>
@@ -315,7 +315,7 @@ const LanguageProficiencyCV: React.FC = () => {
           </p>
           
           <p>
-            For personalized advice on highlighting your language skills for specific industries or roles, consider using <a href="https://atsboost.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
+            For personalized advice on highlighting your language skills for specific industries or roles, consider using <a href="https://hiremzansi.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
           </p>
         </div>
         
@@ -325,7 +325,7 @@ const LanguageProficiencyCV: React.FC = () => {
             Get your resume analyzed to ensure your language proficiencies are effectively showcased with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

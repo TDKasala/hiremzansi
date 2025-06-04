@@ -33,7 +33,7 @@ export async function generateSchemaDocs() {
     `;
     
     const tableResult = await pool.query(tableQuery);
-    let schema = '-- ATSBoost Database Schema\n-- Generated on ' + new Date().toISOString() + '\n\n';
+    let schema = '-- Hire Mzansi Database Schema\n-- Generated on ' + new Date().toISOString() + '\n\n';
     
     for (const row of tableResult.rows) {
       const tableName = row.table_name;

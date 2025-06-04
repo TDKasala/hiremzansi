@@ -129,7 +129,7 @@ export default function SuccessStoriesSection() {
               <h3 className="font-bold text-xl mb-2">From Frustration to Success</h3>
               <p className="text-gray-700">
                 "After months of sending applications with no responses, I was ready to give up. 
-                ATSBoost helped me understand why my CV wasn't getting through. Within 2 weeks of 
+                Hire Mzansi helped me understand why my CV wasn't getting through. Within 2 weeks of 
                 optimizing my CV, I landed three interviews and received my dream job offer!"
               </p>
               <p className="font-medium mt-3 text-secondary">— Thandi M., Cape Town</p>
@@ -197,7 +197,7 @@ export default function SuccessStoriesSection() {
                 transition={{ delay: 1, duration: 0.5 }}
                 className="absolute bottom-4 right-4 bg-primary/90 text-white px-3 py-2 rounded-full text-sm font-bold"
               >
-                ATSBoost Success
+                Hire Mzansi Success
               </motion.div>
             </motion.div>
           </div>

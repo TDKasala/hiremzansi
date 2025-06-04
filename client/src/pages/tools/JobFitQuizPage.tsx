@@ -828,7 +828,7 @@ const JobFitQuizPage = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <Helmet>
-        <title>Job Fit Quiz | ATSBoost</title>
+        <title>Job Fit Quiz | Hire Mzansi</title>
         <meta name="description" content="Discover which South African job roles best match your skills, preferences, and working style with our detailed job fit assessment." />
       </Helmet>
       

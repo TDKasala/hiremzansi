@@ -50,7 +50,7 @@ export function SignIn() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center space-x-2 mb-4">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">ATSBoost</span>
+            <span className="text-2xl font-bold text-gray-900">Hire Mzansi</span>
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to your account</p>

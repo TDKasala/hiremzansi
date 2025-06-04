@@ -6,7 +6,7 @@ import mammoth from 'mammoth';
 const readFileAsync = promisify(fs.readFile);
 
 /**
- * AI Service for ATSBoost
+ * AI Service for Hire Mzansi
  * Handles CV text extraction and analysis
  */
 class AIService {

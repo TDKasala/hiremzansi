@@ -66,7 +66,7 @@ export default function ReferralSourceSection() {
     if (!formData.source) {
       toast({
         title: "Please select a source",
-        description: "Let us know how you found ATSBoost",
+        description: "Let us know how you found Hire Mzansi",
         variant: "destructive",
       });
       return;
@@ -149,7 +149,7 @@ export default function ReferralSourceSection() {
                   <Card className="p-6 shadow-lg border-t-4 border-primary">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Where did you hear about ATSBoost?</h3>
+                        <h3 className="text-lg font-medium">Where did you hear about Hire Mzansi?</h3>
                         
                         <RadioGroup 
                           value={formData.source} 

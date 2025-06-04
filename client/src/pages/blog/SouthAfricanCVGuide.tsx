@@ -22,7 +22,7 @@ export default function SouthAfricanCVGuide() {
   return (
     <>
       <Helmet>
-        <title>Ultimate South African CV Guide | ATSBoost</title>
+        <title>Ultimate South African CV Guide | Hire Mzansi</title>
         <meta
           name="description"
           content="Comprehensive guide to creating a winning CV in South Africa, including ATS optimization, B-BBEE, NQF levels, and local job market requirements."

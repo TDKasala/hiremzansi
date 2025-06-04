@@ -44,7 +44,7 @@ export default function DeepAnalysisPage() {
     return (
       <div className="container max-w-4xl py-8">
         <Helmet>
-          <title>Deep CV Analysis | ATSBoost</title>
+          <title>Deep CV Analysis | Hire Mzansi</title>
           <meta name="description" content="Get a comprehensive analysis of your CV to understand how it measures against South African market expectations" />
         </Helmet>
         
@@ -78,7 +78,7 @@ export default function DeepAnalysisPage() {
     return (
       <div className="container max-w-4xl py-8">
         <Helmet>
-          <title>Deep CV Analysis | ATSBoost</title>
+          <title>Deep CV Analysis | Hire Mzansi</title>
           <meta name="description" content="Get a comprehensive analysis of your CV to understand how it measures against South African market expectations" />
         </Helmet>
         
@@ -118,7 +118,7 @@ export default function DeepAnalysisPage() {
   return (
     <div className="container max-w-4xl py-8">
       <Helmet>
-        <title>Deep CV Analysis | ATSBoost</title>
+        <title>Deep CV Analysis | Hire Mzansi</title>
         <meta name="description" content="Get a comprehensive analysis of your CV to understand how it measures against South African market expectations" />
       </Helmet>
       

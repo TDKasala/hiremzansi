@@ -152,7 +152,7 @@ English (Fluent), Zulu (Native), Xhosa (Conversational)`
   return (
     <>
       <Helmet>
-        <title>Premium Tools | ATSBoost - South African CV Optimization</title>
+        <title>Premium Tools | Hire Mzansi - South African CV Optimization</title>
         <meta name="description" content="Access premium CV optimization tools designed specifically for the South African job market. Enhance your resume with B-BBEE and NQF optimization." />
       </Helmet>
       
@@ -353,7 +353,7 @@ English (Fluent), Zulu (Native), Xhosa (Conversational)`
                     <div className="border rounded-lg p-4 max-w-md mx-auto">
                       <div className="text-sm text-muted-foreground mb-2">SMS Preview:</div>
                       <div className="bg-muted p-3 rounded text-sm font-medium">
-                        ATSBoost: New Marketing Specialist job at Multichoice in Cape Town. 95% match to your skills! Check your email for details or log in to view. Reply STOP to unsubscribe.
+                        Hire Mzansi: New Marketing Specialist job at Multichoice in Cape Town. 95% match to your skills! Check your email for details or log in to view. Reply STOP to unsubscribe.
                       </div>
                     </div>
                   )}

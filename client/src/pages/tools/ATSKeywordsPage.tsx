@@ -186,7 +186,7 @@ const ATSKeywordsPage = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <Helmet>
-        <title>ATS Keywords Tool | ATSBoost</title>
+        <title>ATS Keywords Tool | Hire Mzansi</title>
         <meta name="description" content="Find the perfect ATS keywords for your South African job applications. Our tool identifies essential and recommended keywords to boost your CV's performance." />
       </Helmet>
       

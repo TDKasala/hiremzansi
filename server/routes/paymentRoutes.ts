@@ -250,7 +250,7 @@ router.get("/simulator", async (req, res) => {
   res.send(`
     <html>
       <head>
-        <title>ATSBoost Payment Simulator</title>
+        <title>Hire Mzansi Payment Simulator</title>
         <style>
           body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
           .payment-card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: #f9f9f9; }
@@ -262,7 +262,7 @@ router.get("/simulator", async (req, res) => {
       </head>
       <body>
         <div class="payment-card">
-          <h2>🚀 ATSBoost Payment Gateway</h2>
+          <h2>🚀 Hire Mzansi Payment Gateway</h2>
           <p><strong>Service:</strong> ${item_name}</p>
           <p class="amount">Amount: R${amount}</p>
           <p><strong>Transaction:</strong> ${transactionId}</p>

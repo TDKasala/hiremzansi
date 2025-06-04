@@ -10,6 +10,7 @@ Visit us at [HireMzansi.co.za](https://hiremzansi.co.za)
 
 ## ✨ Key Features
 
+- **Job Marketplace**: Connect with employers and find relevant opportunities across South Africa
 - **ATS Score Analysis**: Get a free ATS compatibility score for your CV
 - **Deep CV Analysis**: Receive detailed feedback with specific improvement suggestions
 - **South African Context Detection**: Identify B-BBEE status, NQF levels, and other SA-specific elements
@@ -17,7 +18,7 @@ Visit us at [HireMzansi.co.za](https://hiremzansi.co.za)
 - **Multi-language Support**: Available in English, isiZulu, Sesotho, Afrikaans, and isiXhosa
 - **Skill Gap Analysis**: Identify missing skills based on your target job
 - **Interview Practice Tools**: Prepare for interviews with AI-powered practice questions
-- **Job Search Integration**: Find relevant job opportunities across top South African job boards
+- **Employer Dashboard**: Post jobs and find qualified candidates efficiently
 
 ## 💻 Tech Stack
 

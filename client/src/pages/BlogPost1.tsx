@@ -15,7 +15,7 @@ export default function BlogPost1() {
   return (
     <>
       <Helmet>
-        <title>7 ATS-Friendly CV Tips for South African Job Seekers | ATSBoost</title>
+        <title>7 ATS-Friendly CV Tips for South African Job Seekers | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to create an ATS-compliant CV that stands out in the South African job market. Discover 7 expert tips to optimize your resume for applicant tracking systems." 
@@ -45,7 +45,7 @@ export default function BlogPost1() {
               </div>
               <div className="flex items-center">
                 <User className="h-4 w-4 mr-2" />
-                <span>ATSBoost Team</span>
+                <span>Hire Mzansi Team</span>
               </div>
               <div className="flex items-center flex-wrap gap-2">
                 <Tag className="h-4 w-4" />
@@ -67,7 +67,7 @@ export default function BlogPost1() {
                 <p className="text-center mb-4">Find out how your CV performs against South African ATS systems instantly.</p>
                 <div className="flex justify-center">
                   <Button asChild>
-                    <a href="https://atsboost.co.za/upload" target="_blank" rel="noopener noreferrer">
+                    <a href="https://hiremzansi.co.za/upload" target="_blank" rel="noopener noreferrer">
                       Analyze My CV Now
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </a>
@@ -125,14 +125,14 @@ export default function BlogPost1() {
           <div className="flex justify-center my-6">
             <Card className="w-full bg-secondary text-white">
               <CardContent className="pt-6">
-                <h3 className="text-xl font-bold mb-2 text-center">ATSBoost: South Africa's #1 CV Optimization Platform</h3>
+                <h3 className="text-xl font-bold mb-2 text-center">Hire Mzansi: South Africa's #1 CV Optimization Platform</h3>
                 <p className="text-center mb-4">
                   Get personalized recommendations to improve your CV's ATS score specifically for South African employers.
                 </p>
                 <div className="flex justify-center">
                   <Button variant="default" className="bg-white text-secondary hover:bg-white/90" asChild>
-                    <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
-                      Visit ATSBoost.co.za
+                    <a href="https://hiremzansi.co.za" target="_blank" rel="noopener noreferrer">
+                      Visit Hire Mzansi.co.za
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
@@ -195,11 +195,11 @@ export default function BlogPost1() {
           <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 my-8">
             <h3 className="font-bold mb-2">How Does Your CV Score Against South African ATS Systems?</h3>
             <p className="mb-4">
-              ATSBoost provides detailed analysis of your CV with South African context-specific recommendations, 
+              Hire Mzansi provides detailed analysis of your CV with South African context-specific recommendations, 
               including B-BBEE optimization, NQF level formatting, and regional keyword suggestions.
             </p>
             <Button asChild>
-              <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
+              <a href="https://hiremzansi.co.za" target="_blank" rel="noopener noreferrer">
                 {t('blog.getFreeAtsScore')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>

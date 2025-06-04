@@ -118,8 +118,8 @@ export default function EmployerDashboardPage() {
     return (
       <div className="container mx-auto py-8 max-w-6xl">
         <Helmet>
-          <title>Create Employer Profile | ATSBoost</title>
-          <meta name="description" content="Create your employer profile on ATSBoost to start posting jobs." />
+          <title>Create Employer Profile | Hire Mzansi</title>
+          <meta name="description" content="Create your employer profile on Hire Mzansi to start posting jobs." />
         </Helmet>
         
         <h1 className="text-3xl font-bold mb-8">Create Employer Profile</h1>
@@ -160,8 +160,8 @@ export default function EmployerDashboardPage() {
   return (
     <div className="container mx-auto py-8 max-w-6xl">
       <Helmet>
-        <title>Employer Dashboard | ATSBoost</title>
-        <meta name="description" content="Manage your job postings and candidates on ATSBoost's employer dashboard." />
+        <title>Employer Dashboard | Hire Mzansi</title>
+        <meta name="description" content="Manage your job postings and candidates on Hire Mzansi's employer dashboard." />
       </Helmet>
       
       {/* Header with employer info */}

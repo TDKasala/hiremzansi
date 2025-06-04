@@ -195,7 +195,7 @@ export function ModernUploadPage() {
                   </div>
                   <h4 className="text-lg font-bold mb-2">Trusted by 50,000+ Users</h4>
                   <p className="text-purple-100 text-sm">
-                    Join thousands of South Africans who've boosted their career prospects with ATSBoost
+                    Join thousands of South Africans who've boosted their career prospects with Hire Mzansi
                   </p>
                 </CardContent>
               </Card>

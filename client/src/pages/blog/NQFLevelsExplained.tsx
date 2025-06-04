@@ -6,7 +6,7 @@ const NQFLevelsExplained: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>NQF Levels Explained: What South African Employers Look For | ATSBoost</title>
+        <title>NQF Levels Explained: What South African Employers Look For | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to correctly present your qualifications using the National Qualifications Framework (NQF) to impress South African employers." 
@@ -138,7 +138,7 @@ const NQFLevelsExplained: React.FC = () => {
           <h2>How to Present NQF Levels on Your Resume</h2>
           
           <p>
-            According to <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, there are several effective ways to include NQF information on your resume:
+            According to <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, there are several effective ways to include NQF information on your resume:
           </p>
           
           <h3>Method 1: Include it directly with your qualification</h3>
@@ -180,7 +180,7 @@ const NQFLevelsExplained: React.FC = () => {
           </ul>
           
           <p>
-            Our <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost ATS Score checker</a> specifically identifies whether your resume properly formats NQF information for South African ATS systems.
+            Our <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi ATS Score checker</a> specifically identifies whether your resume properly formats NQF information for South African ATS systems.
           </p>
           
           <h2>Common Mistakes to Avoid</h2>
@@ -213,7 +213,7 @@ const NQFLevelsExplained: React.FC = () => {
           </p>
           
           <p>
-            For personalized advice on optimizing your CV with NQF information for specific industries or roles, consider using <a href="https://atsboost.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
+            For personalized advice on optimizing your CV with NQF information for specific industries or roles, consider using <a href="https://hiremzansi.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
           </p>
         </div>
         
@@ -223,7 +223,7 @@ const NQFLevelsExplained: React.FC = () => {
             Get your resume analyzed to ensure your NQF levels are properly formatted for South African ATS systems with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

@@ -7,7 +7,7 @@ export default function AboutPage() {
     {
       name: "Denis Kasala",
       title: "Founder & Developer",
-      bio: "Passionate about addressing South Africa's unemployment crisis, Denis founded ATSBoost to empower job seekers with technology that overcomes ATS barriers in the hiring process. His expertise in AI and software development drives our platform's innovative features tailored for the South African job market.",
+      bio: "Passionate about addressing South Africa's unemployment crisis, Denis founded Hire Mzansi to empower job seekers with technology that overcomes ATS barriers in the hiring process. His expertise in AI and software development drives our platform's innovative features tailored for the South African job market.",
       image: "https://images.unsplash.com/photo-1531891570158-e71b35a485bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=400"
     }
   ];
@@ -15,17 +15,17 @@ export default function AboutPage() {
   return (
     <>
       <Helmet>
-        <title>About Us | ATSBoost - South African Resume Optimization</title>
-        <meta name="description" content="Learn about ATSBoost - the team behind South Africa's leading CV optimization platform helping job seekers beat ATS systems and land more interviews." />
-        <meta property="og:title" content="About ATSBoost - Our Mission and Team" />
+        <title>About Us | Hire Mzansi - South African Resume Optimization</title>
+        <meta name="description" content="Learn about Hire Mzansi - the team behind South Africa's leading CV optimization platform helping job seekers beat ATS systems and land more interviews." />
+        <meta property="og:title" content="About Hire Mzansi - Our Mission and Team" />
         <meta property="og:description" content="Learn about the team behind South Africa's CV optimization platform helping job seekers land more interviews." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/about" />
+        <meta property="og:url" content="https://hiremzansi.co.za/about" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">About ATSBoost</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">About Hire Mzansi</h1>
           <p className="text-xl max-w-2xl mx-auto">
             Our mission is to empower South African job seekers with the tools they need to succeed
           </p>
@@ -38,7 +38,7 @@ export default function AboutPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-secondary mb-6">Our Story</h2>
               <p className="text-neutral-700 mb-4">
-                ATSBoost was founded in 2023 by Denis Kasala with a clear mission: to help South African job seekers overcome 
+                Hire Mzansi was founded in 2023 by Denis Kasala with a clear mission: to help South African job seekers overcome 
                 the ATS barrier that prevents many qualified candidates from landing interviews.
               </p>
               <p className="text-neutral-700 mb-4">
@@ -48,7 +48,7 @@ export default function AboutPage() {
               </p>
               <p className="text-neutral-700">
                 Combining expertise in software development, AI technology, and the unique requirements of the South African 
-                job market, Denis built ATSBoost to deliver real results for job seekers across the country, with a particular 
+                job market, Denis built Hire Mzansi to deliver real results for job seekers across the country, with a particular 
                 focus on local context factors like B-BBEE status and NQF levels that other global CV tools overlook.
               </p>
             </div>
@@ -96,13 +96,13 @@ export default function AboutPage() {
                   <p className="text-primary font-semibold mb-4">Founder & Lead Developer</p>
                   <div className="text-neutral-700 space-y-4">
                     <p>
-                      Denis founded ATSBoost in 2023 after witnessing South Africa's growing unemployment crisis and the technical barriers job seekers face in the modern hiring process.
+                      Denis founded Hire Mzansi in 2023 after witnessing South Africa's growing unemployment crisis and the technical barriers job seekers face in the modern hiring process.
                     </p>
                     <p>
                       With over 5 years of experience in software development and AI technologies, Denis combines technical expertise with a deep understanding of South Africa's unique job market challenges.
                     </p>
                     <p>
-                      Prior to ATSBoost, Denis worked as a solutions architect developing enterprise applications for several South African companies. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.
+                      Prior to Hire Mzansi, Denis worked as a solutions architect developing enterprise applications for several South African companies. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.
                     </p>
                     <p>
                       Denis holds a BSc in Computer Science from University of Cape Town and is an active advocate for technology education initiatives across South Africa.

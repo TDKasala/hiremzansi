@@ -30,7 +30,7 @@ const blogPosts: BlogPost[] = [
     tags: ['AI', 'CV Optimization', 'ATS', 'South Africa', 'Job Search'],
     featured: true,
     keywords: ['AI CV optimization South Africa', 'ATS friendly CV', 'job search South Africa', 'CV formatting', 'applicant tracking system'],
-    summary: `By the ATSBoost Team - Your trusted partners in career advancement
+    summary: `By the Hire Mzansi Team - Your trusted partners in career advancement
 
 The South African job market is experiencing a digital revolution that's changing how CVs are processed, evaluated, and ranked. Traditional CV formats that worked just five years ago are now systematically filtered out by sophisticated Applicant Tracking Systems (ATS) before reaching human recruiters.
 
@@ -42,7 +42,7 @@ The impact is profound: without proper AI optimization, your CV has less than a 
 
 **Understanding South African ATS Requirements**
 
-At ATSBoost.co.za, we've analyzed thousands of ATS systems used across South African industries and identified critical success factors. Our AI technology addresses unique local requirements including B-BBEE status representation, NQF education level formatting according to SAQA standards, industry-specific terminology for sectors like mining, finance, and telecommunications, and regional salary band expectations across different provinces.
+At Hire Mzansi.co.za, we've analyzed thousands of ATS systems used across South African industries and identified critical success factors. Our AI technology addresses unique local requirements including B-BBEE status representation, NQF education level formatting according to SAQA standards, industry-specific terminology for sectors like mining, finance, and telecommunications, and regional salary band expectations across different provinces.
 
 **The xAI Advantage in CV Optimization**
 
@@ -68,7 +68,7 @@ Our clients typically see significant improvements in their job search metrics i
 
 The AI system continuously learns from market feedback, ensuring your CV remains optimized as ATS algorithms evolve and industry requirements change. This dynamic approach keeps you ahead of competition in an increasingly automated recruitment landscape.
 
-Ready to transform your career prospects with AI-powered optimization? Visit https://atsboost.co.za and experience the technology that's helping South African professionals succeed in the digital age of recruitment.`
+Ready to transform your career prospects with AI-powered optimization? Visit https://hiremzansi.co.za and experience the technology that's helping South African professionals succeed in the digital age of recruitment.`
   },
   {
     id: '2',
@@ -88,7 +88,7 @@ Local companies increasingly adopt ATS technology with 80% of JSE-listed compani
 
 Use standard fonts like Arial or Calibri, maintain 10-12pt font size, structure your header with name and job title, professional email address, South African phone number (+27), location (city, province), and LinkedIn profile URL.
 
-Ready to optimize your CV for ATS success? Visit https://atsboost.co.za for professional analysis and AI-powered optimization tailored to the South African job market.`
+Ready to optimize your CV for ATS success? Visit https://hiremzansi.co.za for professional analysis and AI-powered optimization tailored to the South African job market.`
   },
   {
     id: '3',
@@ -110,7 +110,7 @@ Our AI understands transformation requirements including B-BBEE scorecard optimi
 
 For Job Seekers (R50 Investment): Comprehensive profile analysis, intelligent job matching with compatibility scoring, career development insights, and direct recruiter connections.
 
-Ready to experience intelligent job matching? Job Seekers start at https://atsboost.co.za/premium-job-seeker and Recruiters discover top talent at https://atsboost.co.za/premium-recruiter.`
+Ready to experience intelligent job matching? Job Seekers start at https://hiremzansi.co.za/premium-job-seeker and Recruiters discover top talent at https://hiremzansi.co.za/premium-recruiter.`
   },
   {
     id: '4',
@@ -122,15 +122,15 @@ Ready to experience intelligent job matching? Job Seekers start at https://atsbo
     tags: ['Job Market', 'AI', 'Remote Work', 'Skills', 'South Africa', 'Career Trends'],
     featured: false,
     keywords: ['South African job market 2025', 'remote work trends SA', 'AI in recruitment', 'skills gap South Africa', 'future of work trends'],
-    summary: `By the ATSBoost Team - Your career development specialists
+    summary: `By the Hire Mzansi Team - Your career development specialists
 
 The South African job market is experiencing unprecedented transformation in 2025. From AI adoption to remote work normalization, understanding these trends is crucial for career success and business growth.
 
 Key statistics for 2025 show 58% of companies now use AI in recruitment processes, remote work adoption increased to 35% of all positions, skills gap affects 73% of South African employers, digital literacy becomes essential across all industries, and green jobs sector growing at 25% annually.
 
-At https://atsboost.co.za, we help professionals navigate these changes through AI-powered career optimization.
+At https://hiremzansi.co.za, we help professionals navigate these changes through AI-powered career optimization.
 
-The future of work in South Africa is being written today. Position yourself at the forefront of these trends with AI-powered career tools at https://atsboost.co.za.`
+The future of work in South Africa is being written today. Position yourself at the forefront of these trends with AI-powered career tools at https://hiremzansi.co.za.`
   },
   {
     id: '5',
@@ -142,7 +142,7 @@ The future of work in South Africa is being written today. Position yourself at 
     tags: ['ATS', 'Applicant Tracking System', 'Job Search', 'South Africa', 'HR Technology'],
     featured: true,
     keywords: ['what is ATS', 'applicant tracking system South Africa', 'ATS meaning', 'how ATS works', 'beat ATS system'],
-    summary: `By the ATSBoost Team - Your experts in ATS optimization
+    summary: `By the Hire Mzansi Team - Your experts in ATS optimization
 
 If you've been wondering "What is an ATS?" and how it affects your job search in South Africa, you're not alone. Applicant Tracking Systems have quietly revolutionized hiring across the country, fundamentally changing how recruiters process and evaluate job applications.
 
@@ -200,7 +200,7 @@ ATS technology continues evolving with artificial intelligence, machine learning
 
 Staying ahead of these changes requires continuous CV optimization and understanding of emerging ATS capabilities. The professionals who adapt to these digital recruitment realities will have significant advantages in the competitive South African job market.
 
-Ready to optimize your CV for ATS success? Visit https://atsboost.co.za for comprehensive ATS compatibility analysis and professional optimization services designed specifically for the South African market.`
+Ready to optimize your CV for ATS success? Visit https://hiremzansi.co.za for comprehensive ATS compatibility analysis and professional optimization services designed specifically for the South African market.`
   },
   {
     id: '6',
@@ -212,7 +212,7 @@ Ready to optimize your CV for ATS success? Visit https://atsboost.co.za for comp
     tags: ['Remote Work', 'South Africa', 'Global Jobs', 'Digital Nomad', 'Work From Home'],
     featured: true,
     keywords: ['remote work South Africa', 'work from home jobs SA', 'global remote opportunities', 'digital nomad South Africa', 'remote work trends'],
-    summary: `By the ATSBoost Team - Connecting SA talent with global opportunities
+    summary: `By the Hire Mzansi Team - Connecting SA talent with global opportunities
 
 Remote work has fundamentally transformed career possibilities for South African professionals, creating unprecedented opportunities to access global markets while maintaining local roots. The shift toward distributed teams has opened doors that were previously impossible for many talented individuals across the country.
 
@@ -282,7 +282,7 @@ The trend toward remote work shows no signs of slowing, with many international 
 
 Emerging technologies like virtual reality collaboration and advanced project management AI will further enable remote work effectiveness. South African professionals who stay current with these technologies will maintain competitive advantages in global markets.
 
-Ready to optimize your CV for global remote opportunities? Visit https://atsboost.co.za for comprehensive analysis and professional optimization services designed specifically for South African professionals seeking international remote work. Our AI-powered platform understands both local capabilities and global requirements, ensuring your CV effectively communicates your remote work potential to international employers.`
+Ready to optimize your CV for global remote opportunities? Visit https://hiremzansi.co.za for comprehensive analysis and professional optimization services designed specifically for South African professionals seeking international remote work. Our AI-powered platform understands both local capabilities and global requirements, ensuring your CV effectively communicates your remote work potential to international employers.`
   },
   {
     id: '7',
@@ -294,7 +294,7 @@ Ready to optimize your CV for global remote opportunities? Visit https://atsboos
     tags: ['B-BBEE', 'Transformation', 'South Africa', 'Diversity', 'Employment Equity'],
     featured: false,
     keywords: ['B-BBEE CV tips', 'transformation experience resume', 'employment equity SA', 'diversity hiring South Africa', 'B-BBEE credentials'],
-    summary: `By the ATSBoost Team - Transformation and career development experts
+    summary: `By the Hire Mzansi Team - Transformation and career development experts
 
 B-BBEE and transformation initiatives significantly impact hiring decisions across South African companies, making it crucial for job seekers to understand how to effectively present their transformation credentials. This strategic positioning can dramatically improve your prospects in a competitive job market where companies actively seek candidates who contribute to both business success and transformation goals.
 
@@ -302,7 +302,7 @@ B-BBEE and transformation initiatives significantly impact hiring decisions acro
 
 The Broad-Based Black Economic Empowerment framework has evolved from a compliance requirement to a strategic business imperative. Companies across South Africa now view B-BBEE not just as regulatory compliance, but as essential for accessing government contracts, improving supplier relationships, and building sustainable businesses that reflect the country's demographics.
 
-This shift means that candidates who can demonstrate genuine transformation leadership and contribution become significantly more attractive to employers. At https://atsboost.co.za, we've observed that professionals who effectively highlight their transformation experience receive 40% more interview invitations compared to those who don't emphasize these credentials.
+This shift means that candidates who can demonstrate genuine transformation leadership and contribution become significantly more attractive to employers. At https://hiremzansi.co.za, we've observed that professionals who effectively highlight their transformation experience receive 40% more interview invitations compared to those who don't emphasize these credentials.
 
 **Strategic Areas to Highlight on Your CV**
 
@@ -372,7 +372,7 @@ Transformation requirements are becoming more sophisticated, with companies seek
 
 Environmental, Social, and Governance (ESG) requirements are expanding the transformation landscape beyond traditional B-BBEE measures. Professionals with experience in sustainable business practices, social impact measurement, and stakeholder capitalism will have significant advantages.
 
-Ready to optimize your transformation credentials for maximum career impact? Visit https://atsboost.co.za for expert guidance on positioning your B-BBEE experience strategically. Our AI-powered platform understands both transformation requirements and business priorities, ensuring your CV effectively communicates your unique value proposition to South African employers.`
+Ready to optimize your transformation credentials for maximum career impact? Visit https://hiremzansi.co.za for expert guidance on positioning your B-BBEE experience strategically. Our AI-powered platform understands both transformation requirements and business priorities, ensuring your CV effectively communicates your unique value proposition to South African employers.`
   },
   {
     id: '8',
@@ -384,7 +384,7 @@ Ready to optimize your transformation credentials for maximum career impact? Vis
     tags: ['NQF', 'Education', 'Qualifications', 'South Africa', 'CV Tips'],
     featured: false,
     keywords: ['NQF levels South Africa', 'SA education qualifications', 'CV education section', 'SAQA recognition', 'qualification levels SA'],
-    summary: `By the ATSBoost Team - Education and qualification specialists
+    summary: `By the Hire Mzansi Team - Education and qualification specialists
 
 Understanding and properly presenting NQF levels on your CV is crucial for South African job seekers. The National Qualifications Framework provides a standardized way to compare qualifications across different education providers.
 
@@ -394,7 +394,7 @@ International qualifications should include SAQA recognition status when applica
 
 Many employers search specifically for NQF levels in ATS systems, making proper formatting essential for CV visibility.
 
-Ensure your education section is optimized for South African employers at https://atsboost.co.za.`
+Ensure your education section is optimized for South African employers at https://hiremzansi.co.za.`
   },
   {
     id: '9',
@@ -406,7 +406,7 @@ Ensure your education section is optimized for South African employers at https:
     tags: ['Salary Negotiation', 'Compensation', 'South Africa', 'Career Advancement', 'Market Rates'],
     featured: true,
     keywords: ['salary negotiation South Africa', 'SA salary trends 2025', 'compensation negotiation tips', 'market rates South Africa', 'salary increase strategies'],
-    summary: `By the ATSBoost Team - Compensation and career advancement specialists
+    summary: `By the Hire Mzansi Team - Compensation and career advancement specialists
 
 Salary negotiation in South Africa requires sophisticated understanding of market dynamics, regional variations, and industry-specific compensation trends. The difference between accepting the first offer and negotiating strategically can result in 15-25% salary improvements, translating to hundreds of thousands of rand over a career lifetime.
 
@@ -490,7 +490,7 @@ Industry network development provides market intelligence and job opportunities 
 
 Geographic mobility and international experience can significantly enhance earning potential, particularly for senior roles in multinational companies.
 
-Ready to optimize your salary negotiation strategy? Visit https://atsboost.co.za for comprehensive market research, negotiation coaching, and CV optimization that positions you for maximum compensation potential. Our platform provides industry-specific salary insights and negotiation strategies tailored to the South African market.`
+Ready to optimize your salary negotiation strategy? Visit https://hiremzansi.co.za for comprehensive market research, negotiation coaching, and CV optimization that positions you for maximum compensation potential. Our platform provides industry-specific salary insights and negotiation strategies tailored to the South African market.`
   },
   {
     id: '10',
@@ -502,7 +502,7 @@ Ready to optimize your salary negotiation strategy? Visit https://atsboost.co.za
     tags: ['Industry CV', 'Sector Specific', 'South Africa', 'Professional Tips', 'Career Advice'],
     featured: false,
     keywords: ['industry specific CV South Africa', 'mining CV tips', 'finance CV guide', 'healthcare resume SA', 'government job applications'],
-    summary: `By the ATSBoost Team - Industry specialization experts
+    summary: `By the Hire Mzansi Team - Industry specialization experts
 
 Different South African industries have unique CV requirements and expectations. Understanding sector-specific needs dramatically improves your application success rate.
 
@@ -512,7 +512,7 @@ Healthcare demands professional registrations (HPCSA numbers), CPD compliance, a
 
 Government positions focus on policy experience, public sector knowledge, and transformation contributions. Each sector uses specific ATS keywords and evaluation criteria.
 
-Get industry-specific CV optimization at https://atsboost.co.za with our specialized sector expertise.`
+Get industry-specific CV optimization at https://hiremzansi.co.za with our specialized sector expertise.`
   },
   {
     id: '11',
@@ -524,7 +524,7 @@ Get industry-specific CV optimization at https://atsboost.co.za with our special
     tags: ['LinkedIn', 'Professional Networking', 'South Africa', 'Digital Presence', 'Personal Branding'],
     featured: true,
     keywords: ['LinkedIn optimization South Africa', 'LinkedIn profile tips SA', 'professional networking SA', 'LinkedIn recruiter search', 'SA LinkedIn strategy'],
-    summary: `By the ATSBoost Team - Digital presence and networking specialists
+    summary: `By the Hire Mzansi Team - Digital presence and networking specialists
 
 LinkedIn has become the primary professional networking platform in South Africa, with 85% of recruiters using it for candidate sourcing. An optimized profile increases visibility by 40x and generates 5x more connection requests.
 
@@ -536,7 +536,7 @@ Active engagement through content sharing, commenting, and networking significan
 
 Professional headshots, skill endorsements, and recommendations add credibility. Many opportunities come through warm introductions rather than cold applications.
 
-Maximize your LinkedIn presence with our comprehensive optimization service at https://atsboost.co.za.`
+Maximize your LinkedIn presence with our comprehensive optimization service at https://hiremzansi.co.za.`
   },
   {
     id: '12',
@@ -548,7 +548,7 @@ Maximize your LinkedIn presence with our comprehensive optimization service at h
     tags: ['Graduate CV', 'Entry Level', 'South Africa', 'New Graduates', 'Career Start'],
     featured: false,
     keywords: ['graduate CV South Africa', 'entry level CV tips', 'SA graduate jobs', 'internship CV', 'new graduate resume'],
-    summary: `By the ATSBoost Team - Graduate career development specialists
+    summary: `By the Hire Mzansi Team - Graduate career development specialists
 
 South African graduates face unique challenges entering a competitive job market. With youth unemployment at concerning levels, strategic CV positioning becomes crucial for landing that first professional role.
 
@@ -560,7 +560,7 @@ Graduate programs at major South African companies actively recruit through univ
 
 Digital literacy, adaptability, and willingness to learn are highly valued by employers hiring graduates. Emphasize these qualities with specific examples.
 
-Access graduate-specific CV templates and career guidance at https://atsboost.co.za.`
+Access graduate-specific CV templates and career guidance at https://hiremzansi.co.za.`
   },
   {
     id: '13',
@@ -572,7 +572,7 @@ Access graduate-specific CV templates and career guidance at https://atsboost.co
     tags: ['Personal Branding', 'Professional Identity', 'South Africa', 'Career Strategy', 'Digital Presence'],
     featured: false,
     keywords: ['personal branding South Africa', 'professional identity SA', 'career branding tips', 'SA job market positioning', 'professional reputation'],
-    summary: `By the ATSBoost Team - Personal branding and career strategy experts
+    summary: `By the Hire Mzansi Team - Personal branding and career strategy experts
 
 Personal branding has become essential for career success in South Africa's competitive job market. A strong professional brand differentiates you from other candidates and creates memorable impressions with employers.
 
@@ -586,7 +586,7 @@ Networking and relationship building support brand development. Many opportuniti
 
 Authenticity is crucial - your brand should reflect genuine strengths and values rather than manufactured personas.
 
-Develop your professional brand strategy with expert guidance at https://atsboost.co.za.`
+Develop your professional brand strategy with expert guidance at https://hiremzansi.co.za.`
   },
   {
     id: '14',
@@ -598,7 +598,7 @@ Develop your professional brand strategy with expert guidance at https://atsboos
     tags: ['AI Tools', 'CV Optimization', 'Technology', 'South Africa', 'Career Tech'],
     featured: true,
     keywords: ['AI CV tools South Africa', 'CV optimization software', 'AI job search tools', 'CV AI technology', 'automated CV improvement'],
-    summary: `By the ATSBoost Team - AI and career technology specialists
+    summary: `By the Hire Mzansi Team - AI and career technology specialists
 
 Artificial Intelligence is revolutionizing CV optimization and job search processes across South Africa, providing unprecedented opportunities for professionals to enhance their career prospects through intelligent technology. The emergence of sophisticated AI tools has democratized access to professional CV optimization services that were previously available only to executives with personal career consultants.
 
@@ -626,9 +626,9 @@ Jobscan specializes in ATS optimization, comparing your CV against specific job 
 
 LinkedIn's Resume Assistant integrates with Microsoft Word to provide AI-powered suggestions based on your industry and target roles. While not as comprehensive as dedicated tools, it offers convenient real-time feedback during the writing process.
 
-**Local Solutions: ATSBoost.co.za's South African Advantage**
+**Local Solutions: Hire Mzansi.co.za's South African Advantage**
 
-While international tools provide valuable general guidance, local solutions like https://atsboost.co.za offer specialized understanding of the South African job market. These platforms incorporate crucial local factors that international tools often miss or misunderstand.
+While international tools provide valuable general guidance, local solutions like https://hiremzansi.co.za offer specialized understanding of the South African job market. These platforms incorporate crucial local factors that international tools often miss or misunderstand.
 
 B-BBEE considerations require nuanced understanding of how to present transformation credentials effectively without appearing tokenistic. Local AI tools understand these sensitivities and provide guidance on optimal positioning strategies.
 
@@ -686,7 +686,7 @@ Begin with free analysis tools to understand baseline improvement opportunities.
 
 Choose tools that align with your industry and career level. Technical professionals may benefit from different platforms than those in creative or business roles. Senior executives need different optimization strategies than early-career professionals.
 
-Ready to experience the power of AI-driven CV optimization designed specifically for the South African market? Visit https://atsboost.co.za for comprehensive analysis that understands both international best practices and local market requirements. Our advanced AI technology helps South African professionals compete effectively in both local and global job markets.`
+Ready to experience the power of AI-driven CV optimization designed specifically for the South African market? Visit https://hiremzansi.co.za for comprehensive analysis that understands both international best practices and local market requirements. Our advanced AI technology helps South African professionals compete effectively in both local and global job markets.`
   }
 ];
 
@@ -750,8 +750,8 @@ export default function SimpleBlogPage() {
                   className="whitespace-pre-line text-gray-700 leading-relaxed prose prose-lg max-w-none"
                   dangerouslySetInnerHTML={{
                     __html: selectedPost.summary.replace(
-                      /https:\/\/atsboost\.co\.za/g, 
-                      '<a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline font-medium">https://atsboost.co.za</a>'
+                      /https:\/\/hiremzansi\.co\.za/g, 
+                      '<a href="https://hiremzansi.co.za" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline font-medium">https://hiremzansi.co.za</a>'
                     )
                   }}
                 />
@@ -763,16 +763,16 @@ export default function SimpleBlogPage() {
               <CardContent className="p-8 text-center">
                 <h2 className="text-2xl font-bold mb-4">Ready to Transform Your Career?</h2>
                 <p className="text-lg mb-6 opacity-90">
-                  Experience AI-powered CV optimization and intelligent job matching at ATSBoost.co.za
+                  Experience AI-powered CV optimization and intelligent job matching at Hire Mzansi.co.za
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
+                  <a href="https://hiremzansi.co.za" target="_blank" rel="noopener noreferrer">
                     <Button size="lg" variant="secondary" className="gap-2">
                       Get Started Free
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </a>
-                  <a href="https://atsboost.co.za/premium-job-seeker" target="_blank" rel="noopener noreferrer">
+                  <a href="https://hiremzansi.co.za/premium-job-seeker" target="_blank" rel="noopener noreferrer">
                     <Button size="lg" variant="outline" className="gap-2 text-white border-white hover:bg-white hover:text-blue-600">
                       Premium Matching
                       <ExternalLink className="h-4 w-4" />
@@ -797,7 +797,7 @@ export default function SimpleBlogPage() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-              ATSBoost Blog
+              Hire Mzansi Blog
             </Link>
             <Link href="/">
               <Button variant="outline" className="gap-2">
@@ -981,14 +981,14 @@ export default function SimpleBlogPage() {
             Get AI-powered CV optimization and intelligent job matching designed for the South African market.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://atsboost.co.za" target="_blank" rel="noopener noreferrer">
+            <a href="https://hiremzansi.co.za" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="secondary" className="gap-2">
                 <Target className="h-5 w-5" />
                 Optimize Your CV
                 <ExternalLink className="h-4 w-4" />
               </Button>
             </a>
-            <a href="https://atsboost.co.za/premium-job-seeker" target="_blank" rel="noopener noreferrer">
+            <a href="https://hiremzansi.co.za/premium-job-seeker" target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="gap-2 text-white border-white hover:bg-white hover:text-blue-600">
                 <Brain className="h-5 w-5" />
                 Premium Job Matching

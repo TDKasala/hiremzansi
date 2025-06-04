@@ -19,7 +19,7 @@ export default function TestimonialsSection() {
   const testimonials: Testimonial[] = [
     {
       rating: 5,
-      text: "After 6 months of job hunting with no callbacks, I used ATSBoost to optimize my CV. Within 2 weeks, I had 3 interview requests! Now I'm working at a major bank in Johannesburg.",
+      text: "After 6 months of job hunting with no callbacks, I used Hire Mzansi to optimize my CV. Within 2 weeks, I had 3 interview requests! Now I'm working at a major bank in Johannesburg.",
       author: {
         image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
         name: "Thabo M.",
@@ -37,7 +37,7 @@ export default function TestimonialsSection() {
     },
     {
       rating: 5,
-      text: "As a recent graduate with limited experience, I was struggling to get noticed. ATSBoost helped me highlight my skills and qualifications correctly. I now have a job at a top engineering firm!",
+      text: "As a recent graduate with limited experience, I was struggling to get noticed. Hire Mzansi helped me highlight my skills and qualifications correctly. I now have a job at a top engineering firm!",
       author: {
         image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100",
         name: "David N.",
@@ -79,7 +79,7 @@ export default function TestimonialsSection() {
             )}
           </div>
           <p className="text-neutral-600 max-w-2xl mx-auto mt-2">
-            See how ATSBoost has helped South African job seekers land interviews and secure jobs.
+            See how Hire Mzansi has helped South African job seekers land interviews and secure jobs.
           </p>
         </div>
         

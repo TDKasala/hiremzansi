@@ -115,7 +115,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-start">
                 <FaEnvelope className="mt-1 mr-2 text-neutral-400" />
-                <span className="text-neutral-400">support@atsboost.co.za</span>
+                <span className="text-neutral-400">support@hiremzansi.co.za</span>
               </li>
               <li className="flex items-start">
                 <FaMapMarkerAlt className="mt-1 mr-2 text-neutral-400" />
@@ -123,13 +123,13 @@ export default function Footer() {
               </li>
             </ul>
             <div className="mt-4 flex space-x-4">
-              <a href="https://twitter.com/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+              <a href="https://twitter.com/hiremzansi" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
                 <FaTwitter className="text-xl" />
               </a>
-              <a href="https://linkedin.com/company/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+              <a href="https://linkedin.com/company/hiremzansi" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
                 <FaLinkedinIn className="text-xl" />
               </a>
-              <a href="https://facebook.com/atsboost" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+              <a href="https://facebook.com/hiremzansi" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
                 <FaFacebookF className="text-xl" />
               </a>
             </div>
@@ -138,7 +138,7 @@ export default function Footer() {
 
         <div className="border-t border-neutral-700 pt-6 text-neutral-400 text-sm flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            &copy; {currentYear} ATSBoost. All rights reserved.
+            &copy; {currentYear} Hire Mzansi. All rights reserved.
           </div>
           <div>
             <span>Built for South African job seekers | POPIA Compliant</span>

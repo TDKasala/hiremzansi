@@ -6,7 +6,7 @@ const IndustrySpecificCVTips: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>Industry-Specific CV Tips for South Africa's Growth Sectors | ATSBoost</title>
+        <title>Industry-Specific CV Tips for South Africa's Growth Sectors | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to tailor your resume for South Africa's growing industries like tech, renewable energy, healthcare, and finance with expert CV tips." 
@@ -43,7 +43,7 @@ const IndustrySpecificCVTips: React.FC = () => {
           </p>
           
           <p>
-            A generic, one-size-fits-all CV rarely impresses recruiters. Our research at <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a> shows that industry-tailored resumes receive 62% more responses than generic ones, especially in competitive sectors.
+            A generic, one-size-fits-all CV rarely impresses recruiters. Our research at <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a> shows that industry-tailored resumes receive 62% more responses than generic ones, especially in competitive sectors.
           </p>
           
           <h2>The Technology Sector</h2>
@@ -252,7 +252,7 @@ const IndustrySpecificCVTips: React.FC = () => {
           
           <ol>
             <li>
-              <strong>ATS Optimization:</strong> Use <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's ATS Score tool</a> to ensure your CV passes automated screening systems common in larger South African companies
+              <strong>ATS Optimization:</strong> Use <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's ATS Score tool</a> to ensure your CV passes automated screening systems common in larger South African companies
             </li>
             <li>
               <strong>B-BBEE Information:</strong> Where relevant, include your B-BBEE status in a professional manner
@@ -271,7 +271,7 @@ const IndustrySpecificCVTips: React.FC = () => {
           <h2>Industry-Specific CV Templates</h2>
           
           <p>
-            Using industry-specific CV templates can give you a competitive edge. <a href="https://atsboost.co.za/industry-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost offers specialized templates</a> for South Africa's growing sectors, pre-populated with industry-appropriate sections, keywords, and formatting.
+            Using industry-specific CV templates can give you a competitive edge. <a href="https://hiremzansi.co.za/industry-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi offers specialized templates</a> for South Africa's growing sectors, pre-populated with industry-appropriate sections, keywords, and formatting.
           </p>
           
           <h2>Conclusion</h2>
@@ -285,7 +285,7 @@ const IndustrySpecificCVTips: React.FC = () => {
           </p>
           
           <p>
-            For personalized guidance on optimizing your CV for a specific South African industry, consider <a href="https://atsboost.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Industry CV Analysis service</a>, which provides tailored recommendations from sector specialists.
+            For personalized guidance on optimizing your CV for a specific South African industry, consider <a href="https://hiremzansi.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Industry CV Analysis service</a>, which provides tailored recommendations from sector specialists.
           </p>
         </div>
         
@@ -295,7 +295,7 @@ const IndustrySpecificCVTips: React.FC = () => {
             Get your resume analyzed for industry-specific keywords and formatting with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

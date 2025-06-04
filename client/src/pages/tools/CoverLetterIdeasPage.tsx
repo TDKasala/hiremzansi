@@ -56,7 +56,7 @@ const CoverLetterIdeasPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-10">
       <Helmet>
-        <title>Cover Letter Ideas | ATSBoost</title>
+        <title>Cover Letter Ideas | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Get industry-specific cover letter templates and prompts tailored for South African employers."

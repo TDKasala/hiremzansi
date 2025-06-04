@@ -56,7 +56,7 @@ const SimplePDFReportButton: React.FC<PDFReportButtonProps> = ({
       });
       
       // Download the PDF
-      downloadPDF(pdfBlob, `ATSBoost_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
+      downloadPDF(pdfBlob, `Hire Mzansi_Report_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
 
       toast({
         title: 'Report Generated',

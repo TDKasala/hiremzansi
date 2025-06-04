@@ -6,7 +6,7 @@ const AIToolsResumeOptimization: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>AI Tools That Can Transform Your South African Resume | ATSBoost</title>
+        <title>AI Tools That Can Transform Your South African Resume | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Discover the best AI tools and technologies to optimize your CV for South African employers, beat ATS systems, and significantly increase your interview chances." 
@@ -77,7 +77,7 @@ const AIToolsResumeOptimization: React.FC = () => {
           
           <div className="bg-gray-100 p-4 rounded my-4">
             <p className="font-bold">Key Insight:</p>
-            <p>Research by <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a> shows that 72% of South African resumes are rejected by ATS systems before a human reviewer sees them, mainly due to formatting issues, missing keywords, or incompatible file types.</p>
+            <p>Research by <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a> shows that 72% of South African resumes are rejected by ATS systems before a human reviewer sees them, mainly due to formatting issues, missing keywords, or incompatible file types.</p>
           </div>
           
           <h2>Essential AI-Powered Resume Tools for South African Job Seekers</h2>
@@ -88,10 +88,10 @@ const AIToolsResumeOptimization: React.FC = () => {
             These tools evaluate how well your resume will perform when processed by applicant tracking systems:
           </p>
           
-          <h4>ATSBoost Resume Scanner</h4>
+          <h4>Hire Mzansi Resume Scanner</h4>
           
           <p>
-            <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Resume Scanner</a> is specifically calibrated for the South African job market. It analyzes your CV against ATS algorithms used by major South African employers and provides:
+            <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Resume Scanner</a> is specifically calibrated for the South African job market. It analyzes your CV against ATS algorithms used by major South African employers and provides:
           </p>
           
           <ul>
@@ -138,10 +138,10 @@ const AIToolsResumeOptimization: React.FC = () => {
             These tools help create professionally formatted, ATS-friendly resumes:
           </p>
           
-          <h4>ATSBoost Template Library</h4>
+          <h4>Hire Mzansi Template Library</h4>
           
           <p>
-            <a href="https://atsboost.co.za/templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost offers ATS-optimized templates</a> specifically designed for the South African job market, including:
+            <a href="https://hiremzansi.co.za/templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi offers ATS-optimized templates</a> specifically designed for the South African job market, including:
           </p>
           
           <ul>
@@ -445,7 +445,7 @@ const AIToolsResumeOptimization: React.FC = () => {
           </p>
           
           <p>
-            For personalized guidance on using AI to optimize your resume for the South African job market, consider <a href="https://atsboost.co.za/ai-resume-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's AI Resume Analysis service</a>, which combines advanced AI tools with human expertise specific to South Africa's employment landscape.
+            For personalized guidance on using AI to optimize your resume for the South African job market, consider <a href="https://hiremzansi.co.za/ai-resume-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's AI Resume Analysis service</a>, which combines advanced AI tools with human expertise specific to South Africa's employment landscape.
           </p>
         </div>
         
@@ -455,7 +455,7 @@ const AIToolsResumeOptimization: React.FC = () => {
             Check how your CV performs against AI screening systems used by South African companies with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

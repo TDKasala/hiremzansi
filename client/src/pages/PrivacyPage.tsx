@@ -4,12 +4,12 @@ export default function PrivacyPage() {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy | ATSBoost - POPIA Compliant</title>
-        <meta name="description" content="ATSBoost privacy policy - how we protect your data and comply with POPIA regulations. Learn about our data collection, storage, and processing practices." />
-        <meta property="og:title" content="ATSBoost Privacy Policy - POPIA Compliant" />
-        <meta property="og:description" content="Learn how ATSBoost protects your data in compliance with South African POPIA regulations." />
+        <title>Privacy Policy | Hire Mzansi - POPIA Compliant</title>
+        <meta name="description" content="Hire Mzansi privacy policy - how we protect your data and comply with POPIA regulations. Learn about our data collection, storage, and processing practices." />
+        <meta property="og:title" content="Hire Mzansi Privacy Policy - POPIA Compliant" />
+        <meta property="og:description" content="Learn how Hire Mzansi protects your data in compliance with South African POPIA regulations." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/privacy" />
+        <meta property="og:url" content="https://hiremzansi.co.za/privacy" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <div className="max-w-4xl mx-auto prose">
             <h2>POPIA Compliance Statement</h2>
             <p>
-              ATSBoost is committed to protecting your privacy and ensuring that your personal information is collected and used properly, lawfully, and transparently in compliance with the Protection of Personal Information Act (POPIA) of South Africa.
+              Hire Mzansi is committed to protecting your privacy and ensuring that your personal information is collected and used properly, lawfully, and transparently in compliance with the Protection of Personal Information Act (POPIA) of South Africa.
             </p>
             
             <h3>Last Updated: June 1, 2023</h3>
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
               If you have any questions about this Privacy Policy or our data practices, please contact us at:
             </p>
             <p>
-              Email: privacy@atsboost.co.za<br />
+              Email: privacy@hiremzansi.co.za<br />
               Address: Cape Town, South Africa
             </p>
             

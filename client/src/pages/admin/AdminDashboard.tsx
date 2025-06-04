@@ -116,8 +116,8 @@ const AdminDashboard: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Admin Dashboard | ATSBoost</title>
-        <meta name="description" content="Admin dashboard for ATSBoost platform management" />
+        <title>Admin Dashboard | Hire Mzansi</title>
+        <meta name="description" content="Admin dashboard for Hire Mzansi platform management" />
       </Helmet>
 
       <div className="container mx-auto p-4">
@@ -125,7 +125,7 @@ const AdminDashboard: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Manage your ATSBoost platform</p>
+              <p className="text-muted-foreground">Manage your Hire Mzansi platform</p>
             </div>
             <div className="flex items-center gap-2">
               <div className="hidden sm:flex items-center text-sm text-muted-foreground">

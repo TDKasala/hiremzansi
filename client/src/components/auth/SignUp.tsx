@@ -74,7 +74,7 @@ export function SignUp() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <TrendingUp className="h-8 w-8 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to ATSBoost!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Hire Mzansi!</h2>
             <p className="text-gray-600 mb-4">
               Your account has been created successfully. Redirecting to your dashboard...
             </p>
@@ -92,7 +92,7 @@ export function SignUp() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center space-x-2 mb-4">
             <TrendingUp className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-gray-900">ATSBoost</span>
+            <span className="text-2xl font-bold text-gray-900">Hire Mzansi</span>
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Create your account</h1>
           <p className="text-gray-600">Start optimizing your CV today</p>

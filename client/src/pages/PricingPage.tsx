@@ -6,12 +6,12 @@ export default function PricingPage() {
   return (
     <>
       <Helmet>
-        <title>Pricing | ATSBoost - South African Resume Optimization</title>
+        <title>Pricing | Hire Mzansi - South African Resume Optimization</title>
         <meta name="description" content="Affordable CV optimization plans for South African job seekers. Choose from free ATS scoring, one-time deep analysis, or premium ongoing optimization." />
-        <meta property="og:title" content="ATSBoost Pricing - CV Optimization for South Africans" />
+        <meta property="og:title" content="Hire Mzansi Pricing - CV Optimization for South Africans" />
         <meta property="og:description" content="Affordable CV optimization plans starting from free. Get your CV past ATS systems and land more interviews." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/pricing" />
+        <meta property="og:url" content="https://hiremzansi.co.za/pricing" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">

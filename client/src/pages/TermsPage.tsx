@@ -4,12 +4,12 @@ export default function TermsPage() {
   return (
     <>
       <Helmet>
-        <title>Terms of Service | ATSBoost</title>
-        <meta name="description" content="ATSBoost terms of service - the rules, guidelines, and agreements for using our South African CV optimization platform." />
-        <meta property="og:title" content="ATSBoost Terms of Service" />
-        <meta property="og:description" content="Read the terms and conditions for using ATSBoost's CV optimization platform." />
+        <title>Terms of Service | Hire Mzansi</title>
+        <meta name="description" content="Hire Mzansi terms of service - the rules, guidelines, and agreements for using our South African CV optimization platform." />
+        <meta property="og:title" content="Hire Mzansi Terms of Service" />
+        <meta property="og:description" content="Read the terms and conditions for using Hire Mzansi's CV optimization platform." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/terms" />
+        <meta property="og:url" content="https://hiremzansi.co.za/terms" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">
@@ -29,7 +29,7 @@ export default function TermsPage() {
               Last Updated: June 1, 2023
             </p>
             <p>
-              These Terms of Service ("Terms") govern your access to and use of the ATSBoost website and services ("Services"). By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, do not access or use our Services.
+              These Terms of Service ("Terms") govern your access to and use of the Hire Mzansi website and services ("Services"). By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to these Terms, do not access or use our Services.
             </p>
             
             <h2>1. Account Registration</h2>
@@ -42,7 +42,7 @@ export default function TermsPage() {
             
             <h2>2. Service Description</h2>
             <p>
-              ATSBoost provides CV/resume optimization services, including ATS (Applicant Tracking System) scoring, analysis, and recommendations. Our Services are designed to help South African job seekers improve their resumes for better ATS compatibility.
+              Hire Mzansi provides CV/resume optimization services, including ATS (Applicant Tracking System) scoring, analysis, and recommendations. Our Services are designed to help South African job seekers improve their resumes for better ATS compatibility.
             </p>
             <p>
               While we strive to provide accurate and helpful analysis, we cannot guarantee employment outcomes or interview success as a result of using our Services.
@@ -50,7 +50,7 @@ export default function TermsPage() {
             
             <h2>3. Subscription and Payment Terms</h2>
             <p>
-              ATSBoost offers free and paid services. By selecting a paid service, you agree to pay the specified fees. All payments are processed securely through our payment processor.
+              Hire Mzansi offers free and paid services. By selecting a paid service, you agree to pay the specified fees. All payments are processed securely through our payment processor.
             </p>
             <p>
               For subscription-based services:
@@ -94,7 +94,7 @@ export default function TermsPage() {
             
             <h2>7. Intellectual Property</h2>
             <p>
-              Our Services, including all content, features, and functionality, are owned by ATSBoost and are protected by copyright, trademark, and other intellectual property laws.
+              Our Services, including all content, features, and functionality, are owned by Hire Mzansi and are protected by copyright, trademark, and other intellectual property laws.
             </p>
             <p>
               These Terms do not grant you any right to use our trademarks, logos, domain names, or other brand features.
@@ -121,7 +121,7 @@ export default function TermsPage() {
             
             <h2>10. Limitation of Liability</h2>
             <p>
-              To the maximum extent permitted by law, ATSBoost shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our Services.
+              To the maximum extent permitted by law, Hire Mzansi shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our Services.
             </p>
             <p>
               In no event shall our total liability exceed the amount you paid for our Services in the six months preceding the event giving rise to the liability.
@@ -148,7 +148,7 @@ export default function TermsPage() {
               If you have any questions about these Terms, please contact us at:
             </p>
             <p>
-              Email: legal@atsboost.co.za<br />
+              Email: legal@hiremzansi.co.za<br />
               Address: Cape Town, South Africa
             </p>
           </div>

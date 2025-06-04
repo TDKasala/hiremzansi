@@ -6,7 +6,7 @@ const BBBEEImpactSAResumes: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>How B-BBEE Status Impacts Your South African Resume | ATSBoost</title>
+        <title>How B-BBEE Status Impacts Your South African Resume | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to properly present your B-BBEE status on your CV to increase your chances of getting hired in South Africa's job market." 
@@ -76,7 +76,7 @@ const BBBEEImpactSAResumes: React.FC = () => {
           <h2>ATS Optimization for B-BBEE Information</h2>
           
           <p>
-            When including B-BBEE information, it's important to consider how Applicant Tracking Systems (ATS) process this information. <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a> recommends:
+            When including B-BBEE information, it's important to consider how Applicant Tracking Systems (ATS) process this information. <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a> recommends:
           </p>
           
           <ul>
@@ -86,7 +86,7 @@ const BBBEEImpactSAResumes: React.FC = () => {
           </ul>
           
           <p>
-            Our <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATS Score tool</a> specifically checks for proper B-BBEE formatting and keyword optimization to ensure your resume passes through South African ATS systems effectively.
+            Our <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATS Score tool</a> specifically checks for proper B-BBEE formatting and keyword optimization to ensure your resume passes through South African ATS systems effectively.
           </p>
           
           <h2>Industry-Specific Considerations</h2>
@@ -116,7 +116,7 @@ const BBBEEImpactSAResumes: React.FC = () => {
           </p>
           
           <p>
-            For personalized advice on optimizing your CV with B-BBEE information for specific industries or roles, consider using <a href="https://atsboost.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
+            For personalized advice on optimizing your CV with B-BBEE information for specific industries or roles, consider using <a href="https://hiremzansi.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Premium CV Analysis</a> service, which provides tailored recommendations for South African job seekers.
           </p>
         </div>
         
@@ -126,7 +126,7 @@ const BBBEEImpactSAResumes: React.FC = () => {
             Get your resume analyzed for B-BBEE optimization and other South African job market requirements with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

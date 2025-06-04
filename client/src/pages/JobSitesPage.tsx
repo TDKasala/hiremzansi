@@ -133,7 +133,7 @@ export default function JobSitesPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <Helmet>
-        <title>Top 10 Job Listing Sites for South African Job Seekers | ATSBoost</title>
+        <title>Top 10 Job Listing Sites for South African Job Seekers | Hire Mzansi</title>
         <meta name="description" content="Discover the best job listing websites in South Africa to find your next career opportunity. Comprehensive guide with features and specializations." />
       </Helmet>
       
@@ -229,7 +229,7 @@ export default function JobSitesPage() {
             <div>
               <h3 className="font-medium mb-1">Keep Your CV ATS-Optimized</h3>
               <p className="text-sm text-muted-foreground">
-                Many of these sites use ATS systems to filter applications. Ensure your CV is optimized using ATSBoost's tools.
+                Many of these sites use ATS systems to filter applications. Ensure your CV is optimized using Hire Mzansi's tools.
               </p>
             </div>
           </div>

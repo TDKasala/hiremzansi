@@ -95,7 +95,7 @@ export default function DashboardPage() {
   return (
     <>
       <Helmet>
-        <title>Dashboard | ATSBoost - South African CV Optimization</title>
+        <title>Dashboard | Hire Mzansi - South African CV Optimization</title>
         <meta name="description" content="Manage your CVs, view ATS scores, and access premium South African job market optimization tools." />
       </Helmet>
       
@@ -641,7 +641,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle>Subscription Status</CardTitle>
                 <CardDescription>
-                  Manage your ATSBoost subscription
+                  Manage your Hire Mzansi subscription
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -6,7 +6,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>2025 ATS Survival Guide for South African Job Seekers | ATSBoost</title>
+        <title>2025 ATS Survival Guide for South African Job Seekers | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Master the latest ATS strategies to ensure your resume gets past automated screening systems and into the hands of South African hiring managers." 
@@ -86,7 +86,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
           </ul>
           
           <p>
-            <a href="https://atsboost.co.za/ats-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's template library</a> offers several South African-specific ATS-optimized templates that maintain a professional appearance while ensuring maximum compatibility.
+            <a href="https://hiremzansi.co.za/ats-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's template library</a> offers several South African-specific ATS-optimized templates that maintain a professional appearance while ensuring maximum compatibility.
           </p>
           
           <h3>2. Optimize for South African-Specific Keywords</h3>
@@ -120,7 +120,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
           </ul>
           
           <p>
-            <a href="https://atsboost.co.za/job-match" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Job Match tool</a> can analyze a job description and your resume to identify missing keywords and suggest optimization strategies specific to South African employers.
+            <a href="https://hiremzansi.co.za/job-match" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Job Match tool</a> can analyze a job description and your resume to identify missing keywords and suggest optimization strategies specific to South African employers.
           </p>
           
           <h3>4. Quantify Achievements and Skills</h3>
@@ -201,7 +201,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
           
           <ol>
             <li>
-              <strong>Use ATSBoost's free ATS scanner:</strong> <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Our ATS Score tool</a> simulates how South African ATS systems evaluate your resume
+              <strong>Use Hire Mzansi's free ATS scanner:</strong> <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Our ATS Score tool</a> simulates how South African ATS systems evaluate your resume
             </li>
             <li>
               <strong>Compare against the job description:</strong> Ensure you've included at least 80% of the primary keywords
@@ -234,7 +234,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
           </p>
           
           <p>
-            Remember that different industries and companies may use different ATS configurations, so it's worth customizing your approach for each application. For a personalized analysis of how your resume performs against industry-specific ATS systems, consider <a href="https://atsboost.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Premium CV Analysis service</a>.
+            Remember that different industries and companies may use different ATS configurations, so it's worth customizing your approach for each application. For a personalized analysis of how your resume performs against industry-specific ATS systems, consider <a href="https://hiremzansi.co.za/premium-tools" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Premium CV Analysis service</a>.
           </p>
           
           <p>
@@ -248,7 +248,7 @@ const ATSSurvivalGuide2025: React.FC = () => {
             Get your resume analyzed against actual South African ATS criteria with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

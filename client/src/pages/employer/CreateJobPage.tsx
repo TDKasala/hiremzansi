@@ -62,8 +62,8 @@ export default function CreateJobPage() {
     return (
       <div className="container mx-auto py-8 max-w-5xl">
         <Helmet>
-          <title>Create Job Posting | ATSBoost</title>
-          <meta name="description" content="Create a new job posting on ATSBoost to find the right talent for your company." />
+          <title>Create Job Posting | Hire Mzansi</title>
+          <meta name="description" content="Create a new job posting on Hire Mzansi to find the right talent for your company." />
         </Helmet>
         
         <div className="flex flex-col items-center justify-center py-12">
@@ -114,8 +114,8 @@ export default function CreateJobPage() {
   return (
     <div className="container mx-auto py-8 max-w-3xl">
       <Helmet>
-        <title>Create Job Posting | ATSBoost</title>
-        <meta name="description" content="Create a new job posting on ATSBoost to find the right talent for your company." />
+        <title>Create Job Posting | Hire Mzansi</title>
+        <meta name="description" content="Create a new job posting on Hire Mzansi to find the right talent for your company." />
       </Helmet>
       
       <div className="mb-6">

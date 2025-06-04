@@ -121,7 +121,7 @@ const CVDetailsPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <Helmet>
-        <title>CV Analysis Details | ATSBoost</title>
+        <title>CV Analysis Details | Hire Mzansi</title>
         <meta
           name="description"
           content="Detailed analysis of your CV's ATS compatibility score, strengths, and improvement areas."

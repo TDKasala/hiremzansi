@@ -49,7 +49,7 @@ export default function PremiumRecruiterPage() {
   return (
     <>
       <Helmet>
-        <title>Premium Talent Matching for Recruiters | ATSBoost</title>
+        <title>Premium Talent Matching for Recruiters | Hire Mzansi</title>
         <meta name="description" content="Find pre-screened, qualified candidates in South Africa. Our AI matches your job requirements with top talent for just R200 per connection." />
       </Helmet>
 

@@ -6,7 +6,7 @@ const PersonalBrandingJobSearch: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>Personal Branding: The Secret Weapon in Your South African Job Search | ATSBoost</title>
+        <title>Personal Branding: The Secret Weapon in Your South African Job Search | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to develop a powerful personal brand that makes your CV stand out to South African employers and helps you navigate the competitive job market." 
@@ -66,7 +66,7 @@ const PersonalBrandingJobSearch: React.FC = () => {
           </ul>
           
           <p>
-            According to research by <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, job seekers with a cohesive personal brand are 58% more likely to be shortlisted for interviews and receive 37% more callbacks than candidates with similar qualifications but no defined personal brand.
+            According to research by <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, job seekers with a cohesive personal brand are 58% more likely to be shortlisted for interviews and receive 37% more callbacks than candidates with similar qualifications but no defined personal brand.
           </p>
           
           <h2>The 5 Pillars of Effective Personal Branding for South African Professionals</h2>
@@ -248,7 +248,7 @@ const PersonalBrandingJobSearch: React.FC = () => {
           </ul>
           
           <p>
-            <a href="https://atsboost.co.za/cv-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's branded CV templates</a> offer ATS-friendly designs that incorporate personal branding elements while ensuring machine readability.
+            <a href="https://hiremzansi.co.za/cv-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's branded CV templates</a> offer ATS-friendly designs that incorporate personal branding elements while ensuring machine readability.
           </p>
           
           <h2>Extending Your Personal Brand Throughout Your Job Search</h2>
@@ -463,7 +463,7 @@ const PersonalBrandingJobSearch: React.FC = () => {
           </p>
           
           <p>
-            For personalized guidance on developing a personal brand that stands out in your specific industry, consider <a href="https://atsboost.co.za/personal-brand-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Personal Brand Analysis service</a>, which provides tailored recommendations for South African professionals at all career stages.
+            For personalized guidance on developing a personal brand that stands out in your specific industry, consider <a href="https://hiremzansi.co.za/personal-brand-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Personal Brand Analysis service</a>, which provides tailored recommendations for South African professionals at all career stages.
           </p>
         </div>
         
@@ -473,7 +473,7 @@ const PersonalBrandingJobSearch: React.FC = () => {
             Take our free Personal Brand Assessment to see how effectively your current professional image is communicating your value to potential employers.
           </p>
           <a 
-            href="https://atsboost.co.za/brand-assessment" 
+            href="https://hiremzansi.co.za/brand-assessment" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

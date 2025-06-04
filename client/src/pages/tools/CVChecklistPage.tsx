@@ -114,7 +114,7 @@ const CVChecklistPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-10">
       <Helmet>
-        <title>CV Checklist | ATSBoost</title>
+        <title>CV Checklist | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Complete South African specific CV checklist with 50+ points to ensure your resume meets local standards and passes ATS systems."

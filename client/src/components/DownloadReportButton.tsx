@@ -212,13 +212,13 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       });
       
       // Add footer
-      const footerText = 'ATSBoost - South African CV Optimization Platform - www.atsboost.co.za';
+      const footerText = 'Hire Mzansi - South African CV Optimization Platform - www.hiremzansi.co.za';
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       doc.text(footerText, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
       
       // Save and download the PDF
-      doc.save(`ATSBoost_CV_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`Hire Mzansi_CV_Report_${new Date().toISOString().split('T')[0]}.pdf`);
 
       toast({
         title: 'Report Generated',

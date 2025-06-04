@@ -15,7 +15,7 @@ export default function RealtimeATSPage() {
   return (
     <>
       <Helmet>
-        <title>Real-Time ATS Scanner | ATSBoost - South African CV Optimization</title>
+        <title>Real-Time ATS Scanner | Hire Mzansi - South African CV Optimization</title>
         <meta name="description" content="Check your CV against Applicant Tracking Systems in real-time and get instant feedback to improve your resume for the South African job market." />
       </Helmet>
       

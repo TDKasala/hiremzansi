@@ -160,7 +160,7 @@ export function AdminDashboard() {
               <Shield className="h-8 w-8 text-primary" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-500">ATSBoost Platform Management</p>
+                <p className="text-sm text-gray-500">Hire Mzansi Platform Management</p>
               </div>
             </div>
             <div className="flex items-center space-x-2">

@@ -166,7 +166,7 @@ export default function JobDetailsPage() {
   return (
     <div className="container mx-auto py-8 max-w-5xl">
       <Helmet>
-        <title>{job.title} | Employer Dashboard | ATSBoost</title>
+        <title>{job.title} | Employer Dashboard | Hire Mzansi</title>
         <meta name="description" content={`Manage job posting: ${job.title} at ${employer?.companyName || 'your company'}`} />
       </Helmet>
       

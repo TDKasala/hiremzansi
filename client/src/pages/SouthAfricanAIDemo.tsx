@@ -224,7 +224,7 @@ export default function SouthAfricanAIDemo() {
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4">
       <Helmet>
-        <title>South African AI CV Analysis Demo | ATSBoost</title>
+        <title>South African AI CV Analysis Demo | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Experience the South African-focused AI CV analysis tool that helps job seekers optimize their CVs for the local job market." 

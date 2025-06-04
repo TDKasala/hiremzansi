@@ -146,7 +146,7 @@ export default function UploadPage() {
       />
       
       <Helmet>
-        <title>Upload and Analyze Your CV | ATSBoost</title>
+        <title>Upload and Analyze Your CV | Hire Mzansi</title>
         <meta name="description" content="Upload your CV to get AI-powered analysis and improve your chances of getting past ATS systems used by South African employers." />
       </Helmet>
       
@@ -157,7 +157,7 @@ export default function UploadPage() {
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-primary mb-1">Guest Upload Mode</h3>
                 <p className="text-sm text-muted-foreground">
-                  You're using ATSBoost without an account. You can upload 1 CV for a basic analysis, 
+                  You're using Hire Mzansi without an account. You can upload 1 CV for a basic analysis, 
                   but creating a free account gives you access to:
                 </p>
                 <ul className="mt-2 text-sm grid gap-1">

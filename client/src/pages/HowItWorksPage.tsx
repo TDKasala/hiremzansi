@@ -6,17 +6,17 @@ export default function HowItWorksPage() {
   return (
     <>
       <Helmet>
-        <title>How It Works | ATSBoost - South African Resume Optimization</title>
-        <meta name="description" content="Learn how ATSBoost helps South African job seekers optimize their CVs to pass ATS systems. Our 3-step process is simple and effective." />
-        <meta property="og:title" content="How ATSBoost Works - CV Optimization for South Africans" />
+        <title>How It Works | Hire Mzansi - South African Resume Optimization</title>
+        <meta name="description" content="Learn how Hire Mzansi helps South African job seekers optimize their CVs to pass ATS systems. Our 3-step process is simple and effective." />
+        <meta property="og:title" content="How Hire Mzansi Works - CV Optimization for South Africans" />
         <meta property="og:description" content="Our 3-step process helps you optimize your CV for ATS systems used by South African employers." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/how-it-works" />
+        <meta property="og:url" content="https://hiremzansi.co.za/how-it-works" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">How ATSBoost Works</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">How Hire Mzansi Works</h1>
           <p className="text-xl max-w-2xl mx-auto">
             Our simple process helps you optimize your CV for ATS systems and land more interviews
           </p>

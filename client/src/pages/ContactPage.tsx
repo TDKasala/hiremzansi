@@ -60,12 +60,12 @@ export default function ContactPage() {
   return (
     <>
       <Helmet>
-        <title>{t('contact.pageTitle')} | ATSBoost - South African Resume Optimization</title>
-        <meta name="description" content="Get in touch with the ATSBoost team. We're here to help with any questions about our CV optimization services for South African job seekers." />
-        <meta property="og:title" content="Contact ATSBoost - We're Here to Help" />
+        <title>{t('contact.pageTitle')} | Hire Mzansi - South African Resume Optimization</title>
+        <meta name="description" content="Get in touch with the Hire Mzansi team. We're here to help with any questions about our CV optimization services for South African job seekers." />
+        <meta property="og:title" content="Contact Hire Mzansi - We're Here to Help" />
         <meta property="og:description" content="Have questions about our CV optimization services? Contact our team for support and information." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za/contact" />
+        <meta property="og:url" content="https://hiremzansi.co.za/contact" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">

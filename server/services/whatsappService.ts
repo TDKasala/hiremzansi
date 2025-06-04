@@ -127,14 +127,14 @@ class WhatsAppService {
     // Basic command handling
     if (message === 'help') {
       this.sendSimpleMessage(from, 
-        'Welcome to ATSBoost! To get your CV analyzed, simply send your CV as a file attachment. ' +
+        'Welcome to Hire Mzansi! To get your CV analyzed, simply send your CV as a file attachment. ' +
         'We support PDF, DOC, and DOCX formats. For more information, visit our website at atsboost.co.za'
       );
       return { success: true, message: 'Help message sent' };
     } 
     else if (message === 'feedback') {
       this.sendSimpleMessage(from, 
-        'Thanks for using ATSBoost! We would love to hear your feedback. ' +
+        'Thanks for using Hire Mzansi! We would love to hear your feedback. ' +
         'Please let us know how our service has helped with your job search journey.'
       );
       return { success: true, message: 'Feedback request sent' };
@@ -387,7 +387,7 @@ class WhatsAppService {
   async sendUploadInstructions(phoneNumber: string): Promise<boolean> {
     const message = 
       `📄 *Upload Your CV via WhatsApp* 📄\n\n` +
-      `Thanks for using ATSBoost! You can now upload your CV directly through WhatsApp for instant ATS scoring.\n\n` +
+      `Thanks for using Hire Mzansi! You can now upload your CV directly through WhatsApp for instant ATS scoring.\n\n` +
       `*How to upload:*\n` +
       `1. Find your CV file (PDF or Word document)\n` +
       `2. Send it as an attachment to this chat\n` +
@@ -405,7 +405,7 @@ class WhatsAppService {
    */
   async sendVerificationCode(phoneNumber: string, code: string): Promise<boolean> {
     const message = 
-      `📱 *Your ATSBoost Verification Code* 📱\n\n` +
+      `📱 *Your Hire Mzansi Verification Code* 📱\n\n` +
       `Your verification code is: *${code}*\n\n` +
       `This code will expire in 10 minutes.\n\n` +
       `If you didn't request this code, please ignore this message.`;

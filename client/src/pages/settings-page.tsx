@@ -33,8 +33,8 @@ const SettingsPage = () => {
   return (
     <>
       <Helmet>
-        <title>Account Settings | ATSBoost</title>
-        <meta name="description" content="Manage your account settings, notifications, and email preferences on ATSBoost - the South African CV optimization platform." />
+        <title>Account Settings | Hire Mzansi</title>
+        <meta name="description" content="Manage your account settings, notifications, and email preferences on Hire Mzansi - the South African CV optimization platform." />
       </Helmet>
 
       <div className="container mx-auto py-8 px-4 md:px-6">

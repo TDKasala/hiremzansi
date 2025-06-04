@@ -45,7 +45,7 @@ export default function ReferralPage() {
   
   // Generate a referral link based on user ID or a default code
   const referralCode = user ? `REF${user.id}${Math.floor(Math.random() * 1000)}` : "ATSBOOST10";
-  const referralLink = `https://atsboost.co.za/signup?ref=${referralCode}`;
+  const referralLink = `https://hiremzansi.co.za/signup?ref=${referralCode}`;
   
   // Mock referral stats data - would come from backend in a real implementation
   const referralStats = {
@@ -78,7 +78,7 @@ export default function ReferralPage() {
   // Share via various platforms 
   const shareVia = (platform: string) => {
     let shareUrl = "";
-    const shareText = "Boost your chances of landing your dream job in South Africa! Use ATSBoost to optimize your CV and stand out to employers. Use my referral link:";
+    const shareText = "Boost your chances of landing your dream job in South Africa! Use Hire Mzansi to optimize your CV and stand out to employers. Use my referral link:";
     
     switch (platform) {
       case "facebook":
@@ -88,7 +88,7 @@ export default function ReferralPage() {
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + " " + referralLink)}`;
         break;
       case "linkedin":
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}&title=${encodeURIComponent("Optimize Your CV with ATSBoost")}&summary=${encodeURIComponent(shareText)}`;
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}&title=${encodeURIComponent("Optimize Your CV with Hire Mzansi")}&summary=${encodeURIComponent(shareText)}`;
         break;
       case "email":
         shareUrl = `mailto:?subject=${encodeURIComponent("Optimize Your CV for South African Job Market")}&body=${encodeURIComponent(shareText + "\n\n" + referralLink)}`;
@@ -103,14 +103,14 @@ export default function ReferralPage() {
   return (
     <>
       <Helmet>
-        <title>Refer 3 Friends, Get Free CV Deep Analysis | ATSBoost</title>
+        <title>Refer 3 Friends, Get Free CV Deep Analysis | Hire Mzansi</title>
         <meta 
           name="description" 
-          content="Refer 3 friends to ATSBoost and get a FREE CV Deep Analysis (R30 value). Help your network improve their CVs while earning valuable resume optimization benefits." 
+          content="Refer 3 friends to Hire Mzansi and get a FREE CV Deep Analysis (R30 value). Help your network improve their CVs while earning valuable resume optimization benefits." 
         />
         <meta 
           name="keywords" 
-          content="free CV deep analysis, resume optimization rewards, ATSBoost referral, South African CV tool, job application referral" 
+          content="free CV deep analysis, resume optimization rewards, Hire Mzansi referral, South African CV tool, job application referral" 
         />
       </Helmet>
       
@@ -270,7 +270,7 @@ export default function ReferralPage() {
                 Reward Structure
               </CardTitle>
               <CardDescription>
-                Earn rewards based on how your referrals use ATSBoost
+                Earn rewards based on how your referrals use Hire Mzansi
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -358,7 +358,7 @@ export default function ReferralPage() {
               </h3>
               <p className="mb-4 max-w-2xl mx-auto">
                 Your network needs quality CV feedback to succeed in South Africa's job market.
-                Share ATSBoost and get valuable tools to boost your own career journey.
+                Share Hire Mzansi and get valuable tools to boost your own career journey.
               </p>
               <Button variant="default" className="bg-white text-secondary hover:bg-white/90" asChild>
                 <Link href="/refer">
@@ -399,7 +399,7 @@ export default function ReferralPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="italic mb-4">
-                  "As a career coach, I recommend ATSBoost to all my clients. The referral program 
+                  "As a career coach, I recommend Hire Mzansi to all my clients. The referral program 
                   has been an unexpected bonus for helping people land jobs in SA's competitive market."
                 </p>
                 <p className="font-semibold">Lesedi K.</p>
@@ -416,7 +416,7 @@ export default function ReferralPage() {
           </h2>
           <p className="mb-6 max-w-2xl mx-auto">
             Help your network overcome South Africa's 32% unemployment crisis.
-            Share ATSBoost with friends and earn rewards together.
+            Share Hire Mzansi with friends and earn rewards together.
           </p>
           <Button size="lg" onClick={copyToClipboard} className="mr-4">
             <Share2 className="mr-2 h-5 w-5" />

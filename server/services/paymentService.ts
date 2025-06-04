@@ -342,7 +342,7 @@ export class PaymentService {
       cancel_url: `${baseUrl}/payment/cancel?id=${payment.id}`,
       notify_url: `${baseUrl}/api/payment/notify`,
       amount: payment.amount,
-      item_name: payment.description || 'ATSBoost Premium Service',
+      item_name: payment.description || 'Hire Mzansi Premium Service',
       custom_str1: payment.transactionId,
     });
 

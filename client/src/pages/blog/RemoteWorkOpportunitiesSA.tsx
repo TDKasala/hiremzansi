@@ -6,7 +6,7 @@ const RemoteWorkOpportunitiesSA: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>Finding Remote Work Opportunities in South Africa | ATSBoost</title>
+        <title>Finding Remote Work Opportunities in South Africa | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Discover how to position your CV for remote positions in South Africa's evolving job market. Learn the skills, keywords, and strategies that make remote employers notice you." 
@@ -117,7 +117,7 @@ const RemoteWorkOpportunitiesSA: React.FC = () => {
           <h2>Optimizing Your CV for Remote Positions</h2>
           
           <p>
-            According to <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, here are specific strategies to make your CV stand out for remote opportunities:
+            According to <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, here are specific strategies to make your CV stand out for remote opportunities:
           </p>
           
           <h3>1. Showcase Remote Work Experience</h3>
@@ -181,7 +181,7 @@ const RemoteWorkOpportunitiesSA: React.FC = () => {
           </ul>
           
           <p>
-            The <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost ATS Score tool</a> specifically checks for these remote work keywords when analyzing resumes.
+            The <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi ATS Score tool</a> specifically checks for these remote work keywords when analyzing resumes.
           </p>
           
           <h3>5. Create a Dedicated "Remote Work Setup" Section</h3>
@@ -285,7 +285,7 @@ const RemoteWorkOpportunitiesSA: React.FC = () => {
           </p>
           
           <p>
-            To get a personalized assessment of how well your CV is optimized for remote opportunities, consider using <a href="https://atsboost.co.za/remote-work-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Remote Work CV Analysis</a>, which evaluates your resume specifically for remote job applications in the South African context.
+            To get a personalized assessment of how well your CV is optimized for remote opportunities, consider using <a href="https://hiremzansi.co.za/remote-work-analysis" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Remote Work CV Analysis</a>, which evaluates your resume specifically for remote job applications in the South African context.
           </p>
           
           <p>
@@ -299,7 +299,7 @@ const RemoteWorkOpportunitiesSA: React.FC = () => {
             Get your resume analyzed specifically for remote work readiness with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

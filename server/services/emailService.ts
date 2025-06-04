@@ -20,7 +20,7 @@ if (sendgridApiKey) {
 // Email templates
 const EMAIL_TEMPLATES = {
   CAREER_DIGEST: {
-    subject: 'Your Personalized Career Recommendations - ATSBoost Weekly Digest',
+    subject: 'Your Personalized Career Recommendations - Hire Mzansi Weekly Digest',
     text: (name: string, recommendations: any) => `
 Hello ${name || 'there'},
 
@@ -38,12 +38,12 @@ ${recommendations.courses.map((course: any) => `- ${course.title}: ${course.desc
 ${recommendations.industryTips ? `INDUSTRY INSIGHTS:
 ${recommendations.industryTips}` : ''}
 
-Log in to your ATSBoost dashboard to see more details and take action on these recommendations.
+Log in to your Hire Mzansi dashboard to see more details and take action on these recommendations.
 
 To manage your email preferences, visit your account settings.
 
 Best regards,
-The ATSBoost Team
+The Hire Mzansi Team
     `,
     html: (name: string, recommendations: any) => `
 <!DOCTYPE html>
@@ -161,7 +161,7 @@ The ATSBoost Team
     
     <p class="footer">
       To manage your email preferences, <a href="https://atsboost.co.za/profile/settings">visit your account settings</a>.<br/>
-      © 2025 ATSBoost. All rights reserved.
+      © 2025 Hire Mzansi. All rights reserved.
     </p>
   </div>
 </body>
@@ -169,13 +169,13 @@ The ATSBoost Team
     `,
   },
   WELCOME: {
-    subject: 'Welcome to ATSBoost - Let\'s Boost Your Career!',
+    subject: 'Welcome to Hire Mzansi - Let\'s Boost Your Career!',
     text: (name: string) => `
 Hello ${name || 'there'},
 
-Welcome to ATSBoost - Your South African career acceleration platform!
+Welcome to Hire Mzansi - Your South African career acceleration platform!
 
-We're excited to have you on board. ATSBoost helps you optimize your CV, find job opportunities, practice interviews, and improve your skills.
+We're excited to have you on board. Hire Mzansi helps you optimize your CV, find job opportunities, practice interviews, and improve your skills.
 
 To get started:
 1. Upload your CV for an instant ATS compatibility score
@@ -185,7 +185,7 @@ To get started:
 If you have any questions, simply reply to this email.
 
 Best regards,
-The ATSBoost Team
+The Hire Mzansi Team
     `,
     html: (name: string) => `
 <!DOCTYPE html>
@@ -193,7 +193,7 @@ The ATSBoost Team
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Welcome to ATSBoost</title>
+  <title>Welcome to Hire Mzansi</title>
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -233,11 +233,11 @@ The ATSBoost Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="ATSBoost Logo" class="logo">
+      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
-      <h1>Welcome to ATSBoost, ${name || 'there'}!</h1>
-      <p>We're excited to have you on board. ATSBoost is your all-in-one South African career acceleration platform.</p>
+      <h1>Welcome to Hire Mzansi, ${name || 'there'}!</h1>
+      <p>We're excited to have you on board. Hire Mzansi is your all-in-one South African career acceleration platform.</p>
       
       <h2>Get started with these simple steps:</h2>
       <ol>
@@ -258,10 +258,10 @@ The ATSBoost Team
       
       <p>If you have any questions, simply reply to this email.</p>
       
-      <p>Best regards,<br>The ATSBoost Team</p>
+      <p>Best regards,<br>The Hire Mzansi Team</p>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} ATSBoost. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} Hire Mzansi. All rights reserved.</p>
       <p>South Africa's premier career advancement platform.</p>
     </div>
   </div>
@@ -270,11 +270,11 @@ The ATSBoost Team
     `
   },
   PASSWORD_RESET: {
-    subject: 'ATSBoost - Reset Your Password',
+    subject: 'Hire Mzansi - Reset Your Password',
     text: (name: string, resetLink: string) => `
 Hello ${name || 'there'},
 
-You recently requested to reset your password for your ATSBoost account. Click the link below to reset it:
+You recently requested to reset your password for your Hire Mzansi account. Click the link below to reset it:
 
 ${resetLink}
 
@@ -283,7 +283,7 @@ This password reset link is only valid for the next 60 minutes.
 If you did not request a password reset, please ignore this email or contact support if you have concerns.
 
 Best regards,
-The ATSBoost Team
+The Hire Mzansi Team
     `,
     html: (name: string, resetLink: string) => `
 <!DOCTYPE html>
@@ -291,7 +291,7 @@ The ATSBoost Team
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reset Your ATSBoost Password</title>
+  <title>Reset Your Hire Mzansi Password</title>
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -337,12 +337,12 @@ The ATSBoost Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="ATSBoost Logo" class="logo">
+      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Reset Your Password</h1>
       <p>Hello ${name || 'there'},</p>
-      <p>You recently requested to reset your password for your ATSBoost account. Click the button below to reset it:</p>
+      <p>You recently requested to reset your password for your Hire Mzansi account. Click the button below to reset it:</p>
       
       <a href="${resetLink}" class="button">Reset My Password</a>
       
@@ -352,10 +352,10 @@ The ATSBoost Team
       
       <p>If you did not request a password reset, please ignore this email or contact our support team if you have concerns.</p>
       
-      <p>Best regards,<br>The ATSBoost Team</p>
+      <p>Best regards,<br>The Hire Mzansi Team</p>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} ATSBoost. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} Hire Mzansi. All rights reserved.</p>
       <p>South Africa's premier career advancement platform.</p>
       <p>If you need assistance, please contact <a href="mailto:support@atsboost.co.za">support@atsboost.co.za</a></p>
     </div>
@@ -365,22 +365,22 @@ The ATSBoost Team
     `
   },
   EMAIL_VERIFICATION: {
-    subject: 'ATSBoost - Verify Your Email Address',
+    subject: 'Hire Mzansi - Verify Your Email Address',
     text: (name: string, verificationLink: string) => `
 Hello ${name || 'there'},
 
-Thank you for creating an account with ATSBoost. Please verify your email address by clicking the link below:
+Thank you for creating an account with Hire Mzansi. Please verify your email address by clicking the link below:
 
 ${verificationLink}
 
 This verification link will expire in 24 hours.
 
-By verifying your email, you'll get full access to all ATSBoost features and stay updated with job opportunities tailored for the South African market.
+By verifying your email, you'll get full access to all Hire Mzansi features and stay updated with job opportunities tailored for the South African market.
 
 If you did not create an account, please ignore this email.
 
 Best regards,
-The ATSBoost Team
+The Hire Mzansi Team
     `,
     html: (name: string, verificationLink: string) => `
 <!DOCTYPE html>
@@ -388,7 +388,7 @@ The ATSBoost Team
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Verify Your ATSBoost Email</title>
+  <title>Verify Your Hire Mzansi Email</title>
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -434,19 +434,19 @@ The ATSBoost Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="ATSBoost Logo" class="logo">
+      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Verify Your Email Address</h1>
       <p>Hello ${name || 'there'},</p>
-      <p>Thank you for creating an account with ATSBoost. Please verify your email address by clicking the button below:</p>
+      <p>Thank you for creating an account with Hire Mzansi. Please verify your email address by clicking the button below:</p>
       
       <a href="${verificationLink}" class="button">Verify My Email</a>
       
       <div class="benefits">
         <h3>Benefits of verifying your email:</h3>
         <ul>
-          <li>Full access to all ATSBoost features</li>
+          <li>Full access to all Hire Mzansi features</li>
           <li>Personalized job recommendations</li>
           <li>Latest South African job market insights</li>
           <li>Important account notifications</li>
@@ -457,10 +457,10 @@ The ATSBoost Team
       
       <p>If you did not create an account, please ignore this email.</p>
       
-      <p>Best regards,<br>The ATSBoost Team</p>
+      <p>Best regards,<br>The Hire Mzansi Team</p>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} ATSBoost. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} Hire Mzansi. All rights reserved.</p>
       <p>South Africa's premier career advancement platform.</p>
       <p>If you need assistance, please contact <a href="mailto:support@atsboost.co.za">support@atsboost.co.za</a></p>
     </div>

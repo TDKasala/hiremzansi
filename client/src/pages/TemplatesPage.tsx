@@ -99,7 +99,7 @@ export default function TemplatesPage() {
   return (
     <>
       <Helmet>
-        <title>CV & Cover Letter Templates - ATSBoost</title>
+        <title>CV & Cover Letter Templates - Hire Mzansi</title>
         <meta name="description" content="Create professional CVs and cover letters with AI-powered templates optimized for South African job market and ATS systems." />
       </Helmet>
 

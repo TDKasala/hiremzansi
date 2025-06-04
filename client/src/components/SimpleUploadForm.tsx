@@ -236,7 +236,7 @@ export default function SimpleUploadForm({
                       htmlFor="consent-checkbox" 
                       className="text-sm text-neutral-700 font-medium cursor-pointer"
                     >
-                      I consent to ATSBoost processing my CV data (POPIA compliant) *
+                      I consent to Hire Mzansi processing my CV data (POPIA compliant) *
                     </label>
                     <p className="text-xs text-neutral-500 mt-1">
                       This consent is required to proceed with analysis as per South African data protection laws

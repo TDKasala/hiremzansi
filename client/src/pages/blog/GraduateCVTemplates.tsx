@@ -6,7 +6,7 @@ const GraduateCVTemplates: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>CV Templates for South African Graduates With No Experience | ATSBoost</title>
+        <title>CV Templates for South African Graduates With No Experience | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to create an impressive graduate CV even with limited work experience. Download free South African CV templates optimized for entry-level job seekers and ATS systems." 
@@ -62,7 +62,7 @@ const GraduateCVTemplates: React.FC = () => {
           </ul>
           
           <p>
-            According to research by <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, 76% of South African graduates submit CVs that significantly undersell their capabilities, with formatting and content choices that don't align with employer expectations.
+            According to research by <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, 76% of South African graduates submit CVs that significantly undersell their capabilities, with formatting and content choices that don't align with employer expectations.
           </p>
           
           <h2>Essential Elements of an Effective South African Graduate CV</h2>
@@ -196,7 +196,7 @@ const GraduateCVTemplates: React.FC = () => {
           <h2>3 ATS-Optimized CV Templates for Different Graduate Scenarios</h2>
           
           <p>
-            Below are three template approaches tailored to different graduate situations. These templates can be <a href="https://atsboost.co.za/graduate-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">downloaded in editable format from ATSBoost.co.za</a>.
+            Below are three template approaches tailored to different graduate situations. These templates can be <a href="https://hiremzansi.co.za/graduate-templates" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">downloaded in editable format from Hire Mzansi.co.za</a>.
           </p>
           
           <h3>Template 1: Skills-Focused Graduate CV</h3>
@@ -361,7 +361,7 @@ const GraduateCVTemplates: React.FC = () => {
           </ul>
           
           <p>
-            Use <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's ATS Score tool</a> to check if your CV is optimized for automated systems before submitting applications.
+            Use <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's ATS Score tool</a> to check if your CV is optimized for automated systems before submitting applications.
           </p>
           
           <h2>Cover Letter Strategies for South African Graduates</h2>
@@ -389,7 +389,7 @@ const GraduateCVTemplates: React.FC = () => {
           </p>
           
           <p>
-            For personalized feedback on your graduate CV, consider using <a href="https://atsboost.co.za/graduate-cv-review" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's Graduate CV Review service</a>, which provides tailored recommendations from industry experts who understand the unique challenges facing South African graduates.
+            For personalized feedback on your graduate CV, consider using <a href="https://hiremzansi.co.za/graduate-cv-review" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's Graduate CV Review service</a>, which provides tailored recommendations from industry experts who understand the unique challenges facing South African graduates.
           </p>
         </div>
         
@@ -399,7 +399,7 @@ const GraduateCVTemplates: React.FC = () => {
             Get access to our library of ATS-optimized CV templates specifically designed for South African graduates with no experience.
           </p>
           <a 
-            href="https://atsboost.co.za/graduate-templates" 
+            href="https://hiremzansi.co.za/graduate-templates" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

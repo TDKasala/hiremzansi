@@ -1,5 +1,5 @@
 /**
- * PayFast Payment Gateway Integration for ATSBoost
+ * PayFast Payment Gateway Integration for Hire Mzansi
  * 
  * This service handles payments and subscriptions through the South African 
  * payment processor PayFast.
@@ -209,7 +209,7 @@ export class PayfastService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'ATSBoost/1.0'
+          'User-Agent': 'Hire Mzansi/1.0'
         },
         body: params.toString()
       });

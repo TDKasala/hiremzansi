@@ -9,8 +9,8 @@ const WhatsAppUploadPage: React.FC = () => {
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8">
       <Helmet>
-        <title>{t('Upload CV via WhatsApp')} | ATSBoost</title>
-        <meta name="description" content={t('Easily upload and analyze your CV using WhatsApp with ATSBoost')} />
+        <title>{t('Upload CV via WhatsApp')} | Hire Mzansi</title>
+        <meta name="description" content={t('Easily upload and analyze your CV using WhatsApp with Hire Mzansi')} />
       </Helmet>
       
       <div className="text-center mb-8">

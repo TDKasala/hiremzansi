@@ -54,7 +54,7 @@ export class GamificationService {
     {
       id: 'first_cv_upload',
       name: '🚀 First Steps',
-      description: 'Upload your first CV to ATSBoost',
+      description: 'Upload your first CV to Hire Mzansi',
       icon: '🚀',
       category: 'cv_optimization',
       points: 50,
@@ -116,7 +116,7 @@ export class GamificationService {
     {
       id: 'daily_visitor',
       name: '📅 Daily Visitor',
-      description: 'Visit ATSBoost for 7 consecutive days',
+      description: 'Visit Hire Mzansi for 7 consecutive days',
       icon: '📅',
       category: 'engagement',
       points: 200,

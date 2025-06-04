@@ -36,7 +36,7 @@ export const MotivationalQuote: React.FC<MotivationalQuoteProps> = ({
   const personalGrowthQuotes = [
     { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela" },
     { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-    { text: "Your career is a journey, not a destination. Keep growing and learning every day.", author: "ATSBoost Team" },
+    { text: "Your career is a journey, not a destination. Keep growing and learning every day.", author: "Hire Mzansi Team" },
     { text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt" },
     { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" }
   ];

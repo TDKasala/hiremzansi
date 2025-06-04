@@ -135,7 +135,7 @@ export default function CVTemplatesPage() {
   return (
     <>
       <Helmet>
-        <title>South African CV Templates | ATSBoost</title>
+        <title>South African CV Templates | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Download ATS-friendly CV templates designed specifically for the South African job market, featuring B-BBEE and NQF sections." 

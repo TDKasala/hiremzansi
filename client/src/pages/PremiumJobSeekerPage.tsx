@@ -44,7 +44,7 @@ export default function PremiumJobSeekerPage() {
   return (
     <>
       <Helmet>
-        <title>Premium Job Matching for Job Seekers | ATSBoost</title>
+        <title>Premium Job Matching for Job Seekers | Hire Mzansi</title>
         <meta name="description" content="Get matched with your perfect job opportunity in South Africa. Our AI analyzes your skills and preferences to find high-quality job matches for just R50." />
       </Helmet>
 

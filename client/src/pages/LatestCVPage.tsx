@@ -42,7 +42,7 @@ export default function LatestCVPage() {
     return (
       <div className="container max-w-4xl py-8">
         <Helmet>
-          <title>Your Latest CV | ATSBoost</title>
+          <title>Your Latest CV | Hire Mzansi</title>
           <meta name="description" content="View your most recent CV analysis and ATS score" />
         </Helmet>
         
@@ -81,7 +81,7 @@ export default function LatestCVPage() {
     return (
       <div className="container max-w-4xl py-8">
         <Helmet>
-          <title>Error Loading CV | ATSBoost</title>
+          <title>Error Loading CV | Hire Mzansi</title>
           <meta name="description" content="Error loading your CV details" />
         </Helmet>
         
@@ -118,7 +118,7 @@ export default function LatestCVPage() {
   return (
     <div className="container max-w-4xl py-8">
       <Helmet>
-        <title>{latestCV.fileName || 'Your CV'} | ATSBoost</title>
+        <title>{latestCV.fileName || 'Your CV'} | Hire Mzansi</title>
         <meta name="description" content="View your CV analysis and ATS score" />
       </Helmet>
       

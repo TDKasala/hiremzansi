@@ -64,7 +64,7 @@ async function comparePasswords(supplied: string, stored: string) {
 export function setupAuth(app: Express) {
   // Set up session middleware with stronger settings
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "ATSBoost-secret-key-strong-and-secure",
+    secret: process.env.SESSION_SECRET || "Hire Mzansi-secret-key-strong-and-secure",
     resave: true,
     saveUninitialized: true,
     store: storage.sessionStore,

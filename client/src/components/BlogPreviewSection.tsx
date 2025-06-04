@@ -22,14 +22,14 @@ export default function BlogPreviewSection() {
       image: "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250",
       date: "April 23, 2025",
       title: "B-BBEE and NQF Levels: Critical Elements for Your South African CV in 2025",
-      summary: "Learn how properly documenting your B-BBEE status and NQF qualifications can increase interview callbacks by 35% according to ATSBoost.co.za's latest research.",
+      summary: "Learn how properly documenting your B-BBEE status and NQF qualifications can increase interview callbacks by 35% according to Hire Mzansi.co.za's latest research.",
       slug: "b-bbee-impact-sa-resumes"
     },
     {
       image: "https://images.unsplash.com/photo-1560264280-88b68371db39?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250",
       date: "March 10, 2025",
       title: "Industry-Specific Resume Keywords That Boost ATS Scores by 40%",
-      summary: "ATSBoost.co.za's comprehensive analysis of 50,000+ South African job postings reveals the exact keywords that will maximize your ATS ranking across 12 major industries.",
+      summary: "Hire Mzansi.co.za's comprehensive analysis of 50,000+ South African job postings reveals the exact keywords that will maximize your ATS ranking across 12 major industries.",
       slug: "industry-specific-cv-tips"
     }
   ];

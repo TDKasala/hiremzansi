@@ -5,7 +5,7 @@ export default function InterviewPracticePage() {
   return (
     <div>
       <Helmet>
-        <title>AI Interview Practice | ATSBoost</title>
+        <title>AI Interview Practice | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Practice job interviews with our AI-powered interview simulator. Get instant feedback and improve your performance." 

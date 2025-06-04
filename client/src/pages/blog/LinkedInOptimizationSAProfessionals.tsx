@@ -6,7 +6,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <Helmet>
-        <title>LinkedIn Optimization Tips for South African Professionals | ATSBoost</title>
+        <title>LinkedIn Optimization Tips for South African Professionals | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Learn how to optimize your LinkedIn profile to complement your CV and maximize your visibility to South African recruiters and employers." 
@@ -54,7 +54,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
           </ul>
           
           <p>
-            According to <a href="https://atsboost.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost.co.za</a>, candidates with optimized LinkedIn profiles receive 40% more recruiter inquiries and are 71% more likely to be invited to interviews in South Africa than those with basic profiles.
+            According to <a href="https://hiremzansi.co.za" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi.co.za</a>, candidates with optimized LinkedIn profiles receive 40% more recruiter inquiries and are 71% more likely to be invited to interviews in South Africa than those with basic profiles.
           </p>
           
           <h2>Key LinkedIn Optimization Strategies for South African Professionals</h2>
@@ -198,7 +198,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
           </ul>
           
           <p>
-            Tools like <a href="https://atsboost.co.za/linkedin-analyzer" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's LinkedIn Analyzer</a> can help identify the most impactful skills to highlight for your specific industry in South Africa.
+            Tools like <a href="https://hiremzansi.co.za/linkedin-analyzer" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's LinkedIn Analyzer</a> can help identify the most impactful skills to highlight for your specific industry in South Africa.
           </p>
           
           <h3>6. Education and Certifications: NQF Context</h3>
@@ -357,7 +357,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
           </ul>
           
           <p>
-            Tools like <a href="https://atsboost.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's ATS Score tool</a> can help ensure your CV complements your LinkedIn optimization efforts.
+            Tools like <a href="https://hiremzansi.co.za/ats-score" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's ATS Score tool</a> can help ensure your CV complements your LinkedIn optimization efforts.
           </p>
           
           <h2>Conclusion</h2>
@@ -367,7 +367,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
           </p>
           
           <p>
-            Remember that LinkedIn optimization is an ongoing process. Regular updates, consistent engagement, and strategic networking will continue to enhance your professional brand over time. For personalized guidance on aligning your LinkedIn profile with your CV for maximum impact, consider <a href="https://atsboost.co.za/linkedin-cv-alignment" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">ATSBoost's LinkedIn-CV Alignment service</a>.
+            Remember that LinkedIn optimization is an ongoing process. Regular updates, consistent engagement, and strategic networking will continue to enhance your professional brand over time. For personalized guidance on aligning your LinkedIn profile with your CV for maximum impact, consider <a href="https://hiremzansi.co.za/linkedin-cv-alignment" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Hire Mzansi's LinkedIn-CV Alignment service</a>.
           </p>
         </div>
         
@@ -377,7 +377,7 @@ const LinkedInOptimizationSAProfessionals: React.FC = () => {
             Get your resume analyzed alongside your LinkedIn profile to ensure consistent personal branding with our free ATS score checker.
           </p>
           <a 
-            href="https://atsboost.co.za/ats-score" 
+            href="https://hiremzansi.co.za/ats-score" 
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
             target="_blank"
             rel="noopener noreferrer"

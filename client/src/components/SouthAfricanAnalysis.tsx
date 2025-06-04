@@ -167,7 +167,7 @@ export default function SouthAfricanAnalysis({
         </Tabs>
       </CardContent>
       <CardFooter className="bg-amber-50 text-sm text-gray-600 italic border-t border-amber-100">
-        Powered by ATSBoost's South African Context Analysis
+        Powered by Hire Mzansi's South African Context Analysis
       </CardFooter>
     </Card>
   );

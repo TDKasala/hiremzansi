@@ -8,10 +8,10 @@ export default function NotFound() {
   return (
     <div className="min-h-[80vh] w-full flex items-center justify-center bg-gray-50 px-4">
       <Helmet>
-        <title>Page Not Found | ATSBoost - South African CV Optimization</title>
+        <title>Page Not Found | Hire Mzansi - South African CV Optimization</title>
         <meta 
           name="description" 
-          content="The page you're looking for cannot be found. Return to ATSBoost's home page to optimize your CV for South African employers." 
+          content="The page you're looking for cannot be found. Return to Hire Mzansi's home page to optimize your CV for South African employers." 
         />
       </Helmet>
       

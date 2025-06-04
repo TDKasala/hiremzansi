@@ -5,7 +5,7 @@ import { eq, lte, and, desc } from 'drizzle-orm';
 import { randomBytes, createHash } from 'crypto';
 
 /**
- * Template Generation Service for ATSBoost
+ * Template Generation Service for Hire Mzansi
  * Provides AI-powered CV and cover letter templates optimized for South African job market
  * 
  * SECURITY FEATURES:

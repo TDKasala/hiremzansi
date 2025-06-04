@@ -57,7 +57,7 @@ const EmailPreferences: React.FC<EmailPreferenceProps> = ({ initialValue = true 
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-bold text-gray-800">Email Preferences</CardTitle>
         <CardDescription>
-          Manage how you receive communications from ATSBoost
+          Manage how you receive communications from Hire Mzansi
         </CardDescription>
       </CardHeader>
 

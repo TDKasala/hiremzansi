@@ -24,7 +24,7 @@ const JobSeekerToolsPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-10">
       <Helmet>
-        <title>Job Seeker Tools | ATSBoost</title>
+        <title>Job Seeker Tools | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Access tools to boost your job search success in the South African market - CV templates, ATS keywords, cover letter templates, and more."

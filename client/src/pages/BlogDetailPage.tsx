@@ -91,7 +91,7 @@ const atsGuide2025: BlogPost = {
   </ul>
   
   <h2>Testing Your CV Against ATS</h2>
-  <p>Before submitting your application, use ATSBoost's tools to:</p>
+  <p>Before submitting your application, use Hire Mzansi's tools to:</p>
   <ul>
     <li>Score your CV against ATS algorithms</li>
     <li>Identify missing keywords and optimization opportunities</li>
@@ -103,7 +103,7 @@ const atsGuide2025: BlogPost = {
   <h2>Conclusion: The Human Element</h2>
   <p>While optimizing for ATS is crucial, remember that your CV will eventually be read by a human. Strike a balance between ATS optimization and creating a compelling narrative that showcases your unique value proposition to potential employers.</p>
   
-  <p>ATSBoost's comprehensive tools can help you navigate the complex world of ATS systems while maintaining the human touch that will ultimately help you stand out from the competition.</p>
+  <p>Hire Mzansi's comprehensive tools can help you navigate the complex world of ATS systems while maintaining the human touch that will ultimately help you stand out from the competition.</p>
   `,
   author: "Thabo Mokoena",
   date: "April 12, 2025",
@@ -181,7 +181,7 @@ export default function BlogDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Helmet>
-          <title>Loading Article... | ATSBoost Blog</title>
+          <title>Loading Article... | Hire Mzansi Blog</title>
         </Helmet>
         <div className="mb-8">
           <Button
@@ -214,12 +214,12 @@ export default function BlogDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>{blogPost.title} | ATSBoost Blog</title>
+        <title>{blogPost.title} | Hire Mzansi Blog</title>
         <meta name="description" content={blogPost.description} />
-        <meta property="og:title" content={`${blogPost.title} | ATSBoost Blog`} />
+        <meta property="og:title" content={`${blogPost.title} | Hire Mzansi Blog`} />
         <meta property="og:description" content={blogPost.description} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://atsboost.co.za/blog/${blogPost.slug}`} />
+        <meta property="og:url" content={`https://hiremzansi.co.za/blog/${blogPost.slug}`} />
         {blogPost.heroImage && <meta property="og:image" content={blogPost.heroImage} />}
       </Helmet>
       

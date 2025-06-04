@@ -5,7 +5,7 @@ import { sql } from 'drizzle-orm';
 import { log } from './vite';
 
 /**
- * Database migration manager for ATSBoost
+ * Database migration manager for Hire Mzansi
  * This utility handles database migrations using timestamp-based migration files
  */
 

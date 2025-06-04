@@ -33,7 +33,7 @@ const InterviewGuidePage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-10">
       <Helmet>
-        <title>Interview Guide | ATSBoost</title>
+        <title>Interview Guide | Hire Mzansi</title>
         <meta 
           name="description" 
           content="South African interview preparation guide with common questions, industry-specific examples, and local context answers."

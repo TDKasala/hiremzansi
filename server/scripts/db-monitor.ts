@@ -15,7 +15,7 @@ import { log } from '../vite';
 const pool = getPool();
 
 async function monitorDatabase() {
-  console.log('===== ATSBoost Database Monitor =====');
+  console.log('===== Hire Mzansi Database Monitor =====');
   console.log('Time:', new Date().toISOString());
   console.log('Environment:', process.env.NODE_ENV || 'development');
   

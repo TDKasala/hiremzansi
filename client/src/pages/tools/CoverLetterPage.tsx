@@ -148,7 +148,7 @@ export default function CoverLetterPage() {
   return (
     <>
       <Helmet>
-        <title>Cover Letter Generator | ATSBoost</title>
+        <title>Cover Letter Generator | Hire Mzansi</title>
         <meta 
           name="description" 
           content="Create professional, customized cover letters for South African job applications with our easy-to-use cover letter generator." 
