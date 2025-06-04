@@ -94,7 +94,7 @@ function App() {
               <Layout>
               <ScrollToTop />
               <Switch>
-                <Route path="/" component={ModernHomePage} />
+                <Route path="/" component={HomePage} />
                 <Route path="/how-it-works" component={HowItWorksPage} />
                 <Route path="/pricing" component={PricingPage} />
                 <Route path="/blog" component={SimpleBlogPage} />

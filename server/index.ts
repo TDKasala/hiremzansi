@@ -44,20 +44,15 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Skip database operations in development if connection fails
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Development mode: Starting server without database dependency');
-    } else {
-      // Run database migrations first
-      const appliedMigrations = await runMigrations();
-      if (appliedMigrations.length > 0) {
-        log(`Applied ${appliedMigrations.length} database migrations`, 'database');
-      }
-      
-      // Initialize database and check health before starting server
-      await initializeDatabase();
-      await checkDatabaseHealth();
+    // Run database migrations first
+    const appliedMigrations = await runMigrations();
+    if (appliedMigrations.length > 0) {
+      log(`Applied ${appliedMigrations.length} database migrations`, 'database');
     }
+    
+    // Initialize database and check health before starting server
+    await initializeDatabase();
+    await checkDatabaseHealth();
     
     const server = await registerRoutes(app);
 
