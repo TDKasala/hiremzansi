@@ -92,6 +92,13 @@ export default function PricingPage() {
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Job Matching</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
+                  </tr>
+                  <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">Savings</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>

@@ -45,7 +45,7 @@ export default function PremiumJobSeekerPage() {
     <>
       <Helmet>
         <title>Premium Job Matching for Job Seekers | Hire Mzansi</title>
-        <meta name="description" content="Get matched with your perfect job opportunity in South Africa. Our AI analyzes your skills and preferences to find high-quality job matches for just R50." />
+        <meta name="description" content="Get matched with your perfect job opportunity in South Africa. Our AI analyzes your skills and preferences to find high-quality job matches completely free for job seekers." />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -62,7 +62,7 @@ export default function PremiumJobSeekerPage() {
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Get matched with vetted job opportunities that align with your skills, experience, and career goals.
-                Pay only R50 to unlock contact details when you find the perfect match.
+                Job matching is completely free for job seekers - find your perfect match today.
               </p>
             </div>
           </div>
