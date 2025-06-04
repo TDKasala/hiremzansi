@@ -138,7 +138,7 @@ export function ModernNavbar() {
                     )}
                   </div>
                   <span className="hidden sm:block text-sm font-medium">
-                    {user.name || user.username}
+                    {(user as any).name || (user as any).username || 'User'}
                   </span>
                   {user.role === 'admin' && (
                     <Badge variant="secondary" className="hidden sm:flex bg-yellow-400 text-yellow-900">
@@ -158,7 +158,7 @@ export function ModernNavbar() {
                       className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2"
                     >
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.name || user.username}</p>
+                        <p className="text-sm font-medium text-gray-900">{(user as any).name || (user as any).username || 'User'}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                       

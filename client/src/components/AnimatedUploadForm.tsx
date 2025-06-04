@@ -116,14 +116,12 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
                   <p className="text-gray-600">Upload your CV to get started with AI-powered analysis</p>
                 </div>
 
-                <motion.div
+                <div
                   {...getRootProps()}
                   className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300
                     ${isDragActive 
                       ? 'border-purple-500 bg-purple-50' 
                       : 'border-gray-300 hover:border-purple-400 hover:bg-purple-25'}`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   <input {...getInputProps()} />
                   <motion.div
