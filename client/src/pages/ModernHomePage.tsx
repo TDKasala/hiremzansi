@@ -19,7 +19,8 @@ import {
   Briefcase,
   MapPin,
   Clock,
-  Award
+  Award,
+  Crown
 } from 'lucide-react';
 
 const FloatingElement = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (

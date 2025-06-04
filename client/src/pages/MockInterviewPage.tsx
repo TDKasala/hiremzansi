@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,20 +8,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Mic, 
-  MicOff, 
   Play, 
-  Pause, 
   RotateCcw, 
   Star,
-  Clock,
   Brain,
   Target,
   Award,
   CheckCircle,
-  AlertCircle,
   Crown,
-  Sparkles
+  Sparkles,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 
 interface InterviewQuestion {
@@ -43,15 +40,12 @@ interface InterviewSession {
 
 export default function MockInterviewPage() {
   const { user } = useAuth();
-  const [isRecording, setIsRecording] = useState(false);
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [session, setSession] = useState<InterviewSession | null>(null);
   const [selectedRole, setSelectedRole] = useState('');
   const [selectedIndustry, setSelectedIndustry] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   const industries = [
     'Technology', 'Finance', 'Healthcare', 'Marketing', 'Engineering',
@@ -112,38 +106,6 @@ export default function MockInterviewPage() {
     
     setSession(newSession);
     setSessionComplete(false);
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        // Here you would typically send the audio to a speech-to-text service
-        console.log('Audio recorded:', audioBlob);
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-      setIsRecording(false);
-    }
   };
 
   const submitAnswer = async () => {
@@ -312,53 +274,38 @@ export default function MockInterviewPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                    {currentQuestion?.question}
-                  </h3>
-                  
-                  {currentQuestion?.tips && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <h4 className="font-medium text-yellow-900 mb-2">Tips for a great answer:</h4>
-                      <ul className="space-y-1 text-sm text-yellow-800">
-                        {currentQuestion.tips.map((tip, index) => (
-                          <li key={index} className="flex items-start">
-                            <Sparkles className="w-3 h-3 mr-2 mt-0.5 flex-shrink-0" />
-                            {tip}
-                          </li>
-                        ))}
-                      </ul>
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <MessageSquare className="w-5 h-5 text-white" />
                     </div>
-                  )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                        {currentQuestion?.question}
+                      </h3>
+                      
+                      {currentQuestion?.tips && (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                          <h4 className="font-medium text-yellow-900 mb-2">Tips for a great answer:</h4>
+                          <ul className="space-y-1 text-sm text-yellow-800">
+                            {currentQuestion.tips.map((tip, index) => (
+                              <li key={index} className="flex items-start">
+                                <Sparkles className="w-3 h-3 mr-2 mt-0.5 flex-shrink-0" />
+                                {tip}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Button
-                      onClick={isRecording ? stopRecording : startRecording}
-                      variant={isRecording ? "destructive" : "outline"}
-                      className="flex-shrink-0"
-                    >
-                      {isRecording ? <MicOff className="w-4 h-4 mr-2" /> : <Mic className="w-4 h-4 mr-2" />}
-                      {isRecording ? 'Stop Recording' : 'Start Recording'}
-                    </Button>
-                    
-                    {isRecording && (
-                      <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                        className="flex items-center text-red-600"
-                      >
-                        <div className="w-3 h-3 bg-red-600 rounded-full mr-2"></div>
-                        Recording...
-                      </motion.div>
-                    )}
-                  </div>
-
                   <Textarea
-                    placeholder="Type your answer here or use voice recording above..."
+                    placeholder="Type your answer here..."
                     value={currentAnswer}
                     onChange={(e) => setCurrentAnswer(e.target.value)}
-                    rows={6}
+                    rows={8}
                     className="resize-none border-2 border-gray-200 focus:border-purple-500 rounded-xl"
                   />
 
@@ -375,11 +322,11 @@ export default function MockInterviewPage() {
                             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
                           />
-                          Analyzing...
+                          Analyzing Response...
                         </>
                       ) : (
                         <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
+                          <Send className="w-4 h-4 mr-2" />
                           Submit Answer
                         </>
                       )}
