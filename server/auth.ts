@@ -62,12 +62,11 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Set up session middleware with stronger settings
+  // Set up session middleware with memory store for development
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "ATSBoost-secret-key-strong-and-secure",
-    resave: true,
-    saveUninitialized: true,
-    store: storage.sessionStore,
+    resave: false,
+    saveUninitialized: false,
     name: "atsboost.sid", // Custom name to identify our cookie
     cookie: {
       secure: false, // Set to false to ensure cookies work in development

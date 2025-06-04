@@ -44,15 +44,8 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    // Run database migrations first
-    const appliedMigrations = await runMigrations();
-    if (appliedMigrations.length > 0) {
-      log(`Applied ${appliedMigrations.length} database migrations`, 'database');
-    }
-    
-    // Initialize database and check health before starting server
-    await initializeDatabase();
-    await checkDatabaseHealth();
+    // Skip database initialization for now - start server immediately
+    log('Starting server in development mode', 'server');
     
     const server = await registerRoutes(app);
 

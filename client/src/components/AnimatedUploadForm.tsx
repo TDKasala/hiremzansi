@@ -28,7 +28,6 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
   const [step, setStep] = useState<'upload' | 'description' | 'ready'>('upload');
-  const [dragActive, setDragActive] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles[0]) {
@@ -140,7 +139,7 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
                       Free Analysis
                     </Badge>
                   </motion.div>
-                </motion.div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

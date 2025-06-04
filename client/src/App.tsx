@@ -155,7 +155,7 @@ function App() {
                 
                 {/* Protected routes requiring authentication */}
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />
-                <Route path="/upload" component={ModernUploadPage} />
+                <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                 <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
                 <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
