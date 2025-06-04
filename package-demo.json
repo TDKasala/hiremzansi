@@ -1,0 +1,7 @@
+{
+  "name": "atsboost-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "demo": "NODE_ENV=development tsx server/dev-server.ts & vite --port 3000"
+  }
+}
