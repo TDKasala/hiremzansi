@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "./LanguageSelector";
-import hireMzansiLogo from "@/assets/hiremzansi-logo.png";
+import hireMzansiLogo from "@assets/Fresh Hire Mzansi Logo with Blue and Green Palette_1749062584652.png";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,8 +45,8 @@ export default function Header() {
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
           <img src={hireMzansiLogo} alt="Hire Mzansi Logo" className="h-12 md:h-14 mr-2" />
           <span className="hidden sm:inline">
-            <span className="text-[#FFCA28] text-2xl md:text-3xl font-bold">HIRE</span><span className="text-[#0D6EFD] text-2xl md:text-3xl font-bold">MZANSI</span>
-            <span className="text-[#FFCA28] ml-1 text-2xl md:text-3xl">•</span>
+            <span className="text-[#2B5A87] text-2xl md:text-3xl font-bold">HIRE</span><span className="text-[#5CB85C] text-2xl md:text-3xl font-bold">MZANSI</span>
+            <span className="text-[#5CB85C] ml-1 text-2xl md:text-3xl">•</span>
           </span>
         </Link>
 

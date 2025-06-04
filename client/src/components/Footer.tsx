@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import hireMzansiLogo from "@/assets/hiremzansi-logo.png";
+import hireMzansiLogo from "@assets/Fresh Hire Mzansi Logo with Blue and Green Palette_1749062584652.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -25,8 +25,8 @@ export default function Footer() {
             <h3 className="text-xl font-bold mb-4 flex items-center">
               <img src={hireMzansiLogo} alt="Hire Mzansi Logo" className="h-8 mr-2" />
               <span>
-                <span className="text-[#6bc04b]">HIRE</span><span className="text-[#1a5fa0]">MZANSI</span>
-                <span className="text-[#ffca28] ml-1">•</span>
+                <span className="text-[#2B5A87]">HIRE</span><span className="text-[#5CB85C]">MZANSI</span>
+                <span className="text-[#5CB85C] ml-1">•</span>
               </span>
             </h3>
             <p className="text-neutral-400 mb-4">

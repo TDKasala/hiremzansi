@@ -1,6 +1,6 @@
 # Hire Mzansi - South African Job Marketplace & CV Optimization Platform
 
-![Hire Mzansi Logo](generated-icon.png)
+![Hire Mzansi Logo](attached_assets/Fresh Hire Mzansi Logo with Blue and Green Palette_1749062584652.png)
 
 ## 🚀 Overview
 
