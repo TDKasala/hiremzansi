@@ -11,6 +11,8 @@ import { ScrollToTop } from "@/lib/scroll-to-top";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
+import { ModernHomePage } from "@/pages/ModernHomePage";
+import { ModernUploadPage } from "@/pages/ModernUploadPage";
 import HowItWorksPage from "@/pages/HowItWorksPage";
 import PricingPage from "@/pages/PricingPage";
 import SimpleBlogPage from "@/pages/SimpleBlogPage";
@@ -92,7 +94,7 @@ function App() {
               <Layout>
               <ScrollToTop />
               <Switch>
-                <Route path="/" component={HomePage} />
+                <Route path="/" component={ModernHomePage} />
                 <Route path="/how-it-works" component={HowItWorksPage} />
                 <Route path="/pricing" component={PricingPage} />
                 <Route path="/blog" component={SimpleBlogPage} />
