@@ -1,12 +1,12 @@
-# ATSBoost - South African CV Optimization Platform
+# Hire Mzansi - South African Job Marketplace & CV Optimization Platform
 
-![ATSBoost Logo](generated-icon.png)
+![Hire Mzansi Logo](generated-icon.png)
 
 ## 🚀 Overview
 
-ATSBoost is a cutting-edge platform designed to help South African job seekers optimize their CVs for Applicant Tracking Systems (ATS). With a 32% unemployment rate affecting approximately 15 million people in South Africa, our platform addresses the critical need for tools that increase job application success rates.
+Hire Mzansi is a cutting-edge platform connecting South African job seekers with opportunities while optimizing their CVs for Applicant Tracking Systems (ATS). With a 32% unemployment rate affecting approximately 15 million people in South Africa, our platform addresses the critical need for comprehensive job search and CV optimization tools.
 
-Visit us at [ATSBoost.co.za](https://atsboost.co.za)
+Visit us at [HireMzansi.co.za](https://hiremzansi.co.za)
 
 ## ✨ Key Features
 

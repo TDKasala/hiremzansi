@@ -17,12 +17,12 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>ATSBoost - South African Resume Optimization Platform</title>
-        <meta name="description" content="ATSBoost helps South African job seekers optimize their CVs to pass ATS systems and land more interviews. Get your free ATS score today!" />
-        <meta property="og:title" content="ATSBoost - South African Resume Optimization Platform" />
-        <meta property="og:description" content="Beat ATS systems and land your dream job with our CV optimization platform designed for South African job seekers." />
+        <title>Hire Mzansi - South African Job Marketplace & CV Optimization</title>
+        <meta name="description" content="Hire Mzansi connects South African job seekers with opportunities while optimizing CVs for ATS systems. Get your free CV analysis today!" />
+        <meta property="og:title" content="Hire Mzansi - South African Job Marketplace & CV Optimization" />
+        <meta property="og:description" content="Connect with employers and optimize your CV for the South African job market with Hire Mzansi's comprehensive platform." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://atsboost.co.za" />
+        <meta property="og:url" content="https://hiremzansi.co.za" />
       </Helmet>
       
       <HeroSection />
