@@ -1,12 +1,20 @@
--- SQL script to create Denis Kasala as platform admin
+-- ===================================================================
+-- SQL SCRIPT TO CREATE DENIS KASALA AS PLATFORM ADMIN
+-- ===================================================================
+-- User Details:
+-- Username: deniskasala
+-- Email: deniskasala17@gmail.com
 -- Password: @Denis1986 (hashed using scrypt with salt)
+-- Role: admin (full platform access)
+-- ===================================================================
 
--- First, check if user already exists and delete if necessary
+-- Step 1: Check if user already exists and remove if necessary
+-- This ensures a clean insert without conflicts
 DELETE FROM users WHERE email = 'deniskasala17@gmail.com' OR username = 'deniskasala';
 
--- Insert the admin user
--- Note: The password hash below is for '@Denis1986' using scrypt algorithm with salt
--- Hash format: {scrypt_hash}.{salt}
+-- Step 2: Insert Denis Kasala as admin user
+-- Password hash generated using scrypt algorithm: '@Denis1986'
+-- Hash format: {128-char-scrypt-hash}.{32-char-salt}
 INSERT INTO users (
     username,
     password,
@@ -29,33 +37,47 @@ INSERT INTO users (
     NOW()
 );
 
--- Get the user ID for creating related records
--- Note: You may need to create additional profile records based on your application requirements
-
--- Create SA Profile for the admin user (optional, based on your application structure)
+-- Step 3: Create South African profile for admin user
+-- This provides additional profile data specific to the SA job market platform
 INSERT INTO sa_profiles (
     user_id,
     province,
     city,
+    whatsapp_enabled,
+    whatsapp_verified,
     created_at,
     updated_at
 ) VALUES (
     (SELECT id FROM users WHERE email = 'deniskasala17@gmail.com'),
     'Gauteng',
     'Johannesburg',
+    false,
+    false,
     NOW(),
     NOW()
 );
 
--- Verify the user was created successfully
+-- Step 4: Verification - Display created admin user details
 SELECT 
-    id,
-    username,
-    email,
-    name,
-    role,
-    is_active,
-    email_verified,
-    created_at
-FROM users 
-WHERE email = 'deniskasala17@gmail.com';
+    u.id,
+    u.username,
+    u.email,
+    u.name,
+    u.role,
+    u.is_active,
+    u.email_verified,
+    u.created_at,
+    sp.province,
+    sp.city
+FROM users u
+LEFT JOIN sa_profiles sp ON u.id = sp.user_id
+WHERE u.email = 'deniskasala17@gmail.com';
+
+-- ===================================================================
+-- ADMIN USER CREATION COMPLETE
+-- ===================================================================
+-- Denis Kasala can now log in with:
+-- Email: deniskasala17@gmail.com
+-- Password: @Denis1986
+-- Role: admin (full platform access)
+-- ===================================================================
