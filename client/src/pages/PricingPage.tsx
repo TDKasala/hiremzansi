@@ -35,33 +35,31 @@ export default function PricingPage() {
                 <thead>
                   <tr className="bg-neutral-100">
                     <th className="py-3 px-4 text-left border-b border-neutral-200">Feature</th>
-                    <th className="py-3 px-4 text-center border-b border-neutral-200">Free</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Free Trial</th>
                     <th className="py-3 px-4 text-center border-b border-neutral-200">Deep Analysis</th>
-                    <th className="py-3 px-4 text-center border-b border-neutral-200">Premium</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Monthly</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Yearly</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Price</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 0</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 25</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 100/month</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 1,080/year</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">CV Analysis Credits</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">3 (3 days)</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">1 (lifetime)</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">50/month</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">50/month</td>
+                  </tr>
+                  <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">ATS Score</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">CV Upload</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">1 CV</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">1 CV</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">Multiple CVs</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Keyword Analysis</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">Basic</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">Advanced</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">Advanced</td>
-                  </tr>
-                  <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">WhatsApp Notifications</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
@@ -70,12 +68,35 @@ export default function PricingPage() {
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">B-BBEE Optimization</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">Real-time CV Editor</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Priority Support</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Savings</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">Save ZAR 120</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">WhatsApp Job Alerts</td>
