@@ -102,7 +102,7 @@ export function ModernHomePage() {
       name: "Thabo Mthembu",
       role: "Senior Developer",
       company: "Cape Town Tech",
-      content: "ATSBoost helped me land my dream job at a top JSE company. The B-BBEE optimization was game-changing!",
+      content: "Hire Mzansi helped me land my dream job at a top JSE company. The B-BBEE optimization was game-changing!",
       rating: 5,
       avatar: "TM"
     },
@@ -503,7 +503,7 @@ export function ModernHomePage() {
               Ready to Transform Your Career?
             </h2>
             <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of South Africans who've already boosted their career prospects with ATSBoost
+              Join thousands of South Africans who've already boosted their career prospects with Hire Mzansi
             </p>
             <Button
               size="lg"

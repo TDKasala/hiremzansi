@@ -137,7 +137,7 @@ Hire Mzansi supports the following languages:
 
 ## 📊 Pricing Model
 
-ATSBoost follows a freemium business model with the following tiers:
+Hire Mzansi follows a freemium business model with the following tiers:
 - **Free**: Basic ATS score and limited recommendations
 - **Basic (R30)**: Deep CV analysis with detailed recommendations
 - **Premium (R100)**: Monthly subscription with unlimited CV analyses and premium tools
@@ -145,7 +145,7 @@ ATSBoost follows a freemium business model with the following tiers:
 
 ## 👥 Contributing
 
-We welcome contributions to ATSBoost! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+We welcome contributions to Hire Mzansi! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
 ## 📄 License
 
