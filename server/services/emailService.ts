@@ -169,13 +169,13 @@ The ATSBoost Team
     `,
   },
   WELCOME: {
-    subject: 'Welcome to Hire Mzansi - Let\'s Accelerate Your Career!',
+    subject: 'Welcome to ATSBoost - Let\'s Boost Your Career!',
     text: (name: string) => `
 Hello ${name || 'there'},
 
-Welcome to Hire Mzansi - Your South African career acceleration platform!
+Welcome to ATSBoost - Your South African career acceleration platform!
 
-We're excited to have you on board. Hire Mzansi helps you optimize your CV, find job opportunities, practice interviews, and improve your skills.
+We're excited to have you on board. ATSBoost helps you optimize your CV, find job opportunities, practice interviews, and improve your skills.
 
 To get started:
 1. Upload your CV for an instant ATS compatibility score

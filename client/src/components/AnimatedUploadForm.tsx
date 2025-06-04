@@ -28,6 +28,7 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
   const [step, setStep] = useState<'upload' | 'description' | 'ready'>('upload');
+  const [dragActive, setDragActive] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles[0]) {
@@ -115,12 +116,14 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
                   <p className="text-gray-600">Upload your CV to get started with AI-powered analysis</p>
                 </div>
 
-                <div
+                <motion.div
                   {...getRootProps()}
                   className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300
                     ${isDragActive 
                       ? 'border-purple-500 bg-purple-50' 
                       : 'border-gray-300 hover:border-purple-400 hover:bg-purple-25'}`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <input {...getInputProps()} />
                   <motion.div
@@ -139,7 +142,7 @@ export function AnimatedUploadForm({ onAnalyze, isAnalyzing = false }: AnimatedU
                       Free Analysis
                     </Badge>
                   </motion.div>
-                </div>
+                </motion.div>
               </CardContent>
             </Card>
           </motion.div>

@@ -33,7 +33,6 @@ export function ModernNavbar() {
   const navItems = [
     { label: 'Home', path: '/' },
     { label: 'How It Works', path: '/how-it-works' },
-    { label: 'Mock Interview', path: '/mock-interview' },
     { label: 'Features', path: '/features' },
     { label: 'Pricing', path: '/pricing' },
     { label: 'About', path: '/about' }
@@ -86,9 +85,9 @@ export function ModernNavbar() {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Hire Mzansi
+                ATSBoost
               </h1>
-              <p className="text-xs text-gray-500">South Africa's #1 Job Platform</p>
+              <p className="text-xs text-gray-500">South Africa's #1 CV Platform</p>
             </div>
           </motion.div>
 
@@ -139,7 +138,7 @@ export function ModernNavbar() {
                     )}
                   </div>
                   <span className="hidden sm:block text-sm font-medium">
-                    {(user as any).name || (user as any).username || 'User'}
+                    {user.name || user.username}
                   </span>
                   {user.role === 'admin' && (
                     <Badge variant="secondary" className="hidden sm:flex bg-yellow-400 text-yellow-900">
@@ -159,7 +158,7 @@ export function ModernNavbar() {
                       className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2"
                     >
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{(user as any).name || (user as any).username || 'User'}</p>
+                        <p className="text-sm font-medium text-gray-900">{user.name || user.username}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                       
@@ -263,7 +262,7 @@ export function ModernNavbar() {
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-1.5">
                     <TrendingUp className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-lg font-bold text-gray-900">Hire Mzansi</span>
+                  <span className="text-lg font-bold text-gray-900">ATSBoost</span>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}

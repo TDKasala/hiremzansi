@@ -1,12 +1,12 @@
-# Hire Mzansi - South African Job Marketplace Platform
+# ATSBoost - South African CV Optimization Platform
 
-![Hire Mzansi Logo](generated-icon.png)
+![ATSBoost Logo](generated-icon.png)
 
 ## 🚀 Overview
 
-Hire Mzansi is a cutting-edge platform designed to connect South African job seekers with employers through AI-powered career tools. With a 32% unemployment rate affecting approximately 15 million people in South Africa, our platform addresses the critical need for tools that increase job application success rates.
+ATSBoost is a cutting-edge platform designed to help South African job seekers optimize their CVs for Applicant Tracking Systems (ATS). With a 32% unemployment rate affecting approximately 15 million people in South Africa, our platform addresses the critical need for tools that increase job application success rates.
 
-Visit us at [hiremzansi.co.za](https://hiremzansi.co.za)
+Visit us at [ATSBoost.co.za](https://atsboost.co.za)
 
 ## ✨ Key Features
 
@@ -128,7 +128,7 @@ We implement the following security measures:
 
 ## 🌍 Internationalization
 
-Hire Mzansi supports the following languages:
+ATSBoost supports the following languages:
 - English (en)
 - isiZulu (zu)
 - Sesotho (st)
@@ -137,7 +137,7 @@ Hire Mzansi supports the following languages:
 
 ## 📊 Pricing Model
 
-Hire Mzansi follows a freemium business model with the following tiers:
+ATSBoost follows a freemium business model with the following tiers:
 - **Free**: Basic ATS score and limited recommendations
 - **Basic (R30)**: Deep CV analysis with detailed recommendations
 - **Premium (R100)**: Monthly subscription with unlimited CV analyses and premium tools
@@ -145,7 +145,7 @@ Hire Mzansi follows a freemium business model with the following tiers:
 
 ## 👥 Contributing
 
-We welcome contributions to Hire Mzansi! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+We welcome contributions to ATSBoost! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
 ## 📄 License
 

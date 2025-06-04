@@ -13,7 +13,6 @@ import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
 import { ModernHomePage } from "@/pages/ModernHomePage";
 import { ModernUploadPage } from "@/pages/ModernUploadPage";
-import MockInterviewPage from "@/pages/MockInterviewPage";
 import HowItWorksPage from "@/pages/HowItWorksPage";
 import PricingPage from "@/pages/PricingPage";
 import SimpleBlogPage from "@/pages/SimpleBlogPage";
@@ -152,7 +151,6 @@ function App() {
                 <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
                 <Route path="/industry-templates" component={IndustryTemplatesPage} />
                 <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
-                <ProtectedRoute path="/mock-interview" component={MockInterviewPage} />
                 <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
                 
                 {/* Protected routes requiring authentication */}

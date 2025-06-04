@@ -45,7 +45,7 @@ export default function BlogPost1() {
               </div>
               <div className="flex items-center">
                 <User className="h-4 w-4 mr-2" />
-                <span>Hire Mzansi Team</span>
+                <span>ATSBoost Team</span>
               </div>
               <div className="flex items-center flex-wrap gap-2">
                 <Tag className="h-4 w-4" />
@@ -67,7 +67,7 @@ export default function BlogPost1() {
                 <p className="text-center mb-4">Find out how your CV performs against South African ATS systems instantly.</p>
                 <div className="flex justify-center">
                   <Button asChild>
-                    <a href="https://hiremzansi.co.za/upload" target="_blank" rel="noopener noreferrer">
+                    <a href="https://atsboost.co.za/upload" target="_blank" rel="noopener noreferrer">
                       Analyze My CV Now
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </a>

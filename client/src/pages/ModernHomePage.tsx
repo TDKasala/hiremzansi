@@ -19,8 +19,7 @@ import {
   Briefcase,
   MapPin,
   Clock,
-  Award,
-  Crown
+  Award
 } from 'lucide-react';
 
 const FloatingElement = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
@@ -102,7 +101,7 @@ export function ModernHomePage() {
       name: "Thabo Mthembu",
       role: "Senior Developer",
       company: "Cape Town Tech",
-      content: "Hire Mzansi helped me land my dream job at a top JSE company. The B-BBEE optimization was game-changing!",
+      content: "ATSBoost helped me land my dream job at a top JSE company. The B-BBEE optimization was game-changing!",
       rating: 5,
       avatar: "TM"
     },
@@ -149,7 +148,7 @@ export function ModernHomePage() {
           <FloatingElement>
             <Badge className="mb-6 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
               <Sparkles className="w-4 h-4 mr-2" />
-              South Africa's #1 Job Marketplace Platform
+              South Africa's #1 CV Optimization Platform
             </Badge>
           </FloatingElement>
 
@@ -165,8 +164,8 @@ export function ModernHomePage() {
 
           <FloatingElement delay={0.4}>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Connect with top employers, land interviews, and secure your dream job with 
-              AI-powered career tools designed for the South African market.
+              Get past ATS systems, land interviews, and secure your dream job with 
+              AI-powered CV optimization designed for the South African market.
             </p>
           </FloatingElement>
 
@@ -227,7 +226,7 @@ export function ModernHomePage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose Hire Mzansi?
+              Why Choose ATSBoost?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Designed specifically for the South African job market with cutting-edge AI technology
@@ -256,111 +255,6 @@ export function ModernHomePage() {
                 </Card>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mock Interview Feature Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-900 to-blue-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-            >
-              <Badge className="mb-6 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black border-0">
-                <Crown className="w-4 h-4 mr-2" />
-                Premium Feature
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                AI-Powered Mock Interviews
-              </h2>
-              <p className="text-xl text-purple-100 mb-8 leading-relaxed">
-                Practice interviews with advanced AI that understands the South African job market. 
-                Get personalized feedback, scoring, and improvement suggestions tailored to your industry.
-              </p>
-              
-              <div className="space-y-4 mb-8">
-                {[
-                  { icon: Brain, text: "AI analyzes your responses in real-time" },
-                  { icon: Target, text: "Industry-specific questions and scenarios" },
-                  { icon: Award, text: "Detailed scoring and improvement recommendations" },
-                  { icon: MapPin, text: "South African workplace context included" }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="flex items-center text-white"
-                  >
-                    <div className="w-10 h-10 bg-white/20 rounded-lg p-2 mr-4">
-                      <item.icon className="w-6 h-6" />
-                    </div>
-                    <span className="text-lg">{item.text}</span>
-                  </motion.div>
-                ))}
-              </div>
-
-              <Button
-                size="lg"
-                className="bg-white text-purple-900 hover:bg-gray-100 px-8 py-6 text-lg rounded-full shadow-2xl"
-                onClick={() => setLocation('/mock-interview')}
-              >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Try Mock Interview
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-medium">Interview Progress</span>
-                    <span className="text-purple-200">Question 3 of 5</span>
-                  </div>
-                  <div className="w-full bg-white/20 rounded-full h-2">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full w-3/5"></div>
-                  </div>
-                  
-                  <div className="bg-white/20 rounded-xl p-4">
-                    <p className="text-white text-sm mb-3">
-                      "Tell me about a time you demonstrated leadership in a team project."
-                    </p>
-                    <div className="flex items-center text-green-400">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      <span className="text-sm">Answer recorded - Score: 87/100</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div className="bg-white/10 rounded-lg p-3">
-                      <div className="text-2xl font-bold text-white">4.2</div>
-                      <div className="text-xs text-purple-200">Avg Score</div>
-                    </div>
-                    <div className="bg-white/10 rounded-lg p-3">
-                      <div className="text-2xl font-bold text-white">12</div>
-                      <div className="text-xs text-purple-200">Interviews</div>
-                    </div>
-                    <div className="bg-white/10 rounded-lg p-3">
-                      <div className="text-2xl font-bold text-white">89%</div>
-                      <div className="text-xs text-purple-200">Success Rate</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </div>
       </section>
@@ -503,7 +397,7 @@ export function ModernHomePage() {
               Ready to Transform Your Career?
             </h2>
             <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of South Africans who've already boosted their career prospects with Hire Mzansi
+              Join thousands of South Africans who've already boosted their career prospects with ATSBoost
             </p>
             <Button
               size="lg"
