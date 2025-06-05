@@ -11,7 +11,6 @@ import {
   jobMatches,
   skills,
   userSkills,
-  payments,
   notifications,
   type User, 
   type InsertUser, 
@@ -36,8 +35,6 @@ import {
   type InsertSkill,
   type UserSkill,
   type InsertUserSkill,
-  type Payment,
-  type InsertPayment,
   type Notification,
   type InsertNotification
 } from "@shared/schema";
@@ -96,6 +93,13 @@ export interface IStorage {
   // Plan operations
   getPlan(id: number): Promise<Plan | undefined>;
   getActivePlans(): Promise<Plan[]>;
+  getSubscriptionPlans(): Promise<Plan[]>;
+  
+  // Database health check
+  checkDatabaseConnection(): Promise<boolean>;
+  
+  // SA Profile operations extended
+  getSaProfileByUserId(userId: number): Promise<SaProfile | undefined>;
   
   // Session store
   sessionStore: session.Store;
@@ -577,6 +581,24 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(plans)
       .where(eq(plans.isActive, true));
+  }
+
+  async getSubscriptionPlans(): Promise<Plan[]> {
+    return await this.getActivePlans();
+  }
+
+  async checkDatabaseConnection(): Promise<boolean> {
+    try {
+      await db.execute(sql`SELECT 1`);
+      return true;
+    } catch (error) {
+      console.error("Database connection check failed:", error);
+      return false;
+    }
+  }
+
+  async getSaProfileByUserId(userId: number): Promise<SaProfile | undefined> {
+    return await this.getSaProfile(userId);
   }
 }
 

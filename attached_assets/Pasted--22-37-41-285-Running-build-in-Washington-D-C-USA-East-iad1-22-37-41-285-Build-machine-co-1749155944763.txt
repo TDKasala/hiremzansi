@@ -1,0 +1,262 @@
+[22:37:41.285] Running build in Washington, D.C., USA (East) – iad1
+[22:37:41.285] Build machine configuration: 2 cores, 8 GB
+[22:37:41.299] Cloning github.com/TDKasala/Hiremzansi (Branch: main, Commit: 68657e3)
+[22:37:41.306] Skipping build cache, deployment was triggered without cache.
+[22:37:42.252] Cloning completed: 953.000ms
+[22:37:42.593] Running "vercel build"
+[22:37:43.028] Vercel CLI 42.2.0
+[22:37:43.176] WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[22:37:43.684] Installing dependencies...
+[22:37:46.896] npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+[22:37:47.516] npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+[22:37:48.082] npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+[22:37:48.539] npm warn deprecated gauge@3.0.2: This package is no longer supported.
+[22:37:48.658] npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+[22:37:48.836] npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+[22:37:49.793] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[22:37:49.837] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[22:37:50.011] npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+[22:38:00.125] 
+[22:38:00.126] added 658 packages in 16s
+[22:38:00.126] 
+[22:38:00.126] 77 packages are looking for funding
+[22:38:00.127]   run `npm fund` for details
+[22:38:00.429] Using TypeScript 5.6.3 (local user-provided)
+[22:38:11.585] server/routes.ts(94,38): error TS2339: Property 'checkDatabaseConnection' does not exist on type 'DatabaseStorage'.
+[22:38:11.585] server/routes.ts(109,35): error TS2551: Property 'getSubscriptionPlans' does not exist on type 'DatabaseStorage'. Did you mean 'getSubscription'?
+[22:38:11.586] server/routes.ts(121,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.586] server/routes.ts(140,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.586] server/routes.ts(159,29): error TS2552: Cannot find name 'insertEmployerSchema'. Did you mean 'insertUserSchema'?
+[22:38:11.587] server/routes.ts(173,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.587] server/routes.ts(199,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.587] server/routes.ts(259,14): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.587] server/routes.ts(260,19): error TS2304: Cannot find name 'employers'.
+[22:38:11.587] server/routes.ts(262,13): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.587] server/routes.ts(263,18): error TS2304: Cannot find name 'employers'.
+[22:38:11.587] server/routes.ts(263,32): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.587] server/routes.ts(263,56): error TS2304: Cannot find name 'employers'.
+[22:38:11.587] server/routes.ts(264,17): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.587] server/routes.ts(268,31): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.587] server/routes.ts(268,40): error TS2304: Cannot find name 'employers'.
+[22:38:11.588] server/routes.ts(272,31): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.590] server/routes.ts(272,40): error TS2304: Cannot find name 'employers'.
+[22:38:11.590] server/routes.ts(276,31): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.590] server/routes.ts(276,40): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.590] server/routes.ts(280,31): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.590] server/routes.ts(280,40): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.590] server/routes.ts(290,33): error TS2339: Property 'where' does not exist on type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.590] server/routes.ts(291,19): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.590] server/routes.ts(298,9): error TS2741: Property 'limit' is missing in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where" | "limit", any[], { job: any; employer: any; }>, "where" | "limit">' but required in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.590] server/routes.ts(300,9): error TS2741: Property 'limit' is missing in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where" | "limit", any[], { job: any; employer: any; }>, "where" | "limit">' but required in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.591] server/routes.ts(304,9): error TS2741: Property 'offset' is missing in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where" | "offset", any[], { job: any; employer: any; }>, "where" | "offset">' but required in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.591] server/routes.ts(308,7): error TS2741: Property 'orderBy' is missing in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where" | "orderBy", any[], { job: any; employer: any; }>, "where" | "orderBy">' but required in type 'Omit<PgSelectBase<any, { job: any; employer: any; }, "partial", any, false, "where", any[], { job: any; employer: any; }>, "where">'.
+[22:38:11.591] server/routes.ts(308,42): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.591] server/routes.ts(373,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(392,29): error TS2304: Cannot find name 'insertJobPostingSchema'.
+[22:38:11.591] server/routes.ts(407,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(445,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(485,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(523,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(554,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.591] server/routes.ts(587,13): error TS7034: Variable 'matchedSkills' implicitly has type 'any[]' in some locations where its type cannot be determined.
+[22:38:11.591] server/routes.ts(606,53): error TS7005: Variable 'matchedSkills' implicitly has an 'any[]' type.
+[22:38:11.591] server/routes.ts(620,61): error TS2345: Argument of type '{ cvId: any; jobId: any; userId: number; matchScore: number; skillsMatched: string[]; }' is not assignable to parameter of type '{ userId: number; cvId: number; jobPostingId: number; matchScore: number; status?: string | null | undefined; saContextScore?: number | null | undefined; skillsMatchScore?: number | null | undefined; ... 6 more ...; notes?: string | ... 1 more ... | undefined; }'.
+[22:38:11.591]   Property 'jobPostingId' is missing in type '{ cvId: any; jobId: any; userId: number; matchScore: number; skillsMatched: string[]; }' but required in type '{ userId: number; cvId: number; jobPostingId: number; matchScore: number; status?: string | null | undefined; saContextScore?: number | null | undefined; skillsMatchScore?: number | null | undefined; ... 6 more ...; notes?: string | ... 1 more ... | undefined; }'.
+[22:38:11.591] server/routes.ts(652,45): error TS2304: Cannot find name 'skills'.
+[22:38:11.591] server/routes.ts(653,21): error TS2304: Cannot find name 'skills'.
+[22:38:11.591] server/routes.ts(656,45): error TS2304: Cannot find name 'skills'.
+[22:38:11.592] server/routes.ts(668,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(682,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(700,9): error TS2353: Object literal may only specify known properties, and 'proficiency' does not exist in type '{ userId: number; skillId: number; proficiencyLevel?: string | null | undefined; yearsOfExperience?: number | null | undefined; isEndorsed?: boolean | null | undefined; }'.
+[22:38:11.592] server/routes.ts(713,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(734,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(755,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(793,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(821,11): error TS2353: Object literal may only specify known properties, and 'bbbeeVerificationStatus' does not exist in type '{ userId?: number | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | undefined; id?: number | SQL<unknown> | PgColumn<...> | undefined; ... 12 more ...; whatsappVerified?: boolean | ... 3 more ... | undefined; }'.
+[22:38:11.592] server/routes.ts(852,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(950,38): error TS2339: Property 'searchTerms' does not exist on type '{ industry: string; keywords: string[]; requirements: string[]; }'.
+[22:38:11.592] server/routes.ts(1063,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1088,48): error TS2345: Argument of type 'Buffer' is not assignable to parameter of type 'string'.
+[22:38:11.592] server/routes.ts(1286,45): error TS2339: Property 'analyzeResume' does not exist on type 'LocalAIService'.
+[22:38:11.592] server/routes.ts(1311,25): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1340,25): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1431,32): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1459,42): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1484,39): error TS2339: Property 'getSaProfileByUserId' does not exist on type 'DatabaseStorage'.
+[22:38:11.592] server/routes.ts(1503,42): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1510,39): error TS2339: Property 'getSaProfileByUserId' does not exist on type 'DatabaseStorage'.
+[22:38:11.592] server/routes.ts(1539,42): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1546,39): error TS2339: Property 'getSaProfileByUserId' does not exist on type 'DatabaseStorage'.
+[22:38:11.592] server/routes.ts(1576,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1651,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1731,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.592] server/routes.ts(1806,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.593] server/routes.ts(1931,77): error TS2304: Cannot find name 'users'.
+[22:38:11.593] server/routes.ts(1932,75): error TS2304: Cannot find name 'cvs'.
+[22:38:11.593] server/routes.ts(1933,84): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.593] server/routes.ts(1933,106): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.593] server/routes.ts(1934,83): error TS2304: Cannot find name 'jobMatches'.
+[22:38:11.593] server/routes.ts(1935,86): error TS2304: Cannot find name 'subscriptions'.
+[22:38:11.593] server/routes.ts(1935,110): error TS2304: Cannot find name 'subscriptions'.
+[22:38:11.599] server/routes.ts(1937,47): error TS2304: Cannot find name 'plans'.
+[22:38:11.600] server/routes.ts(1939,15): error TS2304: Cannot find name 'subscriptions'.
+[22:38:11.600] server/routes.ts(1940,19): error TS2304: Cannot find name 'plans'.
+[22:38:11.600] server/routes.ts(1940,29): error TS2304: Cannot find name 'subscriptions'.
+[22:38:11.600] server/routes.ts(1940,51): error TS2304: Cannot find name 'plans'.
+[22:38:11.600] server/routes.ts(1941,19): error TS2304: Cannot find name 'subscriptions'.
+[22:38:11.600] server/routes.ts(1956,13): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1957,19): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1958,16): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1959,15): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1960,15): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1961,20): error TS2304: Cannot find name 'users'.
+[22:38:11.601] server/routes.ts(1962,25): error TS2304: Cannot find name 'users'.
+[22:38:11.602] server/routes.ts(1963,21): error TS2304: Cannot find name 'users'.
+[22:38:11.602] server/routes.ts(1965,13): error TS2304: Cannot find name 'users'.
+[22:38:11.602] server/routes.ts(1966,21): error TS2304: Cannot find name 'users'.
+[22:38:11.608] server/routes.ts(1986,22): error TS18048: 'req.user' is possibly 'undefined'.
+[22:38:11.608] server/routes.ts(1991,17): error TS2304: Cannot find name 'users'.
+[22:38:11.609] server/routes.ts(1996,19): error TS2304: Cannot find name 'users'.
+[22:38:11.609] server/routes.ts(2013,13): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.609] server/routes.ts(2014,16): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.609] server/routes.ts(2015,19): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.609] server/routes.ts(2016,26): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.609] server/routes.ts(2017,20): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.610] server/routes.ts(2018,16): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.610] server/routes.ts(2019,23): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.610] server/routes.ts(2020,21): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.610] server/routes.ts(2021,23): error TS2304: Cannot find name 'employers'.
+[22:38:11.610] server/routes.ts(2023,13): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.610] server/routes.ts(2024,17): error TS2304: Cannot find name 'employers'.
+[22:38:11.611] server/routes.ts(2024,31): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.611] server/routes.ts(2024,55): error TS2304: Cannot find name 'employers'.
+[22:38:11.611] server/routes.ts(2025,21): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.611] server/routes.ts(2045,17): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.611] server/routes.ts(2050,19): error TS2304: Cannot find name 'jobPostings'.
+[22:38:11.612] 
+[22:38:11.777] server/vite.ts(39,5): error TS2322: Type '{ middlewareMode: boolean; hmr: { server: Server<typeof IncomingMessage, typeof ServerResponse>; }; allowedHosts: boolean; }' is not assignable to type 'ServerOptions'.
+[22:38:11.778]   Types of property 'allowedHosts' are incompatible.
+[22:38:11.778]     Type 'boolean' is not assignable to type 'true | string[] | undefined'.
+[22:38:11.778] 
+[22:38:11.851] server/db-init.ts(246,71): error TS18046: 'err' is of type 'unknown'.
+[22:38:11.861] 
+[22:38:12.294] server/storage.ts(14,3): error TS2305: Module '"@shared/schema"' has no exported member 'payments'.
+[22:38:12.294] server/storage.ts(39,8): error TS2305: Module '"@shared/schema"' has no exported member 'Payment'.
+[22:38:12.294] server/storage.ts(40,8): error TS2305: Module '"@shared/schema"' has no exported member 'InsertPayment'.
+[22:38:12.294] 
+[22:38:12.417] server/services/localAI.ts(640,56): error TS2304: Cannot find name 'content'.
+[22:38:12.417] 
+[22:38:12.544] server/services/quizGeneratorService.ts(61,72): error TS18046: 'error' is of type 'unknown'.
+[22:38:12.545] 
+[22:38:12.752] server/services/whatsappService.ts(174,11): error TS18046: 'error' is of type 'unknown'.
+[22:38:12.752] server/services/whatsappService.ts(229,7): error TS2353: Object literal may only specify known properties, and 'phoneNumber' does not exist in type '{ username: string; password: string; email: string; name?: string | null | undefined; profilePicture?: string | null | undefined; }'.
+[22:38:12.753] server/services/whatsappService.ts(299,7): error TS2353: Object literal may only specify known properties, and 'breakdown' does not exist in type '{ cvId: number; score: number; skillsScore: number; contextScore: number; formatScore: number; issues?: string[] | null | undefined; strengths?: string[] | null | undefined; improvements?: string[] | null | undefined; ... 4 more ...; keywordRecommendations?: { ...; } | ... 1 more ... | undefined; }'.
+[22:38:12.753] server/services/whatsappService.ts(338,53): error TS7006: Parameter 'rec' implicitly has an 'any' type.
+[22:38:12.753] server/services/whatsappService.ts(338,58): error TS7006: Parameter 'i' implicitly has an 'any' type.
+[22:38:12.753] 
+[22:38:12.948] server/employerStorage.ts(20,56): error TS2304: Cannot find name 'Employer'.
+[22:38:12.948] server/employerStorage.ts(21,45): error TS2304: Cannot find name 'employers'.
+[22:38:12.948] server/employerStorage.ts(21,65): error TS2304: Cannot find name 'employers'.
+[22:38:12.948] server/employerStorage.ts(25,68): error TS2304: Cannot find name 'Employer'.
+[22:38:12.948] server/employerStorage.ts(26,45): error TS2304: Cannot find name 'employers'.
+[22:38:12.948] server/employerStorage.ts(26,65): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(36,13): error TS2304: Cannot find name 'Employer'.
+[22:38:12.949] server/employerStorage.ts(37,36): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(42,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.949] server/employerStorage.ts(42,38): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(45,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.949] server/employerStorage.ts(45,38): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(48,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.949] server/employerStorage.ts(48,38): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(51,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.949] server/employerStorage.ts(51,38): error TS2304: Cannot find name 'employers'.
+[22:38:12.949] server/employerStorage.ts(54,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "limit", any[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.949] server/employerStorage.ts(62,48): error TS2304: Cannot find name 'InsertEmployer'.
+[22:38:12.949] server/employerStorage.ts(62,73): error TS2304: Cannot find name 'Employer'.
+[22:38:12.950] server/employerStorage.ts(63,36): error TS2304: Cannot find name 'employers'.
+[22:38:12.950] server/employerStorage.ts(67,67): error TS2304: Cannot find name 'InsertEmployer'.
+[22:38:12.950] server/employerStorage.ts(67,93): error TS2304: Cannot find name 'Employer'.
+[22:38:12.950] server/employerStorage.ts(69,13): error TS2304: Cannot find name 'employers'.
+[22:38:12.950] server/employerStorage.ts(71,15): error TS2304: Cannot find name 'employers'.
+[22:38:12.950] server/employerStorage.ts(78,40): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.950] server/employerStorage.ts(78,62): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.950] server/employerStorage.ts(89,36): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.950] server/employerStorage.ts(94,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.950] server/employerStorage.ts(94,41): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.950] server/employerStorage.ts(97,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.950] server/employerStorage.ts(97,38): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.950] server/employerStorage.ts(100,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.951] server/employerStorage.ts(100,38): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(103,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.951] server/employerStorage.ts(103,38): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(106,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "limit", any[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.951] server/employerStorage.ts(111,3): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "where", any[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.951] server/employerStorage.ts(111,34): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(114,3): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", any, false, "orderBy", any[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", any, false, never, any[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[22:38:12.951] server/employerStorage.ts(114,38): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(123,11): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(124,15): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(125,19): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.951] server/employerStorage.ts(130,36): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.952] server/employerStorage.ts(136,13): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.952] server/employerStorage.ts(138,15): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.952] server/employerStorage.ts(144,19): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.952] server/employerStorage.ts(144,41): error TS2304: Cannot find name 'jobPostings'.
+[22:38:12.952] server/employerStorage.ts(149,36): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(156,11): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(157,15): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(158,19): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(165,11): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(166,15): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(167,19): error TS2304: Cannot find name 'jobMatches'.
+[22:38:12.952] server/employerStorage.ts(173,42): error TS2304: Cannot find name 'skills'.
+[22:38:12.952] server/employerStorage.ts(173,59): error TS2304: Cannot find name 'skills'.
+[22:38:12.953] server/employerStorage.ts(178,42): error TS2304: Cannot find name 'skills'.
+[22:38:12.953] server/employerStorage.ts(178,59): error TS2304: Cannot find name 'skills'.
+[22:38:12.953] server/employerStorage.ts(183,36): error TS2304: Cannot find name 'skills'.
+[22:38:12.953] server/employerStorage.ts(188,27): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.953] server/employerStorage.ts(188,48): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.953] server/employerStorage.ts(192,36): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.953] server/employerStorage.ts(198,13): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.956] server/employerStorage.ts(199,19): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.957] server/employerStorage.ts(199,50): error TS2304: Cannot find name 'userSkills'.
+[22:38:12.957] server/employerStorage.ts(211,5): error TS2741: Property 'limit' is missing in type 'Omit<import("/vercel/path0/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"notifications", { id: import("/vercel/path0/node_modules/drizzle-orm/pg-core/columns/common").PgColumn<{ name: "id"; tableName: "notifications"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: num...' but required in type 'Omit<import("/vercel/path0/node_modules/drizzle-orm/pg-core/query-builders/select").PgSelectBase<"notifications", { id: import("/vercel/path0/node_modules/drizzle-orm/pg-core/columns/common").PgColumn<{ name: "id"; tableName: "notifications"; dataType: "number"; columnType: "PgSerial"; data: number; driverParam: num...'.
+[22:38:12.957] 
+[22:38:13.021] server/services/templateService.ts(3,10): error TS2305: Module '"../../shared/schema"' has no exported member 'generatedTemplates'.
+[22:38:13.021] server/services/templateService.ts(354,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 'Information Technology': { keywords: string[]; requiredSections: string[]; saSpecific: string[]; }; 'Finance & Banking': { keywords: string[]; requiredSections: string[]; saSpecific: string[]; }; }'.
+[22:38:13.021]   No index signature with a parameter of type 'string' was found on type '{ 'Information Technology': { keywords: string[]; requiredSections: string[]; saSpecific: string[]; }; 'Finance & Banking': { keywords: string[]; requiredSections: string[]; saSpecific: string[]; }; }'.
+[22:38:13.025] server/services/templateService.ts(444,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ entry: string; mid: string; senior: string; executive: string; }'.
+[22:38:13.025]   No index signature with a parameter of type 'string' was found on type '{ entry: string; mid: string; senior: string; executive: string; }'.
+[22:38:13.025] server/services/templateService.ts(460,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ 'personal-info': string; 'professional-summary': string; skills: string; experience: string; education: string; certifications: string; languages: string; references: string; achievements: string; projects: string; }'.
+[22:38:13.025]   No index signature with a parameter of type 'string' was found on type '{ 'personal-info': string; 'professional-summary': string; skills: string; experience: string; education: string; certifications: string; languages: string; references: string; achievements: string; projects: string; }'.
+[22:38:13.025] server/services/templateService.ts(479,23): error TS2339: Property 'success' does not exist on type '{ score: number; breakdown: { format: number; skills: number; context: number; }; recommendations: { category: string; suggestion: string; }[]; }'.
+[22:38:13.025] server/services/templateService.ts(479,43): error TS2339: Property 'result' does not exist on type '{ score: number; breakdown: { format: number; skills: number; context: number; }; recommendations: { category: string; suggestion: string; }[]; }'.
+[22:38:13.025] 
+[22:38:13.757] server/routes/pdfTest.ts(36,52): error TS2345: Argument of type 'Buffer' is not assignable to parameter of type 'string'.
+[22:38:13.758] 
+[22:38:13.916] server/routes/paymentRoutes.ts(157,50): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+[22:38:13.916]   Type 'null' is not assignable to type 'string'.
+[22:38:13.916] 
+[22:38:14.717] server/services/candidateScoringService.ts(185,25): error TS7006: Parameter 'match' implicitly has an 'any' type.
+[22:38:14.718] 
+[22:38:14.920] server/services/notificationService.ts(179,7): error TS2345: Argument of type 'SQL<unknown> | undefined' is not assignable to parameter of type 'SQL<unknown>'.
+[22:38:14.921]   Type 'undefined' is not assignable to type 'SQL<unknown>'.
+[22:38:14.921] server/services/notificationService.ts(213,12): error TS18047: 'result.rowCount' is possibly 'null'.
+[22:38:14.922] server/services/notificationService.ts(233,5): error TS2322: Type 'number | null' is not assignable to type 'number'.
+[22:38:14.922]   Type 'null' is not assignable to type 'number'.
+[22:38:14.922] server/services/notificationService.ts(253,12): error TS18047: 'result.rowCount' is possibly 'null'.
+[22:38:14.922] server/services/notificationService.ts(290,5): error TS2322: Type 'number | null' is not assignable to type 'number'.
+[22:38:14.922]   Type 'null' is not assignable to type 'number'.
+[22:38:14.923] 
+[22:38:14.996] server/services/paymentService.ts(25,7): error TS2353: Object literal may only specify known properties, and 'transactionId' does not exist in type '{ userId: number; amount: string; paymentType: string; userType: string; description?: string | null | undefined; relatedEntityId?: number | null | undefined; relatedEntityType?: string | null | undefined; metadata?: Json | undefined; expiresAt?: Date | ... 1 more ... | undefined; currency?: string | undefined; paym...'.
+[22:38:15.000] server/services/paymentService.ts(69,7): error TS2353: Object literal may only specify known properties, and 'transactionId' does not exist in type '{ userId: number; amount: string; paymentType: string; userType: string; description?: string | null | undefined; relatedEntityId?: number | null | undefined; relatedEntityType?: string | null | undefined; metadata?: Json | undefined; expiresAt?: Date | ... 1 more ... | undefined; currency?: string | undefined; paym...'.
+[22:38:15.001] server/services/paymentService.ts(129,21): error TS2698: Spread types may only be created from object types.
+[22:38:15.001] server/services/paymentService.ts(338,47): error TS2345: Argument of type '{ merchant_id: string; merchant_key: string; return_url: string; cancel_url: string; notify_url: string; amount: string; item_name: string; custom_str1: string | null; }' is not assignable to parameter of type 'string | string[][] | Record<string, string> | URLSearchParams | undefined'.
+[22:38:15.002]   Types of property 'custom_str1' are incompatible.
+[22:38:15.002]     Type 'string | null' is not assignable to type 'string | undefined'.
+[22:38:15.002]       Type 'null' is not assignable to type 'string | undefined'.
+[22:38:15.002] 
+[22:38:29.252] Build Completed in /vercel/output [46s]
+[22:38:29.738] Deploying outputs...
+[22:38:36.718] 
+[22:38:36.846] Deployment completed

@@ -15,7 +15,17 @@ import {
   insertCvSchema, 
   insertAtsScoreSchema, 
   insertDeepAnalysisReportSchema,
+  insertEmployerSchema,
+  insertJobPostingSchema,
   saProfiles,
+  users,
+  cvs,
+  jobPostings,
+  employers,
+  jobMatches,
+  skills,
+  subscriptions,
+  plans,
 } from "@shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
@@ -55,7 +65,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated() && req.user && req.user.role === "admin") {
+  if (req.isAuthenticated() && req.user && (req.user as any).role === "admin") {
     return next();
   }
   res.status(403).json({ error: "Admin access required" });
@@ -67,7 +77,7 @@ const hasActiveSubscription = async (req: Request, res: Response, next: NextFunc
   }
   
   try {
-    const userId = req.user.id;
+    const userId = (req.user as any).id;
     const subscription = await storage.getActiveSubscription(userId);
     
     if (!subscription) {
