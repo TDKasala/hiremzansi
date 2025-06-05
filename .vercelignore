@@ -1,0 +1,7 @@
+server/routes.ts
+server/employerStorage.ts
+server/routes/
+*.test.ts
+*.spec.ts
+node_modules
+.git

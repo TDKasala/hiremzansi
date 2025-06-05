@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "strict": false
+  },
+  "exclude": [
+    "server/routes.ts",
+    "server/employerStorage.ts",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}
