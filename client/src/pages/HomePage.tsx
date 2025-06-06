@@ -17,10 +17,10 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Hire Mzansi - South African Job Marketplace & CV Optimization</title>
-        <meta name="description" content="Hire Mzansi connects South African job seekers with opportunities while optimizing CVs for ATS systems. Get your free CV analysis today!" />
-        <meta property="og:title" content="Hire Mzansi - South African Job Marketplace & CV Optimization" />
-        <meta property="og:description" content="Connect with employers and optimize your CV for the South African job market with Hire Mzansi's comprehensive platform." />
+        <title>Hire Mzansi - South African CV Optimization & ATS Analysis</title>
+        <meta name="description" content="Optimize your CV for the South African job market with Hire Mzansi's AI-powered ATS analysis. Get your free CV optimization today!" />
+        <meta property="og:title" content="Hire Mzansi - South African CV Optimization & ATS Analysis" />
+        <meta property="og:description" content="Transform your CV for the South African job market with AI-powered optimization and ATS analysis tools." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://hiremzansi.co.za" />
       </Helmet>

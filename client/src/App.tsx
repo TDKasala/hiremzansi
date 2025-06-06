@@ -49,18 +49,7 @@ import { AdminDashboard } from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 
-// Import premium matching pages
-import PremiumJobSeekerPage from "@/pages/PremiumJobSeekerPage";
-import PremiumRecruiterPage from "@/pages/PremiumRecruiterPage";
-
-// Import job search pages
-import JobsPage from "@/pages/JobsPage";
-import JobDetailsPage from "@/pages/JobDetailsPage";
-import JobSitesPage from "@/pages/JobSitesPage";
-import JobRecommendationsPage from "@/pages/JobRecommendationsPage";
-import IndustryTemplatesPage from "@/pages/IndustryTemplatesPage";
-import InterviewPracticePage from "@/pages/InterviewPracticePage";
-import SkillGapAnalyzerPage from "@/pages/SkillGapAnalyzerPage";
+// Job matching features coming soon - temporarily disabled
 
 // Import tool pages
 import CoverLetterPage from "@/pages/tools/CoverLetterPage";
@@ -111,10 +100,6 @@ function App() {
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                 <Route path="/templates" component={TemplatesPage} />
                 
-                {/* Premium matching routes */}
-                <Route path="/premium-matching/jobseeker" component={PremiumJobSeekerPage} />
-                <Route path="/premium-matching/recruiter" component={PremiumRecruiterPage} />
-                
                 {/* Original blog post */}
                 <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
                 
@@ -144,14 +129,7 @@ function App() {
                 <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
                 <Route path="/tools/interview-guide" component={InterviewGuidePage} />
                 
-                {/* Job search and career advancement pages */}
-                <Route path="/jobs" component={JobsPage} />
-                <Route path="/job/:id" component={JobDetailsPage} />
-                <Route path="/job-sites" component={JobSitesPage} />
-                <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
-                <Route path="/industry-templates" component={IndustryTemplatesPage} />
-                <ProtectedRoute path="/interview/practice" component={InterviewPracticePage} />
-                <ProtectedRoute path="/skills/analyze" component={SkillGapAnalyzerPage} />
+                {/* Job matching services coming soon - temporarily disabled */}
                 
                 {/* Protected routes requiring authentication */}
                 <ProtectedRoute path="/dashboard" component={DashboardPage} />

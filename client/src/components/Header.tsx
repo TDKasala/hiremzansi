@@ -32,9 +32,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: t('common.home') },
     { href: "/templates", label: "CV Templates" },
-    { href: "/job-sites", label: "Job Board" },
     { href: "/pricing", label: t('common.pricing') },
-    { href: "/refer", label: t('common.refer') },
     { href: "/blog", label: t('common.blog') },
     { href: "/about", label: t('common.about') },
   ];
@@ -93,21 +91,15 @@ export default function Header() {
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/job-sites">Job Listing Sites</Link>
+                    <Link href="/premium-tools">CV Tools</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/premium-tools">Premium Tools</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/job-seeker-tools">Job Seeker Tools</Link>
+                  <DropdownMenuItem>
+                    <span className="text-gray-400">Job Matching (Coming Soon)</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem asChild>
-                    <Link href="/interview/practice">Interview Practice</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/skills/analyze">Skill Gap Analysis</Link>
+                  <DropdownMenuItem>
+                    <span className="text-gray-400">Interview Practice (Coming Soon)</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>
