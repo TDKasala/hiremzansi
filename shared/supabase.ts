@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize the Supabase client
 // Use import.meta.env for Vite/client-side, fallback to process.env for server-side
-const supabaseUrl = (typeof import.meta !== 'undefined' ? import.meta.env.VITE_SUPABASE_URL : process.env.SUPABASE_URL) as string || 'https://qvhmqyhapkcszioydfoa.supabase.co';
-const supabaseAnonKey = (typeof import.meta !== 'undefined' ? import.meta.env.VITE_SUPABASE_ANON_KEY : process.env.SUPABASE_ANON_KEY) as string || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2aG1xeWhhcGtjc3ppb3lkZm9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwODI4NjEsImV4cCI6MjA2MzY1ODg2MX0.EgDdrsYL3Sdwr1L_l0lfKgnpQTkK-426yuzLdLHCGP8';
+const supabaseUrl = (typeof import.meta !== 'undefined' ? import.meta.env.VITE_SUPABASE_URL : process.env.SUPABASE_URL) as string;
+const supabaseAnonKey = (typeof import.meta !== 'undefined' ? import.meta.env.VITE_SUPABASE_ANON_KEY : process.env.SUPABASE_ANON_KEY) as string;
 
 // Create a single instance of the Supabase client to use throughout the app
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
