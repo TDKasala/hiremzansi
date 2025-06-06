@@ -21,17 +21,16 @@ export default function PremiumMatchingSection() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2">
+          <Badge className="mb-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2">
             <Bot className="w-4 h-4 mr-2" />
-            NEW: AI-Powered Premium Matching
+            COMING SOON: AI-Powered Job Matching
           </Badge>
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Get Matched with Your Perfect Job or Candidate
+            Premium Job Matching Service (Coming Soon)
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our advanced AI analyzes CVs and job requirements to create high-quality matches. 
-            Different pricing reflects value: recruiters get pre-screened, qualified talent (R200), 
-            while job seekers access vetted opportunities (R50).
+            We're developing an advanced AI system that will analyze CVs and job requirements to create high-quality matches. 
+            Stay tuned for this exciting feature that will connect South African talent with the right opportunities.
           </p>
         </div>
 
@@ -115,10 +114,8 @@ export default function PremiumMatchingSection() {
                   <span>South African salary and location matching included</span>
                 </li>
               </ul>
-              <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700" asChild>
-                <Link href="/premium-matching/jobseeker">
-                  Start Finding Perfect Jobs <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+              <Button className="w-full mt-6 bg-gray-400 cursor-not-allowed" disabled>
+                Coming Soon <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
           </Card>
@@ -153,10 +150,8 @@ export default function PremiumMatchingSection() {
                   <span>Reduce time-to-hire and improve candidate quality</span>
                 </li>
               </ul>
-              <Button className="w-full mt-6 bg-purple-600 hover:bg-purple-700" asChild>
-                <Link href="/premium-matching/recruiter">
-                  Start Finding Perfect Candidates <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
+              <Button className="w-full mt-6 bg-gray-400 cursor-not-allowed" disabled>
+                Coming Soon <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </CardContent>
           </Card>
@@ -165,22 +160,15 @@ export default function PremiumMatchingSection() {
         {/* Call to Action */}
         <div className="text-center bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
           <h3 className="text-3xl font-bold mb-4">
-            Ready to Find Your Perfect Match?
+            Job Matching Coming Soon!
           </h3>
           <p className="text-xl text-gray-300 mb-6 max-w-2xl mx-auto">
-            Join thousands of South African professionals using AI-powered matching 
-            to find their ideal job opportunities and top talent.
+            We're building an advanced AI-powered job matching system specifically for the South African market. 
+            Stay tuned for this exciting feature!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700" asChild>
-              <Link href="/premium-matching/jobseeker">
-                I'm Looking for a Job
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-gray-900" asChild>
-              <Link href="/premium-matching/recruiter">
-                I'm Hiring Talent
-              </Link>
+            <Button size="lg" className="bg-gray-500 cursor-not-allowed" disabled>
+              Job Matching Coming Soon
             </Button>
           </div>
         </div>
