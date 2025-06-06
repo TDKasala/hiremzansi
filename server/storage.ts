@@ -41,11 +41,10 @@ import {
 import { db } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
-import { pool } from "./db";
+import MemoryStore from "memorystore";
 
-// Create PostgreSQL session store
-const PostgresSessionStore = connectPg(session);
+// Create memory session store for development
+const MemStore = MemoryStore(session);
 
 export interface IStorage {
   // User operations
@@ -109,13 +108,10 @@ export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.sessionStore = new PostgresSessionStore({ 
-      pool, 
-      createTableIfMissing: true,
-      tableName: 'sessions',
-      // Prevent the session store from closing the pool when the application terminates
-      // This caused the "Cannot use a pool after calling end on the pool" error
-      pruneSessionInterval: false
+    this.sessionStore = new MemStore({
+      checkPeriod: 86400000, // prune expired entries every 24h
+      ttl: 86400000, // 24 hour TTL
+      stale: true
     });
   }
 
