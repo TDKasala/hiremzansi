@@ -295,6 +295,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Newsletter subscription endpoint
+  app.post("/api/newsletter/subscribe", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, source = 'website' } = req.body;
+      
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ error: "Valid email address is required" });
+      }
+
+      // In a real implementation, you would:
+      // 1. Validate email format more thoroughly
+      // 2. Check if email already exists in newsletter list
+      // 3. Store in database or send to email service (SendGrid, Mailchimp, etc.)
+      // 4. Send confirmation email
+
+      console.log(`Newsletter subscription: ${email} from ${source}`);
+      
+      // For now, just simulate successful subscription
+      res.json({ 
+        success: true, 
+        message: "Successfully subscribed to newsletter",
+        email: email
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error("API Error:", err);
