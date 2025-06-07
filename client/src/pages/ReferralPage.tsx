@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   ArrowRight, 
   Copy, 
@@ -41,26 +43,52 @@ export default function ReferralPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [referralLink, setReferralLink] = useState("");
   const { t } = useTranslation();
   
-  // Generate a referral link based on user ID or a default code
-  const referralCode = user ? `REF${user.id}${Math.floor(Math.random() * 1000)}` : "ATSBOOST10";
-  const referralLink = `https://hiremzansi.co.za/signup?ref=${referralCode}`;
-  
-  // Mock referral stats data - would come from backend in a real implementation
-  const referralStats = {
-    invited: 7,
-    registered: 4,
-    premiumConversions: 2,
-    freeAnalysisEarned: 1,
-  };
+  // Fetch referral stats
+  const { data: referralStats, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/referrals/stats"],
+    enabled: !!user,
+  });
+
+  // Fetch user credits
+  const { data: userCredits, isLoading: creditsLoading } = useQuery({
+    queryKey: ["/api/referrals/credits"],
+    enabled: !!user,
+  });
+
+  // Fetch referral code and link
+  const { data: referralData, isLoading: codeLoading } = useQuery({
+    queryKey: ["/api/referrals/code"],
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (referralData?.referralLink) {
+      setReferralLink(referralData.referralLink);
+    }
+  }, [referralData]);
   
   // Referral rewards explanation
   const referralRewards = [
-    { type: "1 Friend Signs Up", reward: "Free CV Template" },
+    { type: "1 Friend Signs Up", reward: "Free CV Template Access" },
     { type: "3 Friends Sign Up", reward: "Free CV Deep Analysis (R30 value)" },
     { type: "5 Friends Sign Up", reward: "1-Month Premium Subscription" }
   ];
+
+  const displayStats = referralStats || {
+    invited: 0,
+    registered: 0,
+    premiumConversions: 0,
+    freeAnalysisEarned: 0,
+  };
+
+  const displayCredits = userCredits || {
+    freeAnalysisCredits: 0,
+    scanCredits: 0,
+    premiumMonths: 0,
+  };
   
   // Copy referral link to clipboard
   const copyToClipboard = () => {
@@ -235,24 +263,35 @@ export default function ReferralPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-primary">{referralStats.invited}</p>
-                  <p className="text-sm text-muted-foreground">People Invited</p>
+              {statsLoading ? (
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="p-4 bg-muted rounded-lg text-center">
+                      <div className="h-8 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  ))}
                 </div>
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-primary">{referralStats.registered}</p>
-                  <p className="text-sm text-muted-foreground">Signed Up</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold text-primary">{displayStats.invited}</p>
+                    <p className="text-sm text-muted-foreground">People Invited</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold text-primary">{displayStats.registered}</p>
+                    <p className="text-sm text-muted-foreground">Signed Up</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold text-primary">{displayStats.premiumConversions}</p>
+                    <p className="text-sm text-muted-foreground">Premium Users</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold text-green-600">{displayCredits.freeAnalysisCredits}</p>
+                    <p className="text-sm text-muted-foreground">Free Credits Earned</p>
+                  </div>
                 </div>
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-primary">{referralStats.premiumConversions}</p>
-                  <p className="text-sm text-muted-foreground">Premium Users</p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold text-green-600">{referralStats.freeAnalysisEarned}</p>
-                  <p className="text-sm text-muted-foreground">Free Analyses Earned</p>
-                </div>
-              </div>
+              )}
               
               <Button variant="outline" className="w-full" asChild>
                 <Link href="/dashboard">
