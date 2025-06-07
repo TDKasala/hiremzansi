@@ -40,6 +40,7 @@ import MotivationDashboard from "@/pages/MotivationDashboard";
 import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
 import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
+import JobSitesPage from "@/pages/JobSitesPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
 import TemplatesPage from "@/pages/TemplatesPage";
@@ -96,7 +97,9 @@ function App() {
                 <Route path="/auth" component={LoginPage} />
                 <Route path="/auth/callback" component={AuthCallback} />
                 <Route path="/realtime-ats" component={RealtimeATSPage} />
+                <Route path="/referral" component={ReferralPage} />
                 <Route path="/refer" component={ReferralPage} />
+                <Route path="/job-sites" component={JobSitesPage} />
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                 <Route path="/templates" component={TemplatesPage} />
                 

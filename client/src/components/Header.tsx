@@ -32,6 +32,8 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: t('common.home') },
     { href: "/templates", label: "CV Templates" },
+    { href: "/job-sites", label: "Job Board" },
+    { href: "/referral", label: "Refer & Earn" },
     { href: "/pricing", label: t('common.pricing') },
     { href: "/blog", label: t('common.blog') },
     { href: "/about", label: t('common.about') },
@@ -93,8 +95,11 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/premium-tools">CV Tools</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <span className="text-gray-400">Job Matching (Coming Soon)</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/job-sites">Job Board</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/referral">Refer & Earn</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
@@ -204,7 +209,14 @@ export default function Header() {
                   className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
                   onClick={closeMobileMenu}
                 >
-                  Job Listing Sites
+                  Job Board
+                </Link>
+                <Link 
+                  href="/referral"
+                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  Refer & Earn
                 </Link>
                 <Link 
                   href="/interview/practice"
