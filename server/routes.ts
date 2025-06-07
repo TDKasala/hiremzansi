@@ -15,8 +15,7 @@ import {
   insertCvSchema, 
   insertAtsScoreSchema, 
   insertDeepAnalysisReportSchema,
-  insertEmployerSchema,
-  insertJobPostingSchema,
+
   saProfiles,
   users,
   cvs,
@@ -35,7 +34,6 @@ import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
-import { saJobMatchingService } from "./services/saJobMatchingService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
