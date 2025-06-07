@@ -66,7 +66,8 @@ const plans = [
   {
     id: 'professional',
     name: 'Professional',
-    price: 9900, // ZAR 99.00 in cents
+    price: isLaunchDiscountActive ? 5000 : 9900, // ZAR 50.00 or 99.00 in cents
+    originalPrice: 9900,
     interval: 'month',
     features: [
       '15 CV Analyses/Month',
@@ -83,7 +84,8 @@ const plans = [
   {
     id: 'business-annual',
     name: 'Business Annual',
-    price: 99900, // ZAR 999.00 in cents
+    price: isLaunchDiscountActive ? 50000 : 99900, // ZAR 500.00 or 999.00 in cents
+    originalPrice: 99900,
     interval: 'year',
     features: [
       '20 CV Analyses/Month',
@@ -218,9 +220,29 @@ export default function SubscriptionPage() {
               </CardHeader>
               <CardContent className="flex-grow">
                 <div className="mt-1 mb-4">
-                  <span className="text-3xl font-bold">{formatPrice(plan.price)}</span>
-                  {plan.price > 0 && (
-                    <span className="text-muted-foreground ml-1">/{plan.interval}</span>
+                  {isLaunchDiscountActive && plan.originalPrice && plan.price !== plan.originalPrice ? (
+                    <div className="space-y-1">
+                      <div className="text-lg text-gray-500 line-through">
+                        {formatPrice(plan.originalPrice)}
+                        {plan.originalPrice > 0 && (
+                          <span className="text-muted-foreground ml-1">/{plan.interval}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl font-bold text-green-600">{formatPrice(plan.price)}</span>
+                        {plan.price > 0 && (
+                          <span className="text-muted-foreground">/{plan.interval}</span>
+                        )}
+                        <Badge className="bg-red-500 hover:bg-red-600 text-white">50% OFF</Badge>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-3xl font-bold">{formatPrice(plan.price)}</span>
+                      {plan.price > 0 && (
+                        <span className="text-muted-foreground ml-1">/{plan.interval}</span>
+                      )}
+                    </div>
                   )}
                 </div>
                 <ul className="space-y-2">
