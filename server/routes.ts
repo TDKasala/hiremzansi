@@ -26,7 +26,7 @@ import {
 } from "@shared/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
-import { setupAuth } from "./auth";
+import { isAuthenticated, isAdmin, authenticateUser, generateToken } from "./auth";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
