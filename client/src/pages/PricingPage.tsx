@@ -45,9 +45,21 @@ export default function PricingPage() {
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">Price</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 0</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 49</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 99/month</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 999/year</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">
+                      <div className="text-sm text-gray-500 line-through">ZAR 49</div>
+                      <div className="font-bold text-green-600">ZAR 25</div>
+                      <div className="text-xs text-red-500">50% OFF</div>
+                    </td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">
+                      <div className="text-sm text-gray-500 line-through">ZAR 99/month</div>
+                      <div className="font-bold text-green-600">ZAR 50/month</div>
+                      <div className="text-xs text-red-500">50% OFF</div>
+                    </td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">
+                      <div className="text-sm text-gray-500 line-through">ZAR 999/year</div>
+                      <div className="font-bold text-green-600">ZAR 500/year</div>
+                      <div className="text-xs text-red-500">50% OFF</div>
+                    </td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">CV Analysis Credits</td>

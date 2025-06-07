@@ -23,6 +23,10 @@ import { CheckCircle, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Link } from 'wouter';
 
+// Launch discount configuration
+const LAUNCH_DISCOUNT = 0.5;
+const isLaunchDiscountActive = true;
+
 // Subscription plans
 const plans = [
   {
@@ -44,7 +48,8 @@ const plans = [
   {
     id: 'essential-pack',
     name: 'Essential Pack',
-    price: 4900, // ZAR 49.00 in cents
+    price: isLaunchDiscountActive ? 2500 : 4900, // ZAR 25.00 or 49.00 in cents
+    originalPrice: 4900,
     interval: 'one-time',
     features: [
       '5 Complete CV Analyses',

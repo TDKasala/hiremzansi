@@ -28,6 +28,10 @@ type PricingPlan = {
 export default function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
   
+  // Launch discount - 50% off for first 500 users
+  const LAUNCH_DISCOUNT = 0.5;
+  const isLaunchDiscountActive = true; // You can add logic here to check user count or time limit
+  
   const plans: PricingPlan[] = [
     {
       name: "Free Trial",
@@ -47,8 +51,8 @@ export default function PricingSection() {
     },
     {
       name: "Essential Pack",
-      price: "ZAR 49",
-      description: "Perfect for active job seekers",
+      price: isLaunchDiscountActive ? "ZAR 25" : "ZAR 49",
+      description: isLaunchDiscountActive ? "Perfect for active job seekers - 50% OFF!" : "Perfect for active job seekers",
       features: [
         { name: "5 Complete CV Analyses", included: true },
         { name: "Advanced ATS Scoring", included: true },
@@ -63,8 +67,8 @@ export default function PricingSection() {
     },
     {
       name: "Professional",
-      price: "ZAR 99/month",
-      description: "For career professionals & consultants",
+      price: isLaunchDiscountActive ? "ZAR 50/month" : "ZAR 99/month",
+      description: isLaunchDiscountActive ? "For career professionals & consultants - 50% OFF!" : "For career professionals & consultants",
       features: [
         { name: "15 CV Analyses/Month", included: true },
         { name: "Real-time CV Editor", included: true },
@@ -79,8 +83,8 @@ export default function PricingSection() {
     },
     {
       name: "Business Annual",
-      price: "ZAR 999/year",
-      description: "Best value - Save 15%",
+      price: isLaunchDiscountActive ? "ZAR 500/year" : "ZAR 999/year",
+      description: isLaunchDiscountActive ? "Best value - Save 65% with launch discount!" : "Best value - Save 15%",
       features: [
         { name: "20 CV Analyses/Month", included: true },
         { name: "All Professional Features", included: true },
@@ -145,8 +149,24 @@ export default function PricingSection() {
                 <h3 className="text-2xl font-bold text-secondary mb-2">
                   {selectedPlan.name}
                 </h3>
-                <div className="text-4xl font-bold text-primary mb-2">
-                  {selectedPlan.price}
+                <div className="mb-2">
+                  {isLaunchDiscountActive && selectedPlan.name !== "Free Trial" ? (
+                    <div className="text-center">
+                      <div className="text-lg text-gray-500 line-through mb-1">
+                        {selectedPlan.name === "Essential Pack" ? "ZAR 49" :
+                         selectedPlan.name === "Professional" ? "ZAR 99/month" :
+                         selectedPlan.name === "Business Annual" ? "ZAR 999/year" : ""}
+                      </div>
+                      <div className="text-4xl font-bold text-primary flex items-center justify-center gap-2">
+                        {selectedPlan.price}
+                        <span className="bg-red-500 text-white text-sm px-2 py-1 rounded-full">50% OFF</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-4xl font-bold text-primary">
+                      {selectedPlan.price}
+                    </div>
+                  )}
                 </div>
                 <p className="text-neutral-600">{selectedPlan.description}</p>
               </div>
