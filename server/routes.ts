@@ -28,7 +28,6 @@ import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { setupAuth } from "./auth";
 import { payfastService } from "./services/payfastService";
-import { referralService } from "./referralService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";

@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { referrals, referralRewards, userCredits, users } from "@shared/schema";
 import { eq, and, count, sum, sql } from "drizzle-orm";
+import { generateReferralCode } from "../shared/utils";
 
 export class ReferralService {
   
