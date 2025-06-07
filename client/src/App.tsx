@@ -40,6 +40,7 @@ import MotivationDashboard from "@/pages/MotivationDashboard";
 import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
 import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
 import ReferralPage from "@/pages/ReferralPage";
+import ReferralDashboard from "@/pages/ReferralDashboard";
 import JobSitesPage from "@/pages/JobSitesPage";
 import SubscriptionPage from "@/pages/SubscriptionPage";
 import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
@@ -152,6 +153,8 @@ function App() {
                 <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                 <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
                 <ProtectedRoute path="/subscription" component={SubscriptionPage} />
+                <ProtectedRoute path="/referrals" component={ReferralDashboard} />
+                <ProtectedRoute path="/refer-earn" component={ReferralDashboard} />
                 <Route path="/admin/login" component={AdminLogin} />
                 <Route path="/admin/dashboard" component={AdminDashboard} />
                 <Route component={NotFound} />

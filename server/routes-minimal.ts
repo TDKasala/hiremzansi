@@ -12,6 +12,7 @@ import {
   insertJobPostingSchema,
 } from "@shared/schema";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
+import { memoryReferralService } from "./memoryReferralService";
 
 // File upload configuration
 const upload = multer({
@@ -205,6 +206,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filename: req.file.originalname,
         size: req.file.size
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Referral system routes
+  app.get("/api/referrals/code", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
+      const referralCode = await memoryReferralService.getUserReferralCode(userId);
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      
+      res.json({ 
+        referralCode,
+        referralLink: `${baseUrl}/signup?ref=${referralCode}`
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/referrals/stats", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
+      const stats = await memoryReferralService.getReferralStats(userId);
+      const credits = await memoryReferralService.getUserCredits(userId);
+      const rewards = await memoryReferralService.getUserRewards(userId);
+      const referrals = await memoryReferralService.getUserReferrals(userId);
+
+      res.json({
+        stats,
+        credits,
+        rewards,
+        referrals
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/referrals/process-signup", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { referralCode, userId } = req.body;
+      
+      if (!referralCode || !userId) {
+        return res.status(400).json({ error: "Missing referral code or user ID" });
+      }
+
+      await memoryReferralService.processReferralSignup(referralCode, userId);
+      res.json({ message: "Referral processed successfully" });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/referrals/spend-credits", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req.user as any)?.id;
+      const { type, amount = 1 } = req.body;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+
+      if (!type || !['free_analysis', 'scan_credits', 'professional_month', 'discount_credit'].includes(type)) {
+        return res.status(400).json({ error: "Invalid credit type" });
+      }
+
+      const success = await memoryReferralService.spendCredits(userId, type, amount);
+      
+      if (success) {
+        const updatedCredits = await memoryReferralService.getUserCredits(userId);
+        res.json({ success: true, credits: updatedCredits });
+      } else {
+        res.status(400).json({ error: "Insufficient credits" });
+      }
     } catch (error) {
       next(error);
     }
