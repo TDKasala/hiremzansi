@@ -161,7 +161,7 @@ export default function PricingPage() {
                     <td className="py-3 px-4 font-medium">Price</td>
                     <td className="py-3 px-4 text-center">Free</td>
                     <td className="py-3 px-4 text-center">R49 <span className="text-sm">(once-off)</span></td>
-                    <td className="py-3 px-4 text-center">ZAR 100 <span className="text-sm">/month</span></td>
+                    <td className="py-3 px-4 text-center">R99 <span className="text-sm">/month</span></td>
                   </tr>
                 </tbody>
               </table>
