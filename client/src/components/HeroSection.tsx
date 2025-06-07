@@ -96,7 +96,7 @@ export default function HeroSection() {
                   animation: isAnimated ? 'float 6s ease-in-out infinite' : 'none',
                 }}
               >
-                <div className="bg-white text-black p-4 rounded-lg shadow-lg text-[16px] ml-[20px] mr-[20px]">
+                <div className="bg-white text-black p-4 rounded-lg shadow-lg text-[16px] ml-[20px] mr-[20px] pt-[20px] pb-[20px] pl-[21px] pr-[21px]">
                   <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
                     <div>
                       <div className="overflow-hidden">
