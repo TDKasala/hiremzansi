@@ -51,6 +51,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
 // import WhatsAppAnalysis from "./pages/WhatsAppAnalysis";
 import NotFound from "@/pages/not-found";
+import NotFoundPage from "@/pages/NotFoundPage";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 
 // Job matching features coming soon - temporarily disabled
@@ -157,6 +158,7 @@ function App() {
                 <ProtectedRoute path="/refer-earn" component={ReferralDashboard} />
                 <Route path="/admin/login" component={AdminLogin} />
                 <Route path="/admin/dashboard" component={AdminDashboard} />
+                <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>
                 <Toaster />

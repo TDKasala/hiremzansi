@@ -57,7 +57,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/jobs" className="text-neutral-400 hover:text-white transition-colors">
+                <Link href="/404" className="text-neutral-400 hover:text-white transition-colors">
                   Job Board
                 </Link>
               </li>
