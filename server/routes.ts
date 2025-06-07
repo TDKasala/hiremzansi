@@ -42,6 +42,7 @@ import paymentRoutes from "./routes/paymentRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import candidateScoringRoutes from "./routes/candidateScoringRoutes";
 import gamificationRoutes from "./routes/gamificationRoutes";
+import cvAnalysisRoutes from "./routes/cvAnalysis";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 import { referralService } from "./referralService";
@@ -1429,6 +1430,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Additional admin routes
   app.use("/api/admin", isAdmin, adminRoutes);
+  
+  // xAI-powered CV analysis routes (primary AI service)
+  app.use("/api/cv", cvAnalysisRoutes);
   
   // xAI API test routes
   app.use("/api", testXaiApiRoutes);

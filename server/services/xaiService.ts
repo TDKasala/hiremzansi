@@ -1,257 +1,364 @@
 import OpenAI from "openai";
 
-// Initialize OpenAI client with xAI configuration
-const openai = new OpenAI({ 
-  baseURL: "https://api.x.ai/v1", 
+// Initialize xAI client using OpenAI SDK with xAI base URL
+const xai = new OpenAI({
+  baseURL: "https://api.x.ai/v1",
   apiKey: process.env.XAI_API_KEY,
 });
 
-// Fallback to OpenAI if xAI is not available
-const openaiClient = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-/**
- * Service for handling AI analysis using xAI's API
- */
-class XAIService {
-  /**
-   * Analyze CV text content using xAI Grok model
-   * With fallback to OpenAI if xAI is unavailable
-   */
-  async analyzeCV(text: string): Promise<{
-    score: number;
-    breakdown: {
-      format: number;
-      skills: number;
-      context: number;
-    };
-    recommendations: { category: string; suggestion: string }[];
-  }> {
-    try {
-      return await this.analyzeWithXAI(text);
-    } catch (error) {
-      console.warn('xAI analysis failed, falling back to OpenAI:', error);
-      return await this.analyzeWithOpenAI(text);
-    }
-  }
-
-  /**
-   * Analyze CV with xAI's Grok model
-   */
-  private async analyzeWithXAI(text: string) {
-    const prompt = this.createAnalysisPrompt(text);
-    
-    try {
-      const response = await openai.chat.completions.create({
-        model: "grok-2-1212", // Using the latest text model
-        messages: [
-          {
-            role: "system",
-            content: 
-              "You are an expert CV analyzer for South African job seekers. " +
-              "Evaluate CVs based on format (40%), skills (40%), and South African context (20%). " +
-              "Provide a detailed breakdown and specific recommendations."
-          },
-          { role: "user", content: prompt }
-        ],
-        response_format: { type: "json_object" },
-      });
-
-      const content = response.choices[0].message.content || "{}";
-      return this.parseAIResponse(content);
-    } catch (error) {
-      console.error('Error analyzing CV with xAI:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Analyze CV with OpenAI as fallback
-   */
-  private async analyzeWithOpenAI(text: string) {
-    const prompt = this.createAnalysisPrompt(text);
-    
-    try {
-      const response = await openaiClient.chat.completions.create({
-        model: "gpt-4o", // The newest OpenAI model is "gpt-4o" which was released May 13, 2024
-        messages: [
-          {
-            role: "system",
-            content: 
-              "You are an expert CV analyzer for South African job seekers. " +
-              "Evaluate CVs based on format (40%), skills (40%), and South African context (20%). " +
-              "Provide a detailed breakdown and specific recommendations."
-          },
-          { role: "user", content: prompt }
-        ],
-        response_format: { type: "json_object" },
-      });
-
-      const content = response.choices[0].message.content || "{}";
-      return this.parseAIResponse(content);
-    } catch (error) {
-      console.error('Error analyzing CV with OpenAI fallback:', error);
-      // If both services fail, use the default analyzer
-      throw error;
-    }
-  }
-
-  /**
-   * Create analysis prompt for AI models
-   */
-  private createAnalysisPrompt(text: string): string {
-    return `
-Analyze this CV for a South African job seeker:
-
-${text}
-
-Evaluate based on these criteria:
-1. Format (40% of score):
-   - Layout and organization (10pts)
-   - Clear section headers (8pts)
-   - Effective use of bullet points (8pts)
-   - Consistent date formats (6pts)
-   - Appropriate spacing (8pts)
-
-2. Skills (40% of score):
-   - Technical skills relevance (10pts)
-   - Soft skills presentation (8pts)
-   - Qualifications presentation (8pts)
-   - Experience description quality (8pts)
-   - Keyword optimization (6pts)
-
-3. South African Context (20% of score):
-   - B-BBEE status mention (6pts)
-   - NQF level specification (4pts)
-   - South African locations/experience (4pts)
-   - Industry-specific regulations/compliance (3pts)
-   - Local languages (3pts)
-
-Provide:
-1. A total score out of 100
-2. Breakdown of points for each main category
-3. At least 3 specific recommendations for improvement
-
-Return response in this JSON format:
-{
-  "score": <total_score>,
-  "breakdown": {
-    "format": <format_score>,
-    "skills": <skills_score>,
-    "context": <context_score>
-  },
-  "recommendations": [
-    {
-      "category": "<category_name>",
-      "suggestion": "<specific_recommendation>"
-    },
-    ...
-  ]
+export interface CVAnalysisResult {
+  atsScore: number;
+  overallScore: number;
+  strengths: string[];
+  improvements: string[];
+  missingKeywords: string[];
+  formattingIssues: string[];
+  southAfricanContext: {
+    beeCompliance: string;
+    localMarketFit: string;
+    industryRelevance: string;
+    languageAppropriate: boolean;
+  };
+  industry: string;
+  experienceLevel: string;
 }
+
+export interface JobMatchResult {
+  matchScore: number;
+  matchingSkills: string[];
+  missingSkills: string[];
+  salaryEstimate: string;
+  recommendations: string[];
+}
+
+export interface CareerGuidanceResult {
+  nextSteps: string[];
+  skillGaps: string[];
+  trainingRecommendations: string[];
+  careerPath: string;
+}
+
+class XAIService {
+  private async makeRequest(prompt: string, maxTokens: number = 4000): Promise<string> {
+    try {
+      const response = await xai.chat.completions.create({
+        model: "grok-2-1212",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: maxTokens,
+        temperature: 0.7,
+      });
+
+      return response.choices[0].message.content || "";
+    } catch (error) {
+      console.error("xAI API Error:", error);
+      throw new Error("Failed to process with xAI");
+    }
+  }
+
+  async analyzeCVForATS(cvText: string, jobDescription?: string): Promise<CVAnalysisResult> {
+    const prompt = this.buildCVAnalysisPrompt(cvText, jobDescription);
+    const response = await this.makeRequest(prompt);
+    
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      console.error("Failed to parse xAI response:", error);
+      throw new Error("Invalid response format from AI");
+    }
+  }
+
+  async matchJobToCV(cvText: string, jobDescription: string): Promise<JobMatchResult> {
+    const prompt = this.buildJobMatchingPrompt(cvText, jobDescription);
+    const response = await this.makeRequest(prompt);
+    
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      console.error("Failed to parse job matching response:", error);
+      throw new Error("Invalid job matching response");
+    }
+  }
+
+  async generateCareerGuidance(cvText: string, targetRole?: string): Promise<CareerGuidanceResult> {
+    const prompt = this.buildCareerGuidancePrompt(cvText, targetRole);
+    const response = await this.makeRequest(prompt);
+    
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      console.error("Failed to parse career guidance response:", error);
+      throw new Error("Invalid career guidance response");
+    }
+  }
+
+  async generateCoverLetter(cvText: string, jobDescription: string, companyName: string): Promise<string> {
+    const prompt = this.buildCoverLetterPrompt(cvText, jobDescription, companyName);
+    return await this.makeRequest(prompt, 1500);
+  }
+
+  async optimizeLinkedInProfile(cvText: string): Promise<{
+    headline: string;
+    summary: string;
+    skillsRecommendations: string[];
+  }> {
+    const prompt = this.buildLinkedInOptimizationPrompt(cvText);
+    const response = await this.makeRequest(prompt);
+    
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      console.error("Failed to parse LinkedIn optimization response:", error);
+      throw new Error("Invalid LinkedIn optimization response");
+    }
+  }
+
+  private buildCVAnalysisPrompt(cvText: string, jobDescription?: string): string {
+    return `
+You are an expert CV optimization specialist for the South African job market. Analyze this CV and provide comprehensive feedback.
+
+CV CONTENT:
+${cvText}
+
+${jobDescription ? `TARGET JOB DESCRIPTION:\n${jobDescription}\n` : ''}
+
+ANALYSIS REQUIREMENTS:
+1. ATS (Applicant Tracking System) compatibility score (0-100)
+2. Overall CV quality score (0-100) 
+3. Specific strengths and areas for improvement
+4. Missing keywords for South African market
+5. Formatting and structure issues
+6. South African context analysis including B-BBEE considerations
+
+SOUTH AFRICAN MARKET FOCUS:
+- B-BBEE (Broad-Based Black Economic Empowerment) compliance indicators
+- Local industry standards and expectations
+- South African English language conventions
+- Regional salary and experience expectations
+- Skills relevant to SA economy (mining, finance, tech, agriculture)
+
+RESPOND IN VALID JSON FORMAT:
+{
+  "atsScore": number (0-100),
+  "overallScore": number (0-100),
+  "strengths": ["strength1", "strength2", "strength3"],
+  "improvements": ["improvement1", "improvement2", "improvement3"],
+  "missingKeywords": ["keyword1", "keyword2", "keyword3"],
+  "formattingIssues": ["issue1", "issue2"],
+  "southAfricanContext": {
+    "beeCompliance": "assessment of B-BBEE indicators",
+    "localMarketFit": "how well CV fits SA market",
+    "industryRelevance": "relevance to SA industries",
+    "languageAppropriate": boolean
+  },
+  "industry": "detected primary industry",
+  "experienceLevel": "entry-level/mid-level/senior/executive"
+}
+
+Provide actionable, specific feedback tailored to South African employers and ATS systems.
 `;
   }
 
-  /**
-   * Parse AI response into standardized format
-   */
-  private parseAIResponse(responseText: string): {
-    score: number;
-    breakdown: {
-      format: number;
-      skills: number;
-      context: number;
-    };
-    recommendations: { category: string; suggestion: string }[];
-  } {
+  private buildJobMatchingPrompt(cvText: string, jobDescription: string): string {
+    return `
+You are a South African recruitment specialist. Match this CV against the job description and provide detailed analysis.
+
+CV CONTENT:
+${cvText}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+ANALYSIS REQUIREMENTS:
+1. Calculate match percentage (0-100)
+2. Identify matching skills and experience
+3. Highlight missing skills/requirements
+4. Estimate appropriate salary range for South Africa
+5. Provide specific recommendations for improvement
+
+SOUTH AFRICAN CONSIDERATIONS:
+- Local salary benchmarks (in ZAR)
+- B-BBEE and employment equity factors
+- Skills shortage areas in SA
+- Industry-specific requirements
+- Regional variations (Cape Town, Johannesburg, Durban)
+
+RESPOND IN VALID JSON FORMAT:
+{
+  "matchScore": number (0-100),
+  "matchingSkills": ["skill1", "skill2", "skill3"],
+  "missingSkills": ["missing1", "missing2"],
+  "salaryEstimate": "R25,000 - R45,000 per month",
+  "recommendations": ["recommendation1", "recommendation2", "recommendation3"]
+}
+
+Focus on practical, actionable advice for the South African job market.
+`;
+  }
+
+  private buildCareerGuidancePrompt(cvText: string, targetRole?: string): string {
+    return `
+You are a South African career counselor. Analyze this CV and provide career development guidance.
+
+CV CONTENT:
+${cvText}
+
+${targetRole ? `TARGET ROLE: ${targetRole}` : ''}
+
+GUIDANCE REQUIREMENTS:
+1. Suggest logical next career steps
+2. Identify skill gaps for advancement
+3. Recommend training/certification programs available in South Africa
+4. Outline potential career progression path
+
+SOUTH AFRICAN CONTEXT:
+- Local education institutions (Universities, TVET colleges)
+- Professional bodies and certifications (SAICA, SAIPA, etc.)
+- Skills development initiatives and SETA programs
+- Economic growth sectors in South Africa
+- Remote work opportunities vs local positions
+
+RESPOND IN VALID JSON FORMAT:
+{
+  "nextSteps": ["step1", "step2", "step3"],
+  "skillGaps": ["gap1", "gap2"],
+  "trainingRecommendations": ["training1", "training2"],
+  "careerPath": "detailed career progression description"
+}
+
+Provide practical advice considering South African economic realities and opportunities.
+`;
+  }
+
+  private buildCoverLetterPrompt(cvText: string, jobDescription: string, companyName: string): string {
+    return `
+Write a professional cover letter for a South African job application.
+
+CV SUMMARY:
+${cvText.substring(0, 1000)}...
+
+JOB DESCRIPTION:
+${jobDescription}
+
+COMPANY: ${companyName}
+
+REQUIREMENTS:
+1. Professional South African business tone
+2. Highlight relevant experience and skills
+3. Show understanding of local market
+4. Address any B-BBEE or diversity considerations appropriately
+5. Maximum 3 paragraphs
+6. Enthusiastic but professional closing
+
+STRUCTURE:
+- Opening: Interest in position and brief introduction
+- Body: Relevant experience and value proposition
+- Closing: Enthusiasm and call to action
+
+Write a compelling cover letter that stands out to South African employers while maintaining professional standards.
+`;
+  }
+
+  private buildLinkedInOptimizationPrompt(cvText: string): string {
+    return `
+Optimize this professional profile for LinkedIn targeting the South African market.
+
+CV CONTENT:
+${cvText}
+
+OPTIMIZATION REQUIREMENTS:
+1. Compelling professional headline (120 characters max)
+2. Engaging summary section (2000 characters max)
+3. Strategic skills recommendations for SA market
+
+SOUTH AFRICAN FOCUS:
+- Keywords relevant to local recruiters
+- Skills in demand in SA economy
+- Professional tone appropriate for local market
+- Industry-specific terminology
+- Growth sectors emphasis
+
+RESPOND IN VALID JSON FORMAT:
+{
+  "headline": "optimized professional headline",
+  "summary": "compelling professional summary",
+  "skillsRecommendations": ["skill1", "skill2", "skill3", "skill4", "skill5"]
+}
+
+Create content that attracts South African recruiters and highlights market-relevant expertise.
+`;
+  }
+
+  async generateInterviewQuestions(jobDescription: string, experienceLevel: string): Promise<string[]> {
+    const prompt = `
+Generate interview questions for this South African job position.
+
+JOB DESCRIPTION:
+${jobDescription}
+
+EXPERIENCE LEVEL: ${experienceLevel}
+
+REQUIREMENTS:
+1. 8-10 relevant interview questions
+2. Mix of technical and behavioral questions
+3. South African workplace context
+4. Consider diversity and inclusion aspects
+5. Industry-specific questions
+
+SOUTH AFRICAN CONSIDERATIONS:
+- Local business culture and values
+- Workplace equity and transformation
+- Skills development and mentorship
+- Ubuntu philosophy in workplace
+- Local market challenges and opportunities
+
+Provide questions that South African hiring managers would typically ask.
+`;
+
+    const response = await this.makeRequest(prompt);
+    return response.split('\n').filter(line => line.trim().startsWith('1.') || line.trim().startsWith('-')).map(q => q.replace(/^\d+\.?\s*-?\s*/, ''));
+  }
+
+  async analyzeSalaryBenchmark(position: string, location: string, experience: string): Promise<{
+    salaryRange: string;
+    marketAnalysis: string;
+    factors: string[];
+  }> {
+    const prompt = `
+Provide salary benchmark analysis for South African job market.
+
+POSITION: ${position}
+LOCATION: ${location}
+EXPERIENCE: ${experience}
+
+ANALYSIS REQUIREMENTS:
+1. Current salary range in ZAR (monthly)
+2. Market analysis and trends
+3. Factors affecting compensation
+
+SOUTH AFRICAN FACTORS:
+- Cost of living variations by city
+- Industry growth and demand
+- Skills shortage premiums
+- B-BBEE and employment equity impacts
+- Economic conditions and inflation
+
+RESPOND IN VALID JSON FORMAT:
+{
+  "salaryRange": "R35,000 - R55,000 per month",
+  "marketAnalysis": "detailed market analysis",
+  "factors": ["factor1", "factor2", "factor3"]
+}
+
+Provide accurate, current market information for South African job seekers.
+`;
+
+    const response = await this.makeRequest(prompt);
     try {
-      const parsed = JSON.parse(responseText);
-      
-      return {
-        score: Math.round(parsed.score || 50),
-        breakdown: {
-          format: Math.round(parsed.breakdown?.format || 50),
-          skills: Math.round(parsed.breakdown?.skills || 50),
-          context: Math.round(parsed.breakdown?.context || 50)
-        },
-        recommendations: Array.isArray(parsed.recommendations) 
-          ? parsed.recommendations.slice(0, 5) 
-          : [{ category: 'General', suggestion: 'Tailor your CV to match job descriptions' }]
-      };
+      return JSON.parse(response);
     } catch (error) {
-      console.error('Error parsing AI response:', error);
-      
-      // Return default values if parsing fails
-      return {
-        score: 50,
-        breakdown: {
-          format: 50,
-          skills: 50,
-          context: 50
-        },
-        recommendations: [
-          { category: 'General', suggestion: 'Tailor your CV to match job descriptions' },
-          { category: 'Format', suggestion: 'Improve organization with clear section headers' },
-          { category: 'Skills', suggestion: 'Highlight technical skills relevant to your industry' }
-        ]
-      };
+      throw new Error("Invalid salary analysis response");
     }
   }
 }
 
-// Export singleton instance
 export const xaiService = new XAIService();
-
-// Test connection to xAI API
-export async function testXaiConnection() {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "grok-2-1212",
-      messages: [
-        { role: "user", content: "Test connection" }
-      ],
-      max_tokens: 5
-    });
-    return { success: true, message: "xAI API connection successful" };
-  } catch (error: any) {
-    console.error("xAI API connection test failed:", error);
-    return { 
-      success: false, 
-      message: "xAI API connection failed", 
-      error: error.message 
-    };
-  }
-}
-
-// Export the analyzeCV function directly for compatibility with existing code
-export async function analyzeCV(text: string, jobDescription?: string) {
-  try {
-    const result = await xaiService.analyzeCV(text);
-    return {
-      success: true,
-      result: {
-        overall_score: result.score,
-        rating: result.score >= 80 ? "Excellent" : result.score >= 70 ? "Good" : result.score >= 60 ? "Average" : "Needs Improvement",
-        strengths: result.recommendations.filter(r => r.category === "Strengths").map(r => r.suggestion),
-        improvements: result.recommendations.filter(r => r.category !== "Strengths").map(r => r.suggestion),
-        skills_identified: [], // Would be populated in a more comprehensive implementation
-        skill_score: result.breakdown.skills,
-        format_score: result.breakdown.format,
-        sa_score: result.breakdown.context,
-        south_african_context: {
-          b_bbee_mentions: [],
-          nqf_levels: [],
-          locations: [],
-          regulations: [],
-          languages: []
-        }
-      }
-    };
-  } catch (error: any) {
-    console.error("Error in xAI CV analysis:", error);
-    return {
-      success: false,
-      error: error.message || "Failed to analyze CV with xAI"
-    };
-  }
-}
