@@ -46,7 +46,9 @@ import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
 import TemplatesPage from "@/pages/TemplatesPage";
 import SettingsPage from "@/pages/settings-page";
 import BlogPost1 from "@/pages/BlogPost1";
-import { AdminDashboard } from "@/pages/AdminDashboard";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
+// import WhatsAppAnalysis from "./pages/WhatsAppAnalysis";
 import NotFound from "@/pages/not-found";
 import BlogDetailPage from "@/pages/BlogDetailPage";
 
@@ -150,8 +152,8 @@ function App() {
                 <ProtectedRoute path="/premium-tools" component={PremiumToolsPage} />
                 <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
                 <ProtectedRoute path="/subscription" component={SubscriptionPage} />
-                <ProtectedRoute path="/admin" component={AdminDashboard} />
-                
+                <Route path="/admin/login" component={AdminLogin} />
+                <Route path="/admin/dashboard" component={AdminDashboard} />
                 <Route component={NotFound} />
               </Switch>
                 <Toaster />

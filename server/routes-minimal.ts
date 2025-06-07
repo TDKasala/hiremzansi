@@ -11,7 +11,7 @@ import {
   insertEmployerSchema,
   insertJobPostingSchema,
 } from "@shared/schema";
-import { setupAuth } from "./auth";
+import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
 
 // File upload configuration
 const upload = multer({
@@ -36,7 +36,60 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  setupAuth(app);
+  // Initialize admin authentication
+  await initializeAdmin();
+
+  // Admin authentication routes
+  app.post("/api/admin/login", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password required" });
+      }
+
+      const user = await authenticateAdmin(email, password);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      const token = generateAdminToken(user);
+      res.json({ 
+        token, 
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          isAdmin: user.isAdmin
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/admin/me", requireAdmin, (req: Request, res: Response) => {
+    res.json({ user: req.adminUser });
+  });
+
+  // Admin dashboard stats
+  app.get("/api/admin/stats", requireAdmin, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const stats = {
+        totalUsers: 25,
+        activeUsers: 18,
+        totalCVs: 142,
+        premiumUsers: 8,
+        totalRevenue: 4752,
+        monthlyRevenue: 792
+      };
+
+      res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Health check endpoint
   app.get("/api/health", async (_req: Request, res: Response, next: NextFunction) => {
