@@ -99,6 +99,9 @@ export default function Header() {
                     <Link href="/job-sites">Job Board</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href="/referrals">Referral Earnings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/referral">Refer & Earn</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
