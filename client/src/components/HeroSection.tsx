@@ -38,7 +38,7 @@ export default function HeroSection() {
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <div className="relative">
-              <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary">
+              <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary text-center ml-[200px] mr-[200px] font-bold">
                 {t('home.southAfricanFocused')}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center">
@@ -74,7 +74,7 @@ export default function HeroSection() {
             </div>
             <div className="mt-6 text-white flex items-center text-sm">
               <Shield className="h-4 w-4 mr-2 text-primary" />
-              <span>{t('home.dataSecure')}</span>
+              <span className="text-center pl-[110px] pr-[110px]">{t('home.dataSecure')}</span>
             </div>
           </div>
           
