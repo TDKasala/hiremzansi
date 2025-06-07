@@ -25,7 +25,7 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const response = await apiRequest("POST", "/api/auth/login", {
+      const response = await apiRequest("POST", "/api/admin/login", {
         email,
         password,
       });

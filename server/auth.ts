@@ -84,7 +84,7 @@ export async function authenticateUser(email: string, password: string): Promise
       id: user.id,
       email: user.email,
       username: user.username,
-      firstName: user.name || "",
+      firstName: user.name || null,
       lastName: "",
       isAdmin: user.role === "admin",
       role: user.role || "user",
