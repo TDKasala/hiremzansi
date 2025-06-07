@@ -36,25 +36,25 @@ export default function PricingPage() {
                   <tr className="bg-neutral-100">
                     <th className="py-3 px-4 text-left border-b border-neutral-200">Feature</th>
                     <th className="py-3 px-4 text-center border-b border-neutral-200">Free Trial</th>
-                    <th className="py-3 px-4 text-center border-b border-neutral-200">Deep Analysis</th>
-                    <th className="py-3 px-4 text-center border-b border-neutral-200">Monthly</th>
-                    <th className="py-3 px-4 text-center border-b border-neutral-200">Yearly</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Essential Pack</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Professional</th>
+                    <th className="py-3 px-4 text-center border-b border-neutral-200">Business Annual</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">Price</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 0</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 25</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 100/month</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 1,080/year</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 49</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 99/month</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center font-bold">ZAR 999/year</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">CV Analysis Credits</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">3 (3 days)</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">1 (lifetime)</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">50/month</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">50/month</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">1 (7 days)</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">5 (30 days)</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">15/month</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">20/month</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">ATS Score</td>
@@ -92,30 +92,46 @@ export default function PricingPage() {
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Job Matching</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">✓ Free</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Template Library Access</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Savings</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
-                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">Save ZAR 120</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Industry Benchmarking</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">WhatsApp Job Alerts</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Export Multiple Formats</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Bulk Analysis Tools</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Regional Job Matching</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">API Access</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✗</td>
                     <td className="py-3 px-4 border-b border-neutral-200 text-center">✓</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-4 border-b border-neutral-200 font-medium">Annual Savings</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center">-</td>
+                    <td className="py-3 px-4 border-b border-neutral-200 text-center text-green-600">15% (ZAR 189)</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-4 border-b border-neutral-200 font-medium">SA-Specific Recommendations</td>
