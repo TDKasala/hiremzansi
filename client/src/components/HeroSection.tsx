@@ -52,8 +52,10 @@ export default function HeroSection() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {stats.map((stat, index) => (
                 <div key={index} className="bg-white/10 p-3 rounded-lg text-center">
-                  <div className={`text-2xl md:text-3xl font-bold text-[#FFCA28] ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
-                    {stat.value}
+                  <div className="overflow-hidden">
+                    <div className={`text-2xl md:text-3xl font-bold text-[#FFCA28] ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
+                      {stat.value}
+                    </div>
                   </div>
                   <div className="text-xs text-white font-medium">{stat.label}</div>
                 </div>
@@ -62,12 +64,12 @@ export default function HeroSection() {
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <Link href="/upload">
-                <Button size="lg" className="bg-primary text-white hover:bg-opacity-90 transition-colors w-full sm:w-auto text-base md:text-lg">
+                <Button size="default" className="bg-primary text-white hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm">
                   {t('home.getFreeAtsScore')}
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button size="lg" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-base md:text-lg">
+                <Button size="default" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm">
                   {t('home.viewPremiumFeatures')}
                 </Button>
               </Link>
