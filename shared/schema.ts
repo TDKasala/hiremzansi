@@ -664,6 +664,112 @@ export type InsertSkill = z.infer<typeof insertSkillSchema>;
 export type UserSkill = typeof userSkills.$inferSelect;
 export type InsertUserSkill = z.infer<typeof insertUserSkillSchema>;
 
+// Referral system tables
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referrerId: integer("referrer_id").notNull().references(() => users.id),
+  refereeId: integer("referee_id").references(() => users.id),
+  referralCode: text("referral_code").notNull().unique(),
+  refereeEmail: text("referee_email"),
+  status: text("status").default("pending").notNull(), // pending, registered, premium, completed
+  registeredAt: timestamp("registered_at"),
+  premiumUpgradeAt: timestamp("premium_upgrade_at"),
+  rewardEarned: boolean("reward_earned").default(false),
+  rewardType: text("reward_type"), // free_analysis, premium_month, template_access
+  rewardValue: integer("reward_value"), // monetary value in cents
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const referralsRelations = relations(referrals, ({ one }) => ({
+  referrer: one(users, {
+    fields: [referrals.referrerId],
+    references: [users.id],
+  }),
+  referee: one(users, {
+    fields: [referrals.refereeId],
+    references: [users.id],
+  }),
+}));
+
+export const insertReferralSchema = createInsertSchema(referrals).pick({
+  referrerId: true,
+  refereeId: true,
+  referralCode: true,
+  refereeEmail: true,
+  status: true,
+  rewardType: true,
+  rewardValue: true,
+  notes: true,
+});
+
+// Referral rewards tracking
+export const referralRewards = pgTable("referral_rewards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  referralId: integer("referral_id").notNull().references(() => referrals.id),
+  rewardType: text("reward_type").notNull(), // free_analysis, premium_month, scan_credits
+  rewardValue: integer("reward_value"), // number of credits or months
+  rewardAmount: integer("reward_amount"), // monetary value in cents
+  isRedeemed: boolean("is_redeemed").default(false),
+  redeemedAt: timestamp("redeemed_at"),
+  expiresAt: timestamp("expires_at"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const referralRewardsRelations = relations(referralRewards, ({ one }) => ({
+  user: one(users, {
+    fields: [referralRewards.userId],
+    references: [users.id],
+  }),
+  referral: one(referrals, {
+    fields: [referralRewards.referralId],
+    references: [referrals.id],
+  }),
+}));
+
+export const insertReferralRewardSchema = createInsertSchema(referralRewards).pick({
+  userId: true,
+  referralId: true,
+  rewardType: true,
+  rewardValue: true,
+  rewardAmount: true,
+  expiresAt: true,
+  description: true,
+});
+
+// User credits for tracking free analyses, etc.
+export const userCredits = pgTable("user_credits", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id).unique(),
+  freeAnalysisCredits: integer("free_analysis_credits").default(0),
+  scanCredits: integer("scan_credits").default(0),
+  premiumMonths: integer("premium_months").default(0),
+  totalEarned: integer("total_earned").default(0),
+  totalSpent: integer("total_spent").default(0),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userCreditsRelations = relations(userCredits, ({ one }) => ({
+  user: one(users, {
+    fields: [userCredits.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertUserCreditsSchema = createInsertSchema(userCredits).pick({
+  userId: true,
+  freeAnalysisCredits: true,
+  scanCredits: true,
+  premiumMonths: true,
+  totalEarned: true,
+  totalSpent: true,
+});
+
 export type AnalysisReport = {
   score: number;
   skillsScore?: number;
@@ -681,3 +787,13 @@ export type AnalysisReport = {
   nqfDetected?: boolean;
   keywordRecommendations?: string[][];
 };
+
+// Referral system types
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = z.infer<typeof insertReferralSchema>;
+
+export type ReferralReward = typeof referralRewards.$inferSelect;
+export type InsertReferralReward = z.infer<typeof insertReferralRewardSchema>;
+
+export type UserCredits = typeof userCredits.$inferSelect;
+export type InsertUserCredits = z.infer<typeof insertUserCreditsSchema>;

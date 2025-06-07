@@ -44,6 +44,7 @@ import candidateScoringRoutes from "./routes/candidateScoringRoutes";
 import gamificationRoutes from "./routes/gamificationRoutes";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
+import { referralService } from "./referralService";
 
 // File upload configuration
 const upload = multer({
@@ -2061,6 +2062,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Referral system endpoints
+  app.get("/api/referrals/stats", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const stats = await referralService.getReferralStats(userId);
+      res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/referrals/credits", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const credits = await referralService.getUserCredits(userId);
+      res.json(credits);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/referrals/code", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const referralCode = await referralService.generateReferralCode(userId);
+      res.json({ referralCode, referralLink: `${req.protocol}://${req.get('host')}/signup?ref=${referralCode}` });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/referrals/create", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { refereeEmail } = req.body;
+      
+      const referralCode = await referralService.createReferral(userId, refereeEmail);
+      res.json({ 
+        success: true, 
+        referralCode,
+        referralLink: `${req.protocol}://${req.get('host')}/signup?ref=${referralCode}`
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/referrals/signup", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { referralCode, userId } = req.body;
+      
+      if (referralCode && userId) {
+        await referralService.processReferralSignup(referralCode, userId);
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Referral signup processing error:', error);
+      res.json({ success: false, error: error.message });
+    }
+  });
+
+  app.post("/api/referrals/upgrade", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      await referralService.processReferralUpgrade(userId);
+      res.json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/referrals/spend-credit", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { type, amount = 1 } = req.body;
+      
+      const success = await referralService.spendCredits(userId, type, amount);
+      res.json({ success });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/referrals/rewards", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const rewards = await referralService.getUserRewards(userId);
+      res.json(rewards);
     } catch (error) {
       next(error);
     }
