@@ -1,376 +1,293 @@
--- Hire Mzansi Row Level Security Policies
--- Apply these policies in your Supabase SQL editor after creating tables
+-- ============================================
+-- SUPABASE RLS POLICIES FOR HIRE MZANSI
+-- ============================================
+-- Execute this script after creating your tables to set up security
 
--- Enable RLS on all tables
+-- Enable RLS on all tables that need user-level security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE sa_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cvs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE job_postings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE job_matches ENABLE ROW LEVEL SECURITY;
-ALTER TABLE employers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_skills ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE whatsapp_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payment_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cv_analyses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_rewards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_logs ENABLE ROW LEVEL SECURITY;
 
--- =========================================
+-- ============================================
 -- USERS TABLE POLICIES
--- =========================================
+-- ============================================
 
 -- Users can view their own profile
 CREATE POLICY "users_select_own" ON users
-FOR SELECT USING (
-  auth.uid() = id::text OR 
-  auth.jwt() ->> 'role' = 'admin'
-);
+    FOR SELECT 
+    USING (auth.uid() = id);
 
--- Users can update their own profile (except role)
+-- Users can update their own profile
 CREATE POLICY "users_update_own" ON users
-FOR UPDATE USING (
-  auth.uid() = id::text
-) WITH CHECK (
-  auth.uid() = id::text AND
-  (OLD.role = NEW.role OR auth.jwt() ->> 'role' = 'admin')
-);
+    FOR UPDATE 
+    USING (auth.uid() = id);
 
--- Only authenticated users can insert (registration)
-CREATE POLICY "users_insert_registration" ON users
-FOR INSERT WITH CHECK (true);
+-- Allow user registration (public insert)
+CREATE POLICY "users_insert_public" ON users
+    FOR INSERT 
+    WITH CHECK (true);
 
--- Admins can manage all users
-CREATE POLICY "users_admin_all" ON users
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- CV ANALYSES POLICIES
+-- ============================================
 
--- =========================================
--- SA PROFILES TABLE POLICIES
--- =========================================
+-- Users can view their own CV analyses
+CREATE POLICY "cv_analyses_select_own" ON cv_analyses
+    FOR SELECT 
+    USING (auth.uid() = user_id);
 
--- Users can view and manage their own SA profile
-CREATE POLICY "sa_profiles_own" ON sa_profiles
-FOR ALL USING (auth.uid() = user_id::text);
+-- Users can create their own CV analyses
+CREATE POLICY "cv_analyses_insert_own" ON cv_analyses
+    FOR INSERT 
+    WITH CHECK (auth.uid() = user_id);
 
--- Employers can view profiles for job matching (limited data)
-CREATE POLICY "sa_profiles_employer_view" ON sa_profiles
-FOR SELECT USING (
-  auth.jwt() ->> 'role' = 'employer' AND
-  EXISTS (
-    SELECT 1 FROM job_matches jm
-    WHERE jm.job_seeker_id = user_id
-    AND jm.recruiter_id = auth.uid()::integer
-  )
-);
+-- Users can update their own CV analyses
+CREATE POLICY "cv_analyses_update_own" ON cv_analyses
+    FOR UPDATE 
+    USING (auth.uid() = user_id);
 
--- Admins can view all profiles
-CREATE POLICY "sa_profiles_admin_view" ON sa_profiles
-FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
+-- Users can delete their own CV analyses
+CREATE POLICY "cv_analyses_delete_own" ON cv_analyses
+    FOR DELETE 
+    USING (auth.uid() = user_id);
 
--- =========================================
--- CVS TABLE POLICIES
--- =========================================
+-- ============================================
+-- JOB POSTINGS POLICIES (PUBLIC READ)
+-- ============================================
 
--- Users can manage their own CVs
-CREATE POLICY "cvs_own" ON cvs
-FOR ALL USING (auth.uid() = user_id::text);
+-- Job postings are publicly readable (no auth required)
+CREATE POLICY "job_postings_select_public" ON job_postings
+    FOR SELECT 
+    USING (true);
 
--- Employers can view CVs through job matches only
-CREATE POLICY "cvs_employer_matched" ON cvs
-FOR SELECT USING (
-  auth.jwt() ->> 'role' = 'employer' AND
-  EXISTS (
-    SELECT 1 FROM job_matches jm
-    WHERE jm.cv_id = id
-    AND jm.recruiter_id = auth.uid()::integer
-    AND jm.recruiter_paid = true
-  )
-);
+-- ============================================
+-- NEWSLETTER SUBSCRIPTIONS POLICIES
+-- ============================================
 
--- Admins can view all CVs
-CREATE POLICY "cvs_admin_view" ON cvs
-FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
+-- Anyone can subscribe to newsletter
+CREATE POLICY "newsletter_insert_public" ON newsletter_subscriptions
+    FOR INSERT 
+    WITH CHECK (true);
 
--- =========================================
--- PLANS TABLE POLICIES (Public Read)
--- =========================================
+-- Users can view all newsletter subscriptions (for unsubscribe links)
+CREATE POLICY "newsletter_select_public" ON newsletter_subscriptions
+    FOR SELECT 
+    USING (true);
 
--- Anyone can view plans
-CREATE POLICY "plans_public_read" ON plans
-FOR SELECT USING (is_active = true);
+-- Users can update newsletter subscriptions (for unsubscribe)
+CREATE POLICY "newsletter_update_public" ON newsletter_subscriptions
+    FOR UPDATE 
+    USING (true);
 
--- Only admins can manage plans
-CREATE POLICY "plans_admin_manage" ON plans
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- REFERRALS POLICIES
+-- ============================================
 
--- =========================================
--- USER SUBSCRIPTIONS POLICIES
--- =========================================
+-- Users can view referrals they created
+CREATE POLICY "referrals_select_own" ON referrals
+    FOR SELECT 
+    USING (auth.uid() = referrer_id);
 
--- Users can view their own subscriptions
-CREATE POLICY "subscriptions_own_view" ON user_subscriptions
-FOR SELECT USING (auth.uid() = user_id::text);
+-- Users can create referrals
+CREATE POLICY "referrals_insert_own" ON referrals
+    FOR INSERT 
+    WITH CHECK (auth.uid() = referrer_id);
 
--- System can insert subscriptions (payment processing)
-CREATE POLICY "subscriptions_system_insert" ON user_subscriptions
-FOR INSERT WITH CHECK (true);
+-- Users can update their own referrals
+CREATE POLICY "referrals_update_own" ON referrals
+    FOR UPDATE 
+    USING (auth.uid() = referrer_id);
 
--- Users can update their own subscription status
-CREATE POLICY "subscriptions_own_update" ON user_subscriptions
-FOR UPDATE USING (auth.uid() = user_id::text);
+-- System can update referrals (for status changes)
+CREATE POLICY "referrals_system_update" ON referrals
+    FOR UPDATE 
+    USING (true);
 
--- Admins can manage all subscriptions
-CREATE POLICY "subscriptions_admin_all" ON user_subscriptions
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- USER REWARDS POLICIES
+-- ============================================
 
--- =========================================
--- JOB POSTINGS POLICIES
--- =========================================
+-- Users can view their own rewards
+CREATE POLICY "user_rewards_select_own" ON user_rewards
+    FOR SELECT 
+    USING (auth.uid() = user_id);
 
--- Public can view active job postings
-CREATE POLICY "job_postings_public_read" ON job_postings
-FOR SELECT USING (is_active = true);
+-- System can create rewards for users
+CREATE POLICY "user_rewards_insert_system" ON user_rewards
+    FOR INSERT 
+    WITH CHECK (true);
 
--- Employers can manage their own job postings
-CREATE POLICY "job_postings_employer_own" ON job_postings
-FOR ALL USING (auth.uid() = employer_id::text);
+-- Users can update their own rewards (for redemption)
+CREATE POLICY "user_rewards_update_own" ON user_rewards
+    FOR UPDATE 
+    USING (auth.uid() = user_id);
 
--- Admins can manage all job postings
-CREATE POLICY "job_postings_admin_all" ON job_postings
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- CONTACT SUBMISSIONS POLICIES
+-- ============================================
 
--- =========================================
--- JOB MATCHES POLICIES
--- =========================================
+-- Anyone can submit contact forms
+CREATE POLICY "contact_submissions_insert_public" ON contact_submissions
+    FOR INSERT 
+    WITH CHECK (true);
 
--- Job seekers can view their own matches
-CREATE POLICY "job_matches_seeker_view" ON job_matches
-FOR SELECT USING (auth.uid() = job_seeker_id::text);
+-- ============================================
+-- ADMIN POLICIES (SUPERUSER ACCESS)
+-- ============================================
 
--- Employers can view matches for their jobs
-CREATE POLICY "job_matches_employer_view" ON job_matches
-FOR SELECT USING (
-  auth.uid() = recruiter_id::text OR
-  EXISTS (
-    SELECT 1 FROM job_postings jp
-    WHERE jp.id = job_posting_id
-    AND jp.employer_id = auth.uid()::integer
-  )
-);
+-- Admins can access all user data
+CREATE POLICY "admin_users_all" ON users
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- System can create matches
-CREATE POLICY "job_matches_system_insert" ON job_matches
-FOR INSERT WITH CHECK (true);
+-- Admins can manage all CV analyses
+CREATE POLICY "admin_cv_analyses_all" ON cv_analyses
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Users can update match viewing status
-CREATE POLICY "job_matches_update_status" ON job_matches
-FOR UPDATE USING (
-  auth.uid() = job_seeker_id::text OR 
-  auth.uid() = recruiter_id::text
-);
+-- Admins can manage job postings
+CREATE POLICY "admin_job_postings_all" ON job_postings
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Admins can manage all matches
-CREATE POLICY "job_matches_admin_all" ON job_matches
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- Admins can view all newsletter subscriptions
+CREATE POLICY "admin_newsletter_all" ON newsletter_subscriptions
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- =========================================
--- EMPLOYERS TABLE POLICIES
--- =========================================
+-- Admins can manage all referrals
+CREATE POLICY "admin_referrals_all" ON referrals
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Employers can manage their own profile
-CREATE POLICY "employers_own" ON employers
-FOR ALL USING (auth.uid() = user_id::text);
+-- Admins can manage all user rewards
+CREATE POLICY "admin_user_rewards_all" ON user_rewards
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Public can view basic employer info for job postings
-CREATE POLICY "employers_public_basic" ON employers
-FOR SELECT USING (
-  is_verified = true AND
-  EXISTS (
-    SELECT 1 FROM job_postings jp
-    WHERE jp.employer_id = user_id
-    AND jp.is_active = true
-  )
-);
+-- Admins can view all contact submissions
+CREATE POLICY "admin_contact_submissions_all" ON contact_submissions
+    FOR ALL 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Admins can manage all employers
-CREATE POLICY "employers_admin_all" ON employers
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- ADMIN LOGS POLICIES (RESTRICTED)
+-- ============================================
 
--- =========================================
--- SKILLS TABLE POLICIES
--- =========================================
+-- Only admins can view admin logs
+CREATE POLICY "admin_logs_select_admin" ON admin_logs
+    FOR SELECT 
+    USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND is_admin = true
+        )
+    );
 
--- Anyone can view skills (public reference data)
-CREATE POLICY "skills_public_read" ON skills
-FOR SELECT USING (true);
+-- System can create admin logs
+CREATE POLICY "admin_logs_insert_system" ON admin_logs
+    FOR INSERT 
+    WITH CHECK (true);
 
--- Admins can manage skills
-CREATE POLICY "skills_admin_manage" ON skills
-FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+-- ============================================
+-- SERVICE ROLE POLICIES (BYPASS RLS)
+-- ============================================
 
--- =========================================
--- USER SKILLS POLICIES
--- =========================================
+-- Allow service_role to bypass RLS for system operations
+-- This is automatically handled by Supabase for service_role
 
--- Users can manage their own skills
-CREATE POLICY "user_skills_own" ON user_skills
-FOR ALL USING (auth.uid() = user_id::text);
+-- ============================================
+-- POLICY VERIFICATION
+-- ============================================
 
--- Employers can view user skills through job matches
-CREATE POLICY "user_skills_employer_view" ON user_skills
-FOR SELECT USING (
-  auth.jwt() ->> 'role' = 'employer' AND
-  EXISTS (
-    SELECT 1 FROM job_matches jm
-    WHERE jm.job_seeker_id = user_id
-    AND jm.recruiter_id = auth.uid()::integer
-  )
-);
+-- Verify all policies are created
+SELECT 
+    schemaname,
+    tablename,
+    policyname,
+    permissive,
+    roles,
+    cmd,
+    qual
+FROM pg_policies 
+WHERE schemaname = 'public'
+ORDER BY tablename, policyname;
 
--- =========================================
--- NOTIFICATIONS POLICIES
--- =========================================
+-- Verify RLS is enabled on tables
+SELECT 
+    schemaname,
+    tablename,
+    rowsecurity
+FROM pg_tables 
+WHERE schemaname = 'public'
+AND rowsecurity = true;
 
--- Users can view and manage their own notifications
-CREATE POLICY "notifications_own" ON notifications
-FOR ALL USING (auth.uid() = user_id::text);
+-- ============================================
+-- POLICY TESTING QUERIES
+-- ============================================
 
--- System can send notifications
-CREATE POLICY "notifications_system_insert" ON notifications
-FOR INSERT WITH CHECK (true);
+-- Test user can only see their own data
+-- SELECT * FROM users WHERE auth.uid() = id;
 
--- =========================================
--- WHATSAPP SETTINGS POLICIES
--- =========================================
+-- Test admin can see all data  
+-- SELECT * FROM users WHERE EXISTS (
+--     SELECT 1 FROM users 
+--     WHERE id = auth.uid() 
+--     AND is_admin = true
+-- );
 
--- Users can manage their own WhatsApp settings
-CREATE POLICY "whatsapp_settings_own" ON whatsapp_settings
-FOR ALL USING (auth.uid() = user_id::text);
+-- Test public job postings access
+-- SELECT * FROM job_postings;
 
--- =========================================
--- PAYMENT TRANSACTIONS POLICIES
--- =========================================
+-- ============================================
+-- RLS POLICIES SETUP COMPLETE
+-- ============================================
 
--- Users can view their own payment transactions
-CREATE POLICY "payments_own_view" ON payment_transactions
-FOR SELECT USING (auth.uid() = user_id::text);
-
--- System can create payment records
-CREATE POLICY "payments_system_insert" ON payment_transactions
-FOR INSERT WITH CHECK (true);
-
--- Admins can view all payment transactions
-CREATE POLICY "payments_admin_view" ON payment_transactions
-FOR SELECT USING (auth.jwt() ->> 'role' = 'admin');
-
--- =========================================
--- SECURITY FUNCTIONS
--- =========================================
-
--- Function to check if user has active subscription
-CREATE OR REPLACE FUNCTION auth.has_active_subscription(user_uuid text)
-RETURNS boolean AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_subscriptions us
-    WHERE us.user_id = user_uuid::integer
-    AND us.status = 'active'
-    AND (us.expires_at IS NULL OR us.expires_at > NOW())
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Function to check if user has CV analysis credits
-CREATE OR REPLACE FUNCTION auth.has_cv_credits(user_uuid text)
-RETURNS boolean AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM user_subscriptions us
-    WHERE us.user_id = user_uuid::integer
-    AND us.status = 'active'
-    AND us.cv_credits_remaining > 0
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Function to get user role
-CREATE OR REPLACE FUNCTION auth.get_user_role(user_uuid text)
-RETURNS text AS $$
-DECLARE
-  user_role text;
-BEGIN
-  SELECT role INTO user_role FROM users WHERE id = user_uuid::integer;
-  RETURN COALESCE(user_role, 'user');
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- =========================================
--- AUDIT TRIGGERS (Optional but Recommended)
--- =========================================
-
--- Create audit log table
-CREATE TABLE IF NOT EXISTS audit_logs (
-  id SERIAL PRIMARY KEY,
-  table_name TEXT NOT NULL,
-  record_id INTEGER,
-  action TEXT NOT NULL,
-  old_data JSONB,
-  new_data JSONB,
-  user_id INTEGER,
-  timestamp TIMESTAMP DEFAULT NOW()
-);
-
--- Audit trigger function
-CREATE OR REPLACE FUNCTION audit_trigger_function()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO audit_logs (
-    table_name,
-    record_id,
-    action,
-    old_data,
-    new_data,
-    user_id
-  ) VALUES (
-    TG_TABLE_NAME,
-    COALESCE(NEW.id, OLD.id),
-    TG_OP,
-    CASE WHEN TG_OP = 'DELETE' THEN row_to_json(OLD) ELSE NULL END,
-    CASE WHEN TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN row_to_json(NEW) ELSE NULL END,
-    COALESCE(NEW.user_id, OLD.user_id, auth.uid()::integer)
-  );
-  
-  RETURN COALESCE(NEW, OLD);
-END;
-$$ LANGUAGE plpgsql;
-
--- Apply audit triggers to sensitive tables
-CREATE TRIGGER users_audit_trigger
-  AFTER INSERT OR UPDATE OR DELETE ON users
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-
-CREATE TRIGGER cvs_audit_trigger
-  AFTER INSERT OR UPDATE OR DELETE ON cvs
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-
-CREATE TRIGGER payment_transactions_audit_trigger
-  AFTER INSERT OR UPDATE OR DELETE ON payment_transactions
-  FOR EACH ROW EXECUTE FUNCTION audit_trigger_function();
-
--- =========================================
--- INDEXES FOR PERFORMANCE
--- =========================================
-
--- Indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_sa_profiles_user_id ON sa_profiles(user_id);
-CREATE INDEX IF NOT EXISTS idx_cvs_user_id ON cvs(user_id);
-CREATE INDEX IF NOT EXISTS idx_job_postings_employer_active ON job_postings(employer_id, is_active);
-CREATE INDEX IF NOT EXISTS idx_job_matches_seeker ON job_matches(job_seeker_id);
-CREATE INDEX IF NOT EXISTS idx_job_matches_recruiter ON job_matches(recruiter_id);
-CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_status ON user_subscriptions(user_id, status);
-
--- Composite indexes for complex queries
-CREATE INDEX IF NOT EXISTS idx_job_postings_location_industry ON job_postings(location, industry) WHERE is_active = true;
-CREATE INDEX IF NOT EXISTS idx_cvs_analyzed_score ON cvs(is_analyzed, ats_score) WHERE is_analyzed = true;
+SELECT 'RLS policies configured successfully!' as status;
