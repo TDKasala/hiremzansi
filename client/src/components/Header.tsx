@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import LanguageSelector from "./LanguageSelector";
 import hireMzansiLogo from "@assets/Fresh Hire Mzansi Logo with Blue and Green Palette_1749062584652.png";
 
+import New_logo from "@assets/New logo.png";
+
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -43,7 +45,7 @@ export default function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
-          <img src={hireMzansiLogo} alt="Hire Mzansi Logo" className="h-12 md:h-14 pl-[0px] pr-[0px] pt-[0px] pb-[0px] ml-[6px] mr-[6px]" />
+          <img src={New_logo} alt="Hire Mzansi Logo" className="h-12 md:h-14 pl-[0px] pr-[0px] pt-[0px] pb-[0px] ml-[6px] mr-[6px]" />
           <span className="hidden sm:inline">
             <span className="text-[#2B5A87] text-2xl md:text-3xl font-bold">HIRE</span><span className="text-[#5CB85C] text-2xl md:text-3xl font-bold">MZANSI</span>
             <span className="text-[#5CB85C] ml-1 text-2xl md:text-3xl">•</span>
