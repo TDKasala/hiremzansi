@@ -28,7 +28,6 @@ export default function HomePage() {
       <HeroSection />
       <UploadSection />
       <WhatsAppPromoSection />
-      <PremiumMatchingSection />
       <HowItWorksSection />
       <PricingSection />
       <FeaturesSection />
@@ -37,6 +36,7 @@ export default function HomePage() {
       <SkillQuizSection />
       <BlogPreviewSection />
       <ReferralSourceSection />
+      <PremiumMatchingSection />
       <CTASection />
     </>
   );
