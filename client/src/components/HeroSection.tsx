@@ -41,7 +41,7 @@ export default function HeroSection() {
               <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary">
                 {t('home.southAfricanFocused')}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
+              <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center">
                 {t('home.marketReality')}
               </h1>
             </div>
