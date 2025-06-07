@@ -1,6 +1,13 @@
 import { Link } from "wouter";
-import { Check, X } from "lucide-react";
+import { Check, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 type PlanFeature = {
   name: string;
@@ -19,6 +26,8 @@ type PricingPlan = {
 };
 
 export default function PricingSection() {
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  
   const plans: PricingPlan[] = [
     {
       name: "Free Trial",
@@ -100,36 +109,52 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`bg-white rounded-lg shadow-lg p-6 relative ${
-                plan.highlighted
-                  ? "border-2 border-primary transform scale-105"
-                  : "border border-neutral-200"
-              }`}
-            >
-              {plan.highlighted && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Most Popular
-                  </span>
-                </div>
-              )}
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between text-left">
+                  {selectedPlan ? selectedPlan.name : "Select a pricing plan"}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full min-w-[400px]">
+                {plans.map((plan, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={() => setSelectedPlan(plan)}
+                    className="flex flex-col items-start p-4 cursor-pointer hover:bg-neutral-50"
+                  >
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className="font-semibold text-secondary">{plan.name}</span>
+                      <span className="font-bold text-primary">{plan.price}</span>
+                      {plan.highlighted && (
+                        <span className="bg-primary text-white px-2 py-1 rounded text-xs ml-2">
+                          Most Popular
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-sm text-neutral-600">{plan.description}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
+          {selectedPlan && (
+            <div className="bg-white rounded-lg shadow-lg p-6 border border-neutral-200">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-secondary mb-2">
-                  {plan.name}
+                <h3 className="text-2xl font-bold text-secondary mb-2">
+                  {selectedPlan.name}
                 </h3>
-                <div className="text-3xl font-bold text-secondary mb-2">
-                  {plan.price}
+                <div className="text-4xl font-bold text-primary mb-2">
+                  {selectedPlan.price}
                 </div>
-                <p className="text-neutral-600 text-sm">{plan.description}</p>
+                <p className="text-neutral-600">{selectedPlan.description}</p>
               </div>
 
               <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, featureIndex) => (
+                {selectedPlan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-center">
                     {feature.included ? (
                       <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
@@ -149,16 +174,16 @@ export default function PricingSection() {
                 ))}
               </ul>
 
-              <Link href={plan.buttonLink}>
+              <Link href={selectedPlan.buttonLink}>
                 <Button
                   className="w-full"
-                  variant={plan.buttonVariant || "default"}
+                  variant={selectedPlan.buttonVariant || "default"}
                 >
-                  {plan.buttonText}
+                  {selectedPlan.buttonText}
                 </Button>
               </Link>
             </div>
-          ))}
+          )}
         </div>
 
         <div className="text-center mt-12">
