@@ -128,8 +128,8 @@ export function SignUp() {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Hire Mzansi</h1>
-            <p className="text-gray-600">Start your career transformation journey today</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+            <p className="text-gray-600">Get started with your free CV analysis</p>
           </div>
 
           {/* Form Card */}
@@ -198,12 +198,7 @@ export function SignUp() {
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                <div className="flex space-x-1 mt-2">
-                  <div className={`h-1 w-1/4 rounded ${password.length >= 8 ? 'bg-green-500' : 'bg-gray-200'} transition-colors`}></div>
-                  <div className={`h-1 w-1/4 rounded ${password.length >= 8 && /[A-Z]/.test(password) ? 'bg-green-500' : 'bg-gray-200'} transition-colors`}></div>
-                  <div className={`h-1 w-1/4 rounded ${password.length >= 8 && /[a-z]/.test(password) ? 'bg-green-500' : 'bg-gray-200'} transition-colors`}></div>
-                  <div className={`h-1 w-1/4 rounded ${password.length >= 8 && /\d/.test(password) ? 'bg-green-500' : 'bg-gray-200'} transition-colors`}></div>
-                </div>
+
               </div>
 
               <div className="space-y-2">
@@ -284,20 +279,15 @@ export function SignUp() {
           </div>
 
           {/* Trust Badges */}
-          <div className="mt-8 text-center space-y-4">
-            <div className="flex items-center justify-center space-x-6 text-gray-500">
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4" />
-                <span className="text-sm">50,000+ professionals</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4" />
-                <span className="text-sm">Bank-level security</span>
-              </div>
+          <div className="mt-6 text-center">
+            <div className="flex items-center justify-center space-x-4 text-gray-500 text-sm">
+              <span className="flex items-center">
+                <Shield className="h-4 w-4 mr-1" />
+                Secure
+              </span>
+              <span>•</span>
+              <span>Free to start</span>
             </div>
-            <p className="text-xs text-gray-400">
-              Join leading professionals across South Africa
-            </p>
           </div>
         </div>
       </div>
@@ -315,21 +305,21 @@ export function SignUp() {
               <span className="text-3xl font-bold">Hire Mzansi</span>
             </div>
             <h1 className="text-4xl font-bold mb-4 leading-tight">
-              Your Career Success Starts Here
+              Professional CV Optimization
             </h1>
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Join thousands of South African professionals who've transformed their careers with our AI-powered platform.
+              AI-powered tools designed for the South African job market.
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
             <div className="flex items-center space-x-4">
               <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
                 <Target className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Smart CV Analysis</h3>
-                <p className="text-white/80">Get instant feedback and actionable insights</p>
+                <h3 className="font-semibold">ATS Optimization</h3>
+                <p className="text-white/80 text-sm">Beat applicant tracking systems</p>
               </div>
             </div>
             
@@ -338,8 +328,8 @@ export function SignUp() {
                 <Zap className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Rapid Optimization</h3>
-                <p className="text-white/80">Transform your CV in minutes, not hours</p>
+                <h3 className="font-semibold">Instant Analysis</h3>
+                <p className="text-white/80 text-sm">Get feedback in seconds</p>
               </div>
             </div>
             
@@ -348,22 +338,8 @@ export function SignUp() {
                 <Award className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Premium Templates</h3>
-                <p className="text-white/80">Access professionally designed, ATS-friendly templates</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-            <h3 className="font-semibold text-lg mb-4">What our users say:</h3>
-            <blockquote className="text-white/90 italic mb-3">
-              "Hire Mzansi helped me land my dream job at a top consulting firm in Cape Town. The CV optimization was game-changing!"
-            </blockquote>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-full"></div>
-              <div>
-                <div className="font-medium">Sarah M.</div>
-                <div className="text-sm text-white/70">Management Consultant</div>
+                <h3 className="font-semibold">SA-Specific</h3>
+                <p className="text-white/80 text-sm">B-BBEE and local market insights</p>
               </div>
             </div>
           </div>
