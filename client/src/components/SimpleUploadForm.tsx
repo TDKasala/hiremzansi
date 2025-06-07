@@ -149,9 +149,7 @@ export default function SimpleUploadForm({
               Upload Your CV for Free ATS Analysis
             </h2>
             
-
-            
-            <div className="flex items-center mb-8 p-3 bg-primary/5 border border-primary/20 rounded-md">
+            <div className="flex items-center mb-6 p-3 bg-primary/5 border border-primary/20 rounded-md">
               <Lightbulb className="h-5 w-5 text-primary shrink-0 mr-3" />
               <p className="text-sm text-neutral-700">
                 Try our <Link href="/realtime-ats" className="text-primary font-medium hover:underline">Real-Time ATS Scanner</Link> to instantly see how your CV performs!
@@ -160,29 +158,14 @@ export default function SimpleUploadForm({
             
             {!showResults ? (
               <div className="space-y-6">
-                {withJobDescription && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-semibold">Job Description</h3>
-                    </div>
-                    <Textarea
-                      placeholder="Paste the job description here to get tailored ATS scoring and recommendations"
-                      className="min-h-[120px]"
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                    />
-                    <p className="mt-2 text-xs text-neutral-600">
-                      Adding a job description helps us analyze your CV specifically for the position you're applying for
-                    </p>
-                  </div>
-                )}
-
                 {/* Job Description Input */}
                 <div className="mb-6">
-                  <label htmlFor="job-description" className="block text-sm font-medium text-gray-700 mb-2">
-                    Job Description (Optional)
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <label htmlFor="job-description" className="text-lg font-semibold">
+                      Job Description (Optional)
+                    </label>
+                  </div>
                   <textarea
                     id="job-description"
                     rows={4}
@@ -191,9 +174,13 @@ export default function SimpleUploadForm({
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                     placeholder="Paste the job description here for targeted CV analysis..."
                   />
-                  {jobDescription && (
+                  {jobDescription ? (
                     <p className="mt-2 text-xs text-green-600">
                       ✓ Job description added - your CV will be analyzed specifically for this position
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-xs text-neutral-600">
+                      Adding a job description helps us analyze your CV specifically for the position you're applying for
                     </p>
                   )}
                 </div>
