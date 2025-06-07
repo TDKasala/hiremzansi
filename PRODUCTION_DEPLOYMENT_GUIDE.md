@@ -1,412 +1,208 @@
-# ATSBoost Production Deployment Guide for atsboost.co.za
+# Production Deployment Guide - Hire Mzansi
 
-## Pre-Deployment Checklist
+## Overview
+This guide provides step-by-step instructions for deploying Hire Mzansi to production using Vercel and Supabase.
 
-### 1. Environment Configuration
-- [ ] Set NODE_ENV=production
-- [ ] Configure production database URL
-- [ ] Set up SSL certificates for atsboost.co.za
-- [ ] Configure CORS for production domain
-- [ ] Set up CDN for static assets
+## Pre-Deployment Requirements
 
-### 2. Required Environment Variables
-```bash
-# Core Application
+### 1. Accounts Required
+- GitHub account with repository access
+- Vercel account (free tier sufficient)
+- Supabase account (free tier sufficient)
+
+### 2. Repository Preparation
+Ensure your code is pushed to GitHub with all latest changes including:
+- Updated `vercel.json` configuration
+- Production-ready `api/index.ts` handler
+- Supabase database schema file
+- Environment variable documentation
+
+## Step 1: Supabase Database Setup
+
+### Create Supabase Project
+1. Visit [supabase.com](https://supabase.com) and sign in
+2. Click "New Project"
+3. Select your organization
+4. Enter project details:
+   - Name: `hire-mzansi-production`
+   - Database Password: Generate strong password (save it)
+   - Region: Choose closest to your users (e.g., Cape Town)
+5. Click "Create new project" and wait for initialization
+
+### Configure Database
+1. Go to SQL Editor in your Supabase project
+2. Copy and paste the entire contents of `supabase-deployment-ready.sql`
+3. Click "Run" to execute the schema creation
+4. Verify tables are created in the Table Editor
+
+### Collect Database Credentials
+Navigate to Settings → Database and collect:
+- Connection string (under "Connection pooling")
+- Project URL (Settings → API)
+- Anon public key (Settings → API)
+- Service role key (Settings → API - keep this secret)
+
+## Step 2: Vercel Deployment
+
+### Connect Repository
+1. Visit [vercel.com](https://vercel.com) and sign in
+2. Click "New Project"
+3. Import your GitHub repository
+4. Select the repository containing Hire Mzansi
+
+### Configure Build Settings
+Vercel should auto-detect settings, but verify:
+- Build Command: `vite build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+- Node.js Version: 18.x or 20.x
+
+### Add Environment Variables
+In Vercel project settings → Environment Variables, add:
+
+**Required Variables:**
+```
+DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+SUPABASE_URL=https://[project-ref].supabase.co
+SUPABASE_ANON_KEY=[your-anon-key]
+SUPABASE_SERVICE_ROLE_KEY=[your-service-role-key]
+SESSION_SECRET=[generate-32-char-random-string]
 NODE_ENV=production
-PORT=5000
-DATABASE_URL=postgresql://username:password@host:port/database
-
-# Authentication & Security
-JWT_SECRET=your-strong-jwt-secret
-SESSION_SECRET=your-strong-session-secret
-
-# AI Services
-OPENAI_API_KEY=sk-your-openai-key
-XAI_API_KEY=xai-your-xai-key
-
-# Email Services
-SENDGRID_API_KEY=SG.your-sendgrid-key
-SENDGRID_FROM_EMAIL=noreply@atsboost.co.za
-
-# File Storage
-UPLOAD_MAX_SIZE=2097152
-ALLOWED_FILE_TYPES=.pdf,.docx
-
-# Domain Configuration
-FRONTEND_URL=https://atsboost.co.za
-BACKEND_URL=https://api.atsboost.co.za
+REPLIT_DOMAINS=[your-vercel-app].vercel.app
 ```
 
-### 3. Database Setup
-```sql
--- Run these commands in your production PostgreSQL database
-CREATE DATABASE atsboost_production;
-CREATE USER atsboost_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE atsboost_production TO atsboost_user;
+**PostgreSQL Direct Connection:**
+```
+PGHOST=aws-0-[region].pooler.supabase.com
+PGPORT=6543
+PGDATABASE=postgres
+PGUSER=postgres.[project-ref]
+PGPASSWORD=[your-database-password]
 ```
 
-### 4. Domain & SSL Configuration
-- [ ] Point atsboost.co.za to your server IP
-- [ ] Configure SSL certificate (Let's Encrypt recommended)
-- [ ] Set up www.atsboost.co.za redirect to atsboost.co.za
-- [ ] Configure security headers
+### Deploy Application
+1. Click "Deploy" in Vercel
+2. Wait for build completion (usually 2-3 minutes)
+3. Your app will be available at `https://[project-name].vercel.app`
 
-## Recommended Hosting Platforms
+## Step 3: Post-Deployment Configuration
 
-### Option 1: Vercel (Recommended for Frontend + Serverless)
-```json
-{
-  "name": "atsboost",
-  "version": 2,
-  "builds": [
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "server/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/dist/$1"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
-```
+### Test Core Functionality
+1. Visit your deployed application
+2. Test CV upload feature
+3. Test newsletter subscription
+4. Verify database connectivity via health check at `/api/health`
 
-### Option 2: Railway (Full-Stack with Database)
-```json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "npm run build && npm start",
-    "healthcheckPath": "/api/health"
-  }
-}
-```
+### Configure Custom Domain (Optional)
+1. In Vercel project settings → Domains
+2. Add your custom domain
+3. Configure DNS records as instructed
+4. Update `REPLIT_DOMAINS` environment variable
 
-### Option 3: DigitalOcean App Platform
-```yaml
-name: atsboost
-services:
-- name: web
-  source_dir: /
-  github:
-    repo: your-username/atsboost
-    branch: main
-  run_command: npm start
-  environment_slug: node-js
-  instance_count: 1
-  instance_size_slug: basic-xxs
-  env:
-  - key: NODE_ENV
-    value: production
-```
+### Enable Production Features
+1. Configure email service (SendGrid recommended)
+2. Set up payment processing (Stripe)
+3. Configure AI services (OpenAI)
+4. Set up monitoring and analytics
 
-## Database Providers
+## Step 4: Security and Performance
 
-### Option 1: Neon (Recommended)
-- Serverless PostgreSQL optimized for modern apps
-- Built-in connection pooling
-- Automatic scaling
-- Free tier available
+### Security Checklist
+- [ ] All API keys encrypted in Vercel
+- [ ] RLS policies active in Supabase
+- [ ] HTTPS enforced (automatic with Vercel)
+- [ ] CORS properly configured
+- [ ] Database connections use SSL
+- [ ] Session secrets are cryptographically secure
 
-### Option 2: Supabase
-- PostgreSQL with real-time features
-- Built-in authentication
-- File storage included
-- Good for rapid deployment
+### Performance Optimization
+- [ ] Static assets cached via Vercel CDN
+- [ ] Database indexes created
+- [ ] Connection pooling enabled
+- [ ] Image optimization enabled
+- [ ] Edge functions configured if needed
 
-### Option 3: PlanetScale
-- MySQL-compatible serverless database
-- Excellent scaling capabilities
-- Branch-based development workflow
+## Step 5: Monitoring and Maintenance
 
-## Performance Optimizations
+### Set Up Monitoring
+1. Enable Vercel Analytics
+2. Configure Supabase monitoring
+3. Set up error tracking
+4. Monitor performance metrics
 
-### 1. Frontend Optimizations
-```typescript
-// vite.config.ts - Production optimizations
-export default defineConfig({
-  build: {
-    minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu']
-        }
-      }
-    }
-  },
-  server: {
-    compression: true
-  }
-})
-```
-
-### 2. Backend Optimizations
-```typescript
-// Add to server/index.ts
-import compression from 'compression';
-import helmet from 'helmet';
-
-app.use(compression());
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
-}));
-```
-
-### 3. Database Optimizations
-```sql
--- Create indexes for better performance
-CREATE INDEX idx_cvs_user_id ON cvs(user_id);
-CREATE INDEX idx_cvs_created_at ON cvs(created_at);
-CREATE INDEX idx_ats_scores_cv_id ON ats_scores(cv_id);
-CREATE INDEX idx_users_email ON users(email);
-```
-
-## Monitoring & Analytics
-
-### 1. Application Monitoring
-- Set up error tracking (Sentry recommended)
-- Configure uptime monitoring
-- Set up performance monitoring
-- Log aggregation (LogTail or similar)
-
-### 2. Business Analytics
-```typescript
-// Add Google Analytics 4
-// Add to client/index.html
-<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'GA_MEASUREMENT_ID');
-</script>
-```
-
-### 3. SEO Optimizations
-```typescript
-// Add to client/src/components/SEOHead.tsx
-import { Helmet } from 'react-helmet';
-
-export function SEOHead({ 
-  title = "ATSBoost - South Africa's #1 CV Optimization Platform",
-  description = "Optimize your CV for South African ATS systems. Get instant feedback, improve your interview chances, and land your dream job.",
-  keywords = "CV optimization, ATS, South Africa jobs, resume scanner, job search",
-  ogImage = "https://atsboost.co.za/og-image.jpg"
-}) {
-  return (
-    <Helmet>
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      
-      {/* Open Graph */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:url" content="https://atsboost.co.za" />
-      <meta property="og:type" content="website" />
-      
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
-      
-      {/* Schema.org */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "ATSBoost",
-          "description": description,
-          "url": "https://atsboost.co.za",
-          "applicationCategory": "BusinessApplication",
-          "operatingSystem": "Web Browser",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "ZAR"
-          }
-        })}
-      </script>
-    </Helmet>
-  );
-}
-```
-
-## Security Considerations
-
-### 1. Server Security
-```typescript
-// Enhanced security headers
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      fontSrc: ["'self'", "fonts.gstatic.com"],
-      scriptSrc: ["'self'", "www.googletagmanager.com"],
-      imgSrc: ["'self'", "data:", "*.googleusercontent.com"],
-      connectSrc: ["'self'", "api.openai.com", "api.x.ai"]
-    }
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
-```
-
-### 2. Rate Limiting
-```typescript
-import rateLimit from 'express-rate-limit';
-
-const uploadLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 uploads per window
-  message: 'Too many uploads, please try again later.'
-});
-
-app.use('/api/upload', uploadLimit);
-```
-
-### 3. File Upload Security
-```typescript
-// Enhanced file validation
-const fileFilter = (req: Request, file: Express.Multer.File, cb: Function) => {
-  const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-  const maxSize = 2 * 1024 * 1024; // 2MB
-  
-  if (!allowedTypes.includes(file.mimetype)) {
-    return cb(new Error('Invalid file type'), false);
-  }
-  
-  cb(null, true);
-};
-```
-
-## Backup & Recovery
-
-### 1. Database Backups
-```bash
-# Daily automated backups
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-pg_dump $DATABASE_URL > backup_$DATE.sql
-aws s3 cp backup_$DATE.sql s3://atsboost-backups/
-```
-
-### 2. Application Data
-- Set up automated file backups
-- Version control for code deployments
-- Configuration backup strategies
-
-## Launch Checklist
-
-### Pre-Launch (1 week before)
-- [ ] Complete security audit
-- [ ] Performance testing under load
-- [ ] Backup and recovery testing
-- [ ] DNS propagation verification
-- [ ] SSL certificate installation
-- [ ] Analytics setup verification
-
-### Launch Day
-- [ ] Final database migration
-- [ ] Switch DNS to production servers
-- [ ] Monitor error rates and performance
-- [ ] Verify all integrations working
-- [ ] Test payment flows (if applicable)
-- [ ] Monitor user registration flows
-
-### Post-Launch (1 week after)
-- [ ] Monitor application performance
-- [ ] Review error logs daily
-- [ ] Check analytics for user behavior
-- [ ] Gather user feedback
-- [ ] Plan first iteration improvements
-
-## Scaling Considerations
-
-### Application Scaling
-- Horizontal scaling with load balancers
-- Database read replicas for heavy queries
-- CDN for static assets and file uploads
-- Caching layer (Redis) for session management
-
-### Cost Optimization
-- Monitor usage patterns
-- Optimize database queries
-- Implement efficient caching
-- Use serverless functions for sporadic workloads
-
-## Support & Maintenance
-
-### Monitoring Alerts
-Set up alerts for:
-- Application errors (>1% error rate)
-- Response time degradation (>2s average)
-- Database connection issues
-- File upload failures
-- Payment processing errors
-
-### Regular Maintenance
-- Weekly security updates
-- Monthly dependency updates
-- Quarterly performance reviews
-- Annual security audits
+### Backup Strategy
+1. Enable Supabase automatic backups
+2. Configure point-in-time recovery
+3. Test backup restoration process
+4. Document recovery procedures
 
 ## Troubleshooting Common Issues
 
-### Database Connection Issues
-```typescript
-// Connection pooling configuration
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-```
+### Build Failures
+- Check Node.js version compatibility
+- Verify all dependencies in package.json
+- Review build logs for specific errors
+- Ensure TypeScript compilation succeeds
 
-### File Upload Problems
-- Check file size limits
-- Verify MIME type validation
-- Monitor disk space usage
-- Implement virus scanning for uploads
+### Database Connection Issues
+- Verify DATABASE_URL format exactly matches Supabase
+- Check connection pooling is enabled
+- Ensure SSL configuration is correct
+- Test connection from Supabase dashboard
+
+### API Endpoint Errors
+- Check environment variables are set correctly
+- Verify CORS configuration
+- Test endpoints individually
+- Review Vercel function logs
 
 ### Performance Issues
-- Enable query logging in production
-- Use connection pooling
-- Implement proper indexing
-- Monitor memory usage
+- Monitor database query performance
+- Check connection pool usage
+- Optimize slow queries
+- Configure appropriate caching
 
-This comprehensive guide will ensure your ATSBoost platform launches successfully on atsboost.co.za with proper security, performance, and scalability considerations.
+## Environment Variable Templates
+
+### Development (.env.local)
+```
+DATABASE_URL=postgresql://localhost:5432/hiremzansi_dev
+SESSION_SECRET=dev-secret-key-minimum-32-characters
+NODE_ENV=development
+REPLIT_DOMAINS=localhost:5000
+```
+
+### Production (Vercel)
+```
+DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+SUPABASE_URL=https://[project-ref].supabase.co
+SUPABASE_ANON_KEY=[anon-key]
+SUPABASE_SERVICE_ROLE_KEY=[service-role-key]
+SESSION_SECRET=[secure-32-char-random-string]
+NODE_ENV=production
+REPLIT_DOMAINS=[your-app].vercel.app
+SENDGRID_API_KEY=[optional-email-service]
+STRIPE_SECRET_KEY=[optional-payments]
+VITE_STRIPE_PUBLIC_KEY=[optional-payments]
+OPENAI_API_KEY=[optional-ai-features]
+```
+
+## Success Verification
+
+### Deployment Success Indicators
+1. Build completes without errors
+2. Application loads at deployment URL
+3. Health check endpoint returns 200 status
+4. Database queries execute successfully
+5. CV upload functionality works
+6. Newsletter subscription processes
+
+### Next Steps After Deployment
+1. Configure custom domain
+2. Set up email service integration
+3. Enable payment processing
+4. Configure AI services for CV analysis
+5. Set up monitoring and analytics
+6. Plan user onboarding strategy
+
+Your Hire Mzansi application is now ready for production use with enterprise-grade infrastructure!
