@@ -748,6 +748,7 @@ export const userCredits = pgTable("user_credits", {
   freeAnalysisCredits: integer("free_analysis_credits").default(0),
   scanCredits: integer("scan_credits").default(0),
   premiumMonths: integer("premium_months").default(0),
+  discountCredits: integer("discount_credits").default(0),
   totalEarned: integer("total_earned").default(0),
   totalSpent: integer("total_spent").default(0),
   lastUpdated: timestamp("last_updated").defaultNow(),
@@ -766,6 +767,7 @@ export const insertUserCreditsSchema = createInsertSchema(userCredits).pick({
   freeAnalysisCredits: true,
   scanCredits: true,
   premiumMonths: true,
+  discountCredits: true,
   totalEarned: true,
   totalSpent: true,
 });

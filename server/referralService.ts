@@ -105,21 +105,25 @@ export class ReferralService {
     // Get referral statistics
     const stats = await this.getReferralStats(referrerId);
     
-    // Award based on milestones
-    if (stats.registered >= 1 && !await this.hasReward(referrerId, 'template_access')) {
-      await this.awardReward(referrerId, 'template_access', 1, 0, 'Free CV Template Access');
+    // Award based on milestones - aligned with actual pricing
+    if (stats.registered >= 1 && !await this.hasReward(referrerId, 'free_analysis')) {
+      await this.awardReward(referrerId, 'free_analysis', 2, 0, '2 Free CV Analyses (Welcome Reward)');
     }
     
-    if (stats.registered >= 3 && !await this.hasReward(referrerId, 'free_analysis')) {
-      await this.awardReward(referrerId, 'free_analysis', 1, 3000, 'Free CV Deep Analysis (R30 value)');
+    if (stats.registered >= 3 && !await this.hasReward(referrerId, 'essential_pack')) {
+      await this.awardReward(referrerId, 'essential_pack', 1, 4900, 'Free Essential Pack (R49 value)');
     }
     
-    if (stats.registered >= 5 && !await this.hasReward(referrerId, 'premium_month')) {
-      await this.awardReward(referrerId, 'premium_month', 1, 9900, '1-Month Premium Subscription');
+    if (stats.registered >= 5 && !await this.hasReward(referrerId, 'professional_month')) {
+      await this.awardReward(referrerId, 'professional_month', 1, 9900, '1-Month Professional Plan (R99 value)');
     }
     
-    if (stats.premiumConversions >= 3 && !await this.hasReward(referrerId, 'premium_month_bonus')) {
-      await this.awardReward(referrerId, 'premium_month', 1, 9900, 'Bonus Month for Premium Referrals');
+    if (stats.premiumConversions >= 3 && !await this.hasReward(referrerId, 'professional_bonus')) {
+      await this.awardReward(referrerId, 'professional_month', 1, 9900, 'Bonus Professional Month (Premium Referrals)');
+    }
+    
+    if (stats.registered >= 10 && !await this.hasReward(referrerId, 'annual_discount')) {
+      await this.awardReward(referrerId, 'discount_credit', 1, 20000, '20% Discount on Annual Plans');
     }
   }
 
@@ -180,7 +184,8 @@ export class ReferralService {
         userId,
         freeAnalysisCredits: 0,
         scanCredits: 0,
-        premiumMonths: 0
+        premiumMonths: 0,
+        discountCredits: 0
       });
     }
     
@@ -191,12 +196,18 @@ export class ReferralService {
       case 'free_analysis':
         updateData.freeAnalysisCredits = sql`free_analysis_credits + ${rewardValue}`;
         break;
+      case 'essential_pack':
+        updateData.freeAnalysisCredits = sql`free_analysis_credits + 5`; // Essential pack = 5 analyses
+        break;
       case 'scan_credits':
         updateData.scanCredits = sql`scan_credits + ${rewardValue}`;
         break;
-      case 'premium_month':
-      case 'premium_month_bonus':
+      case 'professional_month':
+      case 'professional_bonus':
         updateData.premiumMonths = sql`premium_months + ${rewardValue}`;
+        break;
+      case 'discount_credit':
+        updateData.discountCredits = sql`COALESCE(discount_credits, 0) + ${rewardValue}`;
         break;
     }
     
@@ -270,13 +281,15 @@ export class ReferralService {
         userId,
         freeAnalysisCredits: 0,
         scanCredits: 0,
-        premiumMonths: 0
+        premiumMonths: 0,
+        discountCredits: 0
       });
       
       return {
         freeAnalysisCredits: 0,
         scanCredits: 0,
         premiumMonths: 0,
+        discountCredits: 0,
         totalEarned: 0,
         totalSpent: 0
       };
@@ -288,7 +301,7 @@ export class ReferralService {
   /**
    * Spend user credits
    */
-  async spendCredits(userId: number, type: 'free_analysis' | 'scan_credits' | 'premium_month', amount: number = 1): Promise<boolean> {
+  async spendCredits(userId: number, type: 'free_analysis' | 'scan_credits' | 'professional_month' | 'discount_credit', amount: number = 1): Promise<boolean> {
     const credits = await this.getUserCredits(userId);
     
     let canSpend = false;
@@ -309,9 +322,16 @@ export class ReferralService {
           canSpend = true;
         }
         break;
-      case 'premium_month':
+      case 'professional_month':
         if ((credits.premiumMonths || 0) >= amount) {
           updateData.premiumMonths = (credits.premiumMonths || 0) - amount;
+          updateData.totalSpent = (credits.totalSpent || 0) + amount;
+          canSpend = true;
+        }
+        break;
+      case 'discount_credit':
+        if ((credits.discountCredits || 0) >= amount) {
+          updateData.discountCredits = (credits.discountCredits || 0) - amount;
           updateData.totalSpent = (credits.totalSpent || 0) + amount;
           canSpend = true;
         }
