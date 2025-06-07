@@ -43,7 +43,7 @@ export default function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
-          <img src={hireMzansiLogo} alt="Hire Mzansi Logo" className="h-12 md:h-14 mr-2" />
+          <img src={hireMzansiLogo} alt="Hire Mzansi Logo" className="h-12 md:h-14 pl-[0px] pr-[0px] pt-[0px] pb-[0px] ml-[6px] mr-[6px]" />
           <span className="hidden sm:inline">
             <span className="text-[#2B5A87] text-2xl md:text-3xl font-bold">HIRE</span><span className="text-[#5CB85C] text-2xl md:text-3xl font-bold">MZANSI</span>
             <span className="text-[#5CB85C] ml-1 text-2xl md:text-3xl">•</span>
@@ -70,7 +70,7 @@ export default function Header() {
           </div>
           {user ? (
             // Logged in UI
-            <div className="hidden md:flex items-center space-x-3">
+            (<div className="hidden md:flex items-center space-x-3">
               <Button
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-white"
@@ -143,10 +143,10 @@ export default function Header() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            </div>)
           ) : (
             // Logged out UI
-            <div className="hidden md:flex items-center space-x-3">
+            (<div className="hidden md:flex items-center space-x-3">
               <Button
                 variant="outline"
                 className="border-primary text-primary hover:bg-primary hover:text-white"
@@ -160,7 +160,7 @@ export default function Header() {
               >
                 <Link href="/auth?tab=register">{t('common.signup')}</Link>
               </Button>
-            </div>
+            </div>)
           )}
           
           <Button
@@ -174,7 +174,6 @@ export default function Header() {
           </Button>
         </div>
       </div>
-
       {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden">
