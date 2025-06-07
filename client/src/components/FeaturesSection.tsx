@@ -47,7 +47,7 @@ export default function FeaturesSection() {
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-secondary mb-4">Unlock Your Career Potential</h2>
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
@@ -56,10 +56,10 @@ export default function FeaturesSection() {
         </div>
         
         {/* Premium Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 max-w-6xl mx-auto mb-16 justify-items-center">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
-              <div className="bg-gradient-to-br from-primary to-secondary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-white">
+            <div key={index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 w-full max-w-sm mx-auto text-center">
+              <div className="bg-gradient-to-br from-primary to-secondary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-white mx-auto">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-bold mb-3 text-gray-900">{feature.title}</h3>
