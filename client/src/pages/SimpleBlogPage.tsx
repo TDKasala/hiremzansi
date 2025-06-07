@@ -102,13 +102,13 @@ Ready to optimize your CV for ATS success? Visit https://hiremzansi.co.za for pr
     keywords: ['AI job matching South Africa', 'premium recruitment service', 'intelligent hiring platform', 'job matching algorithm', 'South African recruitment technology'],
     summary: `The recruitment landscape in South Africa is being transformed by AI-powered job matching technology. Our premium service connects job seekers and recruiters through intelligent algorithms that understand local market dynamics and employment requirements.
 
-Job seekers spend hours searching through irrelevant job postings, applying to positions that don't match their skills, missing opportunities due to poor job board algorithms, and lack feedback on application compatibility.
+Job seekers struggle with CVs that don't meet ATS requirements, lack understanding of what recruiters want, and miss opportunities due to poor CV optimization.
 
-Our xAI-powered matching system analyzes multiple factors including Skills Compatibility (35% weight), Experience Level (15% weight), Salary Compatibility (15% weight), Location Preferences (12% weight), Industry Match (10% weight), South African Context (8% weight), and Availability (5% weight).
+Our AI-powered CV analysis system evaluates multiple factors including ATS compatibility, keyword optimization, format structure, content quality, and South African market requirements.
 
-Our AI understands transformation requirements including B-BBEE scorecard optimization, employment equity compliance, skills development opportunities, and supplier development programs.
+Our AI understands local requirements including B-BBEE compliance, NQF level requirements, skills development certifications, and industry-specific terminology.
 
-For Job Seekers (R50 Investment): Comprehensive profile analysis, intelligent job matching with compatibility scoring, career development insights, and direct recruiter connections.
+For Job Seekers: Comprehensive CV analysis, ATS optimization recommendations, format improvement suggestions, and career development insights.
 
 Ready to experience intelligent job matching? Job Seekers start at https://hiremzansi.co.za/premium-job-seeker and Recruiters discover top talent at https://hiremzansi.co.za/premium-recruiter.`
   },

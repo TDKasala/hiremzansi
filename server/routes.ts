@@ -19,9 +19,7 @@ import {
   saProfiles,
   users,
   cvs,
-  jobPostings,
-  employers,
-  jobMatches,
+
   skills,
   subscriptions,
   plans,
