@@ -1,13 +1,10 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { 
   Edit, 
   Search, 
   Bell, 
   FileText,
-  CheckCircle,
-  ChevronDown,
-  ChevronUp
+  CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -18,7 +15,6 @@ type Feature = {
 };
 
 export default function FeaturesSection() {
-  const [sectionOpen, setSectionOpen] = useState(false);
   
   const features: Feature[] = [
     {
@@ -50,99 +46,111 @@ export default function FeaturesSection() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <div 
-            className="cursor-pointer flex items-center justify-center gap-3 hover:bg-gray-50 rounded-lg p-4 transition-colors duration-200"
-            onClick={() => setSectionOpen(!sectionOpen)}
-          >
-            <h2 className="text-3xl font-bold text-secondary">Premium Features</h2>
-            {sectionOpen ? (
-              <ChevronUp className="h-8 w-8 text-primary animate-bounce" />
-            ) : (
-              <ChevronDown className="h-8 w-8 text-primary animate-pulse" />
-            )}
-          </div>
-          <p className="text-neutral-600 max-w-2xl mx-auto mt-2">
-            Explore our advanced tools designed specifically for the South African job market.
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-secondary mb-4">Unlock Your Career Potential</h2>
+          <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
+            Professional CV optimization tools designed for the South African job market
           </p>
         </div>
         
-        <div 
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            sectionOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto animate-fade-in-up">
-            {features.map((feature, index) => (
-              <div key={index} className="flex flex-col md:flex-row md:items-start hover:shadow-lg p-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1">
-                <div className="flex-shrink-0 bg-primary bg-opacity-10 w-12 h-12 rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-4 hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-neutral-600">{feature.description}</p>
+        {/* Premium Features Grid */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+          {features.map((feature, index) => (
+            <div key={index} className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="bg-gradient-to-br from-primary to-secondary w-12 h-12 rounded-lg flex items-center justify-center mb-4 text-white">
+                {feature.icon}
+              </div>
+              <h3 className="text-lg font-bold mb-3 text-gray-900">{feature.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Real-time Editor Showcase */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-5xl mx-auto mb-16">
+          <div className="bg-gradient-to-r from-primary to-secondary p-6 text-white">
+            <h3 className="text-2xl font-bold mb-2">Live ATS Editor</h3>
+            <p className="text-primary-100">Watch your CV score improve in real-time as you type</p>
+          </div>
+          <div className="p-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-lg mb-4 text-gray-900">What You Get:</h4>
+                <div className="space-y-3">
+                  {editorBenefits.map((benefit, index) => (
+                    <div key={index} className="flex items-start">
+                      <CheckCircle className="text-green-500 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+                      <span className="text-gray-700">{benefit}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-16 max-w-4xl mx-auto">
-            <div className="bg-neutral-100 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <div className="md:flex">
-                <div className="md:w-1/2 p-8">
-                  <h3 className="text-2xl font-bold text-secondary mb-4">Real-time CV Editor Demo</h3>
-                  <p className="text-neutral-600 mb-4">
-                    Our premium editor analyzes your CV as you type, providing instant feedback and suggestions.
-                  </p>
-                  <ul className="space-y-3 mb-6">
-                    {editorBenefits.map((benefit, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="text-success mt-1 mr-2 h-5 w-5" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href="/signup">
-                    <Button className="bg-primary text-white hover:bg-opacity-90 transform hover:scale-105 transition-transform duration-200">
-                      Try Premium Editor
-                    </Button>
-                  </Link>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-medium text-gray-900">Live Preview</span>
+                  <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ATS Score: 92%
+                  </div>
                 </div>
-                <div className="md:w-1/2 bg-white p-6">
-                  <div className="border rounded-lg p-4 h-full">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="font-medium">CV Editor</h4>
-                      <div className="text-sm bg-primary bg-opacity-10 text-primary px-2 py-1 rounded">
-                        ATS Score: 82/100
-                      </div>
+                <div className="space-y-3">
+                  <div className="text-sm">
+                    <div className="font-medium mb-1">Keywords Matched:</div>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-xs">Marketing</span>
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-xs">Analytics</span>
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-xs">Leadership</span>
                     </div>
-                    <div className="mb-4">
-                      <div className="font-semibold mb-1">Professional Summary</div>
-                      <div className="border rounded p-2 text-sm bg-neutral-50">
-                        <span className="bg-green-100">Experienced marketing professional</span> with 5+ years in <span className="bg-green-100">digital marketing</span> and <span className="bg-green-100">campaign management</span>. Proven track record of increasing engagement and <span className="bg-yellow-100">ROI</span> through strategic <span className="bg-green-100">social media</span> initiatives.
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <div className="font-semibold mb-1">Skills</div>
-                      <div className="border rounded p-2 text-sm bg-neutral-50">
-                        <span className="bg-green-100">Social Media Marketing</span>, <span className="bg-green-100">Content Creation</span>, <span className="bg-green-100">Analytics</span>, <span className="bg-yellow-100">SEO</span>, <span className="bg-green-100">Campaign Management</span>, <span className="bg-green-100">Adobe Creative Suite</span>
-                      </div>
-                    </div>
-                    <div className="text-sm text-neutral-600 mt-2">
-                      <div className="flex items-center mb-1">
-                        <span className="w-3 h-3 inline-block bg-green-100 mr-2"></span>
-                        <span>Matched keywords</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="w-3 h-3 inline-block bg-yellow-100 mr-2"></span>
-                        <span>Suggested additions</span>
-                      </div>
-                    </div>
+                  </div>
+                  <div className="text-sm">
+                    <div className="font-medium mb-1">Suggestions:</div>
+                    <div className="text-orange-600 text-xs">+ Add "B-BBEE" compliance</div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Premium Features */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+            <h4 className="font-bold text-lg mb-3 text-gray-900">South African Optimization</h4>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>• B-BBEE compliance scoring</li>
+              <li>• NQF level verification</li>
+              <li>• Local industry keywords</li>
+              <li>• SA employment equity awareness</li>
+            </ul>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+            <h4 className="font-bold text-lg mb-3 text-gray-900">Professional Tools</h4>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>• 20 premium CV templates</li>
+              <li>• Cover letter builder</li>
+              <li>• Job matching system</li>
+              <li>• Interview preparation guides</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 text-white max-w-2xl mx-auto">
+            <h3 className="text-2xl font-bold mb-4">Ready to Stand Out?</h3>
+            <p className="mb-6 text-primary-100">Join thousands of South African professionals who've improved their job prospects</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/pricing" className="inline-block">
+                <Button className="bg-white text-primary hover:bg-gray-100 px-8 py-3 text-lg font-semibold">
+                  View Pricing
+                </Button>
+              </Link>
+              <Link href="/signup" className="inline-block">
+                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-primary px-8 py-3 text-lg font-semibold">
+                  Start Free Trial
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
