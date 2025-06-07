@@ -110,7 +110,7 @@ Our AI understands local requirements including B-BBEE compliance, NQF level req
 
 For Job Seekers: Comprehensive CV analysis, ATS optimization recommendations, format improvement suggestions, and career development insights.
 
-Ready to experience intelligent job matching? Job Seekers start at https://hiremzansi.co.za/premium-job-seeker and Recruiters discover top talent at https://hiremzansi.co.za/premium-recruiter.`
+Ready to optimize your CV for success? Start your free analysis at https://hiremzansi.co.za/upload and explore premium features at https://hiremzansi.co.za/pricing.`
   },
   {
     id: '4',
