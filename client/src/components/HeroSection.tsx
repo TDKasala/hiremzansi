@@ -36,16 +36,16 @@ export default function HeroSection() {
     <section id="home" className="bg-gradient-to-r from-secondary to-neutral-900 text-white py-12 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <div className="relative">
-              <Badge className="absolute -top-6 left-0 bg-primary/90 hover:bg-primary text-center ml-[200px] mr-[200px] font-bold">
+          <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col items-center justify-center text-center">
+            <div className="relative w-full">
+              <Badge className="bg-primary/90 hover:bg-primary font-bold mb-4">
                 {t('home.southAfricanFocused')}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4 text-center">
+              <h1 className="text-3xl md:text-5xl font-bold mb-4">
                 {t('home.marketReality')}
               </h1>
             </div>
-            <p className="text-lg md:text-xl mb-6 text-white text-center font-normal">
+            <p className="text-lg md:text-xl mb-6 text-white font-normal">
               {t('home.marketDescription')}
             </p>
             
@@ -74,9 +74,9 @@ export default function HeroSection() {
                 </Button>
               </Link>
             </div>
-            <div className="mt-6 text-white flex items-center text-sm">
+            <div className="mt-6 text-white flex items-center justify-center text-sm">
               <Shield className="h-4 w-4 mr-2 text-primary" />
-              <span className="text-center pl-[110px] pr-[110px]">{t('home.dataSecure')}</span>
+              <span>{t('home.dataSecure')}</span>
             </div>
           </div>
           
