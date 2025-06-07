@@ -1,13 +1,6 @@
 import { Link } from "wouter";
-import { Check, X, ChevronDown } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 
 type PlanFeature = {
   name: string;
@@ -26,8 +19,6 @@ type PricingPlan = {
 };
 
 export default function PricingSection() {
-  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
-  
   // Launch discount - 50% off for first 500 users
   const LAUNCH_DISCOUNT = 0.5;
   const isLaunchDiscountActive = true; // You can add logic here to check user count or time limit
@@ -111,73 +102,57 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between text-left">
-                  {selectedPlan ? selectedPlan.name : "Select a pricing plan"}
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-full min-w-[400px]">
-                {plans.map((plan, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => setSelectedPlan(plan)}
-                    className="flex flex-col items-start p-4 cursor-pointer hover:bg-neutral-50"
-                  >
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className="font-semibold text-secondary">{plan.name}</span>
-                      <span className="font-bold text-primary">{plan.price}</span>
-                      {plan.highlighted && (
-                        <span className="bg-primary text-white px-2 py-1 rounded text-xs ml-2">
-                          Most Popular
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm text-neutral-600">{plan.description}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {selectedPlan && (
-            <div className="bg-white rounded-lg shadow-lg p-6 border border-neutral-200">
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
+          {plans.map((plan, index) => (
+            <div 
+              key={index} 
+              className={`bg-white rounded-lg shadow-lg p-6 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                plan.highlighted 
+                  ? 'border-primary bg-gradient-to-b from-primary/5 to-white relative' 
+                  : 'border-neutral-200'
+              }`}
+            >
+              {plan.highlighted && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+                    Most Popular
+                  </span>
+                </div>
+              )}
+              
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-secondary mb-2">
-                  {selectedPlan.name}
+                <h3 className="text-xl font-bold text-secondary mb-2">
+                  {plan.name}
                 </h3>
-                <div className="mb-2">
-                  {isLaunchDiscountActive && selectedPlan.name !== "Free Trial" ? (
+                <div className="mb-3">
+                  {isLaunchDiscountActive && plan.name !== "Free Trial" ? (
                     <div className="text-center">
-                      <div className="text-lg text-gray-500 line-through mb-1">
-                        {selectedPlan.name === "Essential Pack" ? "ZAR 49" :
-                         selectedPlan.name === "Professional" ? "ZAR 99/month" :
-                         selectedPlan.name === "Business Annual" ? "ZAR 999/year" : ""}
+                      <div className="text-sm text-gray-500 line-through mb-1">
+                        {plan.name === "Essential Pack" ? "ZAR 49" :
+                         plan.name === "Professional" ? "ZAR 99/month" :
+                         plan.name === "Business Annual" ? "ZAR 999/year" : ""}
                       </div>
-                      <div className="text-4xl font-bold text-primary flex items-center justify-center gap-2">
-                        {selectedPlan.price}
-                        <span className="bg-red-500 text-white text-sm px-2 py-1 rounded-full">50% OFF</span>
+                      <div className="text-2xl font-bold text-primary flex items-center justify-center gap-2">
+                        {plan.price}
+                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">50% OFF</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-4xl font-bold text-primary">
-                      {selectedPlan.price}
+                    <div className="text-2xl font-bold text-primary">
+                      {plan.price}
                     </div>
                   )}
                 </div>
-                <p className="text-neutral-600">{selectedPlan.description}</p>
+                <p className="text-neutral-600 text-sm">{plan.description}</p>
               </div>
 
-              <ul className="space-y-3 mb-8">
-                {selectedPlan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-center">
+              <ul className="space-y-2 mb-8 min-h-[180px]">
+                {plan.features.map((feature, featureIndex) => (
+                  <li key={featureIndex} className="flex items-start text-sm">
                     {feature.included ? (
-                      <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
                     ) : (
-                      <X className="h-5 w-5 text-neutral-400 mr-3 flex-shrink-0" />
+                      <X className="h-4 w-4 text-neutral-400 mr-2 mt-0.5 flex-shrink-0" />
                     )}
                     <span
                       className={
@@ -192,16 +167,16 @@ export default function PricingSection() {
                 ))}
               </ul>
 
-              <Link href={selectedPlan.buttonLink}>
+              <Link href={plan.buttonLink}>
                 <Button
                   className="w-full"
-                  variant={selectedPlan.buttonVariant || "default"}
+                  variant={plan.highlighted ? "default" : (plan.buttonVariant || "outline")}
                 >
-                  {selectedPlan.buttonText}
+                  {plan.buttonText}
                 </Button>
               </Link>
             </div>
-          )}
+          ))}
         </div>
 
         <div className="text-center mt-12">
