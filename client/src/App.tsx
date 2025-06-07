@@ -28,6 +28,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import AuthCallback from "./pages/AuthCallback";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
+import XAITestPage from "./pages/XAITestPage";
 import LatestCVPage from "@/pages/LatestCVPage";
 import DeepAnalysisPage from "@/pages/DeepAnalysisPage";
 // Using our new ProfilePage with Supabase integration
@@ -106,6 +107,7 @@ function App() {
                 <Route path="/job-sites" component={JobSitesPage} />
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                 <Route path="/templates" component={TemplatesPage} />
+                <Route path="/xai-test" component={XAITestPage} />
                 
                 {/* Original blog post */}
                 <Route path="/blog/7-ats-friendly-cv-tips-for-south-african-job-seekers" component={BlogPost1} />
