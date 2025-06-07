@@ -45,7 +45,7 @@ export default function HeroSection() {
                 {t('home.marketReality')}
               </h1>
             </div>
-            <p className="text-lg md:text-xl mb-6 text-white">
+            <p className="text-lg md:text-xl mb-6 text-white text-center font-normal">
               {t('home.marketDescription')}
             </p>
             
