@@ -161,7 +161,7 @@ export default function SuccessStoriesSection() {
               animate={isVisible ? "visible" : "hidden"}
             >
               <Link href="/pricing">
-                <Button size="lg" className="bg-primary hover:bg-amber-500 text-white">
+                <Button size="lg" className="bg-primary hover:bg-amber-500 text-white ml-[170px] mr-[170px] pl-[34px] pr-[34px]">
                   Join Our Success Stories
                 </Button>
               </Link>
