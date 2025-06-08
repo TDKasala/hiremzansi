@@ -34,6 +34,9 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
+# Session Security
+SESSION_SECRET=b6a9f6e0115cff0c5d88acc4bff804540a3662e2de2d6ea50429ddc5a811d6046208e88e115a8cc8f3d8bf9f881ee95fe3448e72cffced73166b68af3022bd52
+
 # AI Services (Choose one or both)
 XAI_API_KEY=your-xai-api-key
 OPENAI_API_KEY=your-openai-api-key
