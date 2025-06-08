@@ -1,4 +1,4 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -60,7 +60,7 @@ const analyzeCV = async (content, jobDescription) => {
   }
 };
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -88,7 +88,6 @@ module.exports = async (req, res) => {
 
     // CV upload and analysis
     if (method === 'POST' && path === '/api/upload') {
-      // For demo purposes, simulate file analysis
       const { title, jobDescription } = req.body;
       
       const content = `Professional CV Analysis
@@ -214,4 +213,4 @@ Achievements:
     console.error('API error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
