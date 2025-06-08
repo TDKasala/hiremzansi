@@ -38,6 +38,7 @@ import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
 import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
+import jobMatchingDemoRoutes from "./routes/jobMatchingDemo";
 import pdfTestRoutes from "./routes/pdfTest";
 import optimizedCvAnalysisRoutes from "./routes/optimizedCvAnalysis";
 import paymentRoutes from "./routes/paymentRoutes";
@@ -2315,6 +2316,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
+  // Mount demo job matching routes
+  app.use("/api", jobMatchingDemoRoutes);
 
   // Enhanced job matching endpoints
   app.post("/api/job-matches/find", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
