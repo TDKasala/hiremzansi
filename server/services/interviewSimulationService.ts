@@ -1,7 +1,6 @@
 import { db } from "../db";
 import { randomUUID } from "crypto";
 import OpenAI from "openai";
-import { jobBoardService, JobPosting } from "./jobBoardService";
 
 // Initialize xAI (primary) and OpenAI (fallback)
 const xai = new OpenAI({ 
@@ -58,44 +57,29 @@ interface InterviewParams {
   difficulty?: string;
 }
 
-// Create preset interview question templates
+// Template questions for fallback
 const behavioralQuestionTemplates = [
-  "Tell me about a time when you had to work under pressure to meet a deadline. How did you handle it?",
-  "Describe a situation where you had to resolve a conflict within your team.",
-  "Give me an example of a time you faced a challenging situation at work. How did you handle it?",
-  "Tell me about a time when you had to adapt to a significant change at work.",
-  "Describe a situation where you had to make an important decision with limited information.",
-  "Tell me about a time when you failed at something. How did you handle it?",
-  "Give me an example of a time when you showed leadership skills.",
-  "Describe a project where you had to collaborate with difficult team members.",
-  "Tell me about a time when you exceeded expectations on a project or assignment.",
-  "Describe a situation where you had to solve a problem creatively."
+  "Tell me about a time when you had to work under pressure.",
+  "Describe a situation where you had to work with a difficult team member.",
+  "Give me an example of a goal you reached and tell me how you achieved it.",
+  "Tell me about a time you made a mistake. How did you handle it?",
+  "Describe a time when you had to adapt to a significant change at work."
 ];
 
 const technicalQuestionTemplates = [
-  "Explain how you would implement [technical concept] in a real-world project.",
-  "What tools and technologies have you used for [specific task]?",
-  "How would you approach debugging a complex issue in [relevant technology]?",
-  "Describe your experience with [programming language/framework] and how you've used it.",
-  "What steps would you take to optimize performance in a [specific type] application?",
-  "Explain your approach to ensuring code quality and maintainability.",
-  "How do you stay updated with the latest developments in [relevant technology]?",
-  "Describe a challenging technical problem you solved and your approach to solving it.",
-  "What methodologies do you follow when developing software?",
-  "How would you design a system for [specific scenario]?"
+  "What are your strongest technical skills and how have you applied them?",
+  "Describe a challenging technical problem you solved recently.",
+  "How do you stay updated with the latest technologies in your field?",
+  "Walk me through your approach to debugging a complex issue.",
+  "What tools and technologies do you prefer to work with and why?"
 ];
 
 const situationalQuestionTemplates = [
-  "How would you handle a situation where you disagree with your manager's decision?",
-  "What would you do if you were assigned a task but lacked the necessary skills?",
-  "How would you prioritize your work if you were given multiple urgent tasks?",
-  "What would you do if a team member wasn't contributing their fair share?",
-  "How would you handle criticism of your work?",
-  "What would you do if you identified a process that could be improved?",
-  "How would you respond if a client or stakeholder was unhappy with your work?",
-  "What would you do if you realized you wouldn't meet a deadline?",
-  "How would you handle a situation where you made a mistake that impacted others?",
-  "What approach would you take if you were asked to lead a project outside your expertise?"
+  "How would you handle a situation where you disagree with your supervisor?",
+  "What would you do if you were assigned a task you've never done before?",
+  "How would you prioritize multiple urgent deadlines?",
+  "What would you do if you noticed a colleague wasn't pulling their weight?",
+  "How would you handle receiving constructive criticism?"
 ];
 
 export class InterviewSimulationService {
@@ -118,7 +102,7 @@ For each question, provide:
 5. A reasonable time limit for answering (in seconds)
 6. Optional follow-up questions an interviewer might ask
 
-Format your response as a JSON array of question objects with the following structure:
+Format your response as a JSON object with the following structure:
 {
   "questions": [
     {
@@ -153,7 +137,7 @@ ${params.cvContent}`;
           max_tokens: 2500
         });
         console.log("Successfully used xAI for interview question generation");
-      } catch (xaiError) {
+      } catch (xaiError: any) {
         console.log("xAI failed, falling back to OpenAI:", xaiError.message);
         response = await openai.chat.completions.create({
           model: "gpt-4o",
@@ -184,7 +168,7 @@ ${params.cvContent}`;
     } catch (error) {
       console.error("Error generating interview questions:", error);
       
-      // Fallback to template questions if GPT fails
+      // Fallback to template questions if AI fails
       return this.generateTemplateQuestions(
         params.type || 'general',
         params.difficulty || 'mixed',
@@ -219,32 +203,22 @@ ${params.cvContent}`;
         templates = situationalQuestionTemplates;
         questionType = 'situational';
         break;
-      case 'general':
       default:
-        // Mix different types for general interviews
-        templates = [
-          ...behavioralQuestionTemplates.slice(0, 3),
-          ...technicalQuestionTemplates.slice(0, 3),
-          ...situationalQuestionTemplates.slice(0, 3)
-        ];
+        templates = [...behavioralQuestionTemplates, ...technicalQuestionTemplates, ...situationalQuestionTemplates];
         questionType = 'mixed';
+        break;
     }
     
-    // Shuffle the templates
-    const shuffled = [...templates].sort(() => 0.5 - Math.random());
+    // Shuffle and select questions
+    const shuffled = templates.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count);
     
-    // Select the requested number of questions
-    const selectedTemplates = shuffled.slice(0, count);
-    
-    // Create question objects
-    for (const template of selectedTemplates) {
+    for (const template of selected) {
       // Determine difficulty
       let questionDifficulty: 'easy' | 'medium' | 'hard';
       if (difficulty === 'mixed') {
         const rand = Math.random();
-        if (rand < 0.33) questionDifficulty = 'easy';
-        else if (rand < 0.66) questionDifficulty = 'medium';
-        else questionDifficulty = 'hard';
+        questionDifficulty = rand < 0.33 ? 'easy' : rand < 0.66 ? 'medium' : 'hard';
       } else {
         questionDifficulty = difficulty as 'easy' | 'medium' | 'hard';
       }
@@ -323,7 +297,7 @@ ${answer}`;
           max_tokens: 1500
         });
         console.log("Successfully used xAI for interview answer evaluation");
-      } catch (xaiError) {
+      } catch (xaiError: any) {
         console.log("xAI failed, falling back to OpenAI:", xaiError.message);
         response = await openai.chat.completions.create({
           model: "gpt-4o",
@@ -348,7 +322,7 @@ ${answer}`;
     } catch (error) {
       console.error("Error evaluating answer:", error);
       
-      // Return a generic evaluation if GPT fails
+      // Return a generic evaluation if AI fails
       return {
         score: 60,
         strengths: [
@@ -440,7 +414,7 @@ Average Score: ${averageScore}/100`;
     } catch (error) {
       console.error("Error generating overall feedback:", error);
       
-      // Calculate a fallback score if GPT fails
+      // Calculate a fallback score if AI fails
       const scores = Object.values(session.evaluations).map(e => e.score);
       const averageScore = scores.length > 0 
         ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
@@ -456,28 +430,6 @@ Average Score: ${averageScore}/100`;
   
   // Create a new interview session
   async createSession(userId: number, params: InterviewParams): Promise<InterviewSession> {
-    // Get job details if provided as ID
-    if (params.jobTitle && params.jobTitle.startsWith('job-') && !params.jobDescription) {
-      try {
-        const jobId = params.jobTitle.replace('job-', '');
-        const job = await jobBoardService.getJobById(jobId);
-        
-        if (job) {
-          params.jobTitle = job.title;
-          params.jobDescription = `
-Job Title: ${job.title}
-Company: ${job.company}
-Description: ${job.description}
-Requirements: ${job.requirements.join(', ')}
-Skills: ${job.skills.join(', ')}
-          `;
-        }
-      } catch (error) {
-        console.error("Error fetching job details:", error);
-        // Continue with what we have
-      }
-    }
-    
     // Generate interview questions
     const questions = await this.generateQuestions(params);
     
@@ -495,9 +447,6 @@ Skills: ${job.skills.join(', ')}
       overallFeedback: undefined,
       completedAt: undefined
     };
-    
-    // TODO: Store session in database
-    // For now, we're just returning it
     
     return session;
   }
@@ -527,8 +476,6 @@ Skills: ${job.skills.join(', ')}
     // Store the evaluation
     session.evaluations[questionId] = evaluation;
     
-    // TODO: Update session in database
-    
     return session;
   }
   
@@ -542,86 +489,18 @@ Skills: ${job.skills.join(', ')}
     session.overallFeedback = feedback;
     session.completedAt = new Date().toISOString();
     
-    // TODO: Update session in database
-    
     return session;
   }
   
-  // Get a session by ID
+  // Get a session by ID (placeholder for database integration)
   async getSessionById(sessionId: string): Promise<InterviewSession | null> {
     // TODO: Retrieve session from database
-    // For now, return null
     return null;
   }
   
-  // Get all sessions for a user
+  // Get all sessions for a user (placeholder for database integration)
   async getSessionsByUser(userId: number): Promise<InterviewSession[]> {
     // TODO: Retrieve sessions from database
-    // For now, return empty array
-    return [];
-  }
-}
-    
-    return session;
-  }
-  
-  // Submit an answer to a question in an interview session
-  async submitAnswer(
-    session: InterviewSession,
-    questionId: string,
-    answer: string
-  ): Promise<InterviewSession> {
-    // Find the question
-    const question = session.questions.find(q => q.id === questionId);
-    
-    if (!question) {
-      throw new Error(`Question with ID ${questionId} not found in session`);
-    }
-    
-    // Store the answer
-    session.userAnswers[questionId] = answer;
-    
-    // Evaluate the answer
-    const evaluation = await this.evaluateAnswer(
-      question,
-      answer,
-      session.jobDescription || ''
-    );
-    
-    // Store the evaluation
-    session.evaluations[questionId] = evaluation;
-    
-    // TODO: Update session in database
-    
-    return session;
-  }
-  
-  // Complete an interview session with overall feedback
-  async completeSession(session: InterviewSession): Promise<InterviewSession> {
-    // Generate overall feedback
-    const { score, feedback } = await this.generateOverallFeedback(session);
-    
-    // Update session
-    session.overallScore = score;
-    session.overallFeedback = feedback;
-    session.completedAt = new Date().toISOString();
-    
-    // TODO: Update session in database
-    
-    return session;
-  }
-  
-  // Get a session by ID
-  async getSessionById(sessionId: string): Promise<InterviewSession | null> {
-    // TODO: Retrieve session from database
-    // For now, return null
-    return null;
-  }
-  
-  // Get all sessions for a user
-  async getSessionsByUser(userId: number): Promise<InterviewSession[]> {
-    // TODO: Retrieve sessions from database
-    // For now, return empty array
     return [];
   }
 }

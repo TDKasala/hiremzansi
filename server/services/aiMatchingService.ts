@@ -1,9 +1,13 @@
 import OpenAI from "openai";
 
-// Initialize xAI client using OpenAI SDK with xAI endpoint
+// Initialize xAI client (primary) and OpenAI client (fallback)
 const xai = new OpenAI({ 
   baseURL: "https://api.x.ai/v1", 
   apiKey: process.env.XAI_API_KEY 
+});
+
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
 });
 
 interface JobMatchAnalysis {
@@ -60,16 +64,19 @@ export class AIMatchingService {
   ): Promise<JobMatchAnalysis> {
     
     const prompt = this.buildMatchingPrompt(cvProfile, jobRequirements);
+    const systemContent = `You are an expert South African recruitment AI specializing in job matching. 
+            Analyze CV-job compatibility considering SA market factors like B-BBEE, NQF levels, 
+            local industry dynamics, and cultural fit. Respond with detailed JSON analysis.`;
     
+    // Try xAI first, fallback to OpenAI
+    let response;
     try {
-      const response = await xai.chat.completions.create({
+      response = await xai.chat.completions.create({
         model: "grok-2-1212", // Using the 131K context model for comprehensive analysis
         messages: [
           {
             role: "system",
-            content: `You are an expert South African recruitment AI specializing in job matching. 
-            Analyze CV-job compatibility considering SA market factors like B-BBEE, NQF levels, 
-            local industry dynamics, and cultural fit. Respond with detailed JSON analysis.`
+            content: systemContent
           },
           {
             role: "user",
@@ -79,7 +86,27 @@ export class AIMatchingService {
         response_format: { type: "json_object" },
         temperature: 0.3 // Lower temperature for consistent analysis
       });
+      console.log("Successfully used xAI for job matching analysis");
+    } catch (xaiError: any) {
+      console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+      response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: systemContent
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3
+      });
+    }
 
+    try {
       const analysis = JSON.parse(response.choices[0].message.content || '{}');
       
       return {
