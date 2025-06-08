@@ -11,6 +11,7 @@ import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
 import WhatsAppPromoSection from "@/components/WhatsAppPromoSection";
 import CTASection from "@/components/CTASection";
+import { JobMatchingAnnouncement } from "@/components/JobMatchingAnnouncement";
 
 
 export default function HomePage() {
