@@ -19,10 +19,10 @@ const openai = new OpenAI({
 });
 
 // Configuration
-const OPENAI_CONFIG = {
+const AI_CONFIG = {
   // Models
-  FREE_TIER_MODEL: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-  PREMIUM_TIER_MODEL: "gpt-4o", // Use the same model for premium tier, but with more tokens/complexity
+  XAI_MODEL: "grok-2-1212", // Primary xAI model
+  OPENAI_FALLBACK_MODEL: "gpt-4o", // Fallback OpenAI model
   
   // API Limits
   MAX_TOKENS: 4000,
@@ -33,7 +33,7 @@ const OPENAI_CONFIG = {
 };
 
 /**
- * Generate text using OpenAI
+ * Generate text using xAI (primary) with OpenAI fallback
  * @param prompt Text prompt to send to the model
  * @param options Additional options for the API call
  * @returns Generated text response
@@ -47,31 +47,45 @@ export async function generateTextCompletion(
     systemPrompt?: string;
   } = {}
 ): Promise<string> {
+  const temperature = options.temperature || AI_CONFIG.STANDARD_TEMPERATURE;
+  const maxTokens = options.maxTokens || AI_CONFIG.MAX_TOKENS;
+  const systemPrompt = options.systemPrompt || '';
+
+  const messages: Array<{role: MessageRole, content: string}> = [];
+  
+  if (systemPrompt) {
+    messages.push({ role: 'system', content: systemPrompt });
+  }
+  
+  messages.push({ role: 'user', content: prompt });
+
+  // Try xAI first, fallback to OpenAI
   try {
-    const model = options.model || OPENAI_CONFIG.FREE_TIER_MODEL;
-    const temperature = options.temperature || OPENAI_CONFIG.STANDARD_TEMPERATURE;
-    const maxTokens = options.maxTokens || OPENAI_CONFIG.MAX_TOKENS;
-    const systemPrompt = options.systemPrompt || '';
-
-    const messages: Array<{role: MessageRole, content: string}> = [];
-    
-    if (systemPrompt) {
-      messages.push({ role: 'system', content: systemPrompt });
-    }
-    
-    messages.push({ role: 'user', content: prompt });
-
-    const response = await openai.chat.completions.create({
-      model,
+    const response = await xai.chat.completions.create({
+      model: AI_CONFIG.XAI_MODEL,
       messages,
       temperature,
       max_tokens: maxTokens,
     });
 
+    console.log("Successfully used xAI for text generation");
     return response.choices[0].message.content || "No response generated";
-  } catch (error) {
-    console.error("OpenAI API error:", error);
-    return "An error occurred while generating the response";
+  } catch (xaiError: any) {
+    console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+    
+    try {
+      const response = await openai.chat.completions.create({
+        model: AI_CONFIG.OPENAI_FALLBACK_MODEL,
+        messages,
+        temperature,
+        max_tokens: maxTokens,
+      });
+
+      return response.choices[0].message.content || "No response generated";
+    } catch (openaiError) {
+      console.error("Both xAI and OpenAI failed:", openaiError);
+      return "An error occurred while generating the response";
+    }
   }
 }
 
@@ -82,24 +96,40 @@ export async function generateTextCompletion(
  * @returns JSON object with analysis results
  */
 export async function analyzeText(text: string, systemPrompt: string): Promise<any> {
-  try {
-    const messages: Array<{role: MessageRole, content: string}> = [
-      { role: 'system', content: systemPrompt + " Return your response as a valid JSON object." },
-      { role: 'user', content: text }
-    ];
+  const messages: Array<{role: MessageRole, content: string}> = [
+    { role: 'system', content: systemPrompt + " Return your response as a valid JSON object." },
+    { role: 'user', content: text }
+  ];
 
-    const response = await openai.chat.completions.create({
-      model: OPENAI_CONFIG.PREMIUM_TIER_MODEL,
+  // Try xAI first, fallback to OpenAI
+  try {
+    const response = await xai.chat.completions.create({
+      model: AI_CONFIG.XAI_MODEL,
       messages: messages,
-      temperature: OPENAI_CONFIG.STANDARD_TEMPERATURE,
-      max_tokens: OPENAI_CONFIG.MAX_TOKENS,
+      temperature: AI_CONFIG.STANDARD_TEMPERATURE,
+      max_tokens: AI_CONFIG.MAX_TOKENS,
       response_format: { type: "json_object" }
     });
 
+    console.log("Successfully used xAI for text analysis");
     return JSON.parse(response.choices[0].message.content || "{}");
-  } catch (error) {
-    console.error("OpenAI API analysis error:", error);
-    return { error: "Analysis failed" };
+  } catch (xaiError: any) {
+    console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+    
+    try {
+      const response = await openai.chat.completions.create({
+        model: AI_CONFIG.OPENAI_FALLBACK_MODEL,
+        messages: messages,
+        temperature: AI_CONFIG.STANDARD_TEMPERATURE,
+        max_tokens: AI_CONFIG.MAX_TOKENS,
+        response_format: { type: "json_object" }
+      });
+
+      return JSON.parse(response.choices[0].message.content || "{}");
+    } catch (openaiError) {
+      console.error("Both xAI and OpenAI failed for text analysis:", openaiError);
+      return { error: "Analysis failed" };
+    }
   }
 }
 
@@ -121,5 +151,5 @@ export default {
   generateTextCompletion,
   analyzeText,
   testOpenAI,
-  OPENAI_CONFIG
+  AI_CONFIG
 };
