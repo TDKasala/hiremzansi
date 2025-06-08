@@ -1,179 +1,170 @@
-# Vercel Deployment Guide with Supabase
-
-This guide walks you through deploying Hire Mzansi to Vercel with Supabase as the database.
+# Vercel Deployment Guide for Hire Mzansi CV Optimization Platform
 
 ## Prerequisites
 
-1. **Vercel Account**: Sign up at [vercel.com](https://vercel.com)
-2. **Supabase Account**: Sign up at [supabase.com](https://supabase.com)
-3. **GitHub Repository**: Push your code to GitHub
+1. **Vercel Account**: Create an account at [vercel.com](https://vercel.com)
+2. **Supabase Project**: Create a project at [supabase.com](https://supabase.com)
+3. **Environment Variables**: Prepare your API keys and configuration
 
-## Step 1: Set Up Supabase Database
+## Step 1: Supabase Setup
 
 ### 1.1 Create Supabase Project
-1. Go to [supabase.com/dashboard](https://supabase.com/dashboard)
-2. Click "New Project"
-3. Choose your organization
-4. Enter project name: `hire-mzansi`
-5. Enter a strong database password
-6. Select region closest to your users (e.g., Cape Town)
-7. Click "Create new project"
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Note down your project URL and anon key
+3. Go to Settings > API to find your keys
 
-### 1.2 Get Database Connection Details
-1. Go to Settings → Database
-2. Copy the Connection string under "Connection pooling"
-3. Replace `[YOUR-PASSWORD]` with your database password
-4. Save this as your `DATABASE_URL`
+### 1.2 Set Up Database Schema
+1. Go to SQL Editor in your Supabase dashboard
+2. Copy and paste the contents of `supabase-schema.sql`
+3. Run the SQL to create all necessary tables and functions
 
-### 1.3 Set Up Database Schema
-1. Go to SQL Editor in Supabase
-2. Run the contents of `supabase-schema-corrected.sql` to create tables
-3. Run the contents of `supabase-rls-policies.sql` to set up security
+### 1.3 Configure Storage (Optional)
+1. Go to Storage in Supabase dashboard
+2. Create a bucket named "cv-files" for CV uploads
+3. Set appropriate policies for file access
 
-### 1.4 Get API Keys
-1. Go to Settings → API
-2. Copy the Project URL (SUPABASE_URL)
-3. Copy the anon public key (SUPABASE_ANON_KEY)
-4. Copy the service_role secret key (SUPABASE_SERVICE_ROLE_KEY)
-
-## Step 2: Configure Environment Variables
+## Step 2: Environment Variables
 
 ### 2.1 Required Environment Variables
 Set these in your Vercel project settings:
 
 ```bash
-# Database
-DATABASE_URL=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
-SUPABASE_URL=https://[project-ref].supabase.co
-SUPABASE_ANON_KEY=your_anon_key_here
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
-# PostgreSQL Direct Connection
-PGHOST=aws-0-[region].pooler.supabase.com
-PGPORT=6543
-PGDATABASE=postgres
-PGUSER=postgres.[project-ref]
-PGPASSWORD=your_database_password
+# AI Services (Choose one or both)
+XAI_API_KEY=your-xai-api-key
+OPENAI_API_KEY=your-openai-api-key
 
-# Application
-SESSION_SECRET=generate_random_32_character_string
+# Application Settings
 NODE_ENV=production
-REPLIT_DOMAINS=your-app-name.vercel.app
+BASE_URL=https://your-domain.vercel.app
+
+# Optional Services
+SENDGRID_API_KEY=your-sendgrid-api-key
+TWILIO_ACCOUNT_SID=your-twilio-account-sid
+TWILIO_AUTH_TOKEN=your-twilio-auth-token
+STRIPE_SECRET_KEY=your-stripe-secret-key
 ```
 
-### 2.2 Optional Environment Variables
-```bash
-# Email (for contact forms)
-SENDGRID_API_KEY=your_sendgrid_key
+### 2.2 Setting Variables in Vercel
+1. Go to your Vercel project dashboard
+2. Navigate to Settings > Environment Variables
+3. Add each variable with appropriate values
+4. Set environment to "Production" and "Preview"
 
-# Payments (if enabling paid features)
-STRIPE_SECRET_KEY=your_stripe_secret_key
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+## Step 3: Deployment Configuration
 
-# AI Services (for CV analysis)
-OPENAI_API_KEY=your_openai_key
-```
+### 3.1 Verify Configuration Files
+Ensure these files are properly configured:
 
-## Step 3: Deploy to Vercel
+- `vercel.json` - Routing and build configuration
+- `api/index.ts` - Serverless API handler
+- `package.json` - Dependencies and scripts
 
-### 3.1 Connect Repository
-1. Go to [vercel.com/dashboard](https://vercel.com/dashboard)
-2. Click "New Project"
-3. Import your GitHub repository
-4. Select the repository
+### 3.2 Build Settings
+The following settings should be configured in Vercel:
 
-### 3.2 Configure Build Settings
-Vercel should auto-detect the settings, but verify:
-- **Build Command**: `npm run build`
+- **Framework Preset**: Vite
+- **Build Command**: `vite build`
 - **Output Directory**: `dist`
 - **Install Command**: `npm install`
-- **Development Command**: `npm run dev`
 
-### 3.3 Add Environment Variables
-1. In the Vercel project settings
-2. Go to Environment Variables
-3. Add all the variables from Step 2.1
-4. Make sure to mark sensitive keys as "Encrypted"
+## Step 4: Deploy to Vercel
 
-### 3.4 Deploy
-1. Click "Deploy"
-2. Wait for the build to complete
-3. Your app will be available at `https://your-app-name.vercel.app`
+### 4.1 Connect Repository
+1. Connect your GitHub repository to Vercel
+2. Import the project
+3. Configure the build settings as above
 
-## Step 4: Post-Deployment Setup
+### 4.2 Deploy
+1. Click "Deploy" to start the deployment
+2. Monitor the build logs for any errors
+3. Once deployed, test the application
 
-### 4.1 Test Database Connection
-1. Visit your deployed app
-2. Try the CV upload feature
-3. Check Supabase dashboard for data
+## Step 5: Post-Deployment Testing
 
-### 4.2 Set Up Custom Domain (Optional)
-1. In Vercel project settings
-2. Go to Domains
-3. Add your custom domain
-4. Follow DNS configuration instructions
-
-### 4.3 Configure Authentication
-Update the REPLIT_DOMAINS environment variable with your actual domain:
+### 5.1 Health Check
+Test the API health endpoint:
 ```bash
-REPLIT_DOMAINS=your-actual-domain.com,your-app-name.vercel.app
+curl https://your-domain.vercel.app/api/health
 ```
 
-## Step 5: Database Migrations
+Expected response:
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-12-08T15:40:00.000Z",
+  "environment": "production",
+  "supabase": true
+}
+```
 
-If you need to update the database schema:
+### 5.2 CV Upload Test
+Test CV upload functionality:
+1. Visit your deployed site
+2. Upload a test CV file
+3. Verify analysis results are returned
+4. Check Supabase dashboard for stored data
 
-1. Update the SQL files in your repository
-2. Run migrations in Supabase SQL Editor
-3. Or use the migration scripts in the `migrations/` folder
+### 5.3 Database Connection
+Verify Supabase connection:
+1. Check application logs in Vercel
+2. Verify data is being stored in Supabase tables
+3. Test newsletter subscription functionality
+
+## Step 6: Domain Configuration (Optional)
+
+### 6.1 Custom Domain
+1. Go to Settings > Domains in Vercel
+2. Add your custom domain
+3. Configure DNS records as instructed
+4. Update BASE_URL environment variable
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Database Connection Failed**
-   - Verify DATABASE_URL format
-   - Check Supabase project is not paused
-   - Ensure connection pooling is enabled
+1. **Build Failures**
+   - Check build logs for missing dependencies
+   - Verify all imports are correct
+   - Ensure TypeScript types are properly defined
 
-2. **Build Failures**
-   - Check Node.js version compatibility
-   - Verify all dependencies are in package.json
-   - Check for TypeScript errors
+2. **API Errors**
+   - Verify environment variables are set
+   - Check Supabase connection and credentials
+   - Monitor function logs in Vercel
 
-3. **Environment Variables Not Loading**
-   - Ensure variables are set in Vercel dashboard
-   - Check variable names match exactly
-   - Redeploy after adding new variables
+3. **Database Issues**
+   - Verify Supabase schema is properly created
+   - Check Row Level Security policies
+   - Ensure correct table names and columns
 
-4. **CORS Issues**
-   - Add your domain to Supabase allowed origins
-   - Check API endpoint configurations
+4. **File Upload Issues**
+   - Verify multer configuration
+   - Check file size limits
+   - Ensure proper MIME type handling
 
-### Performance Optimization
+### Monitoring
 
-1. **Enable Edge Functions** (if needed)
-2. **Configure Caching** for static assets
-3. **Set up Monitoring** in Vercel
-4. **Configure Supabase Edge Functions** for heavy operations
+1. **Vercel Analytics**: Monitor performance and usage
+2. **Supabase Logs**: Check database operations
+3. **Error Tracking**: Set up error monitoring (Sentry, etc.)
 
-## Security Checklist
+## Security Considerations
 
-- [ ] All sensitive keys are encrypted in Vercel
-- [ ] RLS policies are enabled in Supabase
-- [ ] HTTPS is enforced
-- [ ] API rate limiting is configured
-- [ ] Database connection uses SSL
-- [ ] Session secrets are properly generated
-- [ ] CORS is properly configured
+1. **Environment Variables**: Never commit sensitive keys to repository
+2. **CORS**: Properly configure CORS for your domain
+3. **Rate Limiting**: Consider implementing rate limiting for API endpoints
+4. **File Validation**: Ensure thorough file validation for uploads
 
-## Support
+## Performance Optimization
 
-If you encounter issues:
-1. Check Vercel deployment logs
-2. Check Supabase logs and metrics
-3. Verify environment variables
-4. Test database connectivity
-5. Check network/firewall settings
+1. **Caching**: Configure appropriate caching headers
+2. **Image Optimization**: Use Vercel's image optimization
+3. **Bundle Analysis**: Monitor bundle size and optimize
+4. **Database Indexing**: Ensure proper database indexes
 
-Your Hire Mzansi application should now be successfully deployed on Vercel with Supabase!
+This deployment should provide a fully functional CV optimization platform with Supabase backend integration.
