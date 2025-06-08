@@ -194,6 +194,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get latest CV endpoint - fixing the frontend error
+  app.get("/api/latest-cv", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // For unauthenticated users, return null
+      if (!req.isAuthenticated()) {
+        return res.json(null);
+      }
+
+      const userId = (req.user as any)?.id;
+      if (!userId) {
+        return res.json(null);
+      }
+      
+      const cvs = await storage.getCVsByUser(userId);
+      const latestCV = cvs && cvs.length > 0 ? cvs[0] : null;
+      res.json(latestCV);
+    } catch (error) {
+      console.error('Error fetching latest CV:', error);
+      res.json(null);
+    }
+  });
+
   // File upload route
   app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {

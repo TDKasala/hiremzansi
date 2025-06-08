@@ -1,16 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../../../shared/supabase';
-import type { User, Session, UserResponse, SignInWithPasswordCredentials } from '@supabase/supabase-js';
+
+// Define a simplified auth user type
+interface AuthUser {
+  id: number;
+  email: string;
+  name?: string;
+  isAdmin?: boolean;
+}
 
 // Define the shape of our auth context
 type AuthContextType = {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
   loading: boolean;
   error: Error | null;
   signUp: (email: string, password: string, userData?: any) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<any>;
+  checkAuth: () => Promise<void>;
 };
 
 // Create the context
@@ -27,60 +33,71 @@ export function useAuth() {
 
 // Provider component that wraps your app and makes auth object available to any child component that calls useAuth()
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    // Check for active session on component mount
-    const checkSession = async () => {
-      try {
-        setLoading(true);
-        
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user || null);
-        
-        // Listen for auth changes
-        const { data: { subscription } } = await supabase.auth.onAuthStateChange(
-          (_event, session) => {
-            console.log('Auth state changed:', _event);
-            setSession(session);
-            setUser(session?.user || null);
-          }
-        );
-        
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        setError(error as Error);
-        console.error('Error checking auth session:', error);
-      } finally {
-        setLoading(false);
+  const checkAuth = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        setUser(null);
+        console.log('Auth state changed:', 'INITIAL_SESSION');
+        return;
       }
-    };
-    
-    checkSession();
+
+      const response = await fetch('/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData.user);
+        console.log('Auth state changed:', 'AUTHENTICATED');
+      } else {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+        console.log('Auth state changed:', 'SIGNED_OUT');
+      }
+    } catch (error) {
+      setError(error as Error);
+      console.error('Error checking auth session:', error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
   }, []);
 
   // Sign up with email and password
   const signUp = async (email: string, password: string, userData: any = {}) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
-          emailRedirectTo: typeof window !== 'undefined' 
-            ? `${window.location.origin}/auth/callback` 
-            : 'https://www.hiremzansi.co.za/auth/callback'
-        }
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password, ...userData })
       });
 
-      if (error) throw error;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Sign up failed');
+      }
+
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+        setUser(data.user);
+      }
+
       return { data, error: null };
     } catch (error) {
       console.error('Error signing up:', error);
@@ -91,12 +108,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
       });
 
-      if (error) throw error;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+        setUser(data.user);
+      }
+
       return { data, error: null };
     } catch (error) {
       console.error('Error signing in:', error);
@@ -107,8 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      localStorage.removeItem('auth_token');
+      setUser(null);
+      console.log('Auth state changed:', 'SIGNED_OUT');
       return { error: null };
     } catch (error) {
       console.error('Error signing out:', error);
@@ -116,15 +147,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // AuthContext value
   const value = {
     user,
-    session,
     loading,
     error,
     signUp,
     signIn,
-    signOut
+    signOut,
+    checkAuth
   };
 
   return (
