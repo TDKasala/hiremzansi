@@ -12,6 +12,8 @@ import ReferralSourceSection from "@/components/ReferralSourceSection";
 import WhatsAppPromoSection from "@/components/WhatsAppPromoSection";
 import CTASection from "@/components/CTASection";
 import { JobMatchingAnnouncement } from "@/components/JobMatchingAnnouncement";
+import { CVOptimizationShowcase } from "@/components/CVOptimizationShowcase";
+import { CVAnalysisFeatures } from "@/components/CVAnalysisFeatures";
 
 
 export default function HomePage() {
@@ -28,8 +30,13 @@ export default function HomePage() {
       
       <HeroSection />
       <UploadSection />
+      <CVOptimizationShowcase />
+      <CVAnalysisFeatures />
       <WhatsAppPromoSection />
       <HowItWorksSection />
+      <div className="container mx-auto px-4 py-8">
+        <JobMatchingAnnouncement />
+      </div>
       <PricingSection />
       <FeaturesSection />
       <SuccessStoriesSection />

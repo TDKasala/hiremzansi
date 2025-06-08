@@ -42,11 +42,11 @@ export default function HeroSection() {
                 {t('home.southAfricanFocused')}
               </Badge>
               <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                {t('home.marketReality')}
+                AI-Powered CV Optimization for South Africa
               </h1>
             </div>
             <p className="text-lg md:text-xl mb-6 text-white font-normal">
-              {t('home.marketDescription')}
+              Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
             </p>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
