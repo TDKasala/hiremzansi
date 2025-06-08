@@ -78,6 +78,7 @@ import GraduateCVTemplates from "@/pages/blog/GraduateCVTemplates";
 import PersonalBrandingJobSearch from "@/pages/blog/PersonalBrandingJobSearch";
 import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
 import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
+import ResumeBuilder from "@/pages/ResumeBuilder";
 
 function App() {
   return (
@@ -137,6 +138,7 @@ function App() {
                 <Route path="/tools/cv-checklist" component={CVChecklistPage} />
                 <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
                 <Route path="/tools/interview-guide" component={InterviewGuidePage} />
+                <Route path="/resume-builder" component={ResumeBuilder} />
                 
                 {/* Job matching services coming soon - temporarily disabled */}
                 

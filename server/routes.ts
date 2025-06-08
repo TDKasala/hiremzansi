@@ -46,6 +46,7 @@ import notificationRoutes from "./routes/notificationRoutes";
 import candidateScoringRoutes from "./routes/candidateScoringRoutes";
 import gamificationRoutes from "./routes/gamificationRoutes";
 import cvAnalysisRoutes from "./routes/cvAnalysis";
+import dynamicResumeBuilderRoutes from "./routes/dynamicResumeBuilder";
 import { sendWeeklyCareerDigests, generatePersonalizedRecommendations } from "./services/recommendationService";
 import { sendCareerDigestEmail } from "./services/emailService";
 import { referralService } from "./referralService";
@@ -2390,6 +2391,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
+  // Mount Dynamic Resume Builder routes
+  app.use("/api", dynamicResumeBuilderRoutes);
   
   // Create HTTP server
   const httpServer = createServer(app);
