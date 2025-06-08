@@ -32,6 +32,7 @@ import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
+import { jobMatchingService } from "./services/jobMatchingService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
@@ -2311,6 +2312,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rewards = await referralService.getUserRewards(userId);
       res.json(rewards);
     } catch (error) {
+      next(error);
+    }
+  });
+
+  // Enhanced job matching endpoints
+  app.post("/api/job-matches/find", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req.user as any).id;
+      const { 
+        cvId, 
+        location, 
+        preferredSalaryRange, 
+        workType, 
+        experienceLevel 
+      } = req.body;
+      
+      if (!cvId) {
+        return res.status(400).json({ error: "CV ID is required" });
+      }
+
+      const matches = await jobMatchingService.findJobMatches({
+        cvId,
+        userId,
+        location,
+        preferredSalaryRange,
+        workType,
+        experienceLevel
+      });
+
+      // Save top matches to database
+      for (const match of matches.slice(0, 10)) {
+        try {
+          await jobMatchingService.saveJobMatch({
+            userId,
+            cvId,
+            jobPostingId: match.jobId,
+            matchScore: match.matchScore,
+            matchReasons: match.matchReasons,
+            skillsMatchScore: match.skillsMatchScore,
+            saContextScore: match.saContextScore,
+            locationScore: match.locationScore
+          });
+        } catch (saveError) {
+          console.log('Error saving match, continuing with others');
+        }
+      }
+
+      res.json({
+        matches: matches.slice(0, 20),
+        totalMatches: matches.length,
+        message: `Found ${matches.length} job matches`
+      });
+    } catch (error) {
+      console.error('Error finding job matches:', error);
+      next(error);
+    }
+  });
+
+  app.get("/api/job-matches/saved", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = (req.user as any).id;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const matches = await jobMatchingService.getUserJobMatches(userId, limit);
+
+      res.json({
+        matches,
+        count: matches.length
+      });
+    } catch (error) {
+      console.error('Error getting saved job matches:', error);
       next(error);
     }
   });
