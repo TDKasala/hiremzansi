@@ -101,41 +101,41 @@ export default function SuccessStoriesSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-24 bg-gradient-to-r from-white to-amber-50">
-      <div className="container mx-auto px-4">
+    <section ref={sectionRef} className="py-12 md:py-16 lg:py-24 bg-gradient-to-r from-white to-amber-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate={isVisible ? "visible" : "hidden"}
-          className="text-center mb-10"
+          className="text-center mb-8 md:mb-12"
         >
-          <motion.h2 variants={itemVariants} className="text-3xl md:text-4xl font-bold mb-4 text-secondary">
+          <motion.h2 variants={itemVariants} className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-secondary px-4">
             Success Stories That Inspire
           </motion.h2>
-          <motion.p variants={itemVariants} className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <motion.p variants={itemVariants} className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4">
             Real South Africans are landing their dream jobs with optimized CVs that stand out 
             from the competition and pass through ATS systems successfully.
           </motion.p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="flex flex-col space-y-6">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="flex flex-col space-y-6 order-2 lg:order-1">
             <motion.div 
               variants={itemVariants}
               initial="hidden"
               animate={isVisible ? "visible" : "hidden"}
-              className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-primary"
+              className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border-l-4 border-primary mx-2 sm:mx-0"
             >
-              <h3 className="font-bold text-xl mb-2">From Frustration to Success</h3>
-              <p className="text-gray-700">
+              <h3 className="font-bold text-lg sm:text-xl mb-2">From Frustration to Success</h3>
+              <p className="text-gray-700 text-sm sm:text-base">
                 "After months of sending applications with no responses, I was ready to give up. 
                 Hire Mzansi helped me understand why my CV wasn't getting through. Within 2 weeks of 
                 optimizing my CV, I landed three interviews and received my dream job offer!"
               </p>
-              <p className="font-medium mt-3 text-secondary">— Thandi M., Cape Town</p>
+              <p className="font-medium mt-3 text-secondary text-sm sm:text-base">— Thandi M., Cape Town</p>
             </motion.div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 px-2 sm:px-0">
               {successStats.map((stat, index) => (
                 <motion.div
                   key={index}
@@ -143,12 +143,12 @@ export default function SuccessStoriesSection() {
                   variants={statsVariants}
                   initial="hidden"
                   animate={isVisible ? "visible" : "hidden"}
-                  className="bg-white p-4 rounded-lg shadow-md text-center border-t-2 border-amber-400"
+                  className="bg-white p-3 sm:p-4 rounded-lg shadow-md text-center border-t-2 border-amber-400"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-primary">
+                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                     {stat.number}
                   </div>
-                  <div className="text-xs text-gray-700 mt-1">
+                  <div className="text-xs sm:text-sm text-gray-700 mt-1">
                     {stat.text}
                   </div>
                 </motion.div>
@@ -159,24 +159,24 @@ export default function SuccessStoriesSection() {
               variants={itemVariants}
               initial="hidden"
               animate={isVisible ? "visible" : "hidden"}
+              className="flex justify-center px-4 sm:px-0"
             >
               <Link href="/pricing">
-                <Button size="lg" className="bg-primary hover:bg-amber-500 text-white ml-[170px] mr-[170px] pl-[34px] pr-[34px]">
+                <Button size="lg" className="bg-primary hover:bg-amber-500 text-white w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base">
                   Join Our Success Stories
                 </Button>
               </Link>
             </motion.div>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center order-1 lg:order-2 px-4 sm:px-0">
             <motion.div
               variants={imageVariants}
               initial="hidden"
               animate={isVisible ? "visible" : "hidden"}
               whileHover="hover"
-              className="relative rounded-xl overflow-hidden shadow-2xl"
+              className="relative rounded-xl overflow-hidden shadow-2xl w-full max-w-sm sm:max-w-md lg:max-w-lg"
               style={{ 
-                maxWidth: "450px",
                 perspective: "1000px"
               }}
             >
@@ -195,7 +195,7 @@ export default function SuccessStoriesSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 transition={{ delay: 1, duration: 0.5 }}
-                className="absolute bottom-4 right-4 bg-primary/90 text-white px-3 py-2 rounded-full text-sm font-bold"
+                className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 bg-primary/90 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold"
               >
                 Hire Mzansi Success
               </motion.div>
