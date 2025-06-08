@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { mockAnalyzeCV } from '../services/mockXaiService';
+import { xaiService } from '../services/xaiService';
 import { formatAnalysisForResponse } from '../services/atsAnalysisService';
 import { storage } from '../storage';
 

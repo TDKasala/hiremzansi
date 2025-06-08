@@ -1,7 +1,7 @@
 import { db } from "../db";
 import { randomUUID } from "crypto";
 import OpenAI from "openai";
-import { jobBoardService, JobPosting } from "./jobBoardService";
+import { jobBoardService } from "./jobBoardService";
 
 // Initialize xAI (primary) and OpenAI (fallback)
 const xai = new OpenAI({ 

@@ -1332,8 +1332,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get latest CV uploaded by user
   app.get("/api/latest-cv", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(404).json({ error: "No CVs found for this user" });
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ error: "Authentication required" });
       }
       
       const userId = req.user.id;
@@ -1345,6 +1345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(cv);
     } catch (error) {
+      console.error("Error fetching latest CV:", error);
       next(error);
     }
   });
