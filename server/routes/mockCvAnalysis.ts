@@ -45,8 +45,8 @@ router.post('/test-cv-analysis/:id', async (req: Request, res: Response) => {
     
     console.log("Starting mock CV analysis demonstration");
     
-    // Use our mock analysis service
-    const analysis = await mockAnalyzeCV(cv.content, jobDescription);
+    // Use xAI service for CV analysis
+    const analysis = await xaiService.analyzeCV(cv.content, jobDescription);
     
     if (!analysis.success) {
       console.error("Mock analysis failed:", analysis.error);
@@ -57,23 +57,18 @@ router.post('/test-cv-analysis/:id', async (req: Request, res: Response) => {
     }
     
     // Format the analysis for the response
+    const result = analysis.data!;
     const formattedAnalysis = formatAnalysisForResponse({
       success: true,
-      score: analysis.result.overall_score,
-      rating: analysis.result.rating,
-      strengths: analysis.result.strengths,
-      improvements: analysis.result.improvements,
-      skills: analysis.result.skills_identified,
-      skillsScore: analysis.result.skill_score,
-      formatScore: analysis.result.format_score,
-      contextScore: analysis.result.sa_score,
-      saKeywordsFound: [
-        ...(analysis.result.south_african_context.b_bbee_mentions || []),
-        ...(analysis.result.south_african_context.nqf_levels || []),
-        ...(analysis.result.south_african_context.locations || []),
-        ...(analysis.result.south_african_context.regulations || []),
-        ...(analysis.result.south_african_context.languages || [])
-      ]
+      score: result.overallScore,
+      rating: Math.round(result.atsScore / 20),
+      strengths: result.strengths,
+      improvements: result.improvements,
+      skills: [],
+      skillsScore: result.atsScore,
+      formatScore: result.atsScore,
+      contextScore: 85,
+      saKeywordsFound: []
     });
     
     // Add demo notice

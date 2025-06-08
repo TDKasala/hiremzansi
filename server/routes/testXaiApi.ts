@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { testXaiConnection } from '../services/xaiService';
+import { xaiService } from '../services/xaiService';
 
 const router = Router();
 

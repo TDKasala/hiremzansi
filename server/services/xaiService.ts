@@ -74,6 +74,15 @@ class XAIService {
     }
   }
 
+  async analyzeCV(cvText: string, jobDescription?: string): Promise<{ success: boolean; data?: CVAnalysisResult; error?: string }> {
+    try {
+      const result = await this.analyzeCVForATS(cvText, jobDescription);
+      return { success: true, data: result };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
   async analyzeCVForATS(cvText: string, jobDescription?: string): Promise<CVAnalysisResult> {
     const prompt = this.buildCVAnalysisPrompt(cvText, jobDescription);
     const response = await this.makeRequest(prompt);

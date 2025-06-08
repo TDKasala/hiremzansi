@@ -1,4 +1,4 @@
-import { analyzeCV as analyzeWithXAI } from './xaiService';
+import { xaiService } from './xaiService';
 import { CV } from '@shared/schema';
 import { sanitizeHtml } from '../utils/textUtil';
 
@@ -50,9 +50,9 @@ export async function analyzeCVContent(
     }
     
     // Analyze the CV using xAI
-    const analysis = await analyzeWithXAI(textContent, jobDescription);
+    const analysis = await xaiService.analyzeCV(textContent, jobDescription);
     
-    if (!analysis.success || !analysis.result) {
+    if (!analysis.success || !analysis.data) {
       return {
         success: false,
         error: analysis.error || "Failed to analyze CV with AI service"
@@ -60,7 +60,7 @@ export async function analyzeCVContent(
     }
     
     // Extract the relevant information from the AI service response
-    const result = analysis.result;
+    const result = analysis.data;
     
     // Prepare the standardized response format
     return {
