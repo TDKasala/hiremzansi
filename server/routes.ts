@@ -27,6 +27,7 @@ import {
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
+import { verifyToken } from "./auth";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
@@ -56,21 +57,76 @@ const upload = multer({
 });
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated()) {
+  // Check for authorization header
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    try {
+      const decoded = verifyToken(token);
+      if (decoded) {
+        (req as any).user = decoded;
+        return next();
+      }
+    } catch (error) {
+      // Token invalid, continue to unauthorized response
+    }
+  }
+  
+  // Check session-based authentication if available
+  if (req.session && (req.session as any).userId) {
     return next();
   }
+  
   res.status(401).json({ error: "Authentication required" });
 };
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated() && req.user && (req.user as any).role === "admin") {
+  // Check for authorization header
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    try {
+      const decoded = verifyToken(token);
+      if (decoded && decoded.role === "admin") {
+        (req as any).user = decoded;
+        return next();
+      }
+    } catch (error) {
+      // Token invalid, continue to unauthorized response
+    }
+  }
+  
+  // Check session-based authentication if available
+  if (req.session && (req.session as any).userId && (req.session as any).isAdmin) {
     return next();
   }
+  
   res.status(403).json({ error: "Admin access required" });
 };
 
 const hasActiveSubscription = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.isAuthenticated()) {
+  // Check for authorization header
+  const authHeader = req.headers.authorization;
+  let user = null;
+  
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
+    try {
+      user = verifyToken(token);
+      if (user) {
+        (req as any).user = user;
+      }
+    } catch (error) {
+      // Token invalid, continue to unauthorized response
+    }
+  }
+  
+  // Check session-based authentication if available
+  if (!user && req.session && (req.session as any).userId) {
+    user = { id: (req.session as any).userId };
+  }
+  
+  if (!user) {
     return res.status(401).json({ error: "Authentication required" });
   }
   
@@ -1332,7 +1388,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get latest CV uploaded by user
   app.get("/api/latest-cv", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.isAuthenticated() || !req.user) {
+      // Check for authorization header
+      const authHeader = req.headers.authorization;
+      let user = null;
+      
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          user = verifyToken(token);
+          if (user) {
+            (req as any).user = user;
+          }
+        } catch (error) {
+          // Token invalid
+        }
+      }
+      
+      // Check session-based authentication if available
+      if (!user && req.session && (req.session as any).userId) {
+        user = { id: (req.session as any).userId };
+        (req as any).user = user;
+      }
+      
+      if (!user) {
         return res.status(401).json({ error: "Authentication required" });
       }
       
