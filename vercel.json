@@ -1,7 +1,11 @@
 {
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "vite",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node"
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
@@ -14,10 +18,6 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "vite build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
   "headers": [
     {
       "source": "/api/(.*)",
