@@ -3,8 +3,12 @@ import { randomUUID } from "crypto";
 import OpenAI from "openai";
 import { jobBoardService, JobPosting } from "./jobBoardService";
 
-// Initialize OpenAI
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Initialize xAI (primary) and OpenAI (fallback)
+const xai = new OpenAI({ 
+  baseURL: "https://api.x.ai/v1", 
+  apiKey: process.env.XAI_API_KEY 
+});
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Types for interview simulations
@@ -136,16 +140,31 @@ ${params.jobDescription}
 Candidate's CV:
 ${params.cvContent}`;
 
-      // Make the API request
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 2500
-      });
+      // Try xAI first, fallback to OpenAI
+      let response;
+      try {
+        response = await xai.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 2500
+        });
+        console.log("Successfully used xAI for interview question generation");
+      } catch (xaiError) {
+        console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 2500
+        });
+      }
 
       const content = response.choices[0].message.content;
       if (!content) {
@@ -291,16 +310,31 @@ ${question.expectedTopics?.join(', ') || 'Not specified'}
 Candidate's Answer:
 ${answer}`;
 
-      // Make the API request
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 1500
-      });
+      // Try xAI first, fallback to OpenAI
+      let response;
+      try {
+        response = await xai.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 1500
+        });
+        console.log("Successfully used xAI for interview answer evaluation");
+      } catch (xaiError) {
+        console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 1500
+        });
+      }
 
       const content = response.choices[0].message.content;
       if (!content) {
@@ -376,15 +410,29 @@ ${JSON.stringify(questionSummaries, null, 2)}
 
 Average Score: ${averageScore}/100`;
 
-      // Make the API request
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        max_tokens: 1200
-      });
+      // Try xAI first, fallback to OpenAI
+      let response;
+      try {
+        response = await xai.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          max_tokens: 1200
+        });
+        console.log("Successfully used xAI for interview overall feedback");
+      } catch (xaiError: any) {
+        console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          max_tokens: 1200
+        });
+      }
 
       const feedback = response.choices[0].message.content || '';
       
@@ -450,6 +498,69 @@ Skills: ${job.skills.join(', ')}
     
     // TODO: Store session in database
     // For now, we're just returning it
+    
+    return session;
+  }
+  
+  // Submit an answer to a question and evaluate it
+  async submitAnswer(
+    session: InterviewSession,
+    questionId: string,
+    answer: string
+  ): Promise<InterviewSession> {
+    // Find the question
+    const question = session.questions.find(q => q.id === questionId);
+    if (!question) {
+      throw new Error(`Question with ID ${questionId} not found`);
+    }
+    
+    // Store the answer
+    session.userAnswers[questionId] = answer;
+    
+    // Evaluate the answer
+    const evaluation = await this.evaluateAnswer(
+      question,
+      answer,
+      session.jobDescription || ''
+    );
+    
+    // Store the evaluation
+    session.evaluations[questionId] = evaluation;
+    
+    // TODO: Update session in database
+    
+    return session;
+  }
+  
+  // Complete an interview session with overall feedback
+  async completeSession(session: InterviewSession): Promise<InterviewSession> {
+    // Generate overall feedback
+    const { score, feedback } = await this.generateOverallFeedback(session);
+    
+    // Update session
+    session.overallScore = score;
+    session.overallFeedback = feedback;
+    session.completedAt = new Date().toISOString();
+    
+    // TODO: Update session in database
+    
+    return session;
+  }
+  
+  // Get a session by ID
+  async getSessionById(sessionId: string): Promise<InterviewSession | null> {
+    // TODO: Retrieve session from database
+    // For now, return null
+    return null;
+  }
+  
+  // Get all sessions for a user
+  async getSessionsByUser(userId: number): Promise<InterviewSession[]> {
+    // TODO: Retrieve sessions from database
+    // For now, return empty array
+    return [];
+  }
+}
     
     return session;
   }
