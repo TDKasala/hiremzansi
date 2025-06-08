@@ -1,9 +1,13 @@
 import OpenAI from "openai";
 
-// Initialize xAI client using OpenAI SDK with xAI base URL
+// Initialize xAI client (primary) and OpenAI client (fallback)
 const xai = new OpenAI({
   baseURL: "https://api.x.ai/v1",
   apiKey: process.env.XAI_API_KEY,
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export interface CVAnalysisResult {
@@ -40,6 +44,7 @@ export interface CareerGuidanceResult {
 
 class XAIService {
   private async makeRequest(prompt: string, maxTokens: number = 4000): Promise<string> {
+    // Try xAI first, fallback to OpenAI
     try {
       const response = await xai.chat.completions.create({
         model: "grok-2-1212",
@@ -48,10 +53,24 @@ class XAIService {
         temperature: 0.7,
       });
 
+      console.log("Successfully used xAI for CV analysis");
       return response.choices[0].message.content || "";
-    } catch (error) {
-      console.error("xAI API Error:", error);
-      throw new Error("Failed to process with xAI");
+    } catch (xaiError: any) {
+      console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+      
+      try {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: maxTokens,
+          temperature: 0.7,
+        });
+
+        return response.choices[0].message.content || "";
+      } catch (openaiError) {
+        console.error("Both xAI and OpenAI failed:", openaiError);
+        throw new Error("Failed to process with AI services");
+      }
     }
   }
 

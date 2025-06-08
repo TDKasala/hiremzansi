@@ -3,8 +3,12 @@ import { randomUUID } from "crypto";
 import OpenAI from "openai";
 import { jobBoardService, JobPosting } from "./jobBoardService";
 
-// Initialize OpenAI
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Initialize xAI (primary) and OpenAI (fallback)
+const xai = new OpenAI({ 
+  baseURL: "https://api.x.ai/v1", 
+  apiKey: process.env.XAI_API_KEY 
+});
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Types for skill analysis
@@ -133,16 +137,31 @@ Format your response as a JSON array with the following structure:
 
 Focus on extracting at least 15-20 distinct skills, including both technical and soft skills.`;
 
-      // Make the API request
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: cvContent }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 2000
-      });
+      // Try xAI first, fallback to OpenAI
+      let response;
+      try {
+        response = await xai.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: cvContent }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 2000
+        });
+        console.log("Successfully used xAI for skill extraction");
+      } catch (xaiError: any) {
+        console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: cvContent }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 2000
+        });
+      }
 
       const content = response.choices[0].message.content;
       if (!content) {
@@ -235,16 +254,31 @@ ${JSON.stringify(params.currentSkills, null, 2)}
 
 ${params.cvContent ? `Additional CV Content: ${params.cvContent}` : ''}`;
 
-      // Make the API request
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 4000
-      });
+      // Try xAI first, fallback to OpenAI
+      let response;
+      try {
+        response = await xai.chat.completions.create({
+          model: "grok-2-1212",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 4000
+        });
+        console.log("Successfully used xAI for skill gap analysis");
+      } catch (xaiError: any) {
+        console.log("xAI failed, falling back to OpenAI:", xaiError.message);
+        response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 4000
+        });
+      }
 
       const content = response.choices[0].message.content;
       if (!content) {

@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-// Type definitions for the OpenAI client
+// Type definitions for the AI client
 type MessageRole = 'system' | 'user' | 'assistant';
 
 interface Message {
@@ -8,7 +8,12 @@ interface Message {
   content: string;
 }
 
-// Initialize the OpenAI client
+// Initialize xAI client (primary) and OpenAI client (fallback)
+const xai = new OpenAI({
+  baseURL: "https://api.x.ai/v1",
+  apiKey: process.env.XAI_API_KEY
+});
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
