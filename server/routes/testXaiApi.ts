@@ -17,10 +17,10 @@ router.get('/test-xai', async (_req: Request, res: Response) => {
       });
     }
     
-    // Test the connection to xAI API
-    const connected = await testXaiConnection();
+    // Test the connection to xAI API by trying a simple CV analysis
+    const testResult = await xaiService.analyzeCV("Test CV content for API connectivity");
     
-    if (connected) {
+    if (testResult.success) {
       return res.json({
         success: true,
         message: 'Successfully connected to xAI Grok API'
@@ -28,7 +28,7 @@ router.get('/test-xai', async (_req: Request, res: Response) => {
     } else {
       return res.status(500).json({
         success: false,
-        message: 'Failed to connect to xAI Grok API'
+        message: 'Failed to connect to xAI API: ' + testResult.error
       });
     }
   } catch (error: any) {

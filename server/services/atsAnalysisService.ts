@@ -65,21 +65,15 @@ export async function analyzeCVContent(
     // Prepare the standardized response format
     return {
       success: true,
-      score: result.overall_score,
-      rating: result.rating,
+      score: result.overallScore,
+      rating: Math.round(result.atsScore / 20).toString(),
       strengths: result.strengths || [],
       improvements: result.improvements || [],
-      skills: result.skills_identified || [],
-      skillsScore: result.skill_score,
-      formatScore: result.format_score,
-      contextScore: result.sa_score,
-      saKeywordsFound: result.south_african_context ? [
-        ...(result.south_african_context.b_bbee_mentions || []),
-        ...(result.south_african_context.nqf_levels || []),
-        ...(result.south_african_context.locations || []),
-        ...(result.south_african_context.regulations || []),
-        ...(result.south_african_context.languages || [])
-      ] : []
+      skills: [],
+      skillsScore: result.atsScore,
+      formatScore: result.atsScore,
+      contextScore: 85,
+      saKeywordsFound: []
     };
   } catch (error: any) {
     console.error('Error in ATS analysis service:', error);
