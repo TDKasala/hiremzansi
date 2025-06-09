@@ -157,10 +157,10 @@ The Hire Mzansi Team
     <p>${recommendations.industryTips}</p>
     ` : ''}
     
-    <a href="https://atsboost.co.za/dashboard" class="cta-button">View Details on Dashboard</a>
+    <a href="https://hiremzansi.co.za/dashboard" class="cta-button">View Details on Dashboard</a>
     
     <p class="footer">
-      To manage your email preferences, <a href="https://atsboost.co.za/profile/settings">visit your account settings</a>.<br/>
+      To manage your email preferences, <a href="https://hiremzansi.co.za/profile/settings">visit your account settings</a>.<br/>
       © 2025 Hire Mzansi. All rights reserved.
     </p>
   </div>
@@ -254,7 +254,7 @@ The Hire Mzansi Team
         <li>Skill gap analysis to advance your career</li>
       </ul>
       
-      <a href="https://atsboost.co.za/dashboard" class="button">Go to My Dashboard</a>
+      <a href="https://hiremzansi.co.za/dashboard" class="button">Go to My Dashboard</a>
       
       <p>If you have any questions, simply reply to this email.</p>
       
@@ -493,7 +493,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   }
   
   try {
-    const fromAddress = options.from || 'notifications@atsboost.co.za';
+    const fromAddress = options.from || 'notifications@hiremzansi.co.za';
     
     // Create email data with proper SendGrid types
     const emailData: MailDataRequired = {
