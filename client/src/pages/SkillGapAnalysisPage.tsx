@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -461,6 +462,10 @@ const SkillGapAnalysisPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 py-12">
+      <Helmet>
+        <title>Skill Gap Analysis | Hire Mzansi</title>
+        <meta name="description" content="Identify skill gaps and get personalized career development recommendations for the South African job market." />
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
