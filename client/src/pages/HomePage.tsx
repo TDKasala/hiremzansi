@@ -30,9 +30,8 @@ export default function HomePage() {
       
       <HeroSection />
       <UploadSection />
-      <CVOptimizationShowcase />
-      <CVAnalysisFeatures />
       <WhatsAppPromoSection />
+      <CVOptimizationShowcase />
       <HowItWorksSection />
       <div className="container mx-auto px-4 py-8">
         <JobMatchingAnnouncement />
