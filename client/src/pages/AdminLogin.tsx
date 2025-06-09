@@ -25,9 +25,6 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      console.log("Making login request to:", "/api/admin/login");
-      console.log("Request body:", { email, password: "***hidden***" });
-      
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: {
@@ -40,21 +37,8 @@ export default function AdminLogin() {
         credentials: "include",
       });
 
-      console.log("Response status:", response.status);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
-      
-      const responseText = await response.text();
-      console.log("Raw response text:", responseText.substring(0, 200));
-
       if (response.ok) {
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error("JSON parse error:", parseError);
-          setError("Server returned invalid response format");
-          return;
-        }
+        const data = await response.json();
         
         // Check if user is admin
         if (!data.user.isAdmin && data.user.role !== "admin") {
@@ -74,16 +58,11 @@ export default function AdminLogin() {
         // Redirect to admin dashboard
         setLocation("/admin/dashboard");
       } else {
-        try {
-          const errorData = JSON.parse(responseText);
-          setError(errorData.message || "Login failed");
-        } catch (parseError) {
-          console.error("Error parsing error response:", parseError);
-          setError(`Server error: ${response.status} ${response.statusText}`);
-        }
+        const errorData = await response.json();
+        setError(errorData.message || "Login failed");
       }
     } catch (error) {
-      console.error("Full login error:", error);
+      console.error("Login error:", error);
       setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);

@@ -52,31 +52,19 @@ app.use((req, res, next) => {
     
     // Add API route protection BEFORE Vite middleware
     app.use((req, res, next) => {
-      // Store original res.end to detect if response was sent
-      const originalEnd = res.end.bind(res);
-      let responseSent = false;
-      
-      res.end = function(...args) {
-        responseSent = true;
-        return originalEnd(...args);
-      };
-      
-      // Set a flag to track if we're in an API route
+      // Only apply special handling to API routes
       if (req.path.startsWith('/api/')) {
         res.locals.isApiRoute = true;
-        
-        // Set a timeout to catch unhandled API routes
-        setTimeout(() => {
-          if (!responseSent && !res.headersSent) {
-            res.status(404).json({ error: 'API endpoint not found' });
-          }
-        }, 0);
       }
-      
       next();
     });
 
     const server = await registerRoutes(app);
+
+    // Catch unhandled API routes AFTER all routes are registered
+    app.use('/api/*', (req: Request, res: Response) => {
+      res.status(404).json({ error: 'API endpoint not found' });
+    });
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
