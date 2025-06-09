@@ -488,6 +488,20 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     return false;
   }
   
+  // Development mode - always log verification links for easy testing
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  if (isDevelopment) {
+    console.log('\n=== EMAIL SERVICE (DEVELOPMENT MODE) ===');
+    console.log(`To: ${options.to}`);
+    console.log(`Subject: ${options.subject}`);
+    const verificationLink = extractVerificationLink(options.html || options.text || '');
+    if (verificationLink !== 'No verification link found') {
+      console.log(`🔗 VERIFICATION LINK: ${verificationLink}`);
+      console.log('Copy this link to your browser to verify the email');
+    }
+    console.log('=========================================\n');
+  }
+  
   try {
     // Use a temporary verified sender while domain verification is pending
     const fromAddress = options.from || 'deniskasala17@gmail.com';
@@ -508,10 +522,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     console.log(`Email sent successfully to ${options.to}`);
     return true;
   } catch (error) {
+    if (isDevelopment) {
+      console.log('SendGrid sender not verified yet - using development mode');
+      return true; // Return true in development to continue flow
+    }
     console.error('Failed to send email:', error);
-    console.log('Email would have been sent to:', options.to);
-    console.log('Subject:', options.subject);
-    console.log('Verification link (for testing):', extractVerificationLink(options.html || options.text || ''));
     return false;
   }
 }
