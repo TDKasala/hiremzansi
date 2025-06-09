@@ -42,7 +42,11 @@ export const simpleAuth = {
   },
 
   async getUserByEmail(email: string) {
-    return users.get(email);
+    console.log("Looking for user with email:", email);
+    console.log("Available users:", Array.from(users.keys()));
+    const user = users.get(email);
+    console.log("Found user:", user ? "Yes" : "No");
+    return user;
   },
 
   async verifyPassword(plainPassword: string, hashedPassword: string) {
@@ -52,8 +56,11 @@ export const simpleAuth = {
   generateToken(userId: number) {
     const user = Array.from(users.values()).find(u => u.id === userId);
     return jwt.sign({ 
-      userId, 
-      email: user?.email 
+      id: userId,
+      email: user?.email,
+      username: user?.username,
+      isAdmin: false,
+      role: user?.role || 'user'
     }, JWT_SECRET, { expiresIn: '24h' });
   },
 
