@@ -247,6 +247,21 @@
   background: white;
 }
 
+/* Gradient animation for discount banner */
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 400% 400%;
+  animation: gradient-x 3s ease infinite;
+}
+
 /* Mobile optimizations */
 @media (max-width: 640px) {
   /* Smaller card paddings on mobile */
