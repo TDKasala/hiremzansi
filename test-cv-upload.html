@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CV Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .button { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 5px; }
+        .error { background: #fee2e2; color: #dc2626; }
+        .success { background: #dcfce7; color: #166534; }
+        input { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test CV Upload Functionality</h1>
+        
+        <h3>Upload Test File</h3>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt">
+        <br>
+        <button class="button" onclick="uploadFile()">Upload CV</button>
+        <div id="result" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showResult('Please select a file first', 'error');
+                return;
+            }
+            
+            console.log('Selected file:', file);
+            console.log('File type:', file.type);
+            console.log('File size:', file.size);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                showResult('Uploading...', 'info');
+                
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    showResult(`Upload successful! CV ID: ${data.id}`, 'success');
+                } else {
+                    showResult(`Upload failed (${response.status}): ${data.error || data.message}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showResult(`Upload error: ${error.message}`, 'error');
+            }
+        }
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+        }
+    </script>
+</body>
+</html>

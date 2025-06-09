@@ -60,6 +60,23 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
+  fileFilter: (req, file, cb) => {
+    console.log("File filter check:", file.mimetype);
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'text/plain'
+    ];
+    
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      console.log("Rejected file type:", file.mimetype);
+      const error = new Error(`Unsupported file type: ${file.mimetype}`);
+      cb(error as any, false);
+    }
+  }
 });
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
@@ -1377,9 +1394,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // CV Upload endpoint - supports both authenticated and guest users
-  app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/upload", (req: Request, res: Response, next: NextFunction) => {
+    upload.single("file")(req, res, (err) => {
+      if (err) {
+        console.log("Multer error:", err);
+        if (err instanceof multer.MulterError) {
+          if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+              error: "File too large",
+              message: "File size must be less than 5MB"
+            });
+          }
+        }
+        return res.status(400).json({
+          error: "File upload error",
+          message: err.message || "Failed to upload file"
+        });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("Upload request received");
+      console.log("Request headers:", req.headers);
+      console.log("Request file:", req.file);
+      console.log("Request body:", req.body);
+      
       if (!req.file) {
+        console.log("No file found in request");
         return res.status(400).json({ 
           error: "No file uploaded", 
           message: "Please upload a file" 

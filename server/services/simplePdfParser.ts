@@ -6,13 +6,13 @@ const exec = promisify(execCallback);
 const readFileAsync = promisify(fs.readFile);
 
 /**
- * Extracts text from a PDF file using a simple, reliable approach
+ * Extracts text from a PDF file or buffer using a simple, reliable approach
  * This function serves as a fallback when other PDF parsing methods fail
  * 
- * @param filePath Path to the PDF file
+ * @param input Path to the PDF file or Buffer containing PDF data
  * @returns Extracted text from the PDF
  */
-export async function extractTextFromPDF(filePath: string): Promise<string> {
+export async function extractTextFromPDF(input: string | Buffer): Promise<string> {
   try {
     // First try using a basic extraction approach
     try {
