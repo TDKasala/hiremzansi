@@ -27,7 +27,8 @@ import {
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
-import { verifyToken } from "./auth";
+import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
+import jwt from "jsonwebtoken";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
@@ -187,6 +188,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/me", requireAdmin, (req: Request, res: Response) => {
     res.json({ user: req.adminUser });
+  });
+
+  // User Authentication Routes - Simple Implementation
+  app.post("/api/auth/signup", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password, name } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Create user using existing auth system
+      const userData = {
+        username: email.split('@')[0],
+        email,
+        password,
+        name: name || '',
+        role: 'user'
+      };
+
+      // Use the auth service to create user with hashed password
+      const hashedPassword = await hashPassword(password);
+      const userToCreate = { ...userData, password: hashedPassword };
+      
+      const user = await storage.createUser(userToCreate);
+      
+      // Generate token
+      const token = generateToken({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        isAdmin: false
+      });
+
+      res.status(201).json({ 
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          name: user.name,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      if (error.message?.includes('unique') || error.message?.includes('already exists')) {
+        return res.status(400).json({ message: "User already exists with this email" });
+      }
+      next(error);
+    }
+  });
+
+  app.post("/api/auth/login", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+
+      // Use existing auth service
+      const { authenticateUser } = require('./auth');
+      const user = await authenticateUser(email, password);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      const { generateToken } = require('./auth');
+      const token = generateToken(user);
+
+      res.json({ 
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          name: user.firstName || user.name,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/auth/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req as any).user;
+      res.json({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.firstName || user.name,
+        role: user.role
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/auth/logout", (req: Request, res: Response) => {
+    res.json({ message: "Logged out successfully" });
   });
 
   // Admin dashboard stats
