@@ -106,12 +106,39 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
+  public memUsers: Map<string, User>;
 
   constructor() {
     this.sessionStore = new MemStore({
       checkPeriod: 86400000, // prune expired entries every 24h
       ttl: 86400000, // 24 hour TTL
       stale: true
+    });
+    this.memUsers = new Map<string, User>();
+    
+    // Add default admin user for testing
+    this.memUsers.set('deniskasala17@gmail.com', {
+      id: 1,
+      username: 'admin',
+      email: 'deniskasala17@gmail.com',
+      password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+      name: 'Admin User',
+      profilePicture: null,
+      role: 'admin',
+      isActive: true,
+      emailVerified: true,
+      verificationToken: null,
+      verificationTokenExpiry: null,
+      lastLogin: null,
+      resetToken: null,
+      resetTokenExpiry: null,
+      receiveEmailDigest: true,
+      lastEmailDigestSent: null,
+      phoneNumber: null,
+      phoneVerified: false,
+      isTemporary: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
   }
 
@@ -127,8 +154,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+    // Use in-memory storage for development
+    return this.memUsers.get(email);
   }
   
   async getUserByPhoneNumber(phoneNumber: string): Promise<User | undefined> {
@@ -197,6 +224,11 @@ export class DatabaseStorage implements IStorage {
       createdAt: now,
       updatedAt: now
     };
+    
+    // Initialize memUsers if it doesn't exist
+    if (!this.memUsers) {
+      this.memUsers = new Map<string, User>();
+    }
     
     // Store in memory for development (replace with actual DB in production)
     this.memUsers.set(newUser.email, newUser);
