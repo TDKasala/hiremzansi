@@ -80,14 +80,37 @@ const SkillGapAnalysisPage: React.FC = () => {
   const onSubmit = async (data: AnalysisFormData) => {
     setIsAnalyzing(true);
     
-    // Simulate analysis delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Generate sample results based on form data
-    const result = generateAnalysisResult(data);
-    setAnalysisResult(result);
-    setIsAnalyzing(false);
-    setShowActionPlan(true);
+    try {
+      const response = await fetch('/api/skill-gap/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentRole: data.currentRole,
+          targetRole: data.targetRole,
+          experience: data.experience,
+          industry: data.industry,
+          currentSkills: data.currentSkills
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze skill gap');
+      }
+
+      const result = await response.json();
+      setAnalysisResult(result);
+      setShowActionPlan(true);
+    } catch (error) {
+      console.error('Error analyzing skill gap:', error);
+      // Fallback to local analysis
+      const result = generateAnalysisResult(data);
+      setAnalysisResult(result);
+      setShowActionPlan(true);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const generateAnalysisResult = (data: AnalysisFormData): SkillGapResult => {
