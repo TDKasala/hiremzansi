@@ -28,6 +28,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
 import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
+import { simpleAuth, authenticateToken } from "./simpleAuth";
 import jwt from "jsonwebtoken";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
@@ -193,35 +194,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Authentication Routes - Simple Implementation
   app.post("/api/auth/signup", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password, name, username } = req.body;
       
       if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      // Create user using existing auth system
-      const userData = {
-        username: email.split('@')[0],
+      // Check if user already exists
+      const existingUser = await simpleAuth.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists with this email" });
+      }
+
+      // Create user using simplified auth system
+      const user = await simpleAuth.createUser({
+        username: username || email.split('@')[0],
         email,
         password,
-        name: name || '',
-        role: 'user'
-      };
-
-      // Use the auth service to create user with hashed password
-      const hashedPassword = await hashPassword(password);
-      const userToCreate = { ...userData, password: hashedPassword };
-      
-      const user = await storage.createUser(userToCreate);
+        name: name || ''
+      });
       
       // Generate token
-      const token = generateToken({
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-        isAdmin: false
-      });
+      const token = simpleAuth.generateToken(user.id);
 
       res.status(201).json({ 
         token,
@@ -234,10 +228,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error) {
-      if (error.message?.includes('unique') || error.message?.includes('already exists')) {
-        return res.status(400).json({ message: "User already exists with this email" });
-      }
-      next(error);
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Failed to create user" });
     }
   });
 
@@ -249,14 +241,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      // Use existing auth service
-      const user = await authenticateUser(email, password);
-      
+      // Get user by email
+      const user = await simpleAuth.getUserByEmail(email);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const token = generateToken(user);
+      // Verify password
+      const isValidPassword = await simpleAuth.verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Generate token
+      const token = simpleAuth.generateToken(user.id);
 
       res.json({ 
         token,
@@ -264,27 +262,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           email: user.email,
           username: user.username,
-          name: user.firstName || user.name,
+          name: user.name,
           role: user.role
         }
       });
     } catch (error) {
-      next(error);
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
     }
   });
 
-  app.get("/api/auth/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+  app.get("/api/auth/me", authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = (req as any).user;
+      const tokenPayload = (req as any).user;
+      const user = await simpleAuth.getUserByEmail(tokenPayload.email);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
       res.json({
         id: user.id,
         email: user.email,
         username: user.username,
-        name: user.firstName || user.name,
+        name: user.name,
         role: user.role
       });
     } catch (error) {
-      next(error);
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to get user" });
     }
   });
 
