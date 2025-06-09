@@ -14,7 +14,6 @@ if (sendgridApiKey) {
   console.log('SendGrid email service initialized successfully');
 } else {
   console.warn('SENDGRID_API_KEY not found in environment variables. Email service will be disabled.');
-  // You'll need to add SENDGRID_API_KEY to your environment variables to enable email functionality
 }
 
 // Email templates
@@ -220,6 +219,12 @@ The Hire Mzansi Team
       border-radius: 4px;
       margin: 20px 0;
     }
+    .features {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
     .footer {
       font-size: 12px;
       color: #666;
@@ -233,20 +238,15 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
-      <h1>Welcome to Hire Mzansi, ${name || 'there'}!</h1>
-      <p>We're excited to have you on board. Hire Mzansi is your all-in-one South African career acceleration platform.</p>
+      <h1>Welcome to Hire Mzansi!</h1>
+      <p>Hello ${name || 'there'},</p>
+      <p>Welcome to Hire Mzansi - Your South African career acceleration platform!</p>
       
-      <h2>Get started with these simple steps:</h2>
-      <ol>
-        <li>Upload your CV for an instant ATS compatibility score</li>
-        <li>Use our premium tools to boost your job search</li>
-        <li>Complete your profile to get personalized recommendations</li>
-      </ol>
+      <p>We're excited to have you on board. Our platform helps you:</p>
       
-      <p>Our platform offers:</p>
       <ul>
         <li>CV ATS scoring and optimization</li>
         <li>Job search with South African market insights</li>
@@ -337,7 +337,7 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Reset Your Password</h1>
@@ -357,7 +357,7 @@ The Hire Mzansi Team
     <div class="footer">
       <p>© ${new Date().getFullYear()} Hire Mzansi. All rights reserved.</p>
       <p>South Africa's premier career advancement platform.</p>
-      <p>If you need assistance, please contact <a href="mailto:support@atsboost.co.za">support@atsboost.co.za</a></p>
+      <p>If you need assistance, please contact <a href="mailto:support@hiremzansi.co.za">support@hiremzansi.co.za</a></p>
     </div>
   </div>
 </body>
@@ -434,7 +434,7 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://atsboost.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Verify Your Email Address</h1>
@@ -448,12 +448,12 @@ The Hire Mzansi Team
         <ul>
           <li>Full access to all Hire Mzansi features</li>
           <li>Personalized job recommendations</li>
-          <li>Latest South African job market insights</li>
-          <li>Important account notifications</li>
+          <li>Weekly career development digest</li>
+          <li>Priority support and updates</li>
         </ul>
       </div>
       
-      <p>This verification link will expire in 24 hours.</p>
+      <p><strong>Please note:</strong> This verification link will expire in 24 hours.</p>
       
       <p>If you did not create an account, please ignore this email.</p>
       
@@ -462,7 +462,6 @@ The Hire Mzansi Team
     <div class="footer">
       <p>© ${new Date().getFullYear()} Hire Mzansi. All rights reserved.</p>
       <p>South Africa's premier career advancement platform.</p>
-      <p>If you need assistance, please contact <a href="mailto:support@atsboost.co.za">support@atsboost.co.za</a></p>
     </div>
   </div>
 </body>
@@ -474,16 +473,13 @@ The Hire Mzansi Team
 interface EmailOptions {
   to: string;
   from?: string;
-  subject: string;  // Changed from optional to required
+  subject: string;
   text?: string;
   html?: string;
 }
 
 /**
  * Send an email using SendGrid
- * 
- * @param options Email sending options
- * @returns Promise resolving to boolean indicating success
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   if (!emailServiceEnabled) {
@@ -495,7 +491,6 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
     const fromAddress = options.from || 'notifications@hiremzansi.co.za';
     
-    // Create email data with proper SendGrid types
     const emailData: MailDataRequired = {
       to: options.to,
       from: fromAddress,
@@ -516,101 +511,50 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
 /**
  * Send a welcome email to a new user
- * 
- * @param email User's email address
- * @param name User's name or username
- * @returns Promise resolving to boolean indicating success
  */
-export async function sendWelcomeEmail(email: string, name: string): Promise<boolean> {
+export async function sendWelcomeEmail(email: string, name?: string): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: EMAIL_TEMPLATES.WELCOME.subject,
-    text: EMAIL_TEMPLATES.WELCOME.text(name),
-    html: EMAIL_TEMPLATES.WELCOME.html(name)
+    text: EMAIL_TEMPLATES.WELCOME.text(name || ''),
+    html: EMAIL_TEMPLATES.WELCOME.html(name || '')
   });
 }
 
 /**
- * Send a password reset email
- * 
- * @param email User's email address
- * @param name User's name or username
- * @param resetToken Password reset token
- * @param baseUrl Base URL for the reset link
- * @returns Promise resolving to boolean indicating success
+ * Send email verification
  */
-export async function sendPasswordResetEmail(
-  email: string, 
-  name: string,
-  resetToken: string,
-  baseUrl: string = 'https://atsboost.co.za'
-): Promise<boolean> {
-  const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
-  
-  return sendEmail({
-    to: email,
-    subject: EMAIL_TEMPLATES.PASSWORD_RESET.subject,
-    text: EMAIL_TEMPLATES.PASSWORD_RESET.text(name, resetLink),
-    html: EMAIL_TEMPLATES.PASSWORD_RESET.html(name, resetLink)
-  });
-}
-
-/**
- * Send an email verification link
- * 
- * @param email User's email address
- * @param name User's name or username
- * @param verificationToken Email verification token
- * @param baseUrl Base URL for the verification link
- * @returns Promise resolving to boolean indicating success
- */
-export async function sendVerificationEmail(
-  email: string,
-  name: string,
-  verificationToken: string,
-  baseUrl: string = 'https://atsboost.co.za'
-): Promise<boolean> {
-  const verificationLink = `${baseUrl}/verify-email?token=${verificationToken}`;
-  
+export async function sendVerificationEmail(email: string, verificationLink: string, name?: string): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: EMAIL_TEMPLATES.EMAIL_VERIFICATION.subject,
-    text: EMAIL_TEMPLATES.EMAIL_VERIFICATION.text(name, verificationLink),
-    html: EMAIL_TEMPLATES.EMAIL_VERIFICATION.html(name, verificationLink)
+    text: EMAIL_TEMPLATES.EMAIL_VERIFICATION.text(name || '', verificationLink),
+    html: EMAIL_TEMPLATES.EMAIL_VERIFICATION.html(name || '', verificationLink)
   });
 }
 
 /**
- * Check if email service is enabled
- * 
- * @returns Boolean indicating if email service is available
+ * Send password reset email
  */
-export function isEmailServiceEnabled(): boolean {
-  return emailServiceEnabled;
+export async function sendPasswordResetEmail(email: string, resetLink: string, name?: string): Promise<boolean> {
+  return sendEmail({
+    to: email,
+    subject: EMAIL_TEMPLATES.PASSWORD_RESET.subject,
+    text: EMAIL_TEMPLATES.PASSWORD_RESET.text(name || '', resetLink),
+    html: EMAIL_TEMPLATES.PASSWORD_RESET.html(name || '', resetLink)
+  });
 }
 
 /**
- * Send a personalized career recommendation email digest
- * 
- * @param email User's email address
- * @param name User's name or username
- * @param recommendations Object containing personalized recommendations
- * @returns Promise resolving to boolean indicating success
+ * Send career digest email
  */
-export async function sendCareerDigestEmail(
-  email: string,
-  name: string,
-  recommendations: {
-    jobMatches?: Array<{title: string, company: string, location: string, matchScore: number}>,
-    skillGaps?: Array<string>,
-    courses?: Array<{title: string, description: string}>,
-    industryTips?: string
-  }
-): Promise<boolean> {
+export async function sendCareerDigestEmail(email: string, recommendations: any, name?: string): Promise<boolean> {
   return sendEmail({
     to: email,
     subject: EMAIL_TEMPLATES.CAREER_DIGEST.subject,
-    text: EMAIL_TEMPLATES.CAREER_DIGEST.text(name, recommendations),
-    html: EMAIL_TEMPLATES.CAREER_DIGEST.html(name, recommendations)
+    text: EMAIL_TEMPLATES.CAREER_DIGEST.text(name || '', recommendations),
+    html: EMAIL_TEMPLATES.CAREER_DIGEST.html(name || '', recommendations)
   });
 }
+
+export { EMAIL_TEMPLATES };
