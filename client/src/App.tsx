@@ -65,6 +65,8 @@ import CoverLetterIdeasPage from "@/pages/tools/CoverLetterIdeasPage";
 import CVChecklistPage from "@/pages/tools/CVChecklistPage";
 import JobFitQuizPage from "@/pages/tools/JobFitQuizPage";
 import InterviewGuidePage from "@/pages/tools/InterviewGuidePage";
+import InterviewPracticePage from "@/pages/InterviewPracticePage";
+import SkillGapAnalysisPage from "@/pages/SkillGapAnalysisPage";
 
 // Import new blog posts
 import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
@@ -138,6 +140,8 @@ function App() {
                 <Route path="/tools/cv-checklist" component={CVChecklistPage} />
                 <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
                 <Route path="/tools/interview-guide" component={InterviewGuidePage} />
+                <Route path="/interview-practice" component={InterviewPracticePage} />
+                <Route path="/skill-gap-analysis" component={SkillGapAnalysisPage} />
                 <Route path="/resume-builder" component={ResumeBuilder} />
                 
                 {/* Job matching services coming soon - temporarily disabled */}

@@ -1315,7 +1315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // CV Upload endpoint
+  // CV Upload endpoint - supports both authenticated and guest users
   app.post("/api/upload", upload.single("file"), async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.file) {
@@ -1357,26 +1357,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sanitize and trim content
       textContent = textContent.replace(/[\r\n]+/g, "\n").trim();
       
+      // Check if user is authenticated by verifying the token
+      let userId = null;
+      let isGuest = true;
+      
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const decoded = simpleAuth.verifyToken(token);
+        if (decoded && typeof decoded === 'object' && 'id' in decoded) {
+          userId = decoded.id as number;
+          isGuest = false;
+        }
+      }
+      
       // Create CV record in the database
       const cvData = {
         fileName: originalname,
         fileType: mimetype,
         fileSize: size,
         content: textContent,
-        userId: req.isAuthenticated() ? req.user?.id : null,
-        isGuest: !req.isAuthenticated()
+        userId: userId,
+        isGuest: isGuest
       };
       
-      // Validate data
-      const validatedData = insertCvSchema.parse(cvData);
-      
       // Create CV record
-      const cv = await storage.createCV(validatedData);
+      const cv = await storage.createCV(cvData);
       
       res.status(201).json(cv);
     } catch (error) {
       console.error("Error processing upload:", error);
-      next(error);
+      res.status(500).json({ 
+        error: "Upload failed", 
+        message: "Failed to process the uploaded file" 
+      });
     }
   });
   
