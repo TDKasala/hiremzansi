@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
@@ -10,6 +11,19 @@ import { closeDbConnection } from "./db";
 import { setupScheduledTasks, cleanupScheduledTasks } from "./services/scheduledTasks";
 
 const app = express();
+
+// Configure session middleware for authentication persistence
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'dev-session-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import session from 'express-session';
 
 // Simple in-memory user storage for development
 const users = new Map<string, any>();
+const emailVerificationTokens = new Map<string, { email: string, token: string, expires: Date }>();
 
 // Add default admin user
 users.set('deniskasala17@gmail.com', {
@@ -38,11 +40,19 @@ export const simpleAuth = {
     };
     
     users.set(user.email, user);
-    return user;
+    
+    // Generate email verification token
+    const verificationToken = this.generateEmailVerificationToken(user.email);
+    
+    return { user, verificationToken };
   },
 
   async getUserByEmail(email: string) {
     return users.get(email);
+  },
+
+  async getUserById(id: number) {
+    return Array.from(users.values()).find(u => u.id === id);
   },
 
   async verifyPassword(plainPassword: string, hashedPassword: string) {
@@ -55,9 +65,9 @@ export const simpleAuth = {
       id: userId,
       email: user?.email,
       username: user?.username,
-      isAdmin: false,
+      isAdmin: user?.role === 'admin',
       role: user?.role || 'user'
-    }, JWT_SECRET, { expiresIn: '24h' });
+    }, JWT_SECRET, { expiresIn: '7d' });
   },
 
   verifyToken(token: string) {
@@ -66,6 +76,40 @@ export const simpleAuth = {
     } catch (error) {
       return null;
     }
+  },
+
+  generateEmailVerificationToken(email: string) {
+    const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    
+    emailVerificationTokens.set(token, { email, token, expires });
+    return token;
+  },
+
+  async verifyEmailToken(token: string) {
+    const tokenData = emailVerificationTokens.get(token);
+    if (!tokenData || tokenData.expires < new Date()) {
+      return false;
+    }
+
+    const user = users.get(tokenData.email);
+    if (user) {
+      user.emailVerified = true;
+      user.updatedAt = new Date();
+      users.set(user.email, user);
+    }
+
+    emailVerificationTokens.delete(token);
+    return true;
+  },
+
+  async sendVerificationEmail(email: string, token: string) {
+    // For development, just log the verification link
+    const verificationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/verify-email?token=${token}`;
+    console.log(`Email verification link for ${email}: ${verificationLink}`);
+    
+    // In production, you would send an actual email here
+    return true;
   }
 };
 

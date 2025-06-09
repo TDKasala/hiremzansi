@@ -207,24 +207,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create user using simplified auth system
-      const user = await simpleAuth.createUser({
+      const { user, verificationToken } = await simpleAuth.createUser({
         username: username || email.split('@')[0],
         email,
         password,
         name: name || ''
       });
       
-      // Generate token
-      const token = simpleAuth.generateToken(user.id);
+      // Store user in session
+      (req as any).session.userId = user.user.id;
+      (req as any).session.user = {
+        id: user.user.id,
+        email: user.user.email,
+        username: user.user.username,
+        name: user.user.name,
+        role: user.user.role
+      };
+
+      // Send verification email
+      await simpleAuth.sendVerificationEmail(user.user.email, verificationToken);
 
       res.status(201).json({ 
-        token,
+        message: "User created successfully. Please check your email to verify your account.",
         user: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          name: user.name,
-          role: user.role
+          id: user.user.id,
+          email: user.user.email,
+          username: user.user.username,
+          name: user.user.name,
+          role: user.user.role,
+          emailVerified: user.user.emailVerified
         }
       });
     } catch (error) {
@@ -253,18 +264,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      // Generate token
-      const token = simpleAuth.generateToken(user.id);
+      // Store user in session
+      (req as any).session.userId = user.id;
+      (req as any).session.user = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        name: user.name,
+        role: user.role
+      };
 
       res.json({ 
-        token,
+        message: "Login successful",
         user: {
           id: user.id,
           email: user.email,
           username: user.username,
           name: user.name,
-          role: user.role
-        }
+          role: user.role,
+          emailVerified: user.emailVerified
+        },
+        redirectTo: "/dashboard"
       });
     } catch (error) {
       console.error("Login error:", error);
