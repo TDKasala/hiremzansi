@@ -5,6 +5,94 @@ import { Shield, CheckCircle, Star, LineChart, BarChart, Zap, ArrowRight, Phone 
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 
+// Casino-style animated counter component
+const AnimatedCounter = ({ 
+  endValue, 
+  duration = 2000, 
+  delay = 0,
+  isVisible = false 
+}: { 
+  endValue: string; 
+  duration?: number; 
+  delay?: number; 
+  isVisible?: boolean;
+}) => {
+  const [currentValue, setCurrentValue] = useState('0');
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+      
+      // Extract number from string (remove non-digit characters except decimal points)
+      const numericValue = parseFloat(endValue.replace(/[^\d.]/g, '')) || 0;
+      const isPercentage = endValue.includes('%');
+      const hasK = endValue.includes('K') || endValue.includes('k');
+      const hasPlus = endValue.includes('+');
+      const hasS = endValue.includes('s');
+      
+      let startTime: number;
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        
+        // Easing function for smooth deceleration with bounce
+        const easeOut = 1 - Math.pow(1 - progress, 4);
+        const current = numericValue * easeOut;
+        
+        let displayValue = '';
+        
+        if (hasK) {
+          displayValue = (current / 1000).toFixed(1) + 'K';
+        } else if (numericValue >= 100) {
+          displayValue = Math.floor(current).toString();
+        } else {
+          displayValue = current.toFixed(1);
+        }
+        
+        if (isPercentage) displayValue += '%';
+        if (hasPlus) displayValue += '+';
+        if (hasS) displayValue += 's';
+        
+        setCurrentValue(displayValue);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [endValue, duration, delay, isVisible]);
+
+  return (
+    <div className="relative overflow-hidden">
+      <div 
+        className={`text-2xl md:text-3xl font-bold text-[#FFCA28] transition-all duration-500 ${
+          isAnimating ? 'animate-pulse' : ''
+        }`}
+        style={{
+          filter: isAnimating ? 'drop-shadow(0 0 12px rgba(255, 202, 40, 0.8))' : 'none',
+          textShadow: isAnimating ? '0 0 15px rgba(255, 202, 40, 0.9), 0 0 25px rgba(255, 202, 40, 0.6)' : 'none',
+          transform: isAnimating ? 'scale(1.05)' : 'scale(1)'
+        }}
+      >
+        {currentValue}
+      </div>
+      {isAnimating && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300/30 to-transparent animate-shine"></div>
+          <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/20 via-amber-300/30 to-yellow-400/20 rounded-lg blur-sm animate-pulse"></div>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default function HeroSection() {
   const { t } = useTranslation();
   
@@ -51,13 +139,16 @@ export default function HeroSection() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-white/10 p-3 rounded-lg text-center">
+                <div key={index} className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300">
                   <div className="overflow-hidden">
-                    <div className={`text-2xl md:text-3xl font-bold text-[#FFCA28] ${isAnimated ? index === 0 ? 'animate-countup' : index === 1 ? 'animate-countup-delay-1' : index === 2 ? 'animate-countup-delay-2' : 'animate-countup-delay-2' : ''}`}>
-                      {stat.value}
-                    </div>
+                    <AnimatedCounter 
+                      endValue={stat.value}
+                      duration={2500 + (index * 300)}
+                      delay={500 + (index * 200)}
+                      isVisible={isAnimated}
+                    />
                   </div>
-                  <div className="text-xs text-white font-medium">{stat.label}</div>
+                  <div className="text-xs text-white font-medium mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
