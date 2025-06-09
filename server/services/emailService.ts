@@ -489,11 +489,15 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   }
   
   try {
-    const fromAddress = options.from || 'notifications@hiremzansi.co.za';
+    // Use a temporary verified sender while domain verification is pending
+    const fromAddress = options.from || 'deniskasala17@gmail.com';
     
     const emailData: MailDataRequired = {
       to: options.to,
-      from: fromAddress,
+      from: {
+        email: fromAddress,
+        name: 'Hire Mzansi'
+      },
       subject: options.subject,
       text: options.text || '',
       html: options.html || ''
@@ -505,8 +509,16 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
+    console.log('Email would have been sent to:', options.to);
+    console.log('Subject:', options.subject);
+    console.log('Verification link (for testing):', extractVerificationLink(options.html || options.text || ''));
     return false;
   }
+}
+
+function extractVerificationLink(content: string): string {
+  const linkMatch = content.match(/https?:\/\/[^\s<>"]+verify-email[^\s<>"]*/);
+  return linkMatch ? linkMatch[0] : 'No verification link found';
 }
 
 /**
