@@ -83,6 +83,7 @@ import PersonalBrandingJobSearch from "@/pages/blog/PersonalBrandingJobSearch";
 import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
 import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
 import ResumeBuilder from "@/pages/ResumeBuilder";
+import JobsPage from "@/pages/JobsPage";
 
 function App() {
   return (
