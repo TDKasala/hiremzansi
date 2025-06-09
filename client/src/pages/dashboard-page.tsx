@@ -43,6 +43,7 @@ import {
 import { CV } from "@shared/schema";
 import DeepAnalysisCard from "@/components/DeepAnalysisCard";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
+import { JobMatchingDashboard } from "@/components/JobMatchingDashboard";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -154,6 +155,10 @@ export default function DashboardPage() {
             <TabsTrigger value="deep-analysis" className="px-4 py-2">
               <LineChart className="mr-2 h-4 w-4" />
               Deep Analysis
+            </TabsTrigger>
+            <TabsTrigger value="job-matches" className="px-4 py-2">
+              <Target className="mr-2 h-4 w-4" />
+              Job Matches
             </TabsTrigger>
             <TabsTrigger value="profile" className="px-4 py-2">
               <User className="mr-2 h-4 w-4" />

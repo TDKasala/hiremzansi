@@ -113,6 +113,7 @@ function App() {
                 <Route path="/job-sites" component={JobSitesPage} />
                 <Route path="/whatsapp-upload" component={WhatsAppUploadPage} />
                 <Route path="/templates" component={TemplatesPage} />
+                <Route path="/jobs" component={JobsPage} />
                 <Route path="/xai-test" component={XAITestPage} />
                 
                 {/* Original blog post */}
