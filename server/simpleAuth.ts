@@ -104,12 +104,42 @@ export const simpleAuth = {
   },
 
   async sendVerificationEmail(email: string, token: string) {
-    // For development, just log the verification link
-    const verificationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/verify-email?token=${token}`;
-    console.log(`Email verification link for ${email}: ${verificationLink}`);
-    
-    // In production, you would send an actual email here
-    return true;
+    try {
+      const emailService = await import('./services/emailService');
+      const user = await this.getUserByEmail(email);
+      const name = user?.name || user?.username || 'there';
+      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const verificationLink = `${baseUrl}/api/auth/verify-email?token=${token}`;
+      
+      // Send email verification email using the template
+      const emailSent = await emailService.sendEmail({
+        to: email,
+        subject: 'Hire Mzansi - Verify Your Email Address',
+        text: `Hello ${name}, Please verify your email address by clicking the link: ${verificationLink}`,
+        html: `
+        <h1>Verify Your Email Address</h1>
+        <p>Hello ${name},</p>
+        <p>Thank you for creating an account with Hire Mzansi. Please verify your email address by clicking the button below:</p>
+        <a href="${verificationLink}" style="display: inline-block; background-color: #1a73e8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Verify My Email</a>
+        <p>If the button doesn't work, copy and paste this link: ${verificationLink}</p>
+        <p>This verification link will expire in 24 hours.</p>
+        <p>Best regards,<br>The Hire Mzansi Team</p>
+        `
+      });
+      
+      if (!emailSent) {
+        // Fallback for development - log the verification link
+        console.log(`Email verification link for ${email}: ${verificationLink}`);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+      // Fallback - log the verification link
+      const verificationLink = `${process.env.BASE_URL || 'http://localhost:5000'}/api/auth/verify-email?token=${token}`;
+      console.log(`Email verification link for ${email}: ${verificationLink}`);
+      return true;
+    }
   }
 };
 

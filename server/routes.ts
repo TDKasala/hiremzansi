@@ -248,6 +248,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send verification email
       await simpleAuth.sendVerificationEmail(newUser.email, verificationToken);
 
+      // Send welcome email
+      try {
+        const { sendWelcomeEmail } = await import('./services/emailService');
+        await sendWelcomeEmail(newUser.email, newUser.name || newUser.username);
+      } catch (error) {
+        console.error('Failed to send welcome email:', error);
+      }
+
       res.status(201).json({ 
         message: "User created successfully. Please check your email to verify your account.",
         user: {
@@ -257,7 +265,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: newUser.name,
           role: newUser.role,
           emailVerified: newUser.emailVerified
-        }
+        },
+        redirect: "/dashboard"
       });
     } catch (error) {
       console.error("Signup error:", error);
