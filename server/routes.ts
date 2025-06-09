@@ -10,6 +10,7 @@ import { localAIService } from "./services/localAI";
 import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
 import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnalysisService";
 import { generateQuizQuestions } from "./services/quizGeneratorService";
+import { careerPathService } from "./services/careerPathService";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -2851,6 +2852,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching learning resources:", error);
       res.status(500).json({ error: "Failed to fetch learning resources" });
+    }
+  });
+
+  // Career Path Visualizer API routes
+  app.get("/api/career-paths", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { industry, search } = req.query;
+      
+      let paths;
+      if (search && typeof search === 'string') {
+        paths = careerPathService.searchCareerPaths(search);
+      } else if (industry && typeof industry === 'string') {
+        paths = careerPathService.getCareerPathsByIndustry(industry);
+      } else {
+        paths = careerPathService.getCareerPaths();
+      }
+      
+      res.json({ paths });
+    } catch (error) {
+      console.error("Career paths error:", error);
+      res.status(500).json({ message: "Failed to get career paths" });
+    }
+  });
+
+  app.get("/api/career-paths/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const path = careerPathService.getCareerPathById(id);
+      
+      if (!path) {
+        return res.status(404).json({ message: "Career path not found" });
+      }
+      
+      const relatedPaths = careerPathService.getRelatedPaths(id);
+      res.json({ path, relatedPaths });
+    } catch (error) {
+      console.error("Career path details error:", error);
+      res.status(500).json({ message: "Failed to get career path details" });
+    }
+  });
+
+  app.get("/api/industry-insights", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { industry } = req.query;
+      
+      if (industry && typeof industry === 'string') {
+        const insight = careerPathService.getIndustryInsight(industry);
+        if (!insight) {
+          return res.status(404).json({ message: "Industry insight not found" });
+        }
+        res.json({ insight });
+      } else {
+        const insights = careerPathService.getIndustryInsights();
+        res.json({ insights });
+      }
+    } catch (error) {
+      console.error("Industry insights error:", error);
+      res.status(500).json({ message: "Failed to get industry insights" });
+    }
+  });
+
+  app.get("/api/salary-benchmarks", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { industry } = req.query;
+      const benchmarks = careerPathService.getSalaryBenchmarks(
+        industry && typeof industry === 'string' ? industry : undefined
+      );
+      res.json({ benchmarks });
+    } catch (error) {
+      console.error("Salary benchmarks error:", error);
+      res.status(500).json({ message: "Failed to get salary benchmarks" });
+    }
+  });
+
+  app.get("/api/skill-demand", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const skillDemand = careerPathService.getSkillDemand();
+      res.json({ skillDemand });
+    } catch (error) {
+      console.error("Skill demand error:", error);
+      res.status(500).json({ message: "Failed to get skill demand data" });
     }
   });
 
