@@ -1,8 +1,8 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+const supabaseUrl = 'https://vkfqohfaxapfajwrzebz.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrZnFvaGZheGFwZmFqd3J6ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMjAyODgsImV4cCI6MjA2NDg5NjI4OH0.-qVAAZSOYmkN6IPQOxgagMjd5ywfQqsosp9udH2lpTA';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

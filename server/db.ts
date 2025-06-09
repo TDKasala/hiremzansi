@@ -1,24 +1,21 @@
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { createClient } from '@supabase/supabase-js';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
+// Supabase configuration with fallback
+const supabaseUrl = process.env.SUPABASE_URL || 'https://vkfqohfaxapfajwrzebz.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrZnFvaGZheGFwZmFqd3J6ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMjAyODgsImV4cCI6MjA2NDg5NjI4OH0.-qVAAZSOYmkN6IPQOxgagMjd5ywfQqsosp9udH2lpTA';
 
-// Configure connection pool for production deployment with Supabase
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+// Create Supabase client for database operations
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const db = drizzle(pool, { schema });
+// Simplified database interface for Supabase
+export const db = {
+  select: () => ({ from: (table: any) => supabase.from(table.name || table) }),
+  insert: (table: any) => ({ values: (data: any) => supabase.from(table.name || table).insert(data) }),
+  update: (table: any) => ({ set: (data: any) => ({ where: (condition: any) => supabase.from(table.name || table).update(data) }) }),
+  delete: (table: any) => ({ where: (condition: any) => supabase.from(table.name || table).delete() })
+};
 
 export const closeDbConnection = async () => {
-  await pool.end();
+  // Supabase handles connections automatically
 };
