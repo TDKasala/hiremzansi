@@ -1,9 +1,8 @@
 import { Helmet } from "react-helmet";
 import HeroSection from "@/components/HeroSection";
 import UploadSection from "@/components/UploadSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
+
 import PricingSection from "@/components/PricingSection";
-import FeaturesSection from "@/components/FeaturesSection";
 import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import SkillQuizSection from "@/components/SkillQuizSection";
@@ -32,12 +31,10 @@ export default function HomePage() {
       <UploadSection />
       <WhatsAppPromoSection />
       <CVOptimizationShowcase />
-      <HowItWorksSection />
       <div className="container mx-auto px-4 py-8">
         <JobMatchingAnnouncement />
       </div>
       <PricingSection />
-      <FeaturesSection />
       <SuccessStoriesSection />
       <TestimonialsSection />
       <SkillQuizSection />
