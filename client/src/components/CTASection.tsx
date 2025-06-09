@@ -30,17 +30,11 @@ export default function CTASection() {
                 Get Your Free ATS Score
               </Button>
             </a>
-            <a href="#pricing-section" onClick={(e) => {
-              e.preventDefault();
-              const pricingSection = document.getElementById('pricing-section');
-              if (pricingSection) {
-                pricingSection.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}>
+            <Link href="/pricing">
               <Button variant="outline" size="lg" className="bg-white text-secondary hover:bg-opacity-90 w-full sm:w-auto">
                 View Pricing Plans
               </Button>
-            </a>
+            </Link>
           </div>
           
           <div className="mt-8 text-neutral-300 flex flex-col sm:flex-row items-center justify-center text-sm">
