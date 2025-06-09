@@ -241,20 +241,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      console.log("Login attempt for email:", email);
-
       // Get user by email
       const user = await simpleAuth.getUserByEmail(email);
-      console.log("User found:", user ? "Yes" : "No");
-      
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
       // Verify password
       const isValidPassword = await simpleAuth.verifyPassword(password, user.password);
-      console.log("Password valid:", isValidPassword);
-      
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }

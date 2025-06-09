@@ -42,11 +42,7 @@ export const simpleAuth = {
   },
 
   async getUserByEmail(email: string) {
-    console.log("Looking for user with email:", email);
-    console.log("Available users:", Array.from(users.keys()));
-    const user = users.get(email);
-    console.log("Found user:", user ? "Yes" : "No");
-    return user;
+    return users.get(email);
   },
 
   async verifyPassword(plainPassword: string, hashedPassword: string) {
