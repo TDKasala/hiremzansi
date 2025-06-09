@@ -207,35 +207,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create user using simplified auth system
-      const { user, verificationToken } = await simpleAuth.createUser({
+      const result = await simpleAuth.createUser({
         username: username || email.split('@')[0],
         email,
         password,
         name: name || ''
       });
       
+      const newUser = result.user;
+      const verificationToken = result.verificationToken;
+      
       // Store user in session
-      (req as any).session.userId = user.user.id;
+      (req as any).session.userId = newUser.id;
       (req as any).session.user = {
-        id: user.user.id,
-        email: user.user.email,
-        username: user.user.username,
-        name: user.user.name,
-        role: user.user.role
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        name: newUser.name,
+        role: newUser.role
       };
 
       // Send verification email
-      await simpleAuth.sendVerificationEmail(user.user.email, verificationToken);
+      await simpleAuth.sendVerificationEmail(newUser.email, verificationToken);
 
       res.status(201).json({ 
         message: "User created successfully. Please check your email to verify your account.",
         user: {
-          id: user.user.id,
-          email: user.user.email,
-          username: user.user.username,
-          name: user.user.name,
-          role: user.user.role,
-          emailVerified: user.user.emailVerified
+          id: newUser.id,
+          email: newUser.email,
+          username: newUser.username,
+          name: newUser.name,
+          role: newUser.role,
+          emailVerified: newUser.emailVerified
         }
       });
     } catch (error) {
@@ -292,10 +295,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auth/me", authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+  // Email verification route
+  app.get("/api/auth/verify-email", async (req: Request, res: Response) => {
     try {
-      const tokenPayload = (req as any).user;
-      const user = await simpleAuth.getUserByEmail(tokenPayload.email);
+      const { token } = req.query;
+      
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Invalid verification token" });
+      }
+
+      const verified = await simpleAuth.verifyEmailToken(token);
+      if (verified) {
+        res.redirect("/?verified=true");
+      } else {
+        res.redirect("/?verified=false");
+      }
+    } catch (error) {
+      console.error("Email verification error:", error);
+      res.redirect("/?verified=false");
+    }
+  });
+
+  // Session-based authentication middleware
+  const requireSession = (req: Request, res: Response, next: NextFunction) => {
+    const session = (req as any).session;
+    if (!session?.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    (req as any).user = session.user;
+    next();
+  };
+
+  app.get("/api/auth/me", requireSession, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const sessionUser = (req as any).user;
+      const user = await simpleAuth.getUserByEmail(sessionUser.email);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -315,7 +349,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req: Request, res: Response) => {
-    res.json({ message: "Logged out successfully" });
+    (req as any).session.destroy((err: any) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Failed to logout" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
   });
 
   // Admin dashboard stats
