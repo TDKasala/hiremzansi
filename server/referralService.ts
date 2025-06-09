@@ -28,6 +28,30 @@ export class ReferralService {
   }
 
   /**
+   * Get user's existing referral code
+   */
+  async getUserReferralCode(userId: number): Promise<string | null> {
+    const [referral] = await db
+      .select()
+      .from(referrals)
+      .where(eq(referrals.referrerId, userId))
+      .limit(1);
+    
+    return referral?.referralCode || null;
+  }
+
+  /**
+   * Save user's referral code
+   */
+  async saveUserReferralCode(userId: number, referralCode: string): Promise<void> {
+    await db.insert(referrals).values({
+      referrerId: userId,
+      referralCode,
+      status: 'pending'
+    });
+  }
+
+  /**
    * Create a referral record when someone clicks a referral link
    */
   async createReferral(referrerId: number, refereeEmail: string): Promise<string> {

@@ -2432,10 +2432,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/referrals/code", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user!.id;
-      const referralCode = await referralService.generateReferralCode(userId);
-      res.json({ referralCode, referralLink: `${req.protocol}://${req.get('host')}/signup?ref=${referralCode}` });
+      let referralCode = await referralService.getUserReferralCode(userId);
+      
+      // If user doesn't have a referral code, generate one
+      if (!referralCode) {
+        referralCode = await referralService.generateReferralCode(userId);
+        await referralService.saveUserReferralCode(userId, referralCode);
+      }
+      
+      const referralLink = `${req.protocol}://${req.get('host')}/signup?ref=${referralCode}`;
+      res.json({ referralCode, referralLink });
     } catch (error) {
       next(error);
+    }
+  });
+
+  app.post("/api/referrals/generate", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Generate a new referral code
+      const referralCode = await referralService.generateReferralCode(userId);
+      await referralService.saveUserReferralCode(userId, referralCode);
+      
+      const referralLink = `${req.protocol}://${req.get('host')}/signup?ref=${referralCode}`;
+      
+      res.json({ 
+        referralCode, 
+        referralLink,
+        message: "New referral link generated successfully"
+      });
+    } catch (error) {
+      console.error("Error generating referral code:", error);
+      res.status(500).json({ error: "Failed to generate referral code" });
     }
   });
 

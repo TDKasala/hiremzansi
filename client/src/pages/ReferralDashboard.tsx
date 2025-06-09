@@ -127,6 +127,34 @@ export default function ReferralDashboard() {
     }
   };
 
+  const generateNewReferralLink = async () => {
+    try {
+      const response = await apiRequest('POST', '/api/referrals/generate');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setReferralCode(data.referralCode);
+        setReferralLink(data.referralLink);
+        toast({
+          title: "New Referral Link Generated",
+          description: data.message,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to generate new referral link",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to generate new referral link",
+        variant: "destructive",
+      });
+    }
+  };
+
   const spendCredits = async (type: string, amount: number = 1) => {
     try {
       const response = await apiRequest('POST', '/api/referrals/spend-credits', {
@@ -328,6 +356,17 @@ export default function ReferralDashboard() {
               size="sm"
             >
               <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="flex justify-center">
+            <Button
+              onClick={generateNewReferralLink}
+              variant="secondary"
+              className="w-full md:w-auto"
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Generate New Link
             </Button>
           </div>
 
