@@ -25,9 +25,16 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const response = await apiRequest("POST", "/api/admin/login", {
-        email,
-        password,
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -45,7 +52,7 @@ export default function AdminLogin() {
         
         toast({
           title: "Login successful",
-          description: `Welcome back, ${data.user.firstName || data.user.email}!`,
+          description: `Welcome back, ${data.user.name || data.user.email}!`,
         });
 
         // Redirect to admin dashboard
@@ -55,8 +62,12 @@ export default function AdminLogin() {
         setError(errorData.message || "Login failed");
       }
     } catch (error) {
-      setError("Network error. Please try again.");
-      console.error("Login error:", error);
+      console.error("Full login error:", error);
+      if (error.message.includes("Unexpected token")) {
+        setError("Server error. Please check if admin route is configured correctly.");
+      } else {
+        setError("Network error. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
