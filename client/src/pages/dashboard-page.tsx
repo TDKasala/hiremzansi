@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { CV } from "@shared/schema";
 import DeepAnalysisCard from "@/components/DeepAnalysisCard";
+import { WelcomeBanner } from "@/components/WelcomeBanner";
 
 export default function DashboardPage() {
   const { user } = useAuth();
