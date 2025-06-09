@@ -108,39 +108,108 @@ const InterviewPracticePage: React.FC = () => {
     }
   ];
 
-  const startNewSession = (jobTitle: string, difficulty: string, questionCount: number) => {
-    const filteredQuestions = questionDatabase
-      .filter(q => difficulty === 'all' || q.difficulty === difficulty)
-      .slice(0, questionCount);
-    
-    setSession({
-      jobTitle,
-      difficulty,
-      questionCount,
-      questions: filteredQuestions,
-      currentIndex: 0,
-      startTime: new Date(),
-      userAnswers: [],
-      feedback: []
-    });
-    setCurrentAnswer('');
-    setIsAnswerSubmitted(false);
-    setShowTips(false);
-    setSessionComplete(false);
+  const startNewSession = async (jobTitle: string, difficulty: string, questionCount: number) => {
+    try {
+      const response = await fetch('/api/interview/generate-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobTitle,
+          difficulty,
+          questionCount: parseInt(questionCount.toString()),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate questions');
+      }
+
+      const data = await response.json();
+      
+      setSession({
+        jobTitle: data.jobTitle,
+        difficulty: data.difficulty,
+        questionCount: data.totalQuestions,
+        questions: data.questions,
+        currentIndex: 0,
+        startTime: new Date(),
+        userAnswers: [],
+        feedback: []
+      });
+      setCurrentAnswer('');
+      setIsAnswerSubmitted(false);
+      setShowTips(false);
+      setSessionComplete(false);
+    } catch (error) {
+      console.error('Error starting session:', error);
+      // Fallback to local questions if API fails
+      const filteredQuestions = questionDatabase
+        .filter(q => difficulty === 'all' || q.difficulty === difficulty)
+        .slice(0, questionCount);
+      
+      setSession({
+        jobTitle,
+        difficulty,
+        questionCount,
+        questions: filteredQuestions,
+        currentIndex: 0,
+        startTime: new Date(),
+        userAnswers: [],
+        feedback: []
+      });
+      setCurrentAnswer('');
+      setIsAnswerSubmitted(false);
+      setShowTips(false);
+      setSessionComplete(false);
+    }
   };
 
-  const submitAnswer = () => {
+  const submitAnswer = async () => {
     if (!session || !currentAnswer.trim()) return;
 
-    const updatedAnswers = [...session.userAnswers, currentAnswer];
-    const feedback = generateFeedback(currentAnswer, session.questions[session.currentIndex]);
-    const updatedFeedback = [...session.feedback, feedback];
+    try {
+      const response = await fetch('/api/interview/submit-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: Date.now().toString(),
+          questionId: session.questions[session.currentIndex].id,
+          answer: currentAnswer,
+          timeSpent: Math.floor((new Date().getTime() - session.startTime.getTime()) / 1000)
+        }),
+      });
 
-    setSession({
-      ...session,
-      userAnswers: updatedAnswers,
-      feedback: updatedFeedback
-    });
+      if (!response.ok) {
+        throw new Error('Failed to submit answer');
+      }
+
+      const data = await response.json();
+      
+      const updatedAnswers = [...session.userAnswers, currentAnswer];
+      const updatedFeedback = [...session.feedback, data.feedback];
+
+      setSession({
+        ...session,
+        userAnswers: updatedAnswers,
+        feedback: updatedFeedback
+      });
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+      // Fallback to local feedback generation
+      const updatedAnswers = [...session.userAnswers, currentAnswer];
+      const feedback = generateFeedback(currentAnswer, session.questions[session.currentIndex]);
+      const updatedFeedback = [...session.feedback, feedback];
+
+      setSession({
+        ...session,
+        userAnswers: updatedAnswers,
+        feedback: updatedFeedback
+      });
+    }
 
     setIsAnswerSubmitted(true);
   };

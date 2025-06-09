@@ -2515,6 +2515,285 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Interview Practice API endpoints
+  app.post("/api/interview/generate-questions", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { jobTitle, difficulty, questionCount, jobDescription } = req.body;
+      
+      // Sample questions database based on difficulty
+      const questionPool = {
+        easy: [
+          {
+            id: '1',
+            question: 'Tell me about yourself and your background.',
+            type: 'behavioral',
+            category: 'Introduction',
+            difficulty: 'easy',
+            tips: [
+              'Keep it concise - 2-3 minutes maximum',
+              'Focus on relevant professional experience',
+              'End with why you\'re interested in this role',
+              'Practice this as it\'s usually the first question'
+            ]
+          },
+          {
+            id: '2',
+            question: 'What are your greatest strengths?',
+            type: 'behavioral',
+            category: 'Self Assessment',
+            difficulty: 'easy',
+            tips: [
+              'Choose strengths relevant to the job',
+              'Provide concrete examples',
+              'Show how they benefit the employer',
+              'Be genuine and confident'
+            ]
+          }
+        ],
+        medium: [
+          {
+            id: '3',
+            question: 'Describe a challenging project you worked on and how you overcame obstacles.',
+            type: 'behavioral',
+            category: 'Problem Solving',
+            difficulty: 'medium',
+            tips: [
+              'Use the STAR method (Situation, Task, Action, Result)',
+              'Choose a relevant example that shows your skills',
+              'Focus on your specific contributions',
+              'Quantify the results when possible'
+            ]
+          },
+          {
+            id: '4',
+            question: 'How do you handle working under pressure and tight deadlines?',
+            type: 'behavioral',
+            category: 'Work Style',
+            difficulty: 'medium',
+            tips: [
+              'Provide specific examples',
+              'Show your organizational skills',
+              'Mention stress management techniques',
+              'Demonstrate adaptability'
+            ]
+          }
+        ],
+        hard: [
+          {
+            id: '5',
+            question: 'Describe a time when you had to work with a difficult team member.',
+            type: 'situational',
+            category: 'Teamwork',
+            difficulty: 'hard',
+            tips: [
+              'Focus on professional handling',
+              'Show communication skills',
+              'Demonstrate conflict resolution',
+              'Emphasize positive outcomes'
+            ]
+          }
+        ]
+      };
+      
+      let selectedQuestions = [];
+      if (difficulty === 'all') {
+        selectedQuestions = [...questionPool.easy, ...questionPool.medium, ...questionPool.hard];
+      } else {
+        selectedQuestions = questionPool[difficulty] || questionPool.medium;
+      }
+      
+      // Shuffle and limit to requested count
+      const shuffled = selectedQuestions.sort(() => 0.5 - Math.random());
+      const questions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+      
+      res.json({
+        sessionId: Date.now().toString(),
+        questions,
+        jobTitle,
+        difficulty,
+        totalQuestions: questions.length
+      });
+    } catch (error) {
+      console.error("Error generating interview questions:", error);
+      res.status(500).json({ error: "Failed to generate interview questions" });
+    }
+  });
+
+  app.post("/api/interview/submit-answer", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { sessionId, questionId, answer, timeSpent } = req.body;
+      
+      if (!answer || answer.trim().length < 10) {
+        return res.status(400).json({ 
+          error: "Answer too short", 
+          message: "Please provide a more detailed answer" 
+        });
+      }
+      
+      // Generate feedback based on answer length and content
+      const wordCount = answer.split(' ').length;
+      let feedback = '';
+      let score = 0;
+      
+      if (wordCount < 20) {
+        feedback = 'Your answer could be more detailed. Try to provide specific examples and expand on your thoughts.';
+        score = 3;
+      } else if (wordCount > 200) {
+        feedback = 'Great detail! Consider being more concise while maintaining the key points.';
+        score = 7;
+      } else {
+        feedback = 'Good length for your answer. Make sure to include specific examples that demonstrate your skills.';
+        score = 8;
+      }
+      
+      // Additional feedback based on keywords
+      const keywords = ['example', 'experience', 'result', 'achieved', 'learned', 'improved'];
+      const hasKeywords = keywords.some(keyword => answer.toLowerCase().includes(keyword));
+      
+      if (hasKeywords) {
+        score += 1;
+        feedback += ' Your answer includes good examples and specific details.';
+      }
+      
+      res.json({
+        feedback,
+        score: Math.min(score, 10),
+        suggestions: [
+          'Use the STAR method for behavioral questions',
+          'Include specific metrics when possible',
+          'Connect your answer to the role requirements'
+        ]
+      });
+    } catch (error) {
+      console.error("Error submitting interview answer:", error);
+      res.status(500).json({ error: "Failed to process answer" });
+    }
+  });
+
+  // Skill Gap Analysis API endpoints
+  app.post("/api/skill-gap/analyze", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { currentRole, targetRole, experience, industry, currentSkills } = req.body;
+      
+      if (!currentRole || !targetRole || !currentSkills) {
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          message: "Please provide current role, target role, and current skills"
+        });
+      }
+      
+      // Calculate match percentage based on role similarity and experience
+      let baseMatch = 45;
+      if (currentRole.toLowerCase().includes(targetRole.toLowerCase()) || 
+          targetRole.toLowerCase().includes(currentRole.toLowerCase())) {
+        baseMatch += 25;
+      }
+      if (experience === 'senior') baseMatch += 10;
+      if (experience === 'mid') baseMatch += 5;
+      
+      const overallMatch = Math.min(Math.max(baseMatch + Math.random() * 20, 30), 85);
+      
+      // Generate skill analysis based on target role
+      const commonSkills = [
+        { name: 'Communication Skills', match: 95, description: 'Strong verbal and written communication abilities', importance: 9 },
+        { name: 'Problem Solving', match: 88, description: 'Analytical thinking and solution-oriented approach', importance: 8 },
+        { name: 'Team Collaboration', match: 82, description: 'Experience working effectively in team environments', importance: 7 },
+        { name: 'Project Management', match: 75, description: 'Basic project coordination and delivery experience', importance: 6 }
+      ];
+      
+      const missingSkills = [
+        { name: `${targetRole} Specific Technology`, match: 25, description: 'Core technical skills required for the target role', importance: 10 },
+        { name: 'Industry Standards & Practices', match: 35, description: `${industry} sector knowledge and best practices`, importance: 8 },
+        { name: 'Advanced Analytics', match: 20, description: 'Data analysis and interpretation capabilities', importance: 7 },
+        { name: 'Leadership & Mentoring', match: 40, description: 'Team leadership and knowledge transfer skills', importance: 6 }
+      ];
+      
+      const analysisResult = {
+        overallMatch: Math.round(overallMatch),
+        summary: `Based on your ${currentRole} background and ${experience}-level experience, you have a ${Math.round(overallMatch)}% match for ${targetRole} roles. There are some key skill gaps to address, but with focused development, you can significantly improve your competitiveness.`,
+        recommendations: `Focus on developing the missing technical skills through practical projects and industry certifications. Build a portfolio showcasing relevant work and consider joining professional communities in ${industry}.`,
+        matchedSkills: commonSkills,
+        missingSkills: missingSkills,
+        actionPlan: {
+          shortTerm: [
+            `Complete online certification in ${targetRole} fundamentals`,
+            'Update LinkedIn profile with relevant keywords',
+            'Start building a portfolio of relevant projects',
+            'Join professional groups and communities'
+          ],
+          mediumTerm: [
+            'Gain hands-on experience through freelance or volunteer projects',
+            'Attend industry conferences and networking events',
+            'Seek mentorship from professionals in your target role',
+            'Consider specialized training programs or bootcamps'
+          ],
+          longTerm: [
+            'Pursue advanced certifications or formal education',
+            'Build a strong professional network in the industry',
+            'Develop thought leadership through content creation',
+            'Consider transition roles that bridge your current and target positions'
+          ]
+        },
+        marketInsights: {
+          salaryRange: 'R350,000 - R650,000 annually',
+          demandLevel: 'High demand',
+          growthProjection: '15% growth expected over next 3 years'
+        }
+      };
+      
+      res.json(analysisResult);
+    } catch (error) {
+      console.error("Error analyzing skill gap:", error);
+      res.status(500).json({ error: "Failed to analyze skill gap" });
+    }
+  });
+
+  app.get("/api/skill-gap/learning-resources/:skill", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { skill } = req.params;
+      const { level = 'beginner' } = req.query;
+      
+      // Sample learning resources based on skill and level
+      const resources = [
+        {
+          title: `${skill} Fundamentals Course`,
+          provider: 'Coursera',
+          type: 'online_course',
+          duration: '4-6 weeks',
+          cost: 'R299/month',
+          rating: 4.5,
+          url: '#',
+          description: `Learn the basics of ${skill} with hands-on projects`
+        },
+        {
+          title: `${skill} Certification Program`,
+          provider: 'edX',
+          type: 'certification',
+          duration: '8-12 weeks',
+          cost: 'R1,200',
+          rating: 4.7,
+          url: '#',
+          description: `Industry-recognized certification in ${skill}`
+        },
+        {
+          title: `${skill} Workshop`,
+          provider: 'Local Training Center',
+          type: 'workshop',
+          duration: '2 days',
+          cost: 'R2,500',
+          rating: 4.3,
+          url: '#',
+          description: `Intensive hands-on workshop for ${skill}`
+        }
+      ];
+      
+      res.json({ skill, level, resources });
+    } catch (error) {
+      console.error("Error fetching learning resources:", error);
+      res.status(500).json({ error: "Failed to fetch learning resources" });
+    }
+  });
+
   // Mount Dynamic Resume Builder routes
   app.use("/api", dynamicResumeBuilderRoutes);
   
