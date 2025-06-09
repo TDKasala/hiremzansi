@@ -38,7 +38,7 @@ import {
   type Notification,
   type InsertNotification
 } from "@shared/schema";
-import { db } from "./db";
+import { db, supabase } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -172,12 +172,21 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const now = new Date();
-    const [user] = await db.insert(users).values({
-      ...insertUser,
-      createdAt: now,
-      updatedAt: now
-    }).returning();
-    return user;
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        ...insertUser,
+        created_at: now,
+        updated_at: now
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+    
+    return data;
   }
 
   async updateUser(id: number, updates: any): Promise<User> {

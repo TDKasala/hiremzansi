@@ -250,14 +250,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use existing auth service
-      const { authenticateUser } = require('./auth');
       const user = await authenticateUser(email, password);
       
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const { generateToken } = require('./auth');
       const token = generateToken(user);
 
       res.json({ 
