@@ -257,6 +257,10 @@ const InterviewPracticePage: React.FC = () => {
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
+        <Helmet>
+          <title>Interview Practice | Hire Mzansi</title>
+          <meta name="description" content="Practice interview questions and improve your responses with AI-powered feedback for South African job opportunities." />
+        </Helmet>
         <div className="max-w-4xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

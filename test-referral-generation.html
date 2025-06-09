@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Referral Link Generation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .button { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 5px; }
+        .error { background: #fee2e2; color: #dc2626; }
+        .success { background: #dcfce7; color: #166534; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Referral Link Generation</h1>
+        
+        <h3>1. Test User Registration</h3>
+        <input type="email" id="email" placeholder="Email address" value="test@example.com">
+        <input type="password" id="password" placeholder="Password" value="password123">
+        <input type="text" id="name" placeholder="Full Name" value="Test User">
+        <button class="button" onclick="testRegistration()">Register Test User</button>
+        <div id="registerResult" class="result" style="display:none;"></div>
+
+        <h3>2. Test Login</h3>
+        <button class="button" onclick="testLogin()">Login Test User</button>
+        <div id="loginResult" class="result" style="display:none;"></div>
+
+        <h3>3. Test Referral Code Generation</h3>
+        <button class="button" onclick="testReferralGeneration()">Generate Referral Code</button>
+        <div id="referralResult" class="result" style="display:none;"></div>
+
+        <h3>4. Test Referral Link</h3>
+        <button class="button" onclick="testReferralStats()">Get Referral Stats</button>
+        <div id="statsResult" class="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let authToken = null;
+
+        async function makeRequest(method, endpoint, data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(`${API_BASE}${endpoint}`, options);
+            return { response, data: await response.json() };
+        }
+
+        async function testRegistration() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value;
+
+            try {
+                const { response, data } = await makeRequest('POST', '/auth/signup', {
+                    email,
+                    password,
+                    name
+                });
+
+                const resultDiv = document.getElementById('registerResult');
+                resultDiv.style.display = 'block';
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✓ Registration successful: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `✗ Registration failed: ${data.error || response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('registerResult').innerHTML = `✗ Error: ${error.message}`;
+                document.getElementById('registerResult').className = 'result error';
+                document.getElementById('registerResult').style.display = 'block';
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const { response, data } = await makeRequest('POST', '/auth/login', {
+                    email,
+                    password
+                });
+
+                const resultDiv = document.getElementById('loginResult');
+                resultDiv.style.display = 'block';
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✓ Login successful: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `✗ Login failed: ${data.error || response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = `✗ Error: ${error.message}`;
+                document.getElementById('loginResult').className = 'result error';
+                document.getElementById('loginResult').style.display = 'block';
+            }
+        }
+
+        async function testReferralGeneration() {
+            try {
+                const { response, data } = await makeRequest('GET', '/referrals/code');
+
+                const resultDiv = document.getElementById('referralResult');
+                resultDiv.style.display = 'block';
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✓ Referral code generated:<br>
+                        Code: ${data.referralCode}<br>
+                        Link: ${data.referralLink}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `✗ Failed to generate referral code: ${data.error || response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('referralResult').innerHTML = `✗ Error: ${error.message}`;
+                document.getElementById('referralResult').className = 'result error';
+                document.getElementById('referralResult').style.display = 'block';
+            }
+        }
+
+        async function testReferralStats() {
+            try {
+                const { response, data } = await makeRequest('GET', '/referrals/stats');
+
+                const resultDiv = document.getElementById('statsResult');
+                resultDiv.style.display = 'block';
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✓ Referral stats:<br>${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `✗ Failed to get referral stats: ${data.error || response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('statsResult').innerHTML = `✗ Error: ${error.message}`;
+                document.getElementById('statsResult').className = 'result error';
+                document.getElementById('statsResult').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
