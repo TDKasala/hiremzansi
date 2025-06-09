@@ -40,6 +40,45 @@ export function DashboardPage() {
         
         <Card>
           <CardHeader>
+            <CardTitle>Career Path Visualizer</CardTitle>
+            <CardDescription>Explore career progression paths</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Discover career opportunities and progression paths in South African industries.</p>
+            <Button asChild>
+              <Link href="/career-path-visualizer">Explore Careers</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Interview Practice</CardTitle>
+            <CardDescription>Practice with AI-powered interviews</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Improve your interview skills with personalized practice sessions.</p>
+            <Button asChild>
+              <Link href="/interview-practice">Start Practice</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Skill Gap Analysis</CardTitle>
+            <CardDescription>Identify areas for improvement</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Analyze your skills against target roles and get development recommendations.</p>
+            <Button asChild>
+              <Link href="/skill-gap-analysis">Analyze Skills</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
             <CardTitle>Profile</CardTitle>
             <CardDescription>Manage your account</CardDescription>
           </CardHeader>
