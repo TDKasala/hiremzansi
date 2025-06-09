@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
+import { useEffect, useState, useRef } from "react";
 import { 
   FileText, 
   Target, 
@@ -16,7 +17,130 @@ import {
   Eye
 } from "lucide-react";
 
+// Animated counter component for progress values
+const AnimatedProgressCounter = ({ 
+  endValue, 
+  duration = 2000, 
+  delay = 0,
+  isVisible = false,
+  suffix = "" 
+}: { 
+  endValue: number; 
+  duration?: number; 
+  delay?: number; 
+  isVisible?: boolean;
+  suffix?: string;
+}) => {
+  const [currentValue, setCurrentValue] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const timer = setTimeout(() => {
+      setIsAnimating(true);
+      
+      let startTime: number;
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        
+        // Smooth easing function
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const current = endValue * easeOutCubic;
+        
+        setCurrentValue(Math.floor(current));
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [endValue, duration, delay, isVisible]);
+
+  return (
+    <span 
+      className={`transition-all duration-300 ${
+        isAnimating ? 'text-shadow-glow' : ''
+      }`}
+      style={{
+        textShadow: isAnimating ? '0 0 8px currentColor' : 'none'
+      }}
+    >
+      {currentValue}{suffix}
+    </span>
+  );
+};
+
+// Animated progress bar component
+const AnimatedProgress = ({ 
+  value, 
+  className = "", 
+  delay = 0,
+  isVisible = false 
+}: { 
+  value: number; 
+  className?: string; 
+  delay?: number;
+  isVisible?: boolean;
+}) => {
+  const [currentValue, setCurrentValue] = useState(0);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const timer = setTimeout(() => {
+      let startTime: number;
+      const animate = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / 2000, 1);
+        
+        // Smooth easing function
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const current = value * easeOutCubic;
+        
+        setCurrentValue(current);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, delay, isVisible]);
+
+  return <Progress value={currentValue} className={className} />;
+};
+
 export function CVOptimizationShowcase() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Intersection Observer to trigger animations when section is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const optimizationFeatures = [
     {
       icon: <Target className="h-6 w-6 text-blue-600" />,
@@ -57,7 +181,7 @@ export function CVOptimizationShowcase() {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section ref={sectionRef} className="py-16 bg-white">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="text-center mb-12">
           <Badge className="mb-4 bg-blue-100 text-blue-700">
@@ -111,23 +235,54 @@ export function CVOptimizationShowcase() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Overall Score</span>
-                    <span className="text-2xl font-bold text-green-600">{sampleAnalysis.overallScore}/100</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      <AnimatedProgressCounter 
+                        endValue={sampleAnalysis.overallScore} 
+                        isVisible={isVisible}
+                        delay={300}
+                        suffix="/100"
+                      />
+                    </span>
                   </div>
-                  <Progress value={sampleAnalysis.overallScore} className="h-3" />
+                  <AnimatedProgress value={sampleAnalysis.overallScore} className="h-3" delay={300} isVisible={isVisible} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 py-4 border-t border-green-200">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-green-700">{sampleAnalysis.atsCompatibility}%</div>
+                  <div className="text-center space-y-2">
+                    <div className="text-lg font-bold text-green-700">
+                      <AnimatedProgressCounter 
+                        endValue={sampleAnalysis.atsCompatibility} 
+                        isVisible={isVisible}
+                        delay={600}
+                        suffix="%"
+                      />
+                    </div>
                     <div className="text-xs text-gray-600">ATS Compatible</div>
+                    <AnimatedProgress value={sampleAnalysis.atsCompatibility} className="h-1.5" delay={600} isVisible={isVisible} />
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-blue-700">{sampleAnalysis.saContext}%</div>
+                  <div className="text-center space-y-2">
+                    <div className="text-lg font-bold text-blue-700">
+                      <AnimatedProgressCounter 
+                        endValue={sampleAnalysis.saContext} 
+                        isVisible={isVisible}
+                        delay={800}
+                        suffix="%"
+                      />
+                    </div>
                     <div className="text-xs text-gray-600">SA Context</div>
+                    <AnimatedProgress value={sampleAnalysis.saContext} className="h-1.5" delay={800} isVisible={isVisible} />
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-purple-700">{sampleAnalysis.skillsMatch}%</div>
+                  <div className="text-center space-y-2">
+                    <div className="text-lg font-bold text-purple-700">
+                      <AnimatedProgressCounter 
+                        endValue={sampleAnalysis.skillsMatch} 
+                        isVisible={isVisible}
+                        delay={1000}
+                        suffix="%"
+                      />
+                    </div>
                     <div className="text-xs text-gray-600">Skills Match</div>
+                    <AnimatedProgress value={sampleAnalysis.skillsMatch} className="h-1.5" delay={1000} isVisible={isVisible} />
                   </div>
                 </div>
 
