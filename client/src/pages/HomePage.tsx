@@ -31,13 +31,13 @@ export default function HomePage() {
       <UploadSection />
       <WhatsAppPromoSection />
       <CVOptimizationShowcase />
-      <div className="container mx-auto px-4 py-8">
-        <JobMatchingAnnouncement />
-      </div>
       <PricingSection />
       <SuccessStoriesSection />
       <TestimonialsSection />
       <SkillQuizSection />
+      <div className="container mx-auto px-4 py-8">
+        <JobMatchingAnnouncement />
+      </div>
       <BlogPreviewSection />
       <ReferralSourceSection />
       <CTASection />
