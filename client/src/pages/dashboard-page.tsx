@@ -101,6 +101,14 @@ export default function DashboardPage() {
       </Helmet>
       
       <div className="container max-w-6xl mx-auto px-4 py-8">
+        {/* Show welcome banner for new users with no CVs */}
+        {userCVs && userCVs.length === 0 && (
+          <WelcomeBanner 
+            userName={user?.name || user?.email?.split('@')[0]}
+            emailVerified={true}
+          />
+        )}
+        
         <MotivationalBanner 
           location="dashboard"
           cvCount={userCVs?.length || 0}
@@ -109,7 +117,7 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">
-              Welcome back, {user?.name || user?.username}
+              Welcome back, {user?.name || user?.email}
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-2">

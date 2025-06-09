@@ -8,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { MotivationProvider } from "./hooks/use-motivation";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
+import { EmailVerificationHandler } from "./components/EmailVerificationHandler";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
@@ -171,6 +172,7 @@ function App() {
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>
+                <EmailVerificationHandler />
                 <Toaster />
               </Layout>
             </MotivationProvider>
