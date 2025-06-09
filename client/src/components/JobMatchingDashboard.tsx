@@ -62,12 +62,12 @@ export function JobMatchingDashboard({ cvId }: JobMatchingDashboardProps) {
   });
 
   // Fetch user's CVs if no cvId provided
-  const { data: userCVs = [] } = useQuery({
+  const { data: userCVs = [] } = useQuery<any[]>({
     queryKey: ['/api/cvs'],
     enabled: !!user && !cvId,
   });
 
-  const defaultCv = userCVs.find((cv: any) => cv.isDefault) || userCVs[0];
+  const defaultCv = (userCVs as any[]).find((cv: any) => cv.isDefault) || (userCVs as any[])[0];
   const activeCvId = cvId || defaultCv?.id;
 
   const handleViewJob = (jobId: number) => {

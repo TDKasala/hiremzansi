@@ -500,6 +500,10 @@ export default function DashboardPage() {
             </div>
           </TabsContent>
 
+          <TabsContent value="job-matches" className="space-y-6">
+            <JobMatchingDashboard cvId={userCVs?.[0]?.id} />
+          </TabsContent>
+
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>

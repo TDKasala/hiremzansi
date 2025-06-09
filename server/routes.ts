@@ -3016,6 +3016,311 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Job Matching API Endpoints (Test Implementation)
+  
+  // Get job matches for a CV
+  app.get("/api/cv-job-matches/:cvId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const cvId = parseInt(req.params.cvId);
+      const userId = req.user.id;
+      
+      // Sample job matches data for demonstration
+      const sampleJobMatches = [
+        {
+          id: 1,
+          matchScore: 85,
+          skillsMatchScore: 88,
+          experienceMatchScore: 82,
+          locationMatchScore: 90,
+          saContextScore: 85,
+          matchedSkills: ["JavaScript", "React", "Node.js", "SQL", "Agile"],
+          missingSkills: ["TypeScript", "AWS", "Docker"],
+          matchReasons: [
+            "Strong match for required JavaScript and React skills",
+            "Experience level aligns with job requirements",
+            "Located in preferred province (Western Cape)"
+          ],
+          improvementSuggestions: [
+            "Add TypeScript experience to increase match score",
+            "Consider AWS certification for cloud skills",
+            "Highlight project management experience"
+          ],
+          isViewed: false,
+          isApplied: false,
+          status: "matched",
+          job: {
+            id: 1,
+            title: "Senior Full Stack Developer",
+            company: "TechCorp SA",
+            location: "Cape Town",
+            province: "Western Cape",
+            employmentType: "Full-time",
+            salaryRange: "45000-65000",
+            description: "Join our dynamic team building cutting-edge web applications...",
+            requiredSkills: ["JavaScript", "React", "Node.js", "SQL"],
+            isRemote: false,
+            isFeatured: true
+          }
+        },
+        {
+          id: 2,
+          matchScore: 72,
+          skillsMatchScore: 75,
+          experienceMatchScore: 70,
+          locationMatchScore: 85,
+          saContextScore: 65,
+          matchedSkills: ["JavaScript", "HTML", "CSS", "Git"],
+          missingSkills: ["Python", "Django", "PostgreSQL"],
+          matchReasons: [
+            "Good foundation in web development technologies",
+            "Location preference matches job location"
+          ],
+          improvementSuggestions: [
+            "Learn Python and Django for better backend skills",
+            "Add database experience with PostgreSQL"
+          ],
+          isViewed: true,
+          isApplied: false,
+          status: "matched",
+          job: {
+            id: 2,
+            title: "Junior Web Developer",
+            company: "Digital Solutions SA",
+            location: "Johannesburg",
+            province: "Gauteng",
+            employmentType: "Full-time",
+            salaryRange: "25000-35000",
+            description: "Great opportunity for a junior developer to grow...",
+            requiredSkills: ["JavaScript", "HTML", "CSS", "Python"],
+            isRemote: true,
+            isFeatured: false
+          }
+        },
+        {
+          id: 3,
+          matchScore: 78,
+          skillsMatchScore: 80,
+          experienceMatchScore: 75,
+          locationMatchScore: 70,
+          saContextScore: 88,
+          matchedSkills: ["Project Management", "Agile", "Scrum", "Communication"],
+          missingSkills: ["PMP Certification", "PRINCE2"],
+          matchReasons: [
+            "Strong project management background",
+            "Excellent B-BBEE compliance alignment",
+            "Agile methodology experience matches requirements"
+          ],
+          improvementSuggestions: [
+            "Obtain PMP certification for senior roles",
+            "Consider PRINCE2 training for government projects"
+          ],
+          isViewed: false,
+          isApplied: false,
+          status: "matched",
+          job: {
+            id: 3,
+            title: "Project Manager - Digital Transformation",
+            company: "SA Government Solutions",
+            location: "Pretoria",
+            province: "Gauteng",
+            employmentType: "Contract",
+            salaryRange: "55000-75000",
+            description: "Lead digital transformation initiatives for government sector...",
+            requiredSkills: ["Project Management", "Agile", "Digital Transformation"],
+            isRemote: false,
+            isFeatured: true
+          }
+        }
+      ];
+      
+      res.json(sampleJobMatches);
+    } catch (error) {
+      console.error("Error fetching job matches:", error);
+      res.status(500).json({ error: "Failed to fetch job matches" });
+    }
+  });
+
+  // Get all job postings (enhanced with sample data)
+  app.get("/api/job-postings", async (req: Request, res: Response) => {
+    try {
+      const { title, location, industry, employmentType, limit } = req.query;
+      
+      // Sample job postings data for demonstration
+      const sampleJobs = [
+        {
+          id: 1,
+          title: "Senior Full Stack Developer",
+          description: "Join our dynamic team building cutting-edge web applications for South African businesses. We're looking for an experienced developer who can work with modern technologies and contribute to our growing platform.",
+          location: "Cape Town",
+          province: "Western Cape",
+          city: "Cape Town",
+          employmentType: "Full-time",
+          experienceLevel: "Senior",
+          salaryRange: "45000-65000",
+          requiredSkills: ["JavaScript", "React", "Node.js", "SQL", "Git"],
+          preferredSkills: ["TypeScript", "AWS", "Docker", "MongoDB"],
+          industry: "Technology",
+          deadline: "2024-07-15T00:00:00.000Z",
+          isActive: true,
+          isFeatured: true,
+          isRemote: false,
+          views: 156,
+          applications: 23,
+          createdAt: "2024-06-15T10:30:00.000Z",
+          employer: {
+            id: 1,
+            companyName: "TechCorp SA",
+            industry: "Technology",
+            logo: ""
+          }
+        },
+        {
+          id: 2,
+          title: "Junior Web Developer",
+          description: "Great opportunity for a junior developer to grow their skills in a supportive environment. You'll work on exciting projects while learning from experienced mentors.",
+          location: "Johannesburg",
+          province: "Gauteng",
+          city: "Johannesburg",
+          employmentType: "Full-time",
+          experienceLevel: "Junior",
+          salaryRange: "25000-35000",
+          requiredSkills: ["JavaScript", "HTML", "CSS", "Python"],
+          preferredSkills: ["React", "Django", "PostgreSQL"],
+          industry: "Technology",
+          deadline: "2024-07-20T00:00:00.000Z",
+          isActive: true,
+          isFeatured: false,
+          isRemote: true,
+          views: 89,
+          applications: 15,
+          createdAt: "2024-06-18T14:20:00.000Z",
+          employer: {
+            id: 2,
+            companyName: "Digital Solutions SA",
+            industry: "Technology",
+            logo: ""
+          }
+        },
+        {
+          id: 3,
+          title: "Project Manager - Digital Transformation",
+          description: "Lead digital transformation initiatives for government sector projects. Must have experience with public sector requirements and B-BBEE compliance.",
+          location: "Pretoria",
+          province: "Gauteng",
+          city: "Pretoria",
+          employmentType: "Contract",
+          experienceLevel: "Senior",
+          salaryRange: "55000-75000",
+          requiredSkills: ["Project Management", "Agile", "Digital Transformation", "Government Sector"],
+          preferredSkills: ["PMP", "PRINCE2", "Change Management"],
+          industry: "Government",
+          deadline: "2024-08-01T00:00:00.000Z",
+          isActive: true,
+          isFeatured: true,
+          isRemote: false,
+          views: 78,
+          applications: 12,
+          createdAt: "2024-06-20T09:15:00.000Z",
+          employer: {
+            id: 3,
+            companyName: "SA Government Solutions",
+            industry: "Government",
+            logo: ""
+          }
+        },
+        {
+          id: 4,
+          title: "Marketing Specialist",
+          description: "Drive marketing campaigns for South African retail brand. Focus on digital marketing strategies and B-BBEE supplier development.",
+          location: "Durban",
+          province: "KwaZulu-Natal",
+          city: "Durban",
+          employmentType: "Full-time",
+          experienceLevel: "Mid-level",
+          salaryRange: "35000-45000",
+          requiredSkills: ["Digital Marketing", "SEO", "Social Media", "Analytics"],
+          preferredSkills: ["Google Ads", "Facebook Marketing", "Content Creation"],
+          industry: "Marketing",
+          deadline: "2024-07-25T00:00:00.000Z",
+          isActive: true,
+          isFeatured: false,
+          isRemote: false,
+          views: 45,
+          applications: 8,
+          createdAt: "2024-06-22T11:00:00.000Z",
+          employer: {
+            id: 4,
+            companyName: "Retail Excellence SA",
+            industry: "Retail",
+            logo: ""
+          }
+        },
+        {
+          id: 5,
+          title: "Data Analyst",
+          description: "Analyze business data to drive insights for mining operations. Experience with South African mining regulations preferred.",
+          location: "Johannesburg",
+          province: "Gauteng",
+          city: "Johannesburg",
+          employmentType: "Full-time",
+          experienceLevel: "Mid-level",
+          salaryRange: "40000-55000",
+          requiredSkills: ["Python", "SQL", "Excel", "Data Visualization"],
+          preferredSkills: ["Power BI", "R", "Mining Industry Knowledge"],
+          industry: "Mining",
+          deadline: "2024-08-10T00:00:00.000Z",
+          isActive: true,
+          isFeatured: false,
+          isRemote: true,
+          views: 67,
+          applications: 19,
+          createdAt: "2024-06-25T16:45:00.000Z",
+          employer: {
+            id: 5,
+            companyName: "Mining Analytics Corp",
+            industry: "Mining",
+            logo: ""
+          }
+        }
+      ];
+      
+      // Apply basic filtering
+      let filteredJobs = sampleJobs;
+      
+      if (title) {
+        const searchTerm = (title as string).toLowerCase();
+        filteredJobs = filteredJobs.filter(job => 
+          job.title.toLowerCase().includes(searchTerm) ||
+          job.description.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      if (location) {
+        filteredJobs = filteredJobs.filter(job => 
+          job.province === location || job.city === location
+        );
+      }
+      
+      if (industry) {
+        filteredJobs = filteredJobs.filter(job => job.industry === industry);
+      }
+      
+      if (employmentType) {
+        filteredJobs = filteredJobs.filter(job => job.employmentType === employmentType);
+      }
+      
+      if (limit) {
+        const limitNum = parseInt(limit as string);
+        filteredJobs = filteredJobs.slice(0, limitNum);
+      }
+      
+      res.json(filteredJobs);
+    } catch (error) {
+      console.error("Error fetching job postings:", error);
+      res.status(500).json({ error: "Failed to fetch job postings" });
+    }
+  });
+
   // Mount Dynamic Resume Builder routes
   app.use("/api", dynamicResumeBuilderRoutes);
   
