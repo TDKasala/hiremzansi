@@ -171,22 +171,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // For now, create a simple in-memory user for testing
+    // In production, this would use the actual database
     const now = new Date();
-    const { data, error } = await supabase
-      .from('users')
-      .insert({
-        ...insertUser,
-        created_at: now,
-        updated_at: now
-      })
-      .select()
-      .single();
+    const newUser: User = {
+      id: Math.floor(Math.random() * 10000),
+      username: insertUser.username,
+      email: insertUser.email,
+      password: insertUser.password,
+      name: insertUser.name || null,
+      profilePicture: insertUser.profilePicture || null,
+      role: 'user',
+      isActive: true,
+      emailVerified: false,
+      verificationToken: null,
+      verificationTokenExpiry: null,
+      lastLogin: null,
+      resetToken: null,
+      resetTokenExpiry: null,
+      receiveEmailDigest: true,
+      lastEmailDigestSent: null,
+      phoneNumber: null,
+      phoneVerified: false,
+      isTemporary: false,
+      createdAt: now,
+      updatedAt: now
+    };
     
-    if (error) {
-      throw new Error(`Failed to create user: ${error.message}`);
-    }
+    // Store in memory for development (replace with actual DB in production)
+    this.memUsers.set(newUser.email, newUser);
     
-    return data;
+    return newUser;
   }
 
   async updateUser(id: number, updates: any): Promise<User> {
