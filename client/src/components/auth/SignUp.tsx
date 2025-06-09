@@ -55,9 +55,10 @@ export function SignUp() {
       
       setSuccess(true);
       
+      // Show success message for email confirmation
       setTimeout(() => {
         setLocation('/dashboard');
-      }, 2000);
+      }, 3000);
     } catch (err: any) {
       console.error('Sign up error:', err);
       setError(err.message || 'Failed to create account');
@@ -81,9 +82,15 @@ export function SignUp() {
             </div>
             
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Welcome to Hire Mzansi!</h2>
-            <p className="text-gray-600 mb-6 text-lg">
-              Your account has been created successfully. Get ready to transform your career journey!
+            <p className="text-gray-600 mb-4 text-lg">
+              Your account has been created successfully!
             </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-blue-800 text-sm font-medium mb-1">📧 Email Verification Sent</p>
+              <p className="text-blue-700 text-sm">
+                We've sent a verification link to your email. Please check your inbox to verify your account.
+              </p>
+            </div>
             
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 mb-6">
               <h3 className="font-semibold text-gray-800 mb-3">What's next?</h3>
