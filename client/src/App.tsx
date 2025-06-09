@@ -67,6 +67,7 @@ import JobFitQuizPage from "@/pages/tools/JobFitQuizPage";
 import InterviewGuidePage from "@/pages/tools/InterviewGuidePage";
 import InterviewPracticePage from "@/pages/InterviewPracticePage";
 import SkillGapAnalysisPage from "@/pages/SkillGapAnalysisPage";
+import CareerPathVisualizerPage from "@/pages/CareerPathVisualizerPage";
 
 // Import new blog posts
 import BBBEEImpactSAResumes from "@/pages/blog/BBBEEImpactSAResumes";
@@ -142,6 +143,7 @@ function App() {
                 <Route path="/tools/interview-guide" component={InterviewGuidePage} />
                 <Route path="/interview-practice" component={InterviewPracticePage} />
                 <Route path="/skill-gap-analysis" component={SkillGapAnalysisPage} />
+                <Route path="/career-path-visualizer" component={CareerPathVisualizerPage} />
                 <Route path="/resume-builder" component={ResumeBuilder} />
                 
                 {/* Job matching services coming soon - temporarily disabled */}
