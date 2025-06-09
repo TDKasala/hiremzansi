@@ -40,26 +40,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('auth_token');
       
-      if (!token) {
-        setUser(null);
-        console.log('Auth state changed:', 'INITIAL_SESSION');
-        return;
-      }
-
       const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include' // Include cookies for session-based auth
       });
 
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData.user);
+        setUser(userData);
         console.log('Auth state changed:', 'AUTHENTICATED');
       } else {
-        localStorage.removeItem('auth_token');
         setUser(null);
         console.log('Auth state changed:', 'SIGNED_OUT');
       }
@@ -84,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for session-based auth
         body: JSON.stringify({ email, password, ...userData })
       });
 
@@ -93,11 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.message || 'Sign up failed');
       }
 
-      if (data.token) {
-        localStorage.setItem('auth_token', data.token);
-        setUser(data.user);
-      }
-
+      setUser(data.user);
       return { data, error: null };
     } catch (error) {
       console.error('Error signing up:', error);
@@ -113,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for session-based auth
         body: JSON.stringify({ email, password })
       });
 
@@ -122,11 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.message || 'Login failed');
       }
 
-      if (data.token) {
-        localStorage.setItem('auth_token', data.token);
-        setUser(data.user);
-      }
-
+      setUser(data.user);
       return { data, error: null };
     } catch (error) {
       console.error('Error signing in:', error);
@@ -137,7 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   const signOut = async () => {
     try {
-      localStorage.removeItem('auth_token');
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include' // Include cookies for session-based auth
+      });
       setUser(null);
       console.log('Auth state changed:', 'SIGNED_OUT');
       return { error: null };
