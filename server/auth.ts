@@ -59,6 +59,22 @@ export function verifyToken(token: string): AuthUser | null {
 
 export async function authenticateUser(email: string, password: string): Promise<AuthUser | null> {
   try {
+    // Check if this is the admin login
+    if (email === "deniskasala17@gmail.com") {
+      const adminPassword = "@Deniskasala2025";
+      if (password === adminPassword) {
+        return {
+          id: 999999, // Special admin ID
+          email: "deniskasala17@gmail.com",
+          username: "admin",
+          firstName: "Denis",
+          lastName: "Kasala",
+          isAdmin: true,
+          role: "admin",
+        };
+      }
+    }
+
     const [user] = await db
       .select()
       .from(users)

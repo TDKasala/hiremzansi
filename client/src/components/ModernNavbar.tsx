@@ -176,7 +176,7 @@ export function ModernNavbar() {
                       {user.role === 'admin' && (
                         <button
                           onClick={() => {
-                            setLocation('/admin');
+                            setLocation('/admin/dashboard');
                             setIsMenuOpen(false);
                           }}
                           className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
