@@ -3323,6 +3323,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Premium Job Matching API Endpoints (Your Business Model)
+  
+  // Recruiter endpoints - for viewing and purchasing matches
+  app.get("/api/recruiter/job-matches", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Sample premium matches for recruiters
+      const sampleRecruiterMatches = [
+        {
+          id: 1,
+          jobId: 101,
+          candidateId: 1001,
+          matchScore: 87,
+          skillsMatch: 90,
+          experienceMatch: 85,
+          locationMatch: 95,
+          saContextMatch: 80,
+          isRecruiterNotified: true,
+          isPaid: false,
+          isContactRevealed: false,
+          matchedSkills: ["JavaScript", "React", "Node.js", "PostgreSQL", "Agile"],
+          missingSkills: ["TypeScript", "AWS"],
+          candidate: {
+            id: 1001,
+            location: "Cape Town, Western Cape",
+            experienceLevel: "Senior (5+ years)",
+            skills: ["JavaScript", "React", "Node.js", "PostgreSQL", "Agile", "Git"],
+            bbbeeLevel: 2,
+            industry: "Technology",
+            cvScore: 85,
+            lastActive: "2024-06-15T14:30:00.000Z"
+          },
+          job: {
+            id: 101,
+            title: "Senior Full Stack Developer",
+            department: "Engineering",
+            urgency: "high" as const,
+            postedDate: "2024-06-10T00:00:00.000Z"
+          },
+          price: 200
+        },
+        {
+          id: 2,
+          jobId: 102,
+          candidateId: 1002,
+          matchScore: 92,
+          skillsMatch: 95,
+          experienceMatch: 90,
+          locationMatch: 85,
+          saContextMatch: 95,
+          isRecruiterNotified: false,
+          isPaid: false,
+          isContactRevealed: false,
+          matchedSkills: ["Project Management", "Agile", "Scrum", "SAP", "B-BBEE Compliance"],
+          missingSkills: ["PMP Certification"],
+          candidate: {
+            id: 1002,
+            location: "Johannesburg, Gauteng",
+            experienceLevel: "Senior (8+ years)",
+            skills: ["Project Management", "Agile", "Scrum", "SAP", "B-BBEE Compliance"],
+            bbbeeLevel: 1,
+            industry: "Government",
+            cvScore: 92,
+            lastActive: "2024-06-14T16:45:00.000Z"
+          },
+          job: {
+            id: 102,
+            title: "Senior Project Manager",
+            department: "Operations",
+            urgency: "medium" as const,
+            postedDate: "2024-06-12T00:00:00.000Z"
+          },
+          price: 250
+        }
+      ];
+      
+      res.json(sampleRecruiterMatches);
+    } catch (error) {
+      console.error("Error fetching recruiter matches:", error);
+      res.status(500).json({ error: "Failed to fetch job matches" });
+    }
+  });
+
+  // Purchase contact access
+  app.post("/api/recruiter/purchase-contact/:matchId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const matchId = parseInt(req.params.matchId);
+      const userId = req.user.id;
+      
+      // Simulate payment processing and contact unlock
+      // In production, integrate with Stripe/PayFast for actual payments
+      
+      res.json({
+        success: true,
+        message: "Contact access purchased successfully",
+        candidateContact: {
+          name: "John Doe",
+          email: "john.doe@email.co.za",
+          phone: "+27 82 123 4567",
+          linkedIn: "https://linkedin.com/in/johndoe"
+        }
+      });
+    } catch (error) {
+      console.error("Error purchasing contact:", error);
+      res.status(500).json({ error: "Failed to purchase contact access" });
+    }
+  });
+
+  // Job seeker notification endpoints
+  app.get("/api/job-seeker/match-notifications", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      
+      // Sample notifications for job seekers (without revealing full job details)
+      const sampleNotifications = [
+        {
+          id: 1,
+          type: "potential_match",
+          title: "New High-Match Opportunity Available",
+          message: "A recruiter has posted a position that's 87% compatible with your skills. Consider optimizing your CV to increase your chances.",
+          matchStrength: 87,
+          industry: "Technology",
+          location: "Cape Town, Western Cape",
+          optimizationTips: [
+            "Add TypeScript experience to match job requirements",
+            "Highlight your Agile methodology experience more prominently",
+            "Include specific project outcomes and metrics"
+          ],
+          requiredSkills: ["JavaScript", "React", "Node.js"],
+          missingSkills: ["TypeScript", "AWS"],
+          isRead: false,
+          createdAt: "2024-06-15T10:30:00.000Z",
+          urgency: "high"
+        },
+        {
+          id: 2,
+          type: "cv_optimization",
+          title: "Optimize CV for Better Matches",
+          message: "Your current CV matches 72% with available positions. Small improvements could increase this to 85%+.",
+          matchStrength: 72,
+          industry: "Technology",
+          location: "Johannesburg, Gauteng",
+          optimizationTips: [
+            "Add more specific technical skills",
+            "Include industry certifications",
+            "Quantify your achievements with numbers"
+          ],
+          requiredSkills: ["JavaScript", "HTML", "CSS"],
+          missingSkills: ["Python", "Django", "PostgreSQL"],
+          isRead: true,
+          createdAt: "2024-06-14T14:20:00.000Z",
+          urgency: "medium"
+        },
+        {
+          id: 3,
+          type: "skill_suggestion",
+          title: "Hot Skills in Your Industry",
+          message: "B-BBEE compliance skills are in high demand. Adding this could unlock premium government positions.",
+          matchStrength: 78,
+          industry: "Government",
+          location: "Pretoria, Gauteng",
+          optimizationTips: [
+            "Add B-BBEE compliance experience",
+            "Highlight government sector projects",
+            "Include public sector certifications"
+          ],
+          requiredSkills: ["Project Management", "Agile"],
+          missingSkills: ["B-BBEE Compliance", "Government Regulations"],
+          isRead: false,
+          createdAt: "2024-06-13T09:15:00.000Z",
+          urgency: "low"
+        }
+      ];
+      
+      res.json(sampleNotifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
+
+  // Private job posting endpoint (hidden from job seekers)
+  app.post("/api/recruiter/private-jobs", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const jobData = req.body;
+      
+      // Create private job posting
+      // Automatically trigger matching against existing CVs
+      // Send notifications to recruiters about matches
+      
+      res.json({
+        success: true,
+        message: "Private job posted successfully. We're analyzing matches...",
+        jobId: Math.floor(Math.random() * 10000),
+        estimatedMatches: Math.floor(Math.random() * 15) + 5
+      });
+    } catch (error) {
+      console.error("Error creating private job:", error);
+      res.status(500).json({ error: "Failed to create private job posting" });
+    }
+  });
+
   // Mount Dynamic Resume Builder routes
   app.use("/api", dynamicResumeBuilderRoutes);
   
