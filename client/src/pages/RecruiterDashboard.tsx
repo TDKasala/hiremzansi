@@ -388,15 +388,16 @@ export default function RecruiterDashboard() {
                       <Button 
                         variant="outline" 
                         onClick={() => setSelectedJob(job.id)}
+                        className="border-brand-blue text-brand-blue hover:bg-brand-blue-light"
                       >
                         <Users className="h-4 w-4 mr-2" />
                         View Matches ({job.matchCount})
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" className="border-brand-green text-brand-green hover:bg-brand-green-light">
                         <Settings className="h-4 w-4 mr-2" />
                         Edit Job
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" className="border-brand-orange text-brand-orange hover:bg-brand-orange-light">
                         <Download className="h-4 w-4 mr-2" />
                         Export Matches
                       </Button>

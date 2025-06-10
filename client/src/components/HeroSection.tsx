@@ -72,12 +72,12 @@ const AnimatedCounter = ({
   return (
     <div className="relative overflow-hidden">
       <div 
-        className={`text-2xl md:text-3xl font-bold text-[#FFCA28] transition-all duration-500 ${
+        className={`text-2xl md:text-3xl font-bold text-brand-orange transition-all duration-500 ${
           isAnimating ? 'animate-pulse' : ''
         }`}
         style={{
-          filter: isAnimating ? 'drop-shadow(0 0 12px rgba(255, 202, 40, 0.8))' : 'none',
-          textShadow: isAnimating ? '0 0 15px rgba(255, 202, 40, 0.9), 0 0 25px rgba(255, 202, 40, 0.6)' : 'none',
+          filter: isAnimating ? 'drop-shadow(0 0 12px rgba(255, 107, 0, 0.8))' : 'none',
+          textShadow: isAnimating ? '0 0 15px rgba(255, 107, 0, 0.9), 0 0 25px rgba(255, 107, 0, 0.6)' : 'none',
           transform: isAnimating ? 'scale(1.05)' : 'scale(1)'
         }}
       >
@@ -85,8 +85,8 @@ const AnimatedCounter = ({
       </div>
       {isAnimating && (
         <>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-300/30 to-transparent animate-shine"></div>
-          <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400/20 via-amber-300/30 to-yellow-400/20 rounded-lg blur-sm animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-orange/30 to-transparent animate-shine"></div>
+          <div className="absolute -inset-2 bg-gradient-to-r from-brand-orange/20 via-brand-orange/30 to-brand-orange/20 rounded-lg blur-sm animate-pulse"></div>
         </>
       )}
     </div>
@@ -206,7 +206,7 @@ export default function HeroSection() {
                       </div>
                       <div className="overflow-hidden">
                         <h3 
-                          className={`text-amber-500 font-semibold text-sm mb-2 ${isAnimated ? 'animate-position-fade-in' : ''}`}
+                          className={`text-brand-orange font-semibold text-sm mb-2 ${isAnimated ? 'animate-position-fade-in' : ''}`}
                           style={{ 
                             animation: isAnimated ? 'position-fade-in 1.5s ease-out forwards 0.6s' : 'none',
                             opacity: 0
@@ -244,16 +244,16 @@ export default function HeroSection() {
                   </div>
                   
                   <div className="mb-3">
-                    <div className="bg-amber-400 text-black px-3 py-1 rounded-md font-bold mb-2 text-sm">Key Skills</div>
+                    <div className="bg-brand-orange text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Key Skills</div>
                     <div className="flex flex-wrap gap-1 mb-3">
-                      <span className="text-xs bg-cyan-200 px-2 py-1 rounded-md">Software Development</span>
-                      <span className="text-xs bg-purple-200 px-2 py-1 rounded-md">Data Analysis</span>
-                      <span className="text-xs bg-pink-200 px-2 py-1 rounded-md">Team Leadership</span>
-                      <span className="text-xs bg-cyan-200 px-2 py-1 rounded-md">Python</span>
-                      <span className="text-xs bg-purple-200 px-2 py-1 rounded-md">SQL</span>
+                      <span className="text-xs bg-brand-blue-light text-brand-blue px-2 py-1 rounded-md">Software Development</span>
+                      <span className="text-xs bg-brand-green-light text-brand-green px-2 py-1 rounded-md">Data Analysis</span>
+                      <span className="text-xs bg-brand-orange-light text-brand-orange px-2 py-1 rounded-md">Team Leadership</span>
+                      <span className="text-xs bg-brand-blue-light text-brand-blue px-2 py-1 rounded-md">Python</span>
+                      <span className="text-xs bg-brand-green-light text-brand-green px-2 py-1 rounded-md">SQL</span>
                     </div>
                     
-                    <div className="bg-cyan-500 text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Experience</div>
+                    <div className="bg-brand-blue text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Experience</div>
                     <div className="mb-3">
                       <p className="font-bold text-sm">Senior Developer</p>
                       <p className="text-xs">InnovaTech Solutions</p>
@@ -265,7 +265,7 @@ export default function HeroSection() {
                       </ul>
                     </div>
                     
-                    <div className="bg-purple-400 text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">SA Qualifications</div>
+                    <div className="bg-brand-green text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">SA Qualifications</div>
                     <ul className="list-disc ml-4 text-xs">
                       <li>BSc Computer Science (NQF Level 7)</li>
                       <li>MICT SETA Python Certification</li>
@@ -277,7 +277,7 @@ export default function HeroSection() {
               
               {/* Animated highlights that appear one by one */}
               <div 
-                className={`absolute top-[15%] left-[11%] w-[78%] h-[6%] bg-amber-200 rounded-full opacity-0 pointer-events-none
+                className={`absolute top-[15%] left-[11%] w-[78%] h-[6%] bg-brand-orange-light rounded-full opacity-0 pointer-events-none
                   ${isAnimated ? 'animate-highlight-1' : ''}`}
                 style={{ 
                   animation: isAnimated ? 'highlight-1 2s forwards 0.5s' : 'none',
@@ -285,7 +285,7 @@ export default function HeroSection() {
               ></div>
               
               <div 
-                className={`absolute top-[36%] left-[15%] w-[70%] h-[20%] bg-amber-200 rounded-lg opacity-0 pointer-events-none
+                className={`absolute top-[36%] left-[15%] w-[70%] h-[20%] bg-brand-blue-light rounded-lg opacity-0 pointer-events-none
                   ${isAnimated ? 'animate-highlight-2' : ''}`}
                 style={{ 
                   animation: isAnimated ? 'highlight-2 2s forwards 1.5s' : 'none',
@@ -293,7 +293,7 @@ export default function HeroSection() {
               ></div>
               
               <div 
-                className={`absolute top-[78%] left-[10%] w-[75%] h-[10%] bg-amber-200 rounded-lg opacity-0 pointer-events-none
+                className={`absolute top-[78%] left-[10%] w-[75%] h-[10%] bg-brand-green-light rounded-lg opacity-0 pointer-events-none
                   ${isAnimated ? 'animate-highlight-3' : ''}`}
                 style={{ 
                   animation: isAnimated ? 'highlight-3 2s forwards 2.5s' : 'none',
