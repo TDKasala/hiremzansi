@@ -14,6 +14,7 @@ import { JobMatchingAnnouncement } from "@/components/JobMatchingAnnouncement";
 import { CVOptimizationShowcase } from "@/components/CVOptimizationShowcase";
 import { CVAnalysisFeatures } from "@/components/CVAnalysisFeatures";
 import { PremiumRecruiterSection } from "@/components/PremiumRecruiterSection";
+import { JobSeekerMatchingBanner } from "@/components/JobSeekerBenefitsAlert";
 
 
 export default function HomePage() {
@@ -33,6 +34,7 @@ export default function HomePage() {
       <WhatsAppPromoSection />
       <CVOptimizationShowcase />
       <PremiumRecruiterSection />
+      <JobSeekerMatchingBanner />
       <PricingSection />
       <SuccessStoriesSection />
       <TestimonialsSection />

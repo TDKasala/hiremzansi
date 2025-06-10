@@ -45,6 +45,7 @@ import DeepAnalysisCard from "@/components/DeepAnalysisCard";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
 import { JobMatchingDashboard } from "@/components/JobMatchingDashboard";
 import { JobSeekerMatchNotifications } from "@/components/JobSeekerMatchNotifications";
+import { JobSeekerBenefitsAlert } from "@/components/JobSeekerBenefitsAlert";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -176,6 +177,7 @@ export default function DashboardPage() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            <JobSeekerBenefitsAlert />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="pb-2">
