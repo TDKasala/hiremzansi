@@ -137,20 +137,28 @@ export default function HeroSection() {
               Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
             </p>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {stats.map((stat, index) => (
-                <div key={index} className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300">
-                  <div className="overflow-hidden">
-                    <AnimatedCounter 
-                      endValue={stat.value}
-                      duration={2500 + (index * 300)}
-                      delay={500 + (index * 200)}
-                      isVisible={isAnimated}
-                    />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {stats.map((stat, index) => {
+                const colors = [
+                  'bg-gradient-to-br from-brand-blue to-brand-blue/80 border-brand-blue/30 shadow-brand-blue/20',
+                  'bg-gradient-to-br from-brand-green to-brand-green/80 border-brand-green/30 shadow-brand-green/20',
+                  'bg-gradient-to-br from-brand-orange to-brand-orange/80 border-brand-orange/30 shadow-brand-orange/20',
+                  'bg-gradient-to-br from-purple-500 to-purple-600/80 border-purple-500/30 shadow-purple-500/20'
+                ];
+                return (
+                  <div key={index} className={`${colors[index]} p-4 rounded-xl text-center border-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm`}>
+                    <div className="overflow-hidden">
+                      <AnimatedCounter 
+                        endValue={stat.value}
+                        duration={2500 + (index * 300)}
+                        delay={500 + (index * 200)}
+                        isVisible={isAnimated}
+                      />
+                    </div>
+                    <div className="text-sm text-white font-semibold mt-2 leading-tight">{stat.label}</div>
                   </div>
-                  <div className="text-xs text-white font-medium mt-1">{stat.label}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
