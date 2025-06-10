@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/use-auth';
+import { useLocation } from 'wouter';
 import { 
   Users, 
   FileText, 
@@ -71,6 +73,27 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState('overview');
+  const { user, loading: authLoading } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // Redirect if not admin
+  useEffect(() => {
+    if (!authLoading && (!user || !user.isAdmin)) {
+      setLocation('/');
+    }
+  }, [user, authLoading, setLocation]);
+
+  // Show loading while checking auth
+  if (authLoading || !user || !user.isAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch admin stats
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -99,7 +122,7 @@ export default function AdminDashboard() {
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      return await apiRequest(`/api/admin/users/${userId}`, 'DELETE');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
