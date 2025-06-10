@@ -144,10 +144,7 @@ export default function AdminDashboard() {
   // Toggle user premium mutation
   const togglePremiumMutation = useMutation({
     mutationFn: async ({ userId, isPremium }: { userId: number; isPremium: boolean }) => {
-      await apiRequest(`/api/admin/users/${userId}/premium`, {
-        method: 'PATCH',
-        body: JSON.stringify({ isPremium }),
-      });
+      return await apiRequest(`/api/admin/users/${userId}/premium`, 'PATCH', { isPremium });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });

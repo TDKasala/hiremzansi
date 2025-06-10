@@ -96,13 +96,7 @@ const AnimatedCounter = ({
 export default function HeroSection() {
   const { t } = useTranslation();
   
-  // Stats for South African context
-  const stats = [
-    { label: "SA Unemployment Rate", value: "33.5%" },
-    { label: "SA Employers Use ATS", value: "75%" },
-    { label: "Applicants Per Job", value: "200+" },
-    { label: "To Make First Impression", value: "8s" }
-  ];
+
   
   // Animation states for CV elements
   const [isAnimated, setIsAnimated] = useState(false);
@@ -137,29 +131,7 @@ export default function HeroSection() {
               Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
             </p>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {stats.map((stat, index) => {
-                const colors = [
-                  'bg-gradient-to-br from-brand-blue to-brand-blue/80 border-brand-blue/30 shadow-brand-blue/20',
-                  'bg-gradient-to-br from-brand-green to-brand-green/80 border-brand-green/30 shadow-brand-green/20',
-                  'bg-gradient-to-br from-brand-orange to-brand-orange/80 border-brand-orange/30 shadow-brand-orange/20',
-                  'bg-gradient-to-br from-purple-500 to-purple-600/80 border-purple-500/30 shadow-purple-500/20'
-                ];
-                return (
-                  <div key={index} className={`${colors[index]} p-4 rounded-xl text-center border-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm`}>
-                    <div className="overflow-hidden">
-                      <AnimatedCounter 
-                        endValue={stat.value}
-                        duration={2500 + (index * 300)}
-                        delay={500 + (index * 200)}
-                        isVisible={isAnimated}
-                      />
-                    </div>
-                    <div className="text-sm text-white font-semibold mt-2 leading-tight">{stat.label}</div>
-                  </div>
-                );
-              })}
-            </div>
+
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <Link href="/upload">

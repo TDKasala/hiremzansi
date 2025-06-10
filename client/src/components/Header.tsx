@@ -116,7 +116,7 @@ export default function Header() {
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   
-                  {user && user.role === 'admin' && (
+                  {user && user.isAdmin && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
@@ -238,7 +238,7 @@ export default function Header() {
                   Skill Gap Analysis
                 </Link>
                 
-                {user && user.role === 'admin' && (
+                {user && user.isAdmin && (
                   <Link 
                     href="/admin"
                     className="block px-4 py-2 border-2 border-amber-500 bg-amber-100 text-amber-700 font-medium text-center rounded-md hover:bg-amber-200 transition-colors"
