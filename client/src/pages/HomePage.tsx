@@ -13,6 +13,7 @@ import CTASection from "@/components/CTASection";
 import { JobMatchingAnnouncement } from "@/components/JobMatchingAnnouncement";
 import { CVOptimizationShowcase } from "@/components/CVOptimizationShowcase";
 import { CVAnalysisFeatures } from "@/components/CVAnalysisFeatures";
+import { PremiumRecruiterSection } from "@/components/PremiumRecruiterSection";
 
 
 export default function HomePage() {
@@ -31,6 +32,7 @@ export default function HomePage() {
       <UploadSection />
       <WhatsAppPromoSection />
       <CVOptimizationShowcase />
+      <PremiumRecruiterSection />
       <PricingSection />
       <SuccessStoriesSection />
       <TestimonialsSection />
