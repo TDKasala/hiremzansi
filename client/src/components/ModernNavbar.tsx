@@ -131,16 +131,16 @@ export function ModernNavbar() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    {user.role === 'admin' ? (
+                    {user.isAdmin ? (
                       <Crown className="w-4 h-4" />
                     ) : (
                       <User className="w-4 h-4" />
                     )}
                   </div>
                   <span className="hidden sm:block text-sm font-medium">
-                    {user.name || user.username}
+                    {user.name || user.email}
                   </span>
-                  {user.role === 'admin' && (
+                  {user.isAdmin && (
                     <Badge variant="secondary" className="hidden sm:flex bg-yellow-400 text-yellow-900">
                       <Shield className="w-3 h-3 mr-1" />
                       Admin
@@ -158,7 +158,7 @@ export function ModernNavbar() {
                       className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2"
                     >
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.name || user.username}</p>
+                        <p className="text-sm font-medium text-gray-900">{user.name || user.email}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                       
@@ -173,7 +173,7 @@ export function ModernNavbar() {
                         Dashboard
                       </button>
 
-                      {user.role === 'admin' && (
+                      {user.isAdmin && (
                         <button
                           onClick={() => {
                             setLocation('/admin/dashboard');
