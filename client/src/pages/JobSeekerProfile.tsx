@@ -436,7 +436,7 @@ export default function JobSeekerProfile() {
                       {userProfile.bbbeeLevel && (
                         <div>
                           <h4 className="font-medium mb-2">B-BBEE Status</h4>
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-brand-green-light text-brand-green">
                             Level {userProfile.bbbeeLevel}
                           </Badge>
                         </div>
@@ -451,10 +451,10 @@ export default function JobSeekerProfile() {
               <Card>
                 <CardContent className="p-6">
                   <div className="flex gap-2">
-                    <Button onClick={() => handleSaveProfile(userProfile)}>
+                    <Button onClick={() => handleSaveProfile(userProfile)} className="btn-brand">
                       Save Changes
                     </Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    <Button variant="outline" onClick={() => setIsEditing(false)} className="btn-brand-outline">
                       Cancel
                     </Button>
                   </div>

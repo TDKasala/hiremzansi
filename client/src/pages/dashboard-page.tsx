@@ -214,7 +214,7 @@ export default function DashboardPage() {
                         <span className="font-medium">68%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-primary h-full rounded-full" style={{ width: "68%" }}></div>
+                        <div className="bg-brand-blue h-full rounded-full" style={{ width: "68%" }}></div>
                       </div>
                     </div>
                     <div>
@@ -223,7 +223,7 @@ export default function DashboardPage() {
                         <span className="font-medium">85%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-primary h-full rounded-full" style={{ width: "85%" }}></div>
+                        <div className="bg-brand-green h-full rounded-full" style={{ width: "85%" }}></div>
                       </div>
                     </div>
                     <div>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                         <span className="font-medium">65%</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-primary h-full rounded-full" style={{ width: "65%" }}></div>
+                        <div className="bg-brand-orange h-full rounded-full" style={{ width: "65%" }}></div>
                       </div>
                     </div>
                   </div>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
                 <CardContent className="pt-2">
                   <div className="space-y-4">
                     <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-blue-light text-brand-blue">
                         <CloudUpload className="h-5 w-5" />
                       </div>
                       <div>
@@ -267,7 +267,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-green-light text-brand-green">
                         <BarChart3 className="h-5 w-5" />
                       </div>
                       <div>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-orange-light text-brand-orange">
                         <Settings className="h-5 w-5" />
                       </div>
                       <div>

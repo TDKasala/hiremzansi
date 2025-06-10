@@ -296,9 +296,9 @@ export default function RecruiterDashboard() {
                       </div>
                       <div className="text-right">
                         {match.isUnlocked ? (
-                          <Badge className="bg-green-100 text-green-800">Unlocked</Badge>
+                          <Badge className="bg-brand-green-light text-brand-green">Unlocked</Badge>
                         ) : (
-                          <Button size="sm" onClick={() => handleUnlockCandidate(match.id)}>
+                          <Button size="sm" onClick={() => handleUnlockCandidate(match.id)} className="btn-brand">
                             <Eye className="h-4 w-4 mr-1" />
                             R{match.price}
                           </Button>
