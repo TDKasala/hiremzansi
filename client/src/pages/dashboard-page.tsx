@@ -509,6 +509,18 @@ export default function DashboardPage() {
             <JobMatchingDashboard cvId={userCVs?.[0]?.id} />
           </TabsContent>
 
+          <TabsContent value="notifications" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Job Match Notifications</CardTitle>
+                <CardDescription>Anonymous alerts about jobs matching your CV</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <JobSeekerMatchNotifications />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>

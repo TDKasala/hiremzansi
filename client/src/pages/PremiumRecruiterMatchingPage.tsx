@@ -80,9 +80,7 @@ export default function PremiumRecruiterMatchingPage() {
   // Purchase contact access mutation
   const purchaseContactMutation = useMutation({
     mutationFn: async (matchId: number) => {
-      return apiRequest(`/api/recruiter/purchase-contact/${matchId}`, {
-        method: 'POST',
-      });
+      return apiRequest(`/api/recruiter/purchase-contact/${matchId}`, 'POST');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/recruiter/job-matches'] });
