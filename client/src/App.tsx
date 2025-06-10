@@ -49,6 +49,8 @@ import WhatsAppUploadPage from "@/pages/WhatsAppUploadPage";
 import TemplatesPage from "@/pages/TemplatesPage";
 import SettingsPage from "@/pages/settings-page";
 import PremiumRecruiterMatchingPage from "@/pages/PremiumRecruiterMatchingPage";
+import RecruiterDashboard from "@/pages/RecruiterDashboard";
+import JobSeekerProfile from "@/pages/JobSeekerProfile";
 import BlogPost1 from "@/pages/BlogPost1";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
@@ -169,6 +171,8 @@ function App() {
                 <Route path="/job-seeker-tools" component={JobSeekerToolsPage} />
                 <ProtectedRoute path="/subscription" component={SubscriptionPage} />
                 <ProtectedRoute path="/recruiter/matches" component={PremiumRecruiterMatchingPage} />
+                <ProtectedRoute path="/recruiter/dashboard" component={RecruiterDashboard} />
+                <ProtectedRoute path="/job-seeker/profile" component={JobSeekerProfile} />
                 <ProtectedRoute path="/referrals" component={ReferralDashboard} />
                 <ProtectedRoute path="/refer-earn" component={ReferralDashboard} />
                 <Route path="/admin/login" component={AdminLogin} />
