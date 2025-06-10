@@ -70,12 +70,12 @@ export function ModernNavbar() {
           >
             <div className="relative">
               <motion.div
-                className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-2"
+                className="w-10 h-10 bg-gradient-brand rounded-xl p-2"
                 animate={{ 
                   boxShadow: [
-                    '0 0 0 0 rgba(147, 51, 234, 0.4)',
-                    '0 0 0 10px rgba(147, 51, 234, 0)',
-                    '0 0 0 0 rgba(147, 51, 234, 0)'
+                    '0 0 0 0 rgba(31, 184, 217, 0.4)',
+                    '0 0 0 10px rgba(31, 184, 217, 0)',
+                    '0 0 0 0 rgba(31, 184, 217, 0)'
                   ]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -84,10 +84,10 @@ export function ModernNavbar() {
               </motion.div>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-gradient-brand bg-clip-text text-transparent">
                 Hire Mzansi
               </h1>
-              <p className="text-xs text-gray-500">South Africa's #1 CV Platform</p>
+              <p className="text-xs text-muted-foreground">South Africa's #1 CV Platform</p>
             </div>
           </motion.div>
 
@@ -99,10 +99,10 @@ export function ModernNavbar() {
                 onClick={() => setLocation(item.path)}
                 className={`text-sm font-medium transition-colors relative ${
                   location === item.path
-                    ? 'text-purple-600'
+                    ? 'text-brand-blue'
                     : scrolled 
-                      ? 'text-gray-700 hover:text-purple-600' 
-                      : 'text-gray-800 hover:text-purple-600'
+                      ? 'text-gray-700 hover:text-brand-blue' 
+                      : 'text-gray-800 hover:text-brand-blue'
                 }`}
                 whileHover={{ y: -2 }}
                 transition={{ duration: 0.2 }}
@@ -110,7 +110,7 @@ export function ModernNavbar() {
                 {item.label}
                 {location === item.path && (
                   <motion.div
-                    className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600"
+                    className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-brand"
                     layoutId="activeTab"
                     initial={false}
                     transition={{ duration: 0.3 }}

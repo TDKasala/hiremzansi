@@ -203,35 +203,58 @@
 }
 
 :root {
-  /* Theme with #FFCA28 amber/yellow as primary and blue accents */
-  --background: 0 0% 100%;  /* White background */
-  --foreground: 20 14.3% 4.1%;
-  --muted: 0 0% 96%;
-  --muted-foreground: 25 5.3% 44.7%;
+  /* Hire Mzansi Brand Colors - TrendingUp Theme */
+  --background: 0 0% 100%;  /* Pure white background */
+  --foreground: 220 13% 9%;  /* Deep charcoal for text */
+  --muted: 220 14% 96%;  /* Light gray backgrounds */
+  --muted-foreground: 220 9% 46%;  /* Muted text */
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 220 13% 9%;
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 0 0% 90%;
-  --input: 0 0% 90%;
-  --primary: 42 100% 57%;  /* #FFCA28 amber/yellow */
-  --primary-foreground: 0 0% 10%;  /* Dark text on amber background */
-  --secondary: 210 100% 50%;  /* Bright blue */
-  --secondary-foreground: 0 0% 100%; /* White text on blue */
-  --accent: 210 100% 95%;  /* Light blue */
-  --accent-foreground: 210 100% 30%; /* Dark blue */
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 42 100% 57%;  /* Match primary */
-  --radius: 0.5rem;
-  --warning: 38 100% 50%;
-  --success: 142 71% 45%;
-  --error: 0 84.2% 60.2%;
-  --chart-1: 42 100% 57%;  /* Primary amber */
-  --chart-2: 210 100% 50%;  /* Blue */
-  --chart-3: 42 80% 25%;  /* Dark amber */
-  --chart-4: 210 80% 70%;  /* Light blue */
-  --chart-5: 42 80% 65%;  /* Medium amber */
+  --card-foreground: 220 13% 9%;
+  --border: 220 13% 91%;  /* Subtle borders */
+  --input: 220 13% 91%;
+  
+  /* Primary: Professional Blue-Green (TrendingUp inspired) */
+  --primary: 200 95% 55%;  /* #1FB8D9 - vibrant blue-cyan */
+  --primary-foreground: 0 0% 100%;  /* White text on primary */
+  
+  /* Secondary: Success Green */
+  --secondary: 145 84% 47%;  /* #16A34A - success green */
+  --secondary-foreground: 0 0% 100%;
+  
+  /* Accent: Warm Orange */
+  --accent: 32 95% 55%;  /* #F97316 - energetic orange */
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 60 9% 98%;
+  --ring: 200 95% 55%;  /* Match primary */
+  --radius: 0.75rem;  /* Slightly more rounded */
+  
+  /* Extended brand colors */
+  --brand-blue: 200 95% 55%;  /* Primary blue */
+  --brand-blue-light: 200 95% 85%;  /* Light blue backgrounds */
+  --brand-blue-dark: 200 95% 35%;  /* Dark blue accents */
+  --brand-green: 145 84% 47%;  /* Success/growth green */
+  --brand-green-light: 145 84% 85%;
+  --brand-orange: 32 95% 55%;  /* Energy/action orange */
+  --brand-orange-light: 32 95% 85%;
+  --brand-purple: 270 60% 60%;  /* Premium features */
+  --brand-purple-light: 270 60% 90%;
+  
+  /* Status colors */
+  --success: 145 84% 47%;  /* Brand green */
+  --warning: 32 95% 55%;  /* Brand orange */
+  --error: 0 84% 60%;
+  --info: 200 95% 55%;  /* Brand blue */
+  
+  /* Chart colors using brand palette */
+  --chart-1: 200 95% 55%;  /* Primary blue */
+  --chart-2: 145 84% 47%;  /* Brand green */
+  --chart-3: 32 95% 55%;   /* Brand orange */
+  --chart-4: 270 60% 60%;  /* Brand purple */
+  --chart-5: 200 95% 35%;  /* Dark blue */
 }
 
 /* Dark theme removed as requested */
@@ -265,6 +288,89 @@
   /* Mobile-friendly grid adjustments */
   .grid {
     @apply gap-4 sm:gap-6;
+  }
+}
+
+@layer utilities {
+  /* Brand Color Utilities */
+  .text-brand-blue { color: hsl(var(--brand-blue)); }
+  .text-brand-green { color: hsl(var(--brand-green)); }
+  .text-brand-orange { color: hsl(var(--brand-orange)); }
+  .text-brand-purple { color: hsl(var(--brand-purple)); }
+  
+  .bg-brand-blue { background-color: hsl(var(--brand-blue)); }
+  .bg-brand-blue-light { background-color: hsl(var(--brand-blue-light)); }
+  .bg-brand-green { background-color: hsl(var(--brand-green)); }
+  .bg-brand-green-light { background-color: hsl(var(--brand-green-light)); }
+  .bg-brand-orange { background-color: hsl(var(--brand-orange)); }
+  .bg-brand-orange-light { background-color: hsl(var(--brand-orange-light)); }
+  .bg-brand-purple { background-color: hsl(var(--brand-purple)); }
+  .bg-brand-purple-light { background-color: hsl(var(--brand-purple-light)); }
+  
+  .border-brand-blue { border-color: hsl(var(--brand-blue)); }
+  .border-brand-green { border-color: hsl(var(--brand-green)); }
+  .border-brand-orange { border-color: hsl(var(--brand-orange)); }
+  
+  /* Brand Gradients */
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, hsl(var(--brand-blue)) 0%, hsl(var(--brand-green)) 100%);
+  }
+  
+  .bg-gradient-brand-warm {
+    background: linear-gradient(135deg, hsl(var(--brand-orange)) 0%, hsl(var(--brand-blue)) 100%);
+  }
+  
+  .bg-gradient-brand-success {
+    background: linear-gradient(135deg, hsl(var(--brand-green)) 0%, hsl(var(--brand-blue)) 100%);
+  }
+  
+  .bg-gradient-brand-premium {
+    background: linear-gradient(135deg, hsl(var(--brand-purple)) 0%, hsl(var(--brand-blue)) 100%);
+  }
+  
+  /* Logo container styles */
+  .logo-container {
+    @apply inline-flex items-center space-x-2 transition-all duration-200;
+  }
+  
+  .logo-icon {
+    @apply w-8 h-8 text-brand-blue transition-colors duration-200;
+  }
+  
+  .logo-text {
+    @apply text-xl font-bold text-foreground transition-colors duration-200;
+  }
+  
+  /* Brand buttons */
+  .btn-brand {
+    @apply bg-brand-blue hover:bg-brand-blue/90 text-white border-0 transition-all duration-200 transform hover:scale-105;
+  }
+  
+  .btn-brand-outline {
+    @apply border-2 border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white transition-all duration-200;
+  }
+  
+  .btn-success {
+    @apply bg-brand-green hover:bg-brand-green/90 text-white transition-all duration-200;
+  }
+  
+  .btn-warning {
+    @apply bg-brand-orange hover:bg-brand-orange/90 text-white transition-all duration-200;
+  }
+  
+  /* Status indicators using brand colors */
+  .status-success { @apply bg-brand-green-light text-brand-green border-brand-green; }
+  .status-warning { @apply bg-brand-orange-light text-brand-orange border-brand-orange; }
+  .status-info { @apply bg-brand-blue-light text-brand-blue border-brand-blue; }
+  .status-premium { @apply bg-brand-purple-light text-brand-purple border-brand-purple; }
+  
+  /* Interactive elements */
+  .hover-lift {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .focus-brand {
+    @apply focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue;
   }
 }
 
