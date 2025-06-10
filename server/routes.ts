@@ -30,7 +30,8 @@ import {
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
-import { verifyToken, hashPassword, authenticateUser, generateToken, isAuthenticated, isAdmin } from "./auth";
+import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
+import { isAuthenticated as authMiddleware, isAdmin as adminMiddleware } from "./auth";
 import { simpleAuth, authenticateToken } from "./simpleAuth";
 import jwt from "jsonwebtoken";
 import { payfastService } from "./services/payfastService";
@@ -1531,7 +1532,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if the CV belongs to the user (if authenticated)
-      const isGuest = !req.isAuthenticated();
+      const isGuest = !req.user;
       
       if (!isGuest && cv.userId && req.user && cv.userId !== req.user.id) {
         return res.status(403).json({ 
