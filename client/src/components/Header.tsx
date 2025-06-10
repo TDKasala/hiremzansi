@@ -48,8 +48,8 @@ export default function Header() {
         <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
           <img src={New_logo} alt="Hire Mzansi Logo" className="h-12 md:h-14 pl-[0px] pr-[0px] pt-[0px] pb-[0px] ml-[6px] mr-[6px]" />
           <span className="hidden sm:inline">
-            <span className="text-[#2B5A87] text-2xl md:text-3xl font-bold">HIRE</span><span className="text-[#5CB85C] text-2xl md:text-3xl font-bold">MZANSI</span>
-            <span className="text-[#5CB85C] ml-1 text-2xl md:text-3xl">•</span>
+            <span className="text-brand-blue text-2xl md:text-3xl font-bold">HIRE</span><span className="text-brand-green text-2xl md:text-3xl font-bold">MZANSI</span>
+            <span className="text-brand-green ml-1 text-2xl md:text-3xl">•</span>
           </span>
         </Link>
 
@@ -58,8 +58,8 @@ export default function Header() {
             <Link 
               key={link.href} 
               href={link.href}
-              className={`px-3 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 font-medium ${
-                location === link.href ? "bg-neutral-100" : ""
+              className={`px-3 py-2 rounded-md text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light font-medium transition-colors ${
+                location === link.href ? "bg-brand-blue-light text-brand-blue" : ""
               }`}
             >
               {link.label}
@@ -76,7 +76,7 @@ export default function Header() {
             (<div className="hidden md:flex items-center space-x-3">
               <Button
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-white"
+                className="btn-brand-outline"
                 asChild
               >
                 <Link href="/dashboard">Dashboard</Link>

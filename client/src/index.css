@@ -343,7 +343,7 @@
   
   /* Brand buttons */
   .btn-brand {
-    @apply bg-brand-blue hover:bg-brand-blue/90 text-white border-0 transition-all duration-200 transform hover:scale-105;
+    @apply bg-brand-blue hover:opacity-90 text-white border-0 transition-all duration-200 transform hover:scale-105;
   }
   
   .btn-brand-outline {
@@ -351,11 +351,11 @@
   }
   
   .btn-success {
-    @apply bg-brand-green hover:bg-brand-green/90 text-white transition-all duration-200;
+    @apply bg-brand-green hover:opacity-90 text-white transition-all duration-200;
   }
   
   .btn-warning {
-    @apply bg-brand-orange hover:bg-brand-orange/90 text-white transition-all duration-200;
+    @apply bg-brand-orange hover:opacity-90 text-white transition-all duration-200;
   }
   
   /* Status indicators using brand colors */

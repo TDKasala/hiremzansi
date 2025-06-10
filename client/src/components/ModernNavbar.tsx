@@ -224,7 +224,7 @@ export function ModernNavbar() {
                 </Button>
                 <Button
                   onClick={() => setLocation('/signup')}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  className="btn-brand"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   Get Started
@@ -283,7 +283,7 @@ export function ModernNavbar() {
                       setLocation(item.path);
                       setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left py-3 px-4 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                    className="block w-full text-left py-3 px-4 text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light rounded-lg transition-colors"
                   >
                     {item.label}
                   </motion.button>
@@ -312,7 +312,7 @@ export function ModernNavbar() {
                       setLocation('/signup');
                       setIsMenuOpen(false);
                     }}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    className="w-full btn-brand"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Get Started
