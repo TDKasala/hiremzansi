@@ -39,9 +39,7 @@ export default function HomePage() {
       <SuccessStoriesSection />
       <TestimonialsSection />
       <SkillQuizSection />
-      <div className="container mx-auto px-4 py-8">
-        <JobMatchingAnnouncement />
-      </div>
+      <JobMatchingAnnouncement />
       <BlogPreviewSection />
       <ReferralSourceSection />
       <CTASection />
