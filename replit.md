@@ -100,7 +100,10 @@ The deployment strategy prioritizes Replit for development and testing, with Ver
 
 ## Changelog
 
-- June 21, 2025. Initial setup
+- June 21, 2025: Initial setup
+- June 21, 2025: Fixed admin authentication - Updated password hash in simpleAuth.ts for deniskasala17@gmail.com with password @Deniskasala2025
+- June 21, 2025: Implemented mobile responsive pricing comparison section with card-based layout for mobile devices
+- June 21, 2025: Removed green statistics section from hero as requested
 
 ## User Preferences
 
