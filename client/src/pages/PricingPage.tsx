@@ -6,12 +6,20 @@ export default function PricingPage() {
   return (
     <>
       <Helmet>
-        <title>Pricing | Hire Mzansi - South African Resume Optimization</title>
-        <meta name="description" content="Affordable CV optimization plans for South African job seekers. Choose from free ATS scoring, one-time deep analysis, or premium ongoing optimization." />
-        <meta property="og:title" content="Hire Mzansi Pricing - CV Optimization for South Africans" />
-        <meta property="og:description" content="Affordable CV optimization plans starting from free. Get your CV past ATS systems and land more interviews." />
+        <title>Affordable CV Optimization Pricing for South African Job Seekers | Free ATS Analysis | Hire Mzansi</title>
+        <meta name="description" content="Choose from affordable CV optimization plans starting at R25. Free ATS analysis, B-BBEE compliance checking, and premium features for South African professionals. 50% launch discount available!" />
+        <meta name="keywords" content="CV optimization pricing South Africa, affordable resume builder SA, ATS analysis cost, B-BBEE CV pricing, professional CV services South Africa, job search tools pricing, career development cost, CV writing services rates" />
+        <meta property="og:title" content="Affordable CV Optimization Plans for South African Professionals - Hire Mzansi" />
+        <meta property="og:description" content="Transform your career with affordable CV optimization plans. Starting at R25 with 50% launch discount. Free ATS analysis, B-BBEE compliance, and professional features." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://hiremzansi.co.za/pricing" />
+        <meta property="og:image" content="https://hiremzansi.co.za/images/pricing-preview.jpg" />
+        <meta property="og:locale" content="en_ZA" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Affordable CV Optimization Plans - Hire Mzansi" />
+        <meta name="twitter:description" content="Professional CV optimization from R25. Free ATS analysis, B-BBEE compliance, 50% launch discount. Perfect for SA job seekers!" />
+        <meta name="twitter:image" content="https://hiremzansi.co.za/images/pricing-twitter.jpg" />
+        <link rel="canonical" href="https://hiremzansi.co.za/pricing" />
       </Helmet>
       
       <div className="bg-secondary py-16 text-white">

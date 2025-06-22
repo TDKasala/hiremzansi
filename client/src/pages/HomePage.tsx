@@ -21,12 +21,20 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Hire Mzansi - South African CV Optimization & ATS Analysis</title>
-        <meta name="description" content="Optimize your CV for the South African job market with Hire Mzansi's AI-powered ATS analysis. Get your free CV optimization today!" />
-        <meta property="og:title" content="Hire Mzansi - South African CV Optimization & ATS Analysis" />
-        <meta property="og:description" content="Transform your CV for the South African job market with AI-powered optimization and ATS analysis tools." />
+        <title>Hire Mzansi - AI-Powered CV Optimization for South African Job Market | ATS-Friendly Resume Builder</title>
+        <meta name="description" content="Land your dream job in South Africa with AI-powered CV optimization. Get ATS-compatible resumes, B-BBEE compliance analysis, NQF level matching, and job market insights. Free CV analysis available - start optimizing today!" />
+        <meta name="keywords" content="CV optimization South Africa, ATS friendly resume, B-BBEE CV analysis, South African job search, resume builder SA, employment equity CV, NQF levels, career development, job matching, professional CV writing" />
+        <meta property="og:title" content="Hire Mzansi - #1 AI CV Optimization Platform for South African Professionals" />
+        <meta property="og:description" content="Transform your career with AI-powered CV optimization built for South Africa. Beat ATS systems, ensure B-BBEE compliance, and access local job market insights. Try free analysis now!" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://hiremzansi.co.za" />
+        <meta property="og:image" content="https://hiremzansi.co.za/images/homepage-preview.jpg" />
+        <meta property="og:locale" content="en_ZA" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="AI CV Optimization for South Africa - Hire Mzansi" />
+        <meta name="twitter:description" content="Get your CV noticed by SA employers. ATS-friendly optimization, B-BBEE compliance, and local market insights. Free analysis available!" />
+        <meta name="twitter:image" content="https://hiremzansi.co.za/images/twitter-card.jpg" />
+        <link rel="canonical" href="https://hiremzansi.co.za/" />
       </Helmet>
       
       <HeroSection />
