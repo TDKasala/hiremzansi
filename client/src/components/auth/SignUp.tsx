@@ -47,18 +47,27 @@ export function SignUp() {
         avatar_url: null
       };
       
-      const { data, error } = await signUp(email, password, userData);
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+          username: email.split('@')[0]
+        }),
+      });
+
+      const data = await response.json();
       
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create account');
       }
       
       setSuccess(true);
-      
-      // Show success message for email confirmation
-      setTimeout(() => {
-        setLocation('/dashboard');
-      }, 3000);
+      // Do not redirect to dashboard - user needs to verify email first
     } catch (err: any) {
       console.error('Sign up error:', err);
       setError(err.message || 'Failed to create account');
@@ -81,15 +90,35 @@ export function SignUp() {
               </div>
             </div>
             
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Welcome to Hire Mzansi!</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Account Created Successfully!</h2>
             <p className="text-gray-600 mb-4 text-lg">
-              Your account has been created successfully!
+              Please verify your email to complete registration
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-blue-800 text-sm font-medium mb-1">📧 Email Verification Sent</p>
-              <p className="text-blue-700 text-sm">
-                We've sent a verification link to your email. Please check your inbox to verify your account.
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <p className="text-amber-800 text-sm font-medium mb-2">Email Verification Required</p>
+              <p className="text-amber-700 text-sm mb-3">
+                We've sent a verification link to <strong>{email}</strong>. Check your inbox and spam folder, then click the verification link to activate your account.
               </p>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/auth/resend-verification', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email })
+                    });
+                    if (response.ok) {
+                      setError('Verification email resent successfully!');
+                      setTimeout(() => setError(null), 3000);
+                    }
+                  } catch (err) {
+                    setError('Failed to resend verification email');
+                  }
+                }}
+                className="text-amber-600 hover:text-amber-800 text-sm font-medium underline"
+              >
+                Resend verification email
+              </button>
             </div>
             
             <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 mb-6">

@@ -238,38 +238,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newUser = result.user;
       const verificationToken = result.verificationToken;
       
-      // Store user in session
-      (req as any).session.userId = newUser.id;
-      (req as any).session.user = {
-        id: newUser.id,
-        email: newUser.email,
-        username: newUser.username,
-        name: newUser.name,
-        role: newUser.role
-      };
-
+      // DO NOT log user in automatically - they need to verify email first
+      
       // Send verification email
       await simpleAuth.sendVerificationEmail(newUser.email, verificationToken);
 
-      // Send welcome email
-      try {
-        const { sendWelcomeEmail } = await import('./services/emailService');
-        await sendWelcomeEmail(newUser.email, newUser.name || newUser.username);
-      } catch (error) {
-        console.error('Failed to send welcome email:', error);
-      }
-
       res.status(201).json({ 
-        message: "User created successfully. Please check your email to verify your account.",
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          username: newUser.username,
-          name: newUser.name,
-          role: newUser.role,
-          emailVerified: newUser.emailVerified
-        },
-        redirect: "/dashboard"
+        message: "Account created successfully! Please check your email (including spam folder) to verify your account before logging in.",
+        requiresVerification: true,
+        email: newUser.email
       });
     } catch (error) {
       console.error("Signup error:", error);
@@ -295,6 +272,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isValidPassword = await simpleAuth.verifyPassword(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      // Check if email is verified (skip for admin users)
+      if (!user.emailVerified && user.role !== 'admin') {
+        return res.status(401).json({ 
+          message: "Please verify your email address before logging in. Check your inbox (including spam folder) for the verification link.",
+          requiresVerification: true,
+          email: user.email
+        });
       }
 
       // Store user in session
@@ -343,6 +329,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Email verification error:", error);
       res.redirect("/?verified=false");
+    }
+  });
+
+  // Resend verification email
+  app.post("/api/auth/resend-verification", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      const user = await simpleAuth.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.emailVerified) {
+        return res.status(400).json({ message: "Email is already verified" });
+      }
+
+      // Generate new verification token
+      const verificationToken = simpleAuth.generateEmailVerificationToken(email);
+      
+      // Send verification email
+      await simpleAuth.sendVerificationEmail(email, verificationToken);
+
+      res.json({ 
+        message: "Verification email sent successfully. Please check your inbox and spam folder.",
+        email: email
+      });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ message: "Failed to resend verification email" });
     }
   });
 

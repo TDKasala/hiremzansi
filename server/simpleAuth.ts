@@ -114,17 +114,96 @@ export const simpleAuth = {
       // Send email verification email using the template
       const emailSent = await emailService.sendEmail({
         to: email,
-        subject: 'Hire Mzansi - Verify Your Email Address',
-        text: `Hello ${name}, Please verify your email address by clicking the link: ${verificationLink}`,
+        subject: '✅ Verify Your Hire Mzansi Account - Action Required',
+        text: `Hello ${name},
+
+Welcome to Hire Mzansi! To complete your account setup and start optimizing your CV for the South African job market, please verify your email address.
+
+Click here to verify: ${verificationLink}
+
+This verification link will expire in 24 hours for security reasons.
+
+If you didn't create this account, you can safely ignore this email.
+
+Best regards,
+The Hire Mzansi Team
+South Africa's #1 AI-Powered CV Optimization Platform`,
         html: `
-        <h1>Verify Your Email Address</h1>
-        <p>Hello ${name},</p>
-        <p>Thank you for creating an account with Hire Mzansi. Please verify your email address by clicking the button below:</p>
-        <a href="${verificationLink}" style="display: inline-block; background-color: #1a73e8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Verify My Email</a>
-        <p>If the button doesn't work, copy and paste this link: ${verificationLink}</p>
-        <p>This verification link will expire in 24 hours.</p>
-        <p>Best regards,<br>The Hire Mzansi Team</p>
-        `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - Hire Mzansi</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f5f7fa;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px 20px;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #1e40af; font-size: 28px; margin: 0;">HIRE<span style="color: #059669;">MZANSI</span></h1>
+            <p style="color: #6b7280; margin: 5px 0 0 0; font-size: 14px;">South Africa's #1 AI-Powered CV Optimization Platform</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div style="background-color: #f8fafc; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
+            <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 20px 0;">Welcome to Hire Mzansi, ${name}!</h2>
+            
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                Thank you for joining South Africa's leading AI-powered CV optimization platform. To complete your account setup and start transforming your career prospects, please verify your email address.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${verificationLink}" 
+                   style="display: inline-block; 
+                          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+                          color: white; 
+                          padding: 16px 32px; 
+                          text-decoration: none; 
+                          border-radius: 8px; 
+                          font-weight: bold; 
+                          font-size: 16px;
+                          box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.25);">
+                    ✅ Verify My Email Address
+                </a>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.5; margin: 20px 0 0 0;">
+                If the button above doesn't work, copy and paste this link into your browser:<br>
+                <a href="${verificationLink}" style="color: #6366f1; word-break: break-all;">${verificationLink}</a>
+            </p>
+        </div>
+        
+        <!-- Features Preview -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #1f2937; font-size: 18px; margin: 0 0 15px 0;">What's waiting for you:</h3>
+            <ul style="color: #374151; padding-left: 20px; margin: 0;">
+                <li style="margin-bottom: 8px;">🎯 ATS-friendly CV optimization</li>
+                <li style="margin-bottom: 8px;">🇿🇦 B-BBEE compliance analysis</li>
+                <li style="margin-bottom: 8px;">📊 South African job market insights</li>
+                <li style="margin-bottom: 8px;">💼 Professional CV templates</li>
+            </ul>
+        </div>
+        
+        <!-- Security Notice -->
+        <div style="background-color: #fef3c7; padding: 15px; border-radius: 6px; border-left: 4px solid #f59e0b; margin-bottom: 30px;">
+            <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 500;">
+                🔒 Security Notice: This verification link will expire in 24 hours. If you didn't create this account, you can safely ignore this email.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">
+                Best regards,<br>
+                <strong>The Hire Mzansi Team</strong>
+            </p>
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                This email was sent to ${email}. If you have questions, contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+</html>`
       });
       
       if (!emailSent) {

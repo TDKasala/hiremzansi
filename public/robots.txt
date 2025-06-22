@@ -1,0 +1,29 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://hiremzansi.co.za/sitemap.xml
+
+# Block admin areas
+Disallow: /admin/
+Disallow: /api/
+
+# Block authentication pages from indexing
+Disallow: /auth/
+Disallow: /login/
+Disallow: /signup/
+
+# Block user dashboard areas
+Disallow: /dashboard/
+Disallow: /premium-tools/
+Disallow: /settings/
+
+# Allow important pages
+Allow: /
+Allow: /pricing
+Allow: /about
+Allow: /contact
+Allow: /blog/
+
+# Crawl delay for politeness
+Crawl-delay: 1

@@ -28,13 +28,22 @@ export function SignIn() {
     
     try {
       setLoading(true);
-      const { data, error } = await signIn(email, password);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
       
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
       }
       
-      setLocation('/dashboard');
+      // Refresh the page to update auth state
+      window.location.href = '/dashboard';
     } catch (err: any) {
       console.error('Sign in error:', err);
       setError(err.message || 'Invalid email or password');
