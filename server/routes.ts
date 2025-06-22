@@ -16,7 +16,9 @@ import {
   insertCvSchema, 
   insertAtsScoreSchema, 
   insertDeepAnalysisReportSchema,
-
+  insertEmployerSchema,
+  insertJobPostingSchema,
+  insertJobMatchSchema,
   saProfiles,
   users,
   cvs,
@@ -27,7 +29,7 @@ import {
   subscriptions,
   plans,
 } from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and } from "drizzle-orm";
 import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
 import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
@@ -436,7 +438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         stats.monthlyRevenue = stats.premiumUsers * 99;
         stats.totalRevenue = stats.monthlyRevenue * 6;
       } catch (error) {
-        console.log("Using mock stats due to storage error:", error.message);
+        console.log("Using mock stats due to storage error:", (error as Error).message);
       }
 
       res.json(stats);
@@ -475,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user's employer profile
   app.get("/api/employers/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       const employer = await employerStorage.getEmployerByUserId(userId);
       
       if (!employer) {
@@ -494,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create employer profile
   app.post("/api/employers", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       // Check if employer profile already exists
       const existingEmployer = await employerStorage.getEmployerByUserId(userId);
@@ -527,7 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update employer profile
   app.put("/api/employers/me", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       // Get employer profile
       const employer = await employerStorage.getEmployerByUserId(userId);
@@ -553,7 +555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get job postings for current employer
   app.get("/api/job-postings/my", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       // Get employer profile
       const employer = await employerStorage.getEmployerByUserId(userId);
@@ -611,61 +613,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         offset
       } = req.query;
       
-      // Create base query for job postings
-      let baseQuery = db.select({
-        job: jobPostings,
-        employer: employers
-      })
-      .from(jobPostings)
-      .innerJoin(employers, eq(jobPostings.employerId, employers.id))
-      .where(eq(jobPostings.isActive, true));
+      // Build conditions array
+      const conditions = [eq(jobPostings.isActive, true)];
       
-      // Apply South African specific filters
       if (province) {
-        baseQuery = baseQuery.where(eq(employers.location, province as string));
+        conditions.push(eq(employers.location, province as string));
       }
       
       if (bbbeeLevel) {
-        baseQuery = baseQuery.where(eq(employers.bbbeeLevel, bbbeeLevel as string));
+        conditions.push(eq(employers.bbbeeLevel, parseInt(bbbeeLevel as string)));
       }
       
       if (industry) {
-        baseQuery = baseQuery.where(eq(jobPostings.industry, industry as string));
+        conditions.push(eq(jobPostings.industry, industry as string));
       }
       
       if (jobType) {
-        baseQuery = baseQuery.where(eq(jobPostings.employmentType, jobType as string));
+        conditions.push(eq(jobPostings.employmentType, jobType as string));
       }
       
-      // Prepare skills filter
-      if (skills) {
-        const skillsList = (skills as string).split(',');
-        
-        // For each skill, check if it's in the required skills array
-        skillsList.forEach(skill => {
-          // Using SQL like to check array contents (simple approach)
-          baseQuery = baseQuery.where(
-            sql`${jobPostings.requiredSkills}::text LIKE ${'%' + skill.trim() + '%'}`
-          );
-        });
-      }
-      
-      // Apply pagination
-      if (limit) {
-        baseQuery = baseQuery.limit(parseInt(limit as string));
-      } else {
-        baseQuery = baseQuery.limit(20); // Default limit
-      }
-      
-      if (offset) {
-        baseQuery = baseQuery.offset(parseInt(offset as string));
-      }
-      
-      // Order by newest first
-      baseQuery = baseQuery.orderBy(desc(jobPostings.createdAt));
-      
-      // Execute query
-      const results = await baseQuery;
+      // Execute query with proper Drizzle structure
+      const results = await db
+        .select({
+          job: jobPostings,
+          employer: employers
+        })
+        .from(jobPostings)
+        .innerJoin(employers, eq(jobPostings.employerId, employers.id))
+        .where(and(...conditions))
+        .orderBy(desc(jobPostings.createdAt))
+        .limit(limit ? parseInt(limit as string) : 20)
+        .offset(offset ? parseInt(offset as string) : 0);
       
       // Format response
       const formattedResults = results.map(({ job, employer }) => ({
@@ -727,7 +705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create job posting
   app.post("/api/job-postings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       // Get employer profile
       const employer = await employerStorage.getEmployerByUserId(userId);
@@ -761,7 +739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/job-postings/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const jobId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       if (isNaN(jobId)) {
         return res.status(400).json({ error: "Invalid job posting ID" });
@@ -799,7 +777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/job-postings/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const jobId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       if (isNaN(jobId)) {
         return res.status(400).json({ error: "Invalid job posting ID" });
@@ -839,7 +817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/job-postings/:id/candidates", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const jobId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       if (isNaN(jobId)) {
         return res.status(400).json({ error: "Invalid job posting ID" });
@@ -877,7 +855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/cv/:id/job-matches", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const cvId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       if (isNaN(cvId)) {
         return res.status(400).json({ error: "Invalid CV ID" });
@@ -908,7 +886,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/job-matches", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { cvId, jobId } = req.body;
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       if (!cvId || !jobId) {
         return res.status(400).json({ error: "CV ID and Job ID are required" });
@@ -941,7 +919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use AI service to calculate match score
       // For now, we'll implement a simple matching algorithm without AI
       // This can be enhanced later with more sophisticated AI matching
-      const matchedSkills = [];
+      const matchedSkills: string[] = [];
       const jobSkills = jobPosting.requiredSkills || [];
       const cvContent = cv.content.toLowerCase();
       
@@ -968,10 +946,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create job match record
       const matchData = {
         cvId,
-        jobId,
+        jobPostingId: jobId,
         userId,
         matchScore: analysisResult.overallScore || 0,
-        skillsMatched: analysisResult.matchedSkills || []
+        matchedSkills: analysisResult.matchedSkills || []
       };
       
       const jobMatch = await employerStorage.createJobMatch(matchData);

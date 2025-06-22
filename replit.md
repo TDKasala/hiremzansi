@@ -106,6 +106,8 @@ The deployment strategy prioritizes Replit for development and testing, with Ver
 - June 21, 2025: Removed green statistics section from hero as requested
 - June 22, 2025: Comprehensive SEO metadata optimization with structured data, Open Graph tags, and Twitter cards for enhanced Google search visibility
 - June 22, 2025: Fixed email verification flow - Users now must verify email before login, improved email templates to avoid spam folders, added resend verification functionality
+- June 22, 2025: Implemented Hire Mzansi logo as favicon across all device formats and platforms
+- June 22, 2025: Confirmed keeping current session-based authentication system over Replit Auth for broader user accessibility
 
 ## User Preferences
 

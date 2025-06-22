@@ -38,7 +38,7 @@ import {
   type Notification,
   type InsertNotification
 } from "@shared/schema";
-import { db, supabase } from "./db";
+import { db } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -96,6 +96,10 @@ export interface IStorage {
   
   // Database health check
   checkDatabaseConnection(): Promise<boolean>;
+  
+  // Admin operations
+  getAllUsers(): Promise<User[]>;
+  getAllCVs(): Promise<CV[]>;
   
   // SA Profile operations extended
   getSaProfileByUserId(userId: number): Promise<SaProfile | undefined>;
@@ -186,8 +190,8 @@ export class DatabaseStorage implements IStorage {
         AND verification_token_expiry > NOW()
       `);
       
-      if (result.rows.length > 0) {
-        return result.rows[0] as User;
+      if (result.length > 0) {
+        return result[0] as User;
       }
       
       return undefined;
@@ -272,8 +276,8 @@ export class DatabaseStorage implements IStorage {
           RETURNING *
         `);
         
-        if (result.rows.length > 0) {
-          return result.rows[0] as User;
+        if (result.length > 0) {
+          return result[0] as User;
         }
       }
     } catch (error) {
@@ -446,7 +450,7 @@ export class DatabaseStorage implements IStorage {
         ) RETURNING *
       `);
       
-      return result.rows[0] as ATSScore;
+      return result[0] as ATSScore;
     } catch (error) {
       console.error("Error creating ATS score:", error);
       
@@ -651,6 +655,15 @@ export class DatabaseStorage implements IStorage {
 
   async getSaProfileByUserId(userId: number): Promise<SaProfile | undefined> {
     return await this.getSaProfile(userId);
+  }
+
+  // Admin operations
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async getAllCVs(): Promise<CV[]> {
+    return await db.select().from(cvs);
   }
 }
 
