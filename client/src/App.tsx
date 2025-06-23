@@ -26,6 +26,8 @@ import DashboardPage from "@/pages/dashboard-page";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import AuthCallback from "./pages/AuthCallback";
 import UploadPage from "@/pages/UploadPage";
 import CVDetailsPage from "@/pages/CVDetailsPage";
@@ -108,6 +110,8 @@ function App() {
                 <Route path="/contact" component={ContactPage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signup" component={SignUpPage} />
+                <Route path="/forgot-password" component={ForgotPasswordPage} />
+                <Route path="/reset-password" component={ResetPasswordPage} />
                 <Route path="/auth" component={LoginPage} />
                 <Route path="/auth/callback" component={AuthCallback} />
                 <Route path="/realtime-ats" component={RealtimeATSPage} />

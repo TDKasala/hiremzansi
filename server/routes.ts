@@ -36,6 +36,8 @@ import { verifyToken, hashPassword, authenticateUser, generateToken } from "./au
 import { isAuthenticated as authMiddleware, isAdmin as adminMiddleware } from "./auth";
 import { simpleAuth, authenticateToken } from "./simpleAuth";
 import jwt from "jsonwebtoken";
+import { sendPasswordResetEmail } from "./services/emailService";
+import crypto from "crypto";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
@@ -212,6 +214,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/me", requireAdmin, (req: Request, res: Response) => {
     res.json({ user: req.adminUser });
+  });
+
+  // Password reset functionality
+  const passwordResetTokens = new Map<string, { email: string; expires: Date }>();
+
+  // Forgot password endpoint
+  app.post("/api/auth/forgot-password", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      // Check if user exists
+      const user = await simpleAuth.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists or not for security
+        return res.json({ message: "If an account with that email exists, a reset link has been sent." });
+      }
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+      
+      // Store token temporarily
+      passwordResetTokens.set(resetToken, { email, expires });
+      
+      // Clean up expired tokens
+      for (const [token, data] of passwordResetTokens.entries()) {
+        if (data.expires < new Date()) {
+          passwordResetTokens.delete(token);
+        }
+      }
+
+      // Send reset email
+      const baseUrl = process.env.BASE_URL || 'https://hiremzansi.co.za';
+      const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
+      
+      await sendPasswordResetEmail(email, resetLink, user.name || 'there');
+
+      res.json({ message: "If an account with that email exists, a reset link has been sent." });
+    } catch (error) {
+      console.error("Error in forgot password:", error);
+      res.status(500).json({ message: "Failed to process password reset request" });
+    }
+  });
+
+  // Reset password endpoint
+  app.post("/api/auth/reset-password", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token, password } = req.body;
+      
+      if (!token || !password) {
+        return res.status(400).json({ message: "Token and password are required" });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters long" });
+      }
+
+      // Check if token exists and is valid
+      const tokenData = passwordResetTokens.get(token);
+      if (!tokenData || tokenData.expires < new Date()) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+
+      // Get user by email
+      const user = await simpleAuth.getUserByEmail(tokenData.email);
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      // Update password
+      await simpleAuth.updatePassword(user.id, password);
+      
+      // Remove used token
+      passwordResetTokens.delete(token);
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Error in reset password:", error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
   });
 
   // User Authentication Routes - Simple Implementation

@@ -103,6 +103,22 @@ export const simpleAuth = {
     return true;
   },
 
+  async updatePassword(userId: number, newPassword: string) {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Find user by ID and update password
+    for (const [email, user] of users.entries()) {
+      if (user.id === userId) {
+        user.password = hashedPassword;
+        user.updatedAt = new Date();
+        users.set(email, user);
+        return true;
+      }
+    }
+    
+    return false;
+  },
+
   async sendVerificationEmail(email: string, token: string) {
     try {
       const emailService = await import('./services/emailService');
