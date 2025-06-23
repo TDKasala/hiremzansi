@@ -4,30 +4,31 @@ import {
   cvs, 
   atsScores, 
   saProfiles, 
-  cvAnalyses, 
+  deepAnalysisReports, 
   subscriptions, 
   employers, 
   jobPostings, 
   jobMatches, 
   skills, 
   userSkills, 
-  notifications,
-  type User,
-  type AuthUser,
-  type CV,
-  type ATSScore,
-  type SAProfile,
-  type CVAnalysis,
-  type Subscription,
-  type Employer,
-  type JobPosting,
-  type JobMatch,
-  type Skill,
-  type UserSkill,
-  type Notification
+  notifications
 } from '@shared/schema';
 import { eq, desc, and, or, like, gte, lte, count, sql } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
+
+// Type definitions for database operations
+type AuthUser = typeof users.$inferSelect;
+type CV = typeof cvs.$inferSelect;
+type ATSScore = typeof atsScores.$inferSelect;
+type SAProfile = typeof saProfiles.$inferSelect;
+type DeepAnalysis = typeof deepAnalysisReports.$inferSelect;
+type Subscription = typeof subscriptions.$inferSelect;
+type Employer = typeof employers.$inferSelect;
+type JobPosting = typeof jobPostings.$inferSelect;
+type JobMatch = typeof jobMatches.$inferSelect;
+type Skill = typeof skills.$inferSelect;
+type UserSkill = typeof userSkills.$inferSelect;
+type Notification = typeof notifications.$inferSelect;
 
 export interface IStorage {
   // User operations

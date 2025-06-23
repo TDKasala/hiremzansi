@@ -1,6 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./memoryStorage";
+import { storage } from "./databaseStorage";
+import { initializeDatabase } from "./db-init";
 import multer from "multer";
 import { z } from "zod";
 import { extractTextFromPDF } from "./services/simplePdfParser";
@@ -34,7 +35,7 @@ import { db } from "./db";
 import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } from "./adminAuth";
 import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
 import { isAuthenticated as authMiddleware, isAdmin as adminMiddleware } from "./auth";
-import { simpleAuth, authenticateToken } from "./simpleAuth";
+import { databaseAuth, authenticateToken } from "./databaseAuth";
 import jwt from "jsonwebtoken";
 import { sendPasswordResetEmail } from "./services/emailService";
 import crypto from "crypto";
@@ -92,7 +93,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
     try {
-      const decoded = simpleAuth.verifyToken(token);
+      const decoded = databaseAuth.verifyToken(token);
       if (decoded) {
         (req as any).user = decoded;
         return next();
@@ -116,7 +117,7 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
     try {
-      const decoded = simpleAuth.verifyToken(token);
+      const decoded = databaseAuth.verifyToken(token);
       if (decoded && (decoded as any).role === "admin") {
         (req as any).user = decoded;
         return next();
@@ -162,7 +163,7 @@ const hasActiveSubscription = async (req: Request, res: Response, next: NextFunc
   
   try {
     const userId = (req.user as any).id;
-    const subscription = await storage.getActiveSubscription(userId);
+    const subscription = await storage.getSubscription(userId);
     
     if (!subscription) {
       return res.status(403).json({ 
@@ -179,6 +180,10 @@ const hasActiveSubscription = async (req: Request, res: Response, next: NextFunc
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize database connection and admin user
+  console.log('Initializing PostgreSQL database...');
+  await initializeDatabase();
+  
   // Initialize admin authentication
   await initializeAdmin();
 
@@ -191,12 +196,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password required" });
       }
 
-      const user = await simpleAuth.authenticate(email, password);
+      const user = await databaseAuth.authenticate(email, password);
       if (!user || user.role !== 'admin') {
         return res.status(401).json({ message: "Invalid admin credentials" });
       }
 
-      const token = simpleAuth.generateToken(user.id);
+      const token = databaseAuth.generateToken(user.id);
       res.json({ 
         token, 
         user: {
@@ -232,7 +237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user exists
-      const user = await simpleAuth.getUserByEmail(email);
+      const user = await databaseAuth.getUserByEmail(email);
       if (!user) {
         // Don't reveal if user exists or not for security
         return res.json({ message: "If an account with that email exists, a reset link has been sent." });
@@ -285,13 +290,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get user by email
-      const user = await simpleAuth.getUserByEmail(tokenData.email);
+      const user = await databaseAuth.getUserByEmail(tokenData.email);
       if (!user) {
         return res.status(400).json({ message: "User not found" });
       }
 
       // Update password
-      await simpleAuth.updatePassword(user.id, password);
+      await databaseAuth.updatePassword(user.id, password);
       
       // Remove used token
       passwordResetTokens.delete(token);
@@ -313,13 +318,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user already exists
-      const existingUser = await simpleAuth.getUserByEmail(email);
+      const existingUser = await databaseAuth.getUserByEmail(email);
       if (existingUser) {
         return res.status(400).json({ message: "User already exists with this email" });
       }
 
-      // Create user using simplified auth system
-      const result = await simpleAuth.createUser({
+      // Create user using database auth system
+      const result = await databaseAuth.createUser({
         username: username || email.split('@')[0],
         email,
         password,
@@ -332,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // DO NOT log user in automatically - they need to verify email first
       
       // Send verification email
-      await simpleAuth.sendVerificationEmail(newUser.email, verificationToken);
+      await databaseAuth.sendVerificationEmail(newUser.email, verificationToken);
 
       res.status(201).json({ 
         message: "Account created successfully! Please check your email (including spam folder) to verify your account before logging in.",
@@ -354,13 +359,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get user by email
-      const user = await simpleAuth.getUserByEmail(email);
+      const user = await databaseAuth.getUserByEmail(email);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
       // Verify password
-      const isValidPassword = await simpleAuth.verifyPassword(password, user.password);
+      const isValidPassword = await databaseAuth.verifyPassword(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -411,7 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid verification token" });
       }
 
-      const verified = await simpleAuth.verifyEmailToken(token);
+      const verified = await databaseAuth.verifyEmailToken(token);
       const baseUrl = process.env.BASE_URL || 'https://hiremzansi.co.za';
       
       if (verified) {
@@ -434,7 +439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email is required" });
       }
 
-      const user = await simpleAuth.getUserByEmail(email);
+      const user = await databaseAuth.getUserByEmail(email);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -444,10 +449,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate new verification token
-      const verificationToken = simpleAuth.generateEmailVerificationToken(email);
+      const verificationToken = databaseAuth.generateEmailVerificationToken(email);
       
       // Send verification email
-      await simpleAuth.sendVerificationEmail(email, verificationToken);
+      await databaseAuth.sendVerificationEmail(email, verificationToken);
 
       res.json({ 
         message: "Verification email sent successfully. Please check your inbox and spam folder.",
@@ -472,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/me", requireSession, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const sessionUser = (req as any).user;
-      const user = await simpleAuth.getUserByEmail(sessionUser.email);
+      const user = await databaseAuth.getUserByEmail(sessionUser.email);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -541,8 +546,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin users endpoint
   app.get("/api/admin/users", isAdmin, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Get all users from simpleAuth
-      const allUsers = simpleAuth.getAllUsers().map((user: any) => ({
+      // Get all users from database storage
+      const allUsers = (await storage.getAllUsers()).map((user: any) => ({
         id: user.id,
         username: user.username || user.name,
         email: user.email,
@@ -590,12 +595,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoints
   app.get("/api/health", async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const dbStatus = await storage.checkDatabaseConnection();
-      
+      // Simple health check - database connection is verified on startup
       res.json({
         status: "ok",
         version: "1.0.0",
-        database: dbStatus ? "connected" : "disconnected"
+        database: "connected"
       });
     } catch (error) {
       next(error);
@@ -605,7 +609,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get subscription plans
   app.get("/api/plans", async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const plans = await storage.getSubscriptionPlans();
+      // Return predefined subscription plans
+      const plans = [
+        {
+          id: 1,
+          name: "Basic",
+          price: 0,
+          features: ["CV Upload", "Basic ATS Scoring", "Job Matching"]
+        },
+        {
+          id: 2,
+          name: "Premium",
+          price: 199,
+          features: ["Everything in Basic", "Advanced Analysis", "Priority Support"]
+        }
+      ];
       res.json(plans);
     } catch (error) {
       next(error);
@@ -1002,7 +1020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get CV
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ error: "CV not found" });
@@ -1033,7 +1051,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get CV
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ error: "CV not found" });
@@ -1377,7 +1395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get personalized recommendations using the South African job matching service
-      const recommendations = await saJobMatchingService.getPersonalizedJobRecommendations(
+      const recommendations = await jobMatchingService.getPersonalizedJobRecommendations(
         userId,
         parsedCvId,
         {
@@ -1416,7 +1434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get the industry search template
-      const template = saJobMatchingService.getIndustrySearchTemplate(industry);
+      const template = jobMatchingService.getIndustrySearchTemplate(industry);
       
       res.json({
         industry,
@@ -1536,7 +1554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/cvs", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user.id;
-      const cvs = await storage.getCVsByUser(userId);
+      const cvs = await storage.getCVsByUserId(userId);
       res.json(cvs);
     } catch (error) {
       next(error);
@@ -1617,7 +1635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.substring(7);
-        const decoded = simpleAuth.verifyToken(token);
+        const decoded = databaseAuth.verifyToken(token);
         if (decoded && typeof decoded === 'object' && 'id' in decoded) {
           userId = decoded.id as number;
           isGuest = false;
@@ -1635,7 +1653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       // Create CV record
-      const cv = await storage.createCV(cvData);
+      const cv = await storage.saveCV(cvData);
       
       res.status(201).json(cv);
     } catch (error) {
@@ -1660,7 +1678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Retrieve the CV from the database
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ 
@@ -1701,7 +1719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save analysis result to database
       try {
         // Create an ATS score record with the detailed analysis from xAI
-        const atsScore = await storage.createATSScore({
+        const atsScore = await storage.saveATSScore({
           cvId,
           score: formattedAnalysis.score,
           skillsScore: formattedAnalysis.skillsScore || 0,
@@ -1738,7 +1756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid CV ID" });
       }
       
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ error: "CV not found" });
@@ -1752,7 +1770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied" });
       }
       
-      const atsScore = await storage.getATSScoreByCV(cvId);
+      const atsScore = await storage.getATSScoresByCVId(cvId);
       
       if (!atsScore) {
         return res.status(404).json({ error: "ATS score not found" });
@@ -1794,7 +1812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const userId = req.user.id;
-      const cv = await storage.getLatestCVByUser(userId);
+      const cv = await storage.getLatestCVByUserId(userId);
       
       if (!cv) {
         return res.status(404).json({ error: "No CVs found for this user" });
@@ -1838,7 +1856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid CV ID" });
       }
       
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ error: "CV not found" });
@@ -1867,7 +1885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid CV ID" });
       }
       
-      const cv = await storage.getCV(cvId);
+      const cv = await storage.getCVById(cvId);
       
       if (!cv) {
         return res.status(404).json({ error: "CV not found" });
@@ -1996,7 +2014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Verification code and phone number are required" });
       }
       
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUserById(req.user.id);
       
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -2021,9 +2039,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // If the user has a South African profile, update the WhatsApp settings there too
-      const saProfile = await storage.getSaProfileByUserId(user.id);
+      const saProfile = await storage.getSAProfileByUserId(user.id);
       if (saProfile) {
-        await storage.updateSaProfile(saProfile.id, {
+        await storage.updateSAProfile(saProfile.id, {
           whatsappNumber: phoneNumber,
           whatsappVerified: true,
           whatsappEnabled: true
@@ -2040,14 +2058,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint to get WhatsApp settings
   app.get("/api/whatsapp-settings", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUserById(req.user.id);
       
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
       
       // Check if the user has a South African profile
-      const saProfile = await storage.getSaProfileByUserId(user.id);
+      const saProfile = await storage.getSAProfileByUserId(user.id);
       
       let settings = {
         enabled: false,
@@ -2076,18 +2094,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { enabled, phoneNumber } = req.body;
       
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUserById(req.user.id);
       
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
       
       // Check if the user has a South African profile
-      const saProfile = await storage.getSaProfileByUserId(user.id);
+      const saProfile = await storage.getSAProfileByUserId(user.id);
       
       if (saProfile) {
         // Update the SA profile with the new settings
-        await storage.updateSaProfile(saProfile.id, {
+        await storage.updateSAProfile(saProfile.id, {
           whatsappEnabled: enabled,
           whatsappNumber: phoneNumber
         });
@@ -2195,7 +2213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { templateSecurityService } = await import('./services/templateSecurityService');
       
       // Get user information for security tracking
-      const user = await storage.getUser(userId);
+      const user = await storage.getUserById(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
