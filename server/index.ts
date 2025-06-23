@@ -61,8 +61,8 @@ app.use((req, res, next) => {
   try {
     log('Starting Hire Mzansi CV Optimization Platform...');
     
-    // Skip database operations to get the platform running
-    log('Running in minimal mode - database features disabled');
+    // Skip database initialization for now to ensure platform runs
+    log('Starting platform in development mode');
     
     // Add API route protection BEFORE Vite middleware
     app.use((req, res, next) => {

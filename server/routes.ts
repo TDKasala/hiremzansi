@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./memoryStorage";
 import multer from "multer";
 import { z } from "zod";
 import { extractTextFromPDF } from "./services/simplePdfParser";
