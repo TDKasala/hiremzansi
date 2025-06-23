@@ -108,13 +108,13 @@ export const simpleAuth = {
       const emailService = await import('./services/emailService');
       const user = await this.getUserByEmail(email);
       const name = user?.name || user?.username || 'there';
-      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const baseUrl = process.env.BASE_URL || 'https://hiremzansi.co.za';
       const verificationLink = `${baseUrl}/api/auth/verify-email?token=${token}`;
       
       // Send email verification email using the template
       const emailSent = await emailService.sendEmail({
         to: email,
-        subject: '✅ Verify Your Hire Mzansi Account - Action Required',
+        subject: 'Complete Your Hire Mzansi Registration',
         text: `Hello ${name},
 
 Welcome to Hire Mzansi! To complete your account setup and start optimizing your CV for the South African job market, please verify your email address.

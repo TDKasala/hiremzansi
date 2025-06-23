@@ -323,10 +323,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const verified = await simpleAuth.verifyEmailToken(token);
+      const baseUrl = process.env.BASE_URL || 'https://hiremzansi.co.za';
+      
       if (verified) {
-        res.redirect("/?verified=true");
+        res.redirect(`${baseUrl}/?verified=true`);
       } else {
-        res.redirect("/?verified=false");
+        res.redirect(`${baseUrl}/?verified=false`);
       }
     } catch (error) {
       console.error("Email verification error:", error);

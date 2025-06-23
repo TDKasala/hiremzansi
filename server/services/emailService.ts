@@ -503,8 +503,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   }
   
   try {
-    // Use a temporary verified sender while domain verification is pending
-    const fromAddress = options.from || 'deniskasala17@gmail.com';
+    // Use verified sender with proper domain name
+    const fromAddress = options.from || 'noreply@hiremzansi.co.za';
     
     const emailData: MailDataRequired = {
       to: options.to,
@@ -512,9 +512,30 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         email: fromAddress,
         name: 'Hire Mzansi'
       },
+      replyTo: {
+        email: 'support@hiremzansi.co.za',
+        name: 'Hire Mzansi Support'
+      },
       subject: options.subject,
       text: options.text || '',
-      html: options.html || ''
+      html: options.html || '',
+      // Add headers to improve deliverability
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'High',
+        'List-Unsubscribe': '<mailto:unsubscribe@hiremzansi.co.za>',
+        'X-Mailer': 'Hire Mzansi Email Service'
+      },
+      // Add tracking settings to improve reputation
+      trackingSettings: {
+        clickTracking: {
+          enable: false
+        },
+        openTracking: {
+          enable: false
+        }
+      }
     };
     
     await mailService.send(emailData);
