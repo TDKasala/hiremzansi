@@ -59,6 +59,22 @@ export const simpleAuth = {
     return await bcrypt.compare(plainPassword, hashedPassword);
   },
 
+  async authenticate(email: string, password: string) {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+
+    const isValidPassword = await this.verifyPassword(password, user.password);
+    if (!isValidPassword) {
+      return null;
+    }
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  },
+
   generateToken(userId: number) {
     const user = Array.from(users.values()).find(u => u.id === userId);
     return jwt.sign({ 
@@ -235,6 +251,10 @@ South Africa's #1 AI-Powered CV Optimization Platform`,
       console.log(`Email verification link for ${email}: ${verificationLink}`);
       return true;
     }
+  },
+
+  getAllUsers() {
+    return Array.from(users.values());
   }
 };
 

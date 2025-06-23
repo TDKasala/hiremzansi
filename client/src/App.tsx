@@ -181,6 +181,7 @@ function App() {
                 <ProtectedRoute path="/refer-earn" component={ReferralDashboard} />
                 <Route path="/admin/login" component={AdminLogin} />
                 <Route path="/admin/dashboard" component={AdminDashboard} />
+                <Route path="/admin" component={AdminDashboard} />
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>
