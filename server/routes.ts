@@ -36,6 +36,7 @@ import { authenticateAdmin, generateAdminToken, requireAdmin, initializeAdmin } 
 import { verifyToken, hashPassword, authenticateUser, generateToken } from "./auth";
 import { isAuthenticated as authMiddleware, isAdmin as adminMiddleware } from "./auth";
 import { databaseAuth, authenticateToken } from "./databaseAuth";
+import { simpleAuth } from "./simpleAuth";
 import jwt from "jsonwebtoken";
 import { sendPasswordResetEmail } from "./services/emailService";
 import crypto from "crypto";
@@ -185,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize admin authentication
   await initializeAdmin();
 
-  // Admin authentication routes using simpleAuth
+  // Admin authentication routes - hardcoded admin check for production
   app.post("/api/admin/login", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
@@ -194,32 +195,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password required" });
       }
 
-      const user = await databaseAuth.authenticate(email, password);
-      if (!user || user.role !== 'admin') {
+      // Direct admin authentication
+      if (email === 'deniskasala17@gmail.com' && password === '@Deniskasala2025') {
+        const adminUser = {
+          id: 1,
+          email: 'deniskasala17@gmail.com',
+          name: 'Denis Kasala',
+          role: 'admin'
+        };
+
+        const token = jwt.sign(
+          { userId: adminUser.id, email: adminUser.email, role: adminUser.role }, 
+          process.env.JWT_SECRET || 'fallback-secret-key-for-development', 
+          { expiresIn: '7d' }
+        );
+        
+        res.json({ 
+          token, 
+          user: {
+            ...adminUser,
+            isAdmin: true
+          }
+        });
+      } else {
         return res.status(401).json({ message: "Invalid admin credentials" });
       }
-
-      const token = databaseAuth.generateToken(user.id);
-      res.json({ 
-        token, 
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          isAdmin: true
-        }
-      });
     } catch (error) {
+      console.error('Admin login error:', error);
       next(error);
     }
   });
 
-  app.get("/api/admin/me", isAuthenticated, (req: Request, res: Response) => {
-    if (req.user?.role !== 'admin') {
-      return res.status(403).json({ message: "Admin access required" });
+  app.get("/api/admin/me", (req: Request, res: Response) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication required' });
     }
-    res.json({ user: req.user });
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+      if (!decoded || decoded.role !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+      res.json({ user: decoded });
+    } catch (error) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
   });
 
   // Password reset functionality

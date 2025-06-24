@@ -51,23 +51,34 @@ export const databaseAuth = {
   },
 
   async authenticate(email: string, password: string) {
+    console.log('Authenticating user:', email);
+    
     const user = await this.getUserByEmail(email);
+    console.log('User found:', user ? { id: user.id, email: user.email, role: user.role } : 'null');
+    
     if (!user) {
+      console.log('User not found in database');
       return null;
     }
 
+    console.log('Verifying password for user:', user.email);
     const isValid = await this.verifyPassword(password, user.password);
+    console.log('Password verification result:', isValid);
+    
     if (!isValid) {
+      console.log('Password verification failed');
       return null;
     }
 
-    if (!user.emailVerified) {
+    // Skip email verification for admin users
+    if (!user.emailVerified && user.role !== 'admin') {
       throw new Error('Email not verified. Please check your email and verify your account before logging in.');
     }
 
     // Update last login
     await storage.updateUser(user.id, { lastLogin: new Date() });
 
+    console.log('Authentication successful for user:', user.email);
     return user;
   },
 
@@ -177,7 +188,7 @@ export const databaseAuth = {
         const adminUser = await storage.createUser({
           username: 'admin',
           email: 'deniskasala17@gmail.com',
-          password: '$2b$10$9iSPl9/VpqAUhRSAoSteueFNwN56xPHuHm1GHbb.aupDsbvDu1FsK', // @Deniskasala2025
+          password: await bcrypt.hash('@Deniskasala2025', 12), // @Deniskasala2025
           name: 'Denis Kasala',
           role: 'admin',
           isActive: true,

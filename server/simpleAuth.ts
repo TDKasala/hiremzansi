@@ -12,7 +12,7 @@ users.set('deniskasala17@gmail.com', {
   id: 1,
   username: 'admin',
   email: 'deniskasala17@gmail.com',
-  password: '$2b$10$9iSPl9/VpqAUhRSAoSteueFNwN56xPHuHm1GHbb.aupDsbvDu1FsK', // @Deniskasala2025
+  password: '$2b$12$D5feoHLBVLyw2tAIiFNHcOic7K/92AqyYxW/cjXzWaNvA6T4EgHcO', // @Deniskasala2025
   name: 'Denis Kasala',
   role: 'admin',
   isActive: true,
