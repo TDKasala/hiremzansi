@@ -206,50 +206,7 @@ export function PremiumRecruiterSection() {
           </div>
         </div>
 
-        {/* Job Seeker Benefits */}
-        <div className="bg-white rounded-lg p-8 mb-12">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              How Job Seekers Benefit
-            </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              While recruiters find talent, our candidates receive valuable feedback 
-              without ever seeing the job details or company information.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Bell className="h-6 w-6 text-blue-600" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Anonymous Notifications</h4>
-              <p className="text-sm text-gray-600">
-                Get alerts about potential matches without revealing job or company details
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">CV Optimization Tips</h4>
-              <p className="text-sm text-gray-600">
-                Receive specific suggestions to improve your CV based on market demand
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Star className="h-6 w-6 text-purple-600" />
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Skill Gap Analysis</h4>
-              <p className="text-sm text-gray-600">
-                Learn which skills are in demand and how to position yourself better
-              </p>
-            </div>
-          </div>
-        </div>
+        
 
         {/* CTA */}
         <div className="text-center">
