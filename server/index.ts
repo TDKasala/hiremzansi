@@ -34,10 +34,13 @@ app.use((req, res, next) => {
     return res.redirect(301, `https://hiremzansi.co.za${req.originalUrl}`);
   }
   
-  // Set security headers for primary domain
+  // Set security headers for primary domain with cache control
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   
   // Set canonical domain headers and HSTS for security
   if (host === 'hiremzansi.co.za') {
