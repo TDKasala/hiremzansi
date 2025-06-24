@@ -71,7 +71,6 @@ export default function JobRecommendationsPage() {
   });
 
   const recommendations: JobRecommendation[] = recommendationsResponse?.recommendations || [];
-  const isDemo = recommendationsResponse?.isDemo || false;
 
   const provinces = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -159,11 +158,7 @@ export default function JobRecommendationsPage() {
                 Personalized opportunities based on your CV and skills
               </p>
             </div>
-            {isDemo && (
-              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                Demo Mode
-              </Badge>
-            )}
+
           </div>
 
           {/* Filters */}
@@ -288,7 +283,7 @@ export default function JobRecommendationsPage() {
                 No Recommendations Yet
               </h3>
               <p className="text-gray-600 mb-6">
-                Try adjusting your filters or upload a more detailed CV to get better recommendations
+                No job opportunities match your current criteria. Try adjusting your filters or update your CV to attract more relevant positions.
               </p>
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Update CV

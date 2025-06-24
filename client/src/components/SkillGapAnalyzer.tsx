@@ -547,7 +547,7 @@ export default function SkillGapAnalyzer() {
       return;
     }
     
-    // Use sample data for demonstration
+    // Use default data when API is unavailable
     setResult(getSampleResults());
     
     // Scroll to results

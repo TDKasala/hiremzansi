@@ -48,8 +48,6 @@ import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
-import mockCvAnalysisRoutes from "./routes/mockCvAnalysis";
-import jobMatchingDemoRoutes from "./routes/jobMatchingDemo";
 import pdfTestRoutes from "./routes/pdfTest";
 import optimizedCvAnalysisRoutes from "./routes/optimizedCvAnalysis";
 import paymentRoutes from "./routes/paymentRoutes";
@@ -529,12 +527,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const cvs = await storage.getAllCVs();
         stats.totalCVs = cvs.length;
         
-        // Mock premium and revenue data
-        stats.premiumUsers = Math.floor(users.length * 0.15);
-        stats.monthlyRevenue = stats.premiumUsers * 99;
-        stats.totalRevenue = stats.monthlyRevenue * 6;
+        // Calculate actual premium users from subscriptions
+        const subscriptions = await db.select().from(plans);
+        stats.premiumUsers = subscriptions.filter(s => s.name !== 'free').length;
+        stats.monthlyRevenue = 0; // Calculate from actual transactions
+        stats.totalRevenue = 0;   // Calculate from actual transactions
       } catch (error) {
-        console.log("Using mock stats due to storage error:", (error as Error).message);
+        console.error("Error fetching stats:", (error as Error).message);
       }
 
       res.json(stats);
@@ -559,16 +558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(allUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
-      res.json([
-        {
-          id: 1,
-          username: "admin",
-          email: "deniskasala17@gmail.com",
-          role: "admin",
-          isActive: true,
-          createdAt: new Date().toISOString()
-        }
-      ]);
+      res.status(500).json({ error: "Failed to fetch users" });
     }
   });
 
@@ -581,14 +571,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileName: cv.fileName,
         userId: cv.userId,
         username: `User ${cv.userId}`,
-        score: Math.floor(Math.random() * 40) + 60, // Mock score for demo
+        score: cv.atsScore || null,
         createdAt: cv.createdAt
       }));
 
       res.json(cvsWithUserInfo);
     } catch (error) {
       console.error("Error fetching CVs:", error);
-      res.json([]);
+      res.status(500).json({ error: "Failed to fetch CVs" });
     }
   });
   
@@ -1600,66 +1590,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid CV ID" });
       }
       
-      // Create demo recommendations for testing
-      const demoRecommendations = [
-        {
-          id: 1,
-          jobTitle: "Software Developer",
-          company: "Tech Solutions SA",
-          location: "Cape Town, Western Cape",
-          salaryRange: "R25,000 - R35,000",
-          matchScore: 87,
-          industry: "Technology",
-          employmentType: "Full-time",
-          experienceLevel: "Mid-level",
-          postedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Join our dynamic team as a Software Developer working on innovative projects that impact millions of users across South Africa.",
-          requirements: ["JavaScript", "React", "Node.js", "SQL"],
-          benefits: ["Medical aid", "Pension fund", "Flexible hours"],
-          isRemote: false,
-          bbbeeCompliant: true
-        },
-        {
-          id: 2,
-          jobTitle: "Business Analyst",
-          company: "Financial Services Group",
-          location: "Johannesburg, Gauteng",
-          salaryRange: "R30,000 - R40,000",
-          matchScore: 82,
-          industry: "Finance",
-          employmentType: "Full-time",
-          experienceLevel: "Senior",
-          postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "Exciting opportunity for an experienced Business Analyst to drive digital transformation initiatives in the financial sector.",
-          requirements: ["Business Analysis", "SQL", "Excel", "Project Management"],
-          benefits: ["Medical aid", "Pension fund", "Performance bonus"],
-          isRemote: true,
-          bbbeeCompliant: true
-        },
-        {
-          id: 3,
-          jobTitle: "Marketing Coordinator",
-          company: "Retail Excellence",
-          location: "Durban, KwaZulu-Natal",
-          salaryRange: "R20,000 - R28,000",
-          matchScore: 75,
-          industry: "Retail",
-          employmentType: "Full-time",
-          experienceLevel: "Mid-level",
-          postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          description: "We are looking for a creative Marketing Coordinator to lead our brand campaigns and drive customer engagement.",
-          requirements: ["Marketing", "Social Media", "Content Creation", "Analytics"],
-          benefits: ["Medical aid", "Staff discounts", "Training opportunities"],
-          isRemote: false,
-          bbbeeCompliant: true
-        }
-      ];
+      // Get CV to verify it exists and belongs to user
+      const cv = await storage.getCVById(parsedCvId);
+      if (!cv) {
+        return res.status(404).json({ error: "CV not found" });
+      }
       
+      if (cv.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      // Query active job postings that match user's CV
+      const jobRecommendations = await db
+        .select({
+          id: jobPostings.id,
+          jobTitle: jobPostings.title,
+          company: employers.companyName,
+          location: jobPostings.location,
+          salaryRange: jobPostings.salaryRange,
+          industry: jobPostings.industry,
+          employmentType: jobPostings.employmentType,
+          experienceLevel: jobPostings.experienceLevel,
+          postedDate: jobPostings.createdAt,
+          description: jobPostings.description,
+          requirements: jobPostings.requirements,
+          benefits: jobPostings.benefits,
+          isRemote: jobPostings.isRemote,
+          bbbeeCompliant: employers.bbbeeCompliant
+        })
+        .from(jobPostings)
+        .innerJoin(employers, eq(jobPostings.employerId, employers.id))
+        .where(and(
+          eq(jobPostings.isActive, true),
+          province ? eq(jobPostings.province, province as string) : undefined,
+          experienceLevel ? eq(jobPostings.experienceLevel, experienceLevel as string) : undefined
+        ))
+        .orderBy(desc(jobPostings.createdAt))
+        .limit(parseInt(limit as string) || 10);
+
+      // Calculate match scores based on CV analysis
+      const recommendations = jobRecommendations.map((job, index) => {
+        // Simple scoring based on database data
+        let matchScore = 70; // Base score
+        
+        // Adjust based on experience level match
+        if (job.experienceLevel && cv.content) {
+          const cvExperience = cv.content.toLowerCase();
+          if (cvExperience.includes('senior') && job.experienceLevel.includes('Senior')) {
+            matchScore += 10;
+          }
+          if (cvExperience.includes('manager') && job.experienceLevel.includes('Manager')) {
+            matchScore += 10;
+          }
+        }
+        
+        // Adjust based on location preference
+        if (province && job.location?.includes(province as string)) {
+          matchScore += 5;
+        }
+        
+        // Ensure score is within reasonable range
+        matchScore = Math.min(95, Math.max(60, matchScore - (index * 2)));
+        
+        return {
+          ...job,
+          matchScore
+        };
+      });
+
+      if (recommendations.length > 0) {
+        return res.json({
+          recommendations,
+          metadata: {
+            count: recommendations.length,
+            filters: {
+              province: province || null,
+              industries: industries ? (industries as string).split(',') : null,
+              experienceLevel: experienceLevel || null
+            }
+          }
+        });
+      }
+      
+      // Return empty results if no matches found
       return res.json({
-        recommendations: demoRecommendations,
-        isDemo: true,
+        recommendations: [],
         metadata: {
-          count: demoRecommendations.length,
+          count: 0,
           filters: {
             province: province || null,
             industries: industries ? (industries as string).split(',') : null,
@@ -1678,55 +1695,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user!.id;
       
-      // Provide demo data for testing
-      const demoMatches = [
-        {
-          id: 1,
-          jobTitle: "Senior Software Engineer",
-          company: "Innovative Tech Solutions",
-          location: "Cape Town, Western Cape",
-          industry: "Technology",
-          matchScore: 92,
-          salaryMatch: true,
-          experienceMatch: true,
-          skillsMatch: 90,
-          isRecruiterInterested: true,
-          recruiterPaid: false,
-          canViewCompany: false,
-          notificationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          matchReasons: [
-            "Strong skills match in React and Node.js",
-            "Experience level aligns perfectly",
-            "Location preference match",
-            "Salary expectations compatible"
-          ]
-        },
-        {
-          id: 2,
-          jobTitle: "Full Stack Developer",
-          company: "Digital Innovation Hub",
-          location: "Johannesburg, Gauteng",
-          industry: "Technology",
-          matchScore: 88,
-          salaryMatch: true,
-          experienceMatch: true,
-          skillsMatch: 85,
-          isRecruiterInterested: false,
-          recruiterPaid: false,
-          canViewCompany: false,
-          notificationDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          matchReasons: [
-            "Technical skills alignment",
-            "Good experience level match",
-            "Open to relocation considered"
-          ]
-        }
-      ];
+      // Get job seeker's actual premium matches
+      const matches = await storage.getJobSeekerMatches(userId);
       
-      return res.json({
-        matches: demoMatches,
-        isDemo: true,
-        message: "Demo matches - real opportunities will appear here"
+      res.json({
+        matches,
+        metadata: {
+          count: matches.length,
+          hasMatches: matches.length > 0
+        }
       });
       
     } catch (error) {
@@ -2087,8 +2064,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // xAI API test routes
   app.use("/api", testXaiApiRoutes);
   
-  // Mock CV analysis routes for demonstration
-  app.use("/api", mockCvAnalysisRoutes);
+  // Removed mock analysis routes for production
   
   // PDF testing routes
   app.use("/api", pdfTestRoutes);
@@ -2915,8 +2891,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mount demo job matching routes
-  app.use("/api", jobMatchingDemoRoutes);
+  // Removed demo routes for production
 
   // Mount webhook routes
   const webhookRoutes = await import('./routes/webhookRoutes');
@@ -3754,8 +3729,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         matches,
-        isDemo: false,
-        message: "Live candidate matches for your job postings"
+        metadata: {
+          count: matches.length,
+          hasMatches: matches.length > 0
+        }
       });
     } catch (error) {
       console.error("Error fetching recruiter matches:", error);

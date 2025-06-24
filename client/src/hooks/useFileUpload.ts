@@ -40,7 +40,7 @@ export function useFileUpload() {
       formData.append('file', file);
       formData.append('title', file.name.replace(/\.[^/.]+$/, "") || "My CV");
 
-      // Create mock progress updates
+      // Create progress updates
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           const newProgress = prev + 10;

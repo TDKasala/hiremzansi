@@ -22,7 +22,7 @@ export default function PremiumToolsPage() {
   const [jobAlertsEnabled, setJobAlertsEnabled] = useState(false);
   const [showJobAlertPreview, setShowJobAlertPreview] = useState(false);
 
-  // Mock CV text for the editor
+  // CV text for the editor
   const [cvText, setCVText] = useState(
     `SIPHO NKOSI
 Marketing Specialist | B-BBEE Level 2

@@ -39,7 +39,7 @@ import PremiumToolsPage from "@/pages/PremiumToolsPage";
 import RealtimeATSPage from "@/pages/RealtimeATSPage";
 import JobSeekerToolsPage from "@/pages/JobSeekerToolsPage";
 import ATSResultsPage from "@/pages/ATSResultsPage";
-import MotivationDemoPage from "@/pages/MotivationDemoPage";
+
 import MotivationDashboard from "@/pages/MotivationDashboard";
 import LocalAIDemoPage from "@/pages/LocalAIDemoPage";
 import SouthAfricanAIDemo from "@/pages/SouthAfricanAIDemo";
@@ -170,7 +170,7 @@ function App() {
                 <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
                 <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
                 <Route path="/ats-results" component={ATSResultsPage} />
-                <Route path="/motivation-demo" component={MotivationDemoPage} />
+      
                 <Route path="/motivation-dashboard" component={MotivationDashboard} />
                 <Route path="/local-ai-demo" component={LocalAIDemoPage} />
                 <Route path="/sa-ai-demo" component={SouthAfricanAIDemo} />

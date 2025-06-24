@@ -46,7 +46,7 @@ export default function ContactPage() {
   function onSubmit(values: ContactFormValues) {
     setIsSubmitting(true);
     
-    // Mock form submission
+    // Form submission logic will be implemented
     setTimeout(() => {
       setIsSubmitting(false);
       form.reset();

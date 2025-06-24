@@ -168,7 +168,7 @@ export function RecruiterCTA() {
             <Link href="/recruiter/matches">
               <Button size="lg" variant="outline">
                 <Target className="h-5 w-5 mr-2" />
-                View Demo
+                Get Started
               </Button>
             </Link>
           </div>

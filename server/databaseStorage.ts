@@ -11,7 +11,8 @@ import {
   jobMatches, 
   skills, 
   userSkills, 
-  notifications
+  notifications,
+  premiumJobMatches
 } from '@shared/schema';
 import { eq, desc, and, or, like, gte, lte, count, sql } from 'drizzle-orm';
 import bcrypt from 'bcrypt';

@@ -44,7 +44,6 @@ export default function JobSeekerMatchesPage() {
   });
 
   const matches: JobMatch[] = matchesResponse?.matches || [];
-  const isDemo = matchesResponse?.isDemo || false;
 
   const getMatchScoreColor = (score: number) => {
     if (score >= 90) return 'text-green-600 bg-green-50';
@@ -94,11 +93,7 @@ export default function JobSeekerMatchesPage() {
                 Anonymous opportunities from recruiters interested in your profile
               </p>
             </div>
-            {isDemo && (
-              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                Demo Mode
-              </Badge>
-            )}
+
           </div>
 
           {/* Stats Overview */}
@@ -157,10 +152,10 @@ export default function JobSeekerMatchesPage() {
                 No Job Matches Yet
               </h3>
               <p className="text-gray-600 mb-6">
-                Upload your CV and optimize it to start receiving anonymous job opportunities from recruiters
+                Recruiters haven't shown interest in your profile yet. Make sure your CV is optimized and complete to attract more opportunities.
               </p>
               <Button className="bg-blue-600 hover:bg-blue-700">
-                Upload Your CV
+                Optimize My CV
               </Button>
             </CardContent>
           </Card>

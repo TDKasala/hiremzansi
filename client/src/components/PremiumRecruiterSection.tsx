@@ -271,7 +271,7 @@ export function PremiumRecruiterSection() {
             <Link href="/recruiter/matches">
               <Button size="lg" variant="outline">
                 <Search className="h-5 w-5 mr-2" />
-                View Demo
+                Get Started
               </Button>
             </Link>
           </div>

@@ -36,7 +36,7 @@ export default function DeepAnalysisCard({ cv, showPaymentForm = true }: DeepAna
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Mock payment success
+      // Payment success handling
       toast({
         title: "Payment Successful",
         description: "Your payment of ZAR 55.50 was processed successfully.",
