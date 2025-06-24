@@ -84,6 +84,47 @@ export const insertSaProfileSchema = createInsertSchema(saProfiles).pick({
   whatsappVerified: true,
 });
 
+// Generated Templates schema
+export const generatedTemplates = pgTable("generated_templates", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  templateId: text("template_id").notNull(),
+  templateType: text("template_type").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  atsScore: real("ats_score").default(0),
+  keywords: text("keywords").array(),
+  saOptimized: boolean("sa_optimized").default(true),
+  securityCode: text("security_code"),
+  watermarkId: text("watermark_id"),
+  userAgent: text("user_agent"),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const generatedTemplatesRelations = relations(generatedTemplates, ({ one }: { one: any }) => ({
+  user: one(users, {
+    fields: [generatedTemplates.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertGeneratedTemplateSchema = createInsertSchema(generatedTemplates).pick({
+  userId: true,
+  templateId: true,
+  templateType: true,
+  title: true,
+  content: true,
+  atsScore: true,
+  keywords: true,
+  saOptimized: true,
+  securityCode: true,
+  watermarkId: true,
+  userAgent: true,
+  ipAddress: true,
+});
+
 // CV schema
 export const cvs = pgTable("cvs", {
   id: serial("id").primaryKey(),
