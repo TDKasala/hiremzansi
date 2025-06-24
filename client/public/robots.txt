@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Primary domain
+Sitemap: https://hiremzansi.co.za/sitemap.xml
+
+# Block replit.app crawling if accessed directly
+User-agent: *
+Disallow: /
+Host: hiremzansi.co.za

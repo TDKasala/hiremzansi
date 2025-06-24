@@ -24,7 +24,7 @@ app.use(session({
   }
 }));
 
-// Force redirect to custom domain
+// Force redirect to custom domain and set primary domain headers
 app.use((req, res, next) => {
   const host = req.get('host');
   const protocol = req.get('x-forwarded-proto') || req.protocol;
@@ -32,6 +32,17 @@ app.use((req, res, next) => {
   // If accessing via replit.app domain, redirect to custom domain
   if (host && host.includes('replit.app')) {
     return res.redirect(301, `https://hiremzansi.co.za${req.originalUrl}`);
+  }
+  
+  // Set security headers for primary domain
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Set canonical domain headers and HSTS for security
+  if (host === 'hiremzansi.co.za') {
+    res.setHeader('Link', '<https://hiremzansi.co.za>; rel="canonical"');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   
   next();
