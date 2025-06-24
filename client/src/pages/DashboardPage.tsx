@@ -33,7 +33,20 @@ export function DashboardPage() {
           <CardContent>
             <p className="mb-4">Find South African jobs that match your qualifications.</p>
             <Button asChild>
-              <Link href="/job-matches">View Matches</Link>
+              <Link href="/job-seeker/matches">View Matches</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Job Recommendations</CardTitle>
+            <CardDescription>Personalized job suggestions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Get AI-powered job recommendations based on your CV.</p>
+            <Button asChild>
+              <Link href="/job-recommendations">View Recommendations</Link>
             </Button>
           </CardContent>
         </Card>

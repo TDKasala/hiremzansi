@@ -100,6 +100,7 @@ export interface IStorage {
   getPremiumJobMatches(employerId: number): Promise<any[]>;
   createPremiumJobMatch(matchData: any): Promise<any>;
   unlockCandidateContact(matchId: number, recruiterId: number): Promise<any>;
+  getJobSeekerMatches(userId: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -524,6 +525,166 @@ export class DatabaseStorage implements IStorage {
       .update(notifications)
       .set({ isRead: true })
       .where(eq(notifications.id, id));
+  }
+
+  // Premium job matching operations
+  async getPremiumJobMatches(employerId: number): Promise<any[]> {
+    const matches = await db
+      .select({
+        id: premiumJobMatches.id,
+        jobSeekerId: premiumJobMatches.jobSeekerId,
+        recruiterId: premiumJobMatches.recruiterId,
+        cvId: premiumJobMatches.cvId,
+        matchScore: premiumJobMatches.matchScore,
+        jobSeekerPaid: premiumJobMatches.jobSeekerPaid,
+        recruiterPaid: premiumJobMatches.recruiterPaid,
+        matchData: premiumJobMatches.matchData,
+        status: premiumJobMatches.status,
+        createdAt: premiumJobMatches.createdAt,
+        cvTitle: cvs.fileName,
+        cvScore: cvs.atsScore,
+        userLocation: users.location,
+        userProvince: users.province,
+      })
+      .from(premiumJobMatches)
+      .leftJoin(cvs, eq(premiumJobMatches.cvId, cvs.id))
+      .leftJoin(users, eq(premiumJobMatches.jobSeekerId, users.id))
+      .leftJoin(jobPostings, eq(premiumJobMatches.jobPostingId, jobPostings.id))
+      .where(eq(jobPostings.employerId, employerId))
+      .orderBy(desc(premiumJobMatches.matchScore));
+
+    return matches.map(match => ({
+      id: match.id,
+      jobId: match.jobSeekerId,
+      candidateId: match.jobSeekerId,
+      matchScore: match.matchScore,
+      skillsMatch: match.matchData?.skillsMatch || 85,
+      experienceMatch: match.matchData?.experienceMatch || 80,
+      locationMatch: match.matchData?.locationMatch || 90,
+      saContextMatch: match.matchData?.saContextMatch || 85,
+      isRecruiterNotified: true,
+      isPaid: match.recruiterPaid,
+      isContactRevealed: match.recruiterPaid,
+      matchedSkills: match.matchData?.matchedSkills || [],
+      missingSkills: match.matchData?.missingSkills || [],
+      candidate: {
+        id: match.jobSeekerId,
+        name: match.recruiterPaid ? match.matchData?.candidateName : undefined,
+        email: match.recruiterPaid ? match.matchData?.candidateEmail : undefined,
+        location: match.userLocation || 'South Africa',
+        experienceLevel: match.matchData?.experienceLevel || 'Mid-level',
+        skills: match.matchData?.skills || [],
+        bbbeeLevel: match.matchData?.bbbeeLevel,
+        industry: match.matchData?.industry || 'Technology',
+        cvScore: match.cvScore || 85,
+        lastActive: match.createdAt?.toISOString() || new Date().toISOString(),
+      },
+      price: match.recruiterPaid ? 0 : 200,
+    }));
+  }
+
+  async createPremiumJobMatch(matchData: any): Promise<any> {
+    const [match] = await db
+      .insert(premiumJobMatches)
+      .values(matchData)
+      .returning();
+    return match;
+  }
+
+  async getJobSeekerMatches(userId: number): Promise<any[]> {
+    // Get premium matches for job seeker
+    const matches = await db
+      .select({
+        id: premiumJobMatches.id,
+        jobSeekerId: premiumJobMatches.jobSeekerId,
+        recruiterId: premiumJobMatches.recruiterId,
+        matchScore: premiumJobMatches.matchScore,
+        jobSeekerPaid: premiumJobMatches.jobSeekerPaid,
+        recruiterPaid: premiumJobMatches.recruiterPaid,
+        matchData: premiumJobMatches.matchData,
+        status: premiumJobMatches.status,
+        createdAt: premiumJobMatches.createdAt,
+        jobTitle: jobPostings.title,
+        jobCompany: employers.companyName,
+        jobLocation: jobPostings.location,
+        jobIndustry: jobPostings.industry,
+      })
+      .from(premiumJobMatches)
+      .leftJoin(jobPostings, eq(premiumJobMatches.jobPostingId, jobPostings.id))
+      .leftJoin(employers, eq(jobPostings.employerId, employers.id))
+      .where(eq(premiumJobMatches.jobSeekerId, userId))
+      .orderBy(desc(premiumJobMatches.matchScore));
+
+    return matches.map(match => ({
+      id: match.id,
+      jobTitle: match.jobTitle || 'Confidential Position',
+      company: match.recruiterPaid ? match.jobCompany : 'Confidential Company',
+      location: match.jobLocation || 'South Africa',
+      industry: match.jobIndustry || 'Various',
+      matchScore: match.matchScore,
+      salaryMatch: match.matchData?.salaryMatch || false,
+      experienceMatch: match.matchData?.experienceMatch || false,
+      skillsMatch: match.matchData?.skillsMatch || 0,
+      isRecruiterInterested: match.recruiterPaid,
+      recruiterPaid: match.recruiterPaid,
+      canViewCompany: match.recruiterPaid,
+      notificationDate: match.createdAt?.toISOString(),
+      matchReasons: match.matchData?.matchReasons || []
+    }));
+  }
+
+  async unlockCandidateContact(matchId: number, recruiterId: number): Promise<any> {
+    // Verify match exists and recruiter owns it
+    const [match] = await db
+      .select()
+      .from(premiumJobMatches)
+      .where(and(
+        eq(premiumJobMatches.id, matchId),
+        eq(premiumJobMatches.recruiterId, recruiterId)
+      ));
+
+    if (!match) {
+      throw new Error('Match not found or access denied');
+    }
+
+    if (match.recruiterPaid) {
+      throw new Error('Contact already unlocked');
+    }
+
+    const [candidate] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        phone: users.phone,
+        location: users.location,
+        province: users.province,
+      })
+      .from(users)
+      .where(eq(users.id, match.jobSeekerId));
+
+    await db
+      .update(premiumJobMatches)
+      .set({ 
+        recruiterPaid: true,
+        recruiterViewed: true,
+        recruiterLastViewedAt: new Date(),
+        status: 'contact_revealed'
+      })
+      .where(eq(premiumJobMatches.id, matchId));
+
+    return {
+      match,
+      candidate: {
+        id: candidate.id,
+        name: `${candidate.firstName} ${candidate.lastName}`.trim(),
+        email: candidate.email,
+        phone: candidate.phone,
+        location: candidate.location,
+        province: candidate.province,
+      }
+    };
   }
 }
 

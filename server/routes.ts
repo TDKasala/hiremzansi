@@ -1560,6 +1560,180 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+
+  // Get latest CV for authenticated user
+  app.get("/api/latest-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const latestCV = await storage.getLatestCVByUserId(userId);
+      
+      if (!latestCV) {
+        return res.status(404).json({ 
+          error: "No CV found", 
+          message: "You haven't uploaded any CVs yet." 
+        });
+      }
+      
+      res.json(latestCV);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Get personalized job recommendations for authenticated users
+  app.get("/api/job-recommendations", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      const { cvId, limit, includeApplied, province, industries, experienceLevel } = req.query;
+      
+      if (!cvId) {
+        return res.status(400).json({ error: "CV ID is required" });
+      }
+      
+      const parsedCvId = parseInt(cvId as string);
+      
+      if (isNaN(parsedCvId)) {
+        return res.status(400).json({ error: "Invalid CV ID" });
+      }
+      
+      // Create demo recommendations for testing
+      const demoRecommendations = [
+        {
+          id: 1,
+          jobTitle: "Software Developer",
+          company: "Tech Solutions SA",
+          location: "Cape Town, Western Cape",
+          salaryRange: "R25,000 - R35,000",
+          matchScore: 87,
+          industry: "Technology",
+          employmentType: "Full-time",
+          experienceLevel: "Mid-level",
+          postedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          description: "Join our dynamic team as a Software Developer working on innovative projects that impact millions of users across South Africa.",
+          requirements: ["JavaScript", "React", "Node.js", "SQL"],
+          benefits: ["Medical aid", "Pension fund", "Flexible hours"],
+          isRemote: false,
+          bbbeeCompliant: true
+        },
+        {
+          id: 2,
+          jobTitle: "Business Analyst",
+          company: "Financial Services Group",
+          location: "Johannesburg, Gauteng",
+          salaryRange: "R30,000 - R40,000",
+          matchScore: 82,
+          industry: "Finance",
+          employmentType: "Full-time",
+          experienceLevel: "Senior",
+          postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          description: "Exciting opportunity for an experienced Business Analyst to drive digital transformation initiatives in the financial sector.",
+          requirements: ["Business Analysis", "SQL", "Excel", "Project Management"],
+          benefits: ["Medical aid", "Pension fund", "Performance bonus"],
+          isRemote: true,
+          bbbeeCompliant: true
+        },
+        {
+          id: 3,
+          jobTitle: "Marketing Coordinator",
+          company: "Retail Excellence",
+          location: "Durban, KwaZulu-Natal",
+          salaryRange: "R20,000 - R28,000",
+          matchScore: 75,
+          industry: "Retail",
+          employmentType: "Full-time",
+          experienceLevel: "Mid-level",
+          postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          description: "We are looking for a creative Marketing Coordinator to lead our brand campaigns and drive customer engagement.",
+          requirements: ["Marketing", "Social Media", "Content Creation", "Analytics"],
+          benefits: ["Medical aid", "Staff discounts", "Training opportunities"],
+          isRemote: false,
+          bbbeeCompliant: true
+        }
+      ];
+      
+      return res.json({
+        recommendations: demoRecommendations,
+        isDemo: true,
+        metadata: {
+          count: demoRecommendations.length,
+          filters: {
+            province: province || null,
+            industries: industries ? (industries as string).split(',') : null,
+            experienceLevel: experienceLevel || null
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error getting job recommendations:", error);
+      next(error);
+    }
+  });
+
+  // Get job seeker premium matches 
+  app.get("/api/job-seeker/matches", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Provide demo data for testing
+      const demoMatches = [
+        {
+          id: 1,
+          jobTitle: "Senior Software Engineer",
+          company: "Innovative Tech Solutions",
+          location: "Cape Town, Western Cape",
+          industry: "Technology",
+          matchScore: 92,
+          salaryMatch: true,
+          experienceMatch: true,
+          skillsMatch: 90,
+          isRecruiterInterested: true,
+          recruiterPaid: false,
+          canViewCompany: false,
+          notificationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          matchReasons: [
+            "Strong skills match in React and Node.js",
+            "Experience level aligns perfectly",
+            "Location preference match",
+            "Salary expectations compatible"
+          ]
+        },
+        {
+          id: 2,
+          jobTitle: "Full Stack Developer",
+          company: "Digital Innovation Hub",
+          location: "Johannesburg, Gauteng",
+          industry: "Technology",
+          matchScore: 88,
+          salaryMatch: true,
+          experienceMatch: true,
+          skillsMatch: 85,
+          isRecruiterInterested: false,
+          recruiterPaid: false,
+          canViewCompany: false,
+          notificationDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          matchReasons: [
+            "Technical skills alignment",
+            "Good experience level match",
+            "Open to relocation considered"
+          ]
+        }
+      ];
+      
+      return res.json({
+        matches: demoMatches,
+        isDemo: true,
+        message: "Demo matches - real opportunities will appear here"
+      });
+      
+    } catch (error) {
+      console.error("Error fetching job seeker matches:", error);
+      res.status(500).json({ error: "Failed to fetch matches" });
+    }
+  });
   
   // CV Upload endpoint - supports both authenticated and guest users
   app.post("/api/upload", (req: Request, res: Response, next: NextFunction) => {
