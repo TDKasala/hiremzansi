@@ -170,10 +170,10 @@ export default function CVTemplatesPage() {
             <TabsContent value="creative"></TabsContent>
           </Tabs>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredTemplates.map(template => (
               <Card key={template.id} className="overflow-hidden flex flex-col group hover:border-primary/40 transition-colors">
-                <div className="relative bg-gray-100 h-48 overflow-hidden">
+                <div className="relative bg-gray-100 h-40 sm:h-48 overflow-hidden">
                   {!template.image ? (
                     <div className="absolute inset-0 flex items-center justify-center text-gray-400">
                       <FileText className="h-16 w-16" />
@@ -193,13 +193,13 @@ export default function CVTemplatesPage() {
                   )}
                 </div>
                 
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-2 p-4 sm:p-6">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{template.title}</CardTitle>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base sm:text-lg truncate">{template.title}</CardTitle>
                       <CardDescription className="text-xs flex items-center mt-1">
-                        <Clock className="h-3 w-3 mr-1" />
-                        5 min setup • {template.free ? 'Free' : 'Premium'}
+                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">5 min setup • {template.free ? 'Free' : 'Premium'}</span>
                       </CardDescription>
                     </div>
                     
@@ -210,41 +210,44 @@ export default function CVTemplatesPage() {
                   </div>
                 </CardHeader>
                 
-                <CardContent className="flex-grow">
-                  <p className="text-sm mb-4">{template.description}</p>
+                <CardContent className="flex-grow p-4 sm:p-6">
+                  <p className="text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">{template.description}</p>
                   
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 sm:space-y-2">
                     {template.features.slice(0, 3).map((feature, index) => (
-                      <div key={index} className="flex items-start text-sm">
-                        <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{feature}</span>
+                      <div key={index} className="flex items-start text-xs sm:text-sm">
+                        <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-muted-foreground leading-tight">{feature}</span>
                       </div>
                     ))}
                     
                     {template.features.length > 3 && (
-                      <p className="text-xs text-muted-foreground pl-6">
+                      <p className="text-xs text-muted-foreground pl-5 sm:pl-6">
                         +{template.features.length - 3} more features
                       </p>
                     )}
                   </div>
                 </CardContent>
                 
-                <CardFooter className="border-t pt-4 gap-2 flex">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="mr-1 h-4 w-4" />
-                    Preview
+                <CardFooter className="border-t pt-3 sm:pt-4 gap-2 flex p-4 sm:p-6">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs sm:text-sm h-8 sm:h-9">
+                    <Eye className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Preview</span>
+                    <span className="sm:hidden">View</span>
                   </Button>
                   
                   {template.free ? (
-                    <Button size="sm" className="flex-1">
-                      <Download className="mr-1 h-4 w-4" />
-                      Download
+                    <Button size="sm" className="flex-1 text-xs sm:text-sm h-8 sm:h-9">
+                      <Download className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Download</span>
+                      <span className="sm:hidden">Get</span>
                     </Button>
                   ) : (
-                    <Button size="sm" className="flex-1" asChild>
+                    <Button size="sm" className="flex-1 text-xs sm:text-sm h-8 sm:h-9" asChild>
                       <a href="/pricing">
-                        <Lock className="mr-1 h-4 w-4" />
-                        Premium
+                        <Lock className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Premium</span>
+                        <span className="sm:hidden">Pro</span>
                       </a>
                     </Button>
                   )}
@@ -254,64 +257,64 @@ export default function CVTemplatesPage() {
           </div>
         </div>
         
-        <div className="mt-12 bg-primary/5 border border-primary/20 rounded-lg p-6">
+        <div className="mt-8 sm:mt-12 bg-primary/5 border border-primary/20 rounded-lg p-4 sm:p-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold mb-4">CV Template Best Practices for South Africa</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center sm:text-left">CV Template Best Practices for South Africa</h2>
             
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2 flex items-center">
-                  <CheckCircle className="h-5 w-5 text-primary mr-2" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 flex-shrink-0" />
                   Essential Elements
                 </h3>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 sm:space-y-3">
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Include B-BBEE status if applicable</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Include B-BBEE status if applicable</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Specify NQF levels for all qualifications</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Specify NQF levels for all qualifications</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>List language proficiencies (important in multilingual SA)</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">List language proficiencies (important in multilingual SA)</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Include ID number (last 3 digits can be XXX for privacy)</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Include ID number (last 3 digits can be XXX for privacy)</span>
                   </li>
                 </ul>
               </div>
               
-              <div>
-                <h3 className="text-lg font-semibold mb-2 flex items-center">
-                  <CheckCircle className="h-5 w-5 text-primary mr-2" />
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 flex-shrink-0" />
                   ATS Optimization
                 </h3>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-2 sm:space-y-3">
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Use standard section headings (Experience, Education)</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Use standard section headings (Experience, Education)</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Avoid tables, text boxes, and complex formatting</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Avoid tables, text boxes, and complex formatting</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Use industry-standard job titles</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Use industry-standard job titles</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-primary mr-2 mt-0.5" />
-                    <span>Include relevant South African industry keywords</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-primary mr-2 mt-1 flex-shrink-0" />
+                    <span className="text-sm sm:text-base leading-tight">Include relevant South African industry keywords</span>
                   </li>
                 </ul>
               </div>
             </div>
             
-            <div className="mt-6">
-              <Button asChild>
+            <div className="mt-6 sm:mt-8 text-center">
+              <Button asChild className="w-full sm:w-auto">
                 <a href="/upload">
                   Check Your CV's ATS Score
                 </a>

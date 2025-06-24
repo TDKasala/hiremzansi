@@ -135,18 +135,18 @@ export default function HeroSection() {
             
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
               <Link href="/upload">
-                <Button size="default" className="bg-primary text-white hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm">
+                <Button size="default" className="bg-primary text-white hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm sm:text-base h-12 sm:h-11">
                   {t('home.getFreeAtsScore')}
                 </Button>
               </Link>
               <Link href="/pricing">
-                <Button size="default" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm">
+                <Button size="default" variant="outline" className="bg-white text-secondary hover:bg-opacity-90 transition-colors w-full sm:w-auto text-sm sm:text-base h-12 sm:h-11">
                   {t('home.viewPremiumFeatures')}
                 </Button>
               </Link>
             </div>
-            <div className="mt-6 text-white flex items-center justify-center text-sm">
-              <Shield className="h-4 w-4 mr-2 text-primary" />
+            <div className="mt-4 sm:mt-6 text-white flex items-center justify-center md:justify-start text-xs sm:text-sm">
+              <Shield className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
               <span>{t('home.dataSecure')}</span>
             </div>
           </div>

@@ -91,13 +91,13 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-16 bg-neutral-50">
+    <section id="pricing" className="py-8 sm:py-16 bg-neutral-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-secondary mb-3 sm:mb-4">
             Choose Your Plan
           </h2>
-          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto px-2">
             Affordable CV optimization plans designed for South African job seekers
           </p>
         </div>
