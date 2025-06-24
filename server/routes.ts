@@ -2744,6 +2744,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mount demo job matching routes
   app.use("/api", jobMatchingDemoRoutes);
 
+  // Mount webhook routes
+  const webhookRoutes = await import('./routes/webhookRoutes');
+  app.use("/api/webhooks", webhookRoutes.default);
+
   // Enhanced job matching endpoints
   app.post("/api/job-matches/find", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -3485,8 +3489,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Recruiter endpoints - for viewing and purchasing matches
   app.get("/api/recruiter/job-matches", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      // Sample premium matches for recruiters
-      const sampleRecruiterMatches = [
+      const userId = req.user!.id;
+      
+      // Get recruiter's employer profile
+      const employer = await storage.getEmployerByUserId(userId);
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+
+      // Get real matches from database
+      const matches = await storage.getPremiumJobMatches(employer.id);
+      
+      // If no real matches, provide sample data for demo
+      if (matches.length === 0) {
+        const sampleRecruiterMatches = [
         {
           id: 1,
           jobId: 101,
@@ -3553,12 +3569,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
           price: 250
         }
-      ];
+        ];
+        
+        return res.json({
+          matches: sampleRecruiterMatches,
+          isDemo: true,
+          message: "Demo data - real matches will appear here once you have active job postings"
+        });
+      }
       
-      res.json(sampleRecruiterMatches);
+      res.json({
+        matches,
+        isDemo: false,
+        message: "Live candidate matches for your job postings"
+      });
     } catch (error) {
       console.error("Error fetching recruiter matches:", error);
       res.status(500).json({ error: "Failed to fetch job matches" });
+    }
+  });
+
+  // Unlock candidate contact details (R200 payment)
+  app.post("/api/recruiter/unlock-candidate/:matchId", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const matchId = parseInt(req.params.matchId);
+
+      if (isNaN(matchId)) {
+        return res.status(400).json({ error: "Invalid match ID" });
+      }
+
+      // Get employer profile
+      const employer = await storage.getEmployerByUserId(userId);
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+
+      // Create payment for contact unlock
+      const payment = await paymentService.createRecruiterPayment(
+        userId,
+        matchId,
+        employer.id
+      );
+
+      res.json({
+        success: true,
+        payment: {
+          id: payment.payment.id,
+          amount: payment.payment.amount,
+          transactionId: payment.payment.transactionId,
+          expiresAt: payment.payment.expiresAt,
+        },
+        paymentUrl: payment.paymentUrl,
+        message: "Payment created. Redirecting to secure payment gateway...",
+      });
+
+    } catch (error: any) {
+      console.error("Error creating recruiter payment:", error);
+      res.status(500).json({ 
+        error: error.message || "Failed to process payment request" 
+      });
+    }
+  });
+
+  // Get recruiter dashboard stats
+  app.get("/api/recruiter/stats", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      
+      const employer = await storage.getEmployerByUserId(userId);
+      if (!employer) {
+        return res.status(404).json({ error: "Employer profile not found" });
+      }
+
+      // Get job postings count
+      const jobPostings = await storage.getJobPostingsByEmployerId(employer.id);
+      
+      // Get matches count (mock for now)
+      const matches = await storage.getPremiumJobMatches(employer.id);
+      
+      const stats = {
+        activeJobs: jobPostings.filter(job => job.status === 'active').length,
+        totalCandidates: matches.length,
+        unlockedContacts: matches.filter(match => match.isPaid).length,
+        responseRate: matches.length > 0 ? Math.round((matches.filter(match => match.isPaid).length / matches.length) * 100) : 0,
+        creditsRemaining: 10, // Mock credits system
+        averageMatchScore: matches.length > 0 ? Math.round(matches.reduce((sum, match) => sum + match.matchScore, 0) / matches.length) : 0
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching recruiter stats:", error);
+      res.status(500).json({ error: "Failed to fetch recruiter statistics" });
     }
   });
 

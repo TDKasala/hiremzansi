@@ -95,6 +95,11 @@ export interface IStorage {
   createNotification(notificationData: Partial<Notification>): Promise<Notification>;
   getNotificationsByUserId(userId: number): Promise<Notification[]>;
   markNotificationAsRead(id: number): Promise<void>;
+  
+  // Premium matching operations
+  getPremiumJobMatches(employerId: number): Promise<any[]>;
+  createPremiumJobMatch(matchData: any): Promise<any>;
+  unlockCandidateContact(matchId: number, recruiterId: number): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
