@@ -94,6 +94,7 @@ import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
 import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
 import ResumeBuilder from "@/pages/ResumeBuilder";
 import JobsPage from "@/pages/JobsPage";
+import SkillsQuizPage from "@/pages/SkillsQuizPage";
 
 function App() {
   return (
@@ -189,6 +190,7 @@ function App() {
                 <Route path="/admin/login" component={AdminLogin} />
                 <Route path="/admin/dashboard" component={AdminDashboard} />
                 <Route path="/admin" component={AdminDashboard} />
+                <Route path="/skills-quiz" component={SkillsQuizPage} />
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>

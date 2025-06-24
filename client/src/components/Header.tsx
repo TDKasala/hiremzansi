@@ -34,6 +34,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: t('common.home') },
     { href: "/templates", label: "CV Templates" },
+    { href: "/skills-quiz", label: "Skills Quiz" },
     { href: "/jobs", label: "Find Jobs" },
     { href: "/job-sites", label: "Job Board" },
     { href: "/referral", label: "Refer & Earn" },

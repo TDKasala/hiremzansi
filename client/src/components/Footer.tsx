@@ -83,6 +83,16 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/templates" className="text-neutral-400 hover:text-white transition-colors">
+                  CV Templates
+                </Link>
+              </li>
+              <li>
+                <Link href="/skills-quiz" className="text-neutral-400 hover:text-white transition-colors">
+                  Skills Quiz
+                </Link>
+              </li>
+              <li>
                 <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
                   CV Tips
                 </Link>

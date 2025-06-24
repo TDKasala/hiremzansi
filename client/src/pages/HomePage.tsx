@@ -5,7 +5,7 @@ import UploadSection from "@/components/UploadSection";
 import PricingSection from "@/components/PricingSection";
 import SuccessStoriesSection from "@/components/SuccessStoriesSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import SkillQuizSection from "@/components/SkillQuizSection";
+
 import BlogPreviewSection from "@/components/BlogPreviewSection";
 import ReferralSourceSection from "@/components/ReferralSourceSection";
 import WhatsAppPromoSection from "@/components/WhatsAppPromoSection";
@@ -46,7 +46,7 @@ export default function HomePage() {
       <PricingSection />
       <SuccessStoriesSection />
       <TestimonialsSection />
-      <SkillQuizSection />
+
       <JobMatchingAnnouncement />
       <BlogPreviewSection />
       <ReferralSourceSection />
