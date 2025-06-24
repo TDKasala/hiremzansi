@@ -528,8 +528,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin dashboard stats
-  app.get("/api/admin/stats", isAdmin, async (req: Request, res: Response, next: NextFunction) => {
+  app.get("/api/admin/stats", async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (!token) {
+        return res.status(401).json({ message: 'Authentication required' });
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+      if (!decoded || decoded.role !== 'admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
       // Get basic stats from storage
       const stats = {
         totalUsers: 0,
