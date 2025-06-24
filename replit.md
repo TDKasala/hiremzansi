@@ -112,6 +112,7 @@ The deployment strategy prioritizes Replit for development and testing, with Ver
 - June 23, 2025: Fixed email verification redirection for hiremzansi.co.za domain and improved email deliverability to prevent spam folder issues
 - June 23, 2025: Completed admin authentication system overhaul - Unified token verification across all middlewares, fixed admin endpoint access, verified full functionality with proper JWT handling
 - June 23, 2025: MAJOR MILESTONE - Completed full PostgreSQL database migration from memory storage, replacing all simpleAuth references with databaseAuth, now using Neon PostgreSQL with proper SSL connection for production-ready data persistence
+- June 24, 2025: Implemented domain redirect middleware to force all replit.app traffic to redirect permanently to hiremzansi.co.za custom domain using 301 redirects
 
 ## User Preferences
 

@@ -24,6 +24,19 @@ app.use(session({
   }
 }));
 
+// Force redirect to custom domain
+app.use((req, res, next) => {
+  const host = req.get('host');
+  const protocol = req.get('x-forwarded-proto') || req.protocol;
+  
+  // If accessing via replit.app domain, redirect to custom domain
+  if (host && host.includes('replit.app')) {
+    return res.redirect(301, `https://hiremzansi.co.za${req.originalUrl}`);
+  }
+  
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
