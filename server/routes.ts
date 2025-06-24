@@ -4221,6 +4221,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CV Templates API - Get available templates
+  app.get("/api/cv-templates", async (req: Request, res: Response) => {
+    try {
+      const templates = [
+        {
+          id: 1,
+          title: "Professional Plus",
+          category: "corporate",
+          popular: true,
+          free: false,
+          description: "A clean, professional template ideal for corporate positions with a focus on readability and ATS optimization.",
+          features: [
+            "ATS-friendly format",
+            "B-BBEE section included", 
+            "Skills matrix with ratings",
+            "NQF qualification layout"
+          ],
+          preview_url: "/templates/professional-plus-preview.jpg"
+        },
+        {
+          id: 2,
+          title: "Graduate Essential",
+          category: "graduate",
+          popular: false,
+          free: true,
+          description: "Perfect for recent graduates entering the South African job market.",
+          features: [
+            "Education-focused layout",
+            "Skills and achievements highlight",
+            "Internship/volunteer section", 
+            "Projects portfolio section"
+          ],
+          preview_url: "/templates/graduate-essential-preview.jpg"
+        },
+        {
+          id: 3,
+          title: "Technical Specialist",
+          category: "technical",
+          popular: false,
+          free: false,
+          description: "Designed for IT, engineering and technical professionals.",
+          features: [
+            "Technical skills matrix",
+            "Project showcase section",
+            "GitHub/portfolio links",
+            "Certifications highlight"
+          ],
+          preview_url: "/templates/technical-specialist-preview.jpg"
+        }
+      ];
+      
+      res.json({ templates });
+    } catch (error) {
+      console.error("Error fetching CV templates:", error);
+      res.status(500).json({ error: "Failed to fetch CV templates" });
+    }
+  });
+
+  // Generate AI-powered CV template
+  app.post("/api/templates/ai-generate", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+      const userId = decoded.userId;
+
+      const { userProfile, templateOptions } = req.body;
+      
+      // Import template service
+      const { templateService } = await import('./services/templateService');
+      
+      // Generate template
+      const template = await templateService.generateAIPoweredTemplate(userProfile);
+      
+      res.json({
+        success: true,
+        template: {
+          id: template.id,
+          title: template.title,
+          content: template.content,
+          atsScore: template.atsScore,
+          keywords: template.keywords,
+          saOptimized: template.saOptimized
+        }
+      });
+    } catch (error) {
+      console.error("Error generating AI template:", error);
+      res.status(500).json({ error: "Failed to generate AI template" });
+    }
+  });
+
   // Admin user update endpoint
   app.patch("/api/admin/users/:id", async (req: Request, res: Response) => {
     try {
