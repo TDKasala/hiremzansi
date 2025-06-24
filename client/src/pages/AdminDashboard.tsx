@@ -212,43 +212,80 @@ const AdminDashboard: React.FC = () => {
   // User management mutations
   const updateUserMutation = useMutation({
     mutationFn: async (data: { userId: number; updates: Partial<AdminUser> }) => {
-      return adminQuery(`/api/admin/users/${data.userId}`, {
+      console.log('Updating user:', data.userId, 'with data:', data.updates);
+      const response = await adminQuery(`/api/admin/users/${data.userId}`, {
         method: 'PATCH',
         body: JSON.stringify(data.updates),
       });
+      console.log('Update response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: 'User updated successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({ 
+        title: 'User updated successfully',
+        description: `User ${variables.userId} has been updated`
+      });
+      setShowUserDetails(false); // Close the details modal
     },
-    onError: () => {
-      toast({ title: 'Failed to update user', variant: 'destructive' });
+    onError: (error: any, variables) => {
+      console.error('User update error:', error);
+      toast({ 
+        title: 'Failed to update user', 
+        description: error.message || `Could not update user ${variables.userId}`,
+        variant: 'destructive' 
+      });
     },
   });
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return adminQuery(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      console.log('Deleting user:', userId);
+      const response = await adminQuery(`/api/admin/users/${userId}`, { method: 'DELETE' });
+      console.log('Delete response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data, userId) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({ title: 'User deleted successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({ 
+        title: 'User deleted successfully',
+        description: `User ${userId} has been permanently removed`
+      });
     },
-    onError: () => {
-      toast({ title: 'Failed to delete user', variant: 'destructive' });
+    onError: (error: any, userId) => {
+      console.error('User delete error:', error);
+      toast({ 
+        title: 'Failed to delete user', 
+        description: error.message || `Could not delete user ${userId}`,
+        variant: 'destructive' 
+      });
     },
   });
 
   const deleteCVMutation = useMutation({
     mutationFn: async (cvId: number) => {
-      return adminQuery(`/api/admin/cvs/${cvId}`, { method: 'DELETE' });
+      console.log('Deleting CV:', cvId);
+      const response = await adminQuery(`/api/admin/cvs/${cvId}`, { method: 'DELETE' });
+      console.log('CV delete response:', response);
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data, cvId) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/cvs'] });
-      toast({ title: 'CV deleted successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({ 
+        title: 'CV deleted successfully',
+        description: `CV ${cvId} has been permanently removed`
+      });
     },
-    onError: () => {
-      toast({ title: 'Failed to delete CV', variant: 'destructive' });
+    onError: (error: any, cvId) => {
+      console.error('CV delete error:', error);
+      toast({ 
+        title: 'Failed to delete CV', 
+        description: error.message || `Could not delete CV ${cvId}`,
+        variant: 'destructive' 
+      });
     },
   });
 

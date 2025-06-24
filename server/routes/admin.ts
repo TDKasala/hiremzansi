@@ -3,20 +3,35 @@ import { db } from "../db";
 import { users, cvs, atsScores, saProfiles, plans, subscriptions } from "@shared/schema";
 import { count, sql, and, eq, gte, desc } from "drizzle-orm";
 import { sendWeeklyCareerDigests } from "../services/recommendationService";
+import { storage } from "../databaseStorage";
 
 const router = Router();
 
 // Middleware to check if user is admin
 const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  try {
+    // Check for authorization header (JWT token)
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
 
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ error: "Forbidden - Admin access required" });
-  }
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+    
+    if (!decoded || decoded.role !== 'admin') {
+      return res.status(403).json({ error: "Admin access required" });
+    }
 
-  next();
+    // Add decoded user info to request
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("Admin auth error:", error);
+    return res.status(401).json({ error: "Invalid authentication token" });
+  }
 };
 
 // Get admin dashboard stats
@@ -217,6 +232,153 @@ router.put("/users/:id", isAdmin, async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+// PATCH route for user updates (alternative to PUT)
+router.patch("/users/:id", isAdmin, async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id);
+    const updates = req.body;
+    
+    console.log(`Admin ${req.user?.id} updating user ${userId} with:`, updates);
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+    
+    // Prevent changing your own role (admin can't demote themselves)
+    if (req.user && req.user.id === userId && updates.role && updates.role !== 'admin') {
+      return res.status(403).json({ error: "You cannot change your own admin role" });
+    }
+    
+    // Check if user exists first
+    const existingUser = await storage.getUserById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // Prepare the update data, only include fields that are provided
+    const updateData: any = {};
+    if (updates.role !== undefined) updateData.role = updates.role;
+    if (updates.isActive !== undefined) updateData.isActive = updates.isActive;
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.email !== undefined) updateData.email = updates.email;
+    
+    // Use storage.updateUser for better compatibility
+    const updatedUser = await storage.updateUser(userId, updateData);
+    
+    console.log('User updated successfully:', updatedUser);
+    
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ 
+      error: "Failed to update user",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
+// Delete user (admin only)
+router.delete("/users/:id", isAdmin, async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.id);
+    
+    console.log(`Admin ${req.user?.id} attempting to delete user ${userId}`);
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+    
+    // Prevent admin from deleting themselves
+    if (req.user && req.user.id === userId) {
+      return res.status(403).json({ error: "You cannot delete your own account" });
+    }
+    
+    // Check if user exists
+    const existingUser = await storage.getUserById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    // Don't allow deletion of other admin users (safety measure)
+    if (existingUser.role === 'admin') {
+      return res.status(403).json({ error: "Cannot delete admin users" });
+    }
+    
+    // Delete user's related data first (cascade delete)
+    try {
+      // Delete CVs
+      const userCVs = await storage.getCVsByUserId(userId);
+      for (const cv of userCVs) {
+        await storage.deleteCV(cv.id);
+      }
+      
+      // Delete SA profiles and other related data through database
+      await db.delete(saProfiles).where(sql`${saProfiles.userId} = ${userId}`);
+      await db.delete(atsScores).where(sql`${atsScores.userId} = ${userId}`);
+      
+      // Finally delete the user
+      await db.delete(users).where(sql`${users.id} = ${userId}`);
+      
+      console.log('User deleted successfully:', userId);
+      
+      res.json({ 
+        success: true, 
+        message: "User and all related data deleted successfully",
+        deletedUserId: userId 
+      });
+    } catch (deleteError) {
+      console.error("Error during cascade delete:", deleteError);
+      throw deleteError;
+    }
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ 
+      error: "Failed to delete user",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
+// Delete CV (admin only)
+router.delete("/cvs/:id", isAdmin, async (req: Request, res: Response) => {
+  try {
+    const cvId = parseInt(req.params.id);
+    
+    console.log(`Admin ${req.user?.id} attempting to delete CV ${cvId}`);
+    
+    if (isNaN(cvId)) {
+      return res.status(400).json({ error: "Invalid CV ID" });
+    }
+    
+    // Check if CV exists using storage
+    const existingCV = await storage.getCVById(cvId);
+    if (!existingCV) {
+      return res.status(404).json({ error: "CV not found" });
+    }
+    
+    // Delete CV and related data using storage method
+    await storage.deleteCV(cvId);
+    
+    console.log('CV deleted successfully:', cvId);
+    
+    res.json({ 
+      success: true, 
+      message: "CV and related data deleted successfully",
+      deletedCVId: cvId 
+    });
+  } catch (error) {
+    console.error("Error deleting CV:", error);
+    res.status(500).json({ 
+      error: "Failed to delete CV",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
   }
 });
 
