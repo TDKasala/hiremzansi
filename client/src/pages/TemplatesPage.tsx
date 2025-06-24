@@ -172,23 +172,27 @@ export default function TemplatesPage() {
           </div>
 
           {/* Template Types Tabs */}
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
-              <TabsTrigger value="ai-powered" className="flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                AI-Powered
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-6 sm:mb-8">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-0 h-auto sm:h-10 p-1 mb-6 sm:mb-8">
+              <TabsTrigger value="ai-powered" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
+                <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">AI-Powered</span>
+                <span className="sm:hidden">AI</span>
               </TabsTrigger>
-              <TabsTrigger value="industry" className="flex items-center gap-2">
-                <Building className="h-4 w-4" />
-                Industry
+              <TabsTrigger value="industry" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
+                <Building className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Industry</span>
+                <span className="sm:hidden">Industry</span>
               </TabsTrigger>
-              <TabsTrigger value="cover-letter" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Cover Letters
+              <TabsTrigger value="cover-letter" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Cover Letters</span>
+                <span className="sm:hidden">Letters</span>
               </TabsTrigger>
-              <TabsTrigger value="dynamic" className="flex items-center gap-2">
-                <Wrench className="h-4 w-4" />
-                Dynamic Builder
+              <TabsTrigger value="dynamic" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 sm:py-1.5 px-2 sm:px-3 text-xs sm:text-sm">
+                <Wrench className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Dynamic Builder</span>
+                <span className="sm:hidden">Builder</span>
               </TabsTrigger>
             </TabsList>
 
@@ -205,62 +209,63 @@ export default function TemplatesPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg mb-3">Key Features:</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <Target className="h-5 w-5 text-primary mt-0.5" />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="font-semibold text-base sm:text-lg mb-2 sm:mb-3">Key Features:</h3>
+                      <div className="space-y-2 sm:space-y-3">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="font-medium">Personalized Content</p>
-                            <p className="text-sm text-gray-600">AI analyzes your experience and creates tailored content</p>
+                            <p className="font-medium text-sm sm:text-base">Personalized Content</p>
+                            <p className="text-xs sm:text-sm text-gray-600">AI analyzes your experience and creates tailored content</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-3">
-                          <Globe className="h-5 w-5 text-primary mt-0.5" />
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Globe className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="font-medium">SA Market Optimized</p>
-                            <p className="text-sm text-gray-600">Includes B-BBEE, NQF levels, and local requirements</p>
+                            <p className="font-medium text-sm sm:text-base">SA Market Optimized</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Includes B-BBEE, NQF levels, and local requirements</p>
                           </div>
                         </div>
-                        <div className="flex items-start gap-3">
-                          <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-primary mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="font-medium">ATS Optimized</p>
-                            <p className="text-sm text-gray-600">Keywords and formatting designed to pass ATS screening</p>
+                            <p className="font-medium text-sm sm:text-base">ATS Optimized</p>
+                            <p className="text-xs sm:text-sm text-gray-600">Keywords and formatting designed to pass ATS screening</p>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-gradient-to-br from-primary/10 to-blue-50 p-6 rounded-lg">
-                      <h4 className="font-semibold mb-3">How it works:</h4>
-                      <ol className="space-y-2 text-sm">
+                    <div className="bg-gradient-to-br from-primary/10 to-blue-50 p-4 sm:p-6 rounded-lg">
+                      <h4 className="font-semibold mb-2 sm:mb-3 text-sm sm:text-base">How it works:</h4>
+                      <ol className="space-y-2 text-xs sm:text-sm">
                         <li className="flex items-center gap-2">
-                          <span className="bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">1</span>
-                          Input your profile information
+                          <span className="bg-primary text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs flex-shrink-0">1</span>
+                          <span className="text-xs sm:text-sm">Input your profile information</span>
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">2</span>
-                          AI analyzes your background
+                          <span className="bg-primary text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs flex-shrink-0">2</span>
+                          <span className="text-xs sm:text-sm">AI analyzes your background</span>
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">3</span>
-                          Generate personalized template
+                          <span className="bg-primary text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs flex-shrink-0">3</span>
+                          <span className="text-xs sm:text-sm">Generate personalized template</span>
                         </li>
                         <li className="flex items-center gap-2">
-                          <span className="bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">4</span>
-                          Download and customize
+                          <span className="bg-primary text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-xs flex-shrink-0">4</span>
+                          <span className="text-xs sm:text-sm">Download and customize</span>
                         </li>
                       </ol>
                     </div>
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-primary hover:bg-primary/90" onClick={handleCreateAITemplate}>
-                      <Bot className="h-4 w-4 mr-2" />
-                      {hasPremium ? 'Create AI Template' : 'Upgrade for AI Templates'}
+                  <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <Button size="default" className="bg-primary hover:bg-primary/90 w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={handleCreateAITemplate}>
+                      <Bot className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                      <span className="hidden sm:inline">{hasPremium ? 'Create AI Template' : 'Upgrade for AI Templates'}</span>
+                      <span className="sm:hidden">{hasPremium ? 'Create AI' : 'Upgrade'}</span>
                     </Button>
-                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('ai-powered')}>
-                      <Eye className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="default" className="w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={() => handleViewExamples('ai-powered')}>
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       View Examples
                     </Button>
                   </div>
@@ -282,24 +287,25 @@ export default function TemplatesPage() {
                 </CardHeader>
                 <CardContent>
                   {categories?.categories?.industries && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
                       {categories.categories.industries.map((industry: string) => (
                         <Card key={industry} className="hover:shadow-md transition-shadow cursor-pointer border-2 hover:border-blue-400">
-                          <CardHeader className="pb-2">
-                            <CardTitle className="text-base">{industry}</CardTitle>
+                          <CardHeader className="pb-2 p-3 sm:p-4">
+                            <CardTitle className="text-sm sm:text-base">{industry}</CardTitle>
                           </CardHeader>
-                          <CardContent>
-                            <p className="text-sm text-gray-600 mb-3">
+                          <CardContent className="p-3 sm:p-4 pt-0">
+                            <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
                               Optimized for {industry.toLowerCase()} sector requirements
                             </p>
-                            <div className="flex gap-2">
-                              <Button size="sm" variant="outline" onClick={() => handleViewExamples(industry)}>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Button size="sm" variant="outline" className="text-xs sm:text-sm h-8 sm:h-9" onClick={() => handleViewExamples(industry)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 Preview
                               </Button>
-                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleCreateIndustryTemplate(industry)}>
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm h-8 sm:h-9" onClick={() => handleCreateIndustryTemplate(industry)}>
                                 <Download className="h-3 w-3 mr-1" />
-                                {hasPremium ? 'Use Template' : 'Upgrade to Use'}
+                                <span className="hidden sm:inline">{hasPremium ? 'Use Template' : 'Upgrade to Use'}</span>
+                                <span className="sm:hidden">{hasPremium ? 'Use' : 'Upgrade'}</span>
                               </Button>
                             </div>
                           </CardContent>
@@ -307,9 +313,9 @@ export default function TemplatesPage() {
                       ))}
                     </div>
                   )}
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-semibold mb-2">Industry Benefits:</h4>
-                    <ul className="text-sm space-y-1">
+                  <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2 text-sm sm:text-base">Industry Benefits:</h4>
+                    <ul className="text-xs sm:text-sm space-y-1">
                       <li>• Pre-loaded with industry-specific keywords</li>
                       <li>• Formatted according to sector standards</li>
                       <li>• Includes relevant skill categories</li>
@@ -373,13 +379,14 @@ export default function TemplatesPage() {
                       </ul>
                     </div>
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={handleCreateCoverLetter}>
-                      <FileText className="h-4 w-4 mr-2" />
-                      {hasPremium ? 'Create Cover Letter' : 'Upgrade for Cover Letters'}
+                  <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <Button size="default" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={handleCreateCoverLetter}>
+                      <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                      <span className="hidden sm:inline">{hasPremium ? 'Create Cover Letter' : 'Upgrade for Cover Letters'}</span>
+                      <span className="sm:hidden">{hasPremium ? 'Create Letter' : 'Upgrade'}</span>
                     </Button>
-                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('cover-letter')}>
-                      <Users className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="default" className="w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={() => handleViewExamples('cover-letter')}>
+                      <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Browse Examples
                     </Button>
                   </div>
@@ -458,13 +465,14 @@ export default function TemplatesPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-6 flex gap-4">
-                    <Button size="lg" className="bg-purple-600 hover:bg-purple-700" onClick={handleStartDynamicBuilder}>
-                      <Wrench className="h-4 w-4 mr-2" />
-                      {hasPremium ? 'Start Building' : 'Upgrade to Build'}
+                  <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    <Button size="default" className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={handleStartDynamicBuilder}>
+                      <Wrench className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                      <span className="hidden sm:inline">{hasPremium ? 'Start Building' : 'Upgrade to Build'}</span>
+                      <span className="sm:hidden">{hasPremium ? 'Start' : 'Upgrade'}</span>
                     </Button>
-                    <Button variant="outline" size="lg" onClick={() => handleViewExamples('dynamic-builder')}>
-                      <Eye className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="default" className="w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={() => handleViewExamples('dynamic-builder')}>
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Watch Demo
                     </Button>
                   </div>
@@ -475,20 +483,20 @@ export default function TemplatesPage() {
 
           {/* Call to Action */}
           <Card className="bg-gradient-to-r from-primary to-blue-600 text-white">
-            <CardContent className="p-8 text-center">
-              <h2 className="text-2xl font-bold mb-4">Ready to Create Your Perfect CV?</h2>
-              <p className="text-lg mb-6 opacity-90">
+            <CardContent className="p-4 sm:p-8 text-center">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Ready to Create Your Perfect CV?</h2>
+              <p className="text-base sm:text-lg mb-4 sm:mb-6 opacity-90 px-2">
                 Join thousands of South African job seekers who have improved their interview chances with our templates.
               </p>
               {user ? (
-                <Button size="lg" variant="secondary" className="text-primary font-semibold">
-                  <Sparkles className="h-4 w-4 mr-2" />
+                <Button size="default" variant="secondary" className="text-primary font-semibold w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11">
+                  <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                   Start Creating Templates
                 </Button>
               ) : (
                 <Link href="/auth">
-                  <Button size="lg" variant="secondary" className="text-primary font-semibold">
-                    <Users className="h-4 w-4 mr-2" />
+                  <Button size="default" variant="secondary" className="text-primary font-semibold w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11">
+                    <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                     Sign Up to Get Started
                   </Button>
                 </Link>
