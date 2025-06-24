@@ -30,7 +30,7 @@ interface AdminStats {
   monthlyRevenue: number;
 }
 
-interface User {
+interface AdminUser {
   id: number;
   email: string;
   name: string;
@@ -40,475 +40,381 @@ interface User {
   isPremium: boolean;
 }
 
-interface CV {
+interface AdminCV {
   id: number;
   fileName: string;
   userId: number;
   userName: string;
-  uploadedAt: string;
-  analysisScore?: number;
+  userEmail: string;
+  createdAt: string;
+  analysisStatus: string;
 }
 
-interface JobPosting {
-  id: number;
-  title: string;
-  company: string;
-  location: string;
-  salary?: string;
-  postedAt: string;
-  status: string;
-  employerId: number;
-}
-
-export default function AdminDashboard() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [selectedTab, setSelectedTab] = useState('overview');
-  const { user, loading: authLoading } = useAuth();
+const AdminDashboard: React.FC = () => {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [adminUser, setAdminUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Redirect if not admin
+  // Check admin authentication on component mount
   useEffect(() => {
-    if (!authLoading && (!user || !user.isAdmin)) {
-      setLocation('/');
+    const checkAdminAuth = async () => {
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        setLocation('/admin/login');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/admin/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAdminUser(data.user);
+        } else {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_user');
+          setLocation('/admin/login');
+        }
+      } catch (error) {
+        console.error('Admin auth check failed:', error);
+        setLocation('/admin/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAdminAuth();
+  }, [setLocation]);
+  
+  // Custom query function for admin requests
+  const adminQuery = async (url: string) => {
+    const token = localStorage.getItem('admin_token');
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        setLocation('/admin/login');
+        throw new Error('Authentication expired');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  }, [user, authLoading, setLocation]);
-
-  // Show loading while checking auth
-  if (authLoading || !user || !user.isAdmin) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fetch admin stats
-  const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
+    
+    return response.json();
+  };
+  
+  // Fetch admin dashboard stats
+  const { data: statsData, isLoading: isStatsLoading } = useQuery<AdminStats>({
     queryKey: ['/api/admin/stats'],
-    retry: false,
+    queryFn: () => adminQuery('/api/admin/stats'),
+    enabled: !!adminUser,
   });
-
-  // Fetch users
-  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+  
+  // Fetch users for management
+  const { data: usersData, isLoading: isUsersLoading } = useQuery<AdminUser[]>({
     queryKey: ['/api/admin/users'],
-    retry: false,
+    queryFn: () => adminQuery('/api/admin/users'),
+    enabled: !!adminUser && activeTab === 'users',
   });
-
-  // Fetch CVs
-  const { data: cvs = [], isLoading: cvsLoading } = useQuery<CV[]>({
+  
+  // Fetch CVs for management
+  const { data: cvsData, isLoading: isCvsLoading } = useQuery<AdminCV[]>({
     queryKey: ['/api/admin/cvs'],
-    retry: false,
+    queryFn: () => adminQuery('/api/admin/cvs'),
+    enabled: !!adminUser && activeTab === 'cvs',
   });
 
-  // Fetch job postings
-  const { data: jobPostings = [], isLoading: jobsLoading } = useQuery<JobPosting[]>({
-    queryKey: ['/api/admin/job-postings'],
-    retry: false,
-  });
-
-  // Delete user mutation
-  const deleteUserMutation = useMutation({
-    mutationFn: async (userId: number) => {
-      return await apiRequest(`/api/admin/users/${userId}`, 'DELETE');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
-      toast({
-        title: "Success",
-        description: "User deleted successfully",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete user",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Toggle user premium mutation
-  const togglePremiumMutation = useMutation({
-    mutationFn: async ({ userId, isPremium }: { userId: number; isPremium: boolean }) => {
-      return await apiRequest(`/api/admin/users/${userId}/premium`, 'PATCH', { isPremium });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({
-        title: "Success",
-        description: "User premium status updated",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update user premium status",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-ZA', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    setLocation('/admin/login');
+    toast({
+      title: 'Logged out',
+      description: 'You have been logged out successfully',
     });
   };
 
-  if (statsLoading) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading admin dashboard...</p>
         </div>
       </div>
     );
   }
 
+  if (!adminUser) {
+    return null;
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage the Hire Mzansi platform</p>
-        </div>
-        <Badge className="bg-red-500 hover:bg-red-600 text-white">
-          <Shield className="h-4 w-4 mr-2" />
-          Super Admin
-        </Badge>
-      </div>
+    <>
+      <Helmet>
+        <title>Admin Dashboard | Hire Mzansi</title>
+        <meta name="description" content="Admin dashboard for Hire Mzansi platform management" />
+      </Helmet>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="cvs">CVs</TabsTrigger>
-          <TabsTrigger value="jobs">Job Postings</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6 mt-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-l-4 border-l-brand-blue">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-brand-blue" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats?.premiumUsers || 0} premium users
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-brand-green">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total CVs</CardTitle>
-                <FileText className="h-4 w-4 text-brand-green" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalCVs || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  Uploaded by users
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-brand-orange">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Job Postings</CardTitle>
-                <Briefcase className="h-4 w-4 text-brand-orange" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalJobPostings || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  From {stats?.activeRecruiters || 0} recruiters
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-purple-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Matches</CardTitle>
-                <TrendingUp className="h-4 w-4 text-purple-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalMatches || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  AI-powered matches
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-cyan-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Recruiters</CardTitle>
-                <Building className="h-4 w-4 text-cyan-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.activeRecruiters || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  Posting jobs
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-pink-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Platform Status</CardTitle>
-                <Activity className="h-4 w-4 text-pink-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">Online</div>
-                <p className="text-xs text-muted-foreground">
-                  All systems operational
-                </p>
-              </CardContent>
-            </Card>
+      <div className="container mx-auto p-4">
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <p className="text-muted-foreground">Manage your Hire Mzansi platform</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center text-sm text-muted-foreground">
+                Logged in as <span className="font-semibold ml-1">{adminUser.email}</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
-        </TabsContent>
 
-        <TabsContent value="users" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-brand-blue" />
-                User Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {usersLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue"></div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {users.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h3 className="font-semibold">{user.name}</h3>
-                            <p className="text-sm text-gray-600">{user.email}</p>
-                          </div>
-                          <Badge variant={user.role === 'admin' ? 'destructive' : user.isPremium ? 'default' : 'secondary'}>
-                            {user.role === 'admin' ? 'Admin' : user.isPremium ? 'Premium' : 'Free'}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            Joined: {formatDate(user.createdAt)}
-                          </span>
-                          {user.lastLogin && (
-                            <span className="flex items-center gap-1">
-                              <Activity className="h-3 w-3" />
-                              Last login: {formatDate(user.lastLogin)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => togglePremiumMutation.mutate({ 
-                            userId: user.id, 
-                            isPremium: !user.isPremium 
-                          })}
-                          disabled={user.role === 'admin'}
-                        >
-                          <UserCheck className="h-4 w-4 mr-1" />
-                          {user.isPremium ? 'Remove Premium' : 'Make Premium'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deleteUserMutation.mutate(user.id)}
-                          disabled={user.role === 'admin' || deleteUserMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="cvs">CVs</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-4">
+              {isStatsLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  {[...Array(6)].map((_, i) => (
+                    <Card key={i}>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                        <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-8 bg-gray-200 rounded w-16 animate-pulse mb-2"></div>
+                        <div className="h-3 bg-gray-200 rounded w-32 animate-pulse"></div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="cvs" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-brand-green" />
-                CV Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {cvsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-green"></div>
-                </div>
               ) : (
-                <div className="space-y-4">
-                  {cvs.map((cv) => (
-                    <div key={cv.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h3 className="font-semibold">{cv.fileName}</h3>
-                            <p className="text-sm text-gray-600">Uploaded by: {cv.userName}</p>
-                          </div>
-                          {cv.analysisScore && (
-                            <Badge variant="outline">
-                              Score: {cv.analysisScore}%
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
-                          <Calendar className="h-3 w-3" />
-                          Uploaded: {formatDate(cv.uploadedAt)}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{statsData?.totalUsers || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        Platform registered users
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{statsData?.activeUsers || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        Users active this month
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total CVs</CardTitle>
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{statsData?.totalCVs || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        CVs uploaded and analyzed
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Premium Users</CardTitle>
+                      <Shield className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{statsData?.premiumUsers || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        Active premium subscriptions
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">R{statsData?.totalRevenue || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        All-time revenue
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">R{statsData?.monthlyRevenue || 0}</div>
+                      <p className="text-xs text-muted-foreground">
+                        This month's revenue
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="jobs" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-brand-orange" />
-                Job Posting Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {jobsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-orange"></div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {jobPostings.map((job) => (
-                    <div key={job.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h3 className="font-semibold">{job.title}</h3>
-                            <p className="text-sm text-gray-600">{job.company} - {job.location}</p>
-                          </div>
-                          <Badge variant={job.status === 'active' ? 'default' : 'secondary'}>
-                            {job.status}
-                          </Badge>
+            <TabsContent value="users" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>User Management</CardTitle>
+                  <CardDescription>Manage platform users and their access levels</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isUsersLoading ? (
+                    <div className="space-y-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-4">
+                          <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
                         </div>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            Posted: {formatDate(job.postedAt)}
-                          </span>
-                          {job.salary && (
-                            <span>Salary: {job.salary}</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View Details
-                        </Button>
-                        <Button size="sm" variant="destructive">
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Remove
-                        </Button>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                  ) : (
+                    <div className="space-y-2">
+                      {usersData?.length ? (
+                        usersData.map((user) => (
+                          <div key={user.id} className="flex items-center justify-between p-3 border rounded">
+                            <div className="flex items-center space-x-3">
+                              <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
+                              <Badge variant={user.isPremium ? "default" : "secondary"}>
+                                {user.isPremium ? "Premium" : "Free"}
+                              </Badge>
+                              <Badge variant="outline">{user.role}</Badge>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" disabled={user.role === 'admin'}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center text-muted-foreground py-4">No users found</p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-purple-500" />
-                Platform Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">General Settings</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="platform-name">Platform Name</Label>
-                    <Input id="platform-name" defaultValue="Hire Mzansi" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="support-email">Support Email</Label>
-                    <Input id="support-email" defaultValue="support@hiremzansi.co.za" />
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">AI Settings</h3>
-                  <div className="space-y-2">
-                    <Label htmlFor="match-threshold">Match Threshold (%)</Label>
-                    <Input id="match-threshold" type="number" defaultValue="75" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="analysis-model">Analysis Model</Label>
-                    <Select defaultValue="gpt-4">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="gpt-4">GPT-4</SelectItem>
-                        <SelectItem value="gpt-3.5">GPT-3.5</SelectItem>
-                        <SelectItem value="local">Local Model</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="pt-6 border-t">
-                <Button className="bg-brand-blue hover:bg-brand-blue/90">
-                  Save Settings
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+            <TabsContent value="cvs" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>CV Management</CardTitle>
+                  <CardDescription>View and manage uploaded CVs</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isCvsLoading ? (
+                    <div className="space-y-2">
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} className="flex items-center space-x-4">
+                          <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {cvsData?.length ? (
+                        cvsData.map((cv) => (
+                          <div key={cv.id} className="flex items-center justify-between p-3 border rounded">
+                            <div className="flex items-center space-x-3">
+                              <FileText className="h-5 w-5 text-muted-foreground" />
+                              <div>
+                                <p className="font-medium">{cv.fileName}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {cv.userEmail} • {new Date(cv.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <Badge variant="outline">{cv.analysisStatus}</Badge>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-center text-muted-foreground py-4">No CVs found</p>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Platform Settings</CardTitle>
+                  <CardDescription>Configure platform-wide settings and preferences</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Settings management is currently under development. Contact the development team for configuration changes.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </>
   );
-}
+};
+
+export default AdminDashboard;
