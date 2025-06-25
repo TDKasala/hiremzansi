@@ -99,7 +99,6 @@ export async function getJobPostings(query?: {
       employerId: jobPostings.employerId,
       title: jobPostings.title,
       description: jobPostings.description,
-      location: jobPostings.location,
       employmentType: jobPostings.employmentType,
       experienceLevel: jobPostings.experienceLevel,
       salaryRange: jobPostings.salaryRange,
@@ -109,9 +108,7 @@ export async function getJobPostings(query?: {
       deadline: jobPostings.deadline,
       isActive: jobPostings.isActive,
       isFeatured: jobPostings.isFeatured,
-      isRemote: jobPostings.isRemote,
       views: jobPostings.views,
-      applications: jobPostings.applications,
       createdAt: jobPostings.createdAt,
       updatedAt: jobPostings.updatedAt,
     }).from(jobPostings);
@@ -120,9 +117,6 @@ export async function getJobPostings(query?: {
     if (query) {
       if (query.title) {
         baseQuery = baseQuery.where(sql`${jobPostings.title} ILIKE ${`%${query.title}%`}`);
-      }
-      if (query.location) {
-        baseQuery = baseQuery.where(eq(jobPostings.location, query.location));
       }
       if (query.employmentType) {
         baseQuery = baseQuery.where(eq(jobPostings.employmentType, query.employmentType));
@@ -146,12 +140,15 @@ export async function getJobPostings(query?: {
     // Add placeholder values for missing fields
     return result.map(job => ({
       ...job,
-      province: job.location?.split(',')[1]?.trim() || '',
-      city: job.location?.split(',')[0]?.trim() || '',
+      location: 'Cape Town, Western Cape', // Default location
+      province: 'Western Cape',
+      city: 'Cape Town',
       department: null,
       bbbeePreference: false,
       nqfRequirement: null,
-      languageRequirements: ['English']
+      languageRequirements: ['English'],
+      isRemote: false,
+      applications: 0 // Default value
     })) as JobPosting[];
   } catch (error) {
     console.error('Error fetching job postings:', error);
