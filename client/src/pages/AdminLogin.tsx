@@ -56,23 +56,11 @@ export default function AdminLogin() {
           description: `Welcome back, ${data.user.name || data.user.email}!`,
         });
 
-        // Multiple redirection strategies for maximum reliability
-        console.log('Admin login successful, attempting redirection...');
+        // Immediate redirection without any delays
+        console.log('Admin login successful, redirecting immediately...');
         
-        // Strategy 1: Use wouter navigation
-        setLocation("/admin/dashboard");
-        
-        // Strategy 2: Force page navigation as backup
-        setTimeout(() => {
-          console.log('Backup redirection triggered');
-          window.location.href = "/admin/dashboard";
-        }, 100);
-        
-        // Strategy 3: Force replace as final backup
-        setTimeout(() => {
-          console.log('Final redirection fallback');
-          window.location.replace("/admin/dashboard");
-        }, 500);
+        // Use only window.location.href for immediate navigation
+        window.location.href = "/admin/dashboard";
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Login failed");
