@@ -94,24 +94,7 @@ export async function getJobPostings(query?: {
   limit?: number;
 }): Promise<JobPosting[]> {
   try {
-    let baseQuery = db.select({
-      id: jobPostings.id,
-      employerId: jobPostings.employerId,
-      title: jobPostings.title,
-      description: jobPostings.description,
-      employmentType: jobPostings.employmentType,
-      experienceLevel: jobPostings.experienceLevel,
-      salaryRange: jobPostings.salaryRange,
-      requiredSkills: jobPostings.requiredSkills,
-      preferredSkills: jobPostings.preferredSkills,
-      industry: jobPostings.industry,
-      deadline: jobPostings.deadline,
-      isActive: jobPostings.isActive,
-      isFeatured: jobPostings.isFeatured,
-      views: jobPostings.views,
-      createdAt: jobPostings.createdAt,
-      updatedAt: jobPostings.updatedAt,
-    }).from(jobPostings);
+    let baseQuery = db.select().from(jobPostings);
 
     // Apply filters
     if (query) {
@@ -167,26 +150,25 @@ export async function getJobPostingsByEmployer(employerId: number): Promise<JobP
 }
 
 export async function createJobPosting(jobData: any): Promise<JobPosting> {
-  // Only insert fields that exist in the actual database schema
+  // Insert only fields that exist in database schema
   const cleanJobData = {
     employerId: jobData.employerId,
     title: jobData.title,
     description: jobData.description,
-    employmentType: jobData.employmentType,
-    experienceLevel: jobData.experienceLevel,
-    salaryRange: jobData.salaryRange,
-    requiredSkills: jobData.requiredSkills,
-    preferredSkills: jobData.preferredSkills,
-    industry: jobData.industry,
-    deadline: jobData.deadline,
-    isActive: jobData.isActive,
-    isFeatured: jobData.isFeatured,
-    views: jobData.views
+    employmentType: jobData.employmentType || 'Full-time',
+    experienceLevel: jobData.experienceLevel || 'Mid-level',
+    salaryRange: jobData.salaryRange || '40000-60000',
+    requiredSkills: jobData.requiredSkills || [],
+    preferredSkills: jobData.preferredSkills || [],
+    industry: jobData.industry || 'Technology',
+    isActive: true,
+    isFeatured: false,
+    views: 0
   };
   
   const [job] = await db.insert(jobPostings).values(cleanJobData).returning();
   
-  // Add frontend-required fields that don't exist in database
+  // Return with frontend-expected fields
   return {
     ...job,
     location: 'Cape Town, Western Cape',

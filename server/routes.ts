@@ -864,21 +864,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employerId: employer.id
       };
       
-      // Validate and prepare data for database insertion (matching actual schema)
+      // Prepare data with only required fields
       const validatedData = {
         employerId: employer.id,
         title: req.body.title,
         description: req.body.description,
-        employmentType: req.body.employmentType || 'Full-time',
-        experienceLevel: req.body.experienceLevel || 'Mid-level',
-        salaryRange: req.body.salaryRange || '40000-60000',
-        requiredSkills: req.body.requiredSkills || [],
-        preferredSkills: req.body.preferredSkills || [],
-        industry: req.body.industry || 'Technology',
-        deadline: req.body.deadline ? new Date(req.body.deadline) : null,
-        isActive: true,
-        isFeatured: false,
-        views: 0
+        employmentType: req.body.employmentType,
+        experienceLevel: req.body.experienceLevel,
+        salaryRange: req.body.salaryRange,
+        requiredSkills: req.body.requiredSkills,
+        preferredSkills: req.body.preferredSkills,
+        industry: req.body.industry
       };
       
       // Create job posting
@@ -3549,9 +3545,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ];
         
         return res.json({
-          matches: sampleRecruiterMatches,
-          isDemo: true,
-          message: "Demo data - real matches will appear here once you have active job postings"
+          matches: [],
+          message: "No job matches available. Create job postings to see candidate matches."
         });
       }
       

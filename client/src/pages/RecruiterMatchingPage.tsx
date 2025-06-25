@@ -165,11 +165,7 @@ export default function RecruiterMatchingPage() {
             <p className="text-gray-600">
               AI-powered matches for your job postings
             </p>
-            {isDemo && (
-              <Badge variant="outline" className="mt-2">
-                Demo Mode - Real matches will appear with active job postings
-              </Badge>
-            )}
+
           </div>
 
           {stats && (
