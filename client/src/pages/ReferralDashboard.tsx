@@ -373,10 +373,10 @@ export default function ReferralDashboard() {
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">Reward Structure:</h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• 1 signup = 2 Free CV Analyses</li>
-              <li>• 3 signups = Essential Pack (R49 value)</li>
-              <li>• 5 signups = Professional Month (R99 value)</li>
-              <li>• 10 signups = 20% Discount on Annual Plans</li>
+              <li>• 1 signup = 2 Free CV Analyses (R10 value)</li>
+              <li>• 3 signups = Essential Pack (R25 value)</li>
+              <li>• 5 signups = Professional Month (R50 value)</li>
+              <li>• 10 signups = 20% Annual Discount (R100 savings)</li>
             </ul>
           </div>
         </CardContent>

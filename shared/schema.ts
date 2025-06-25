@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number"),
   phoneVerified: boolean("phone_verified").default(false),
   isTemporary: boolean("is_temporary").default(false),
+  referralCode: text("referral_code"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

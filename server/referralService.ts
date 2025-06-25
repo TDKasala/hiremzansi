@@ -245,38 +245,57 @@ export class ReferralService {
    * Get referral statistics for a user
    */
   async getReferralStats(userId: number) {
-    const [invitedCount] = await db
-      .select({ count: count() })
-      .from(referrals)
-      .where(eq(referrals.referrerId, userId));
-    
-    const [registeredCount] = await db
-      .select({ count: count() })
-      .from(referrals)
-      .where(and(
-        eq(referrals.referrerId, userId),
-        eq(referrals.status, 'registered')
-      ));
-    
-    const [premiumCount] = await db
-      .select({ count: count() })
-      .from(referrals)
-      .where(and(
-        eq(referrals.referrerId, userId),
-        eq(referrals.status, 'premium')
-      ));
-    
-    const [rewardsEarned] = await db
-      .select({ count: count() })
-      .from(referralRewards)
-      .where(eq(referralRewards.userId, userId));
-    
-    return {
-      invited: invitedCount.count,
-      registered: registeredCount.count,
-      premiumConversions: premiumCount.count,
-      freeAnalysisEarned: rewardsEarned.count
-    };
+    if (!userId || isNaN(userId)) {
+      return {
+        invited: 0,
+        registered: 0,
+        premiumConversions: 0,
+        freeAnalysisEarned: 0
+      };
+    }
+
+    try {
+      const [invitedCount] = await db
+        .select({ count: count() })
+        .from(referrals)
+        .where(eq(referrals.referrerId, userId));
+      
+      const [registeredCount] = await db
+        .select({ count: count() })
+        .from(referrals)
+        .where(and(
+          eq(referrals.referrerId, userId),
+          eq(referrals.status, 'registered')
+        ));
+      
+      const [premiumCount] = await db
+        .select({ count: count() })
+        .from(referrals)
+        .where(and(
+          eq(referrals.referrerId, userId),
+          eq(referrals.status, 'premium')
+        ));
+      
+      const [rewardsEarned] = await db
+        .select({ count: count() })
+        .from(referralRewards)
+        .where(eq(referralRewards.userId, userId));
+      
+      return {
+        invited: invitedCount?.count || 0,
+        registered: registeredCount?.count || 0,
+        premiumConversions: premiumCount?.count || 0,
+        freeAnalysisEarned: rewardsEarned?.count || 0
+      };
+    } catch (error) {
+      console.error('Error getting referral stats:', error);
+      return {
+        invited: 0,
+        registered: 0,
+        premiumConversions: 0,
+        freeAnalysisEarned: 0
+      };
+    }
   }
 
   /**

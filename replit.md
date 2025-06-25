@@ -121,7 +121,7 @@ The deployment strategy prioritizes Replit for development and testing, with Ver
 - June 25, 2025: DATABASE SCHEMA ALIGNMENT - Fixed job posting database schema mismatches by aligning createJobPosting function with actual database structure. Employers can now manually post jobs through authenticated API endpoints using admin credentials.
 - June 25, 2025: PRODUCTION DEPLOYMENT READY - Completed full demo data removal, debugged and fixed job posting system with proper database schema alignment. System now production-ready with working manual job posting via authenticated API endpoints. Removed all demo content from recruiter matching, blog pages, and test components. System clean and ready for production deployment.
 - June 25, 2025: PREMIUM ATS KEYWORDS SERVICE - Implemented premium ATS keywords analysis tool at /tools/ats-keywords using xAI Grok-2-1212 model. Service analyzes CV content against job descriptions to identify missing keywords, provides South African context optimization, and generates actionable recommendations for ATS compatibility improvement.
-- June 25, 2025: REFERRAL PRICING ALIGNMENT - Fixed referral reward values to match current launch pricing (50% discount). Adjusted all reward tiers to reflect actual service costs: Essential Pack R25, Professional R50/month, Annual discount R100 savings.
+- June 25, 2025: REFERRAL PRICING ALIGNMENT - Fixed referral reward values to match current launch pricing (50% discount). Updated both backend API routes and frontend displays to reflect actual service costs: Essential Pack R25, Professional R50/month, Annual discount R100 savings. All milestone values now accurate. Fixed database schema issues and referral code generation functionality.
 
 ## User Preferences
 

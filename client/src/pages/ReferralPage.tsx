@@ -70,11 +70,13 @@ export default function ReferralPage() {
     }
   }, [referralData]);
   
-  // Referral rewards explanation
+  // Referral rewards explanation - aligned with current pricing
   const referralRewards = [
-    { type: "1 Friend Signs Up", reward: "Free CV Template Access" },
-    { type: "3 Friends Sign Up", reward: "Free CV Deep Analysis (R30 value)" },
-    { type: "5 Friends Sign Up", reward: "1-Month Premium Subscription" }
+    { type: "1 Friend Signs Up", reward: "2 Free CV Analyses (R10 value)" },
+    { type: "3 Friends Sign Up", reward: "Free Essential Pack (R25 value)" },
+    { type: "5 Friends Sign Up", reward: "1-Month Professional Plan (R50 value)" },
+    { type: "2 Premium Conversions", reward: "Bonus Professional Month (R50 value)" },
+    { type: "10 Friends Sign Up", reward: "20% Annual Discount (R100 savings)" }
   ];
 
   const displayStats = referralStats || {
