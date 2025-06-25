@@ -22,7 +22,6 @@ export default function AboutPage() {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://hiremzansi.co.za/about" />
       </Helmet>
-      
       <div className="bg-secondary py-16 text-white">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">About Hire Mzansi</h1>
@@ -31,7 +30,6 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
-      
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
@@ -101,9 +99,7 @@ export default function AboutPage() {
                     <p>
                       With over 5 years of experience in software development and AI technologies, Denis combines technical expertise with a deep understanding of South Africa's unique job market challenges.
                     </p>
-                    <p>
-                      Prior to Hire Mzansi, Denis worked as a solutions architect developing enterprise applications for several South African companies. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.
-                    </p>
+                    <p>Prior to Hire Mzansi, Denis worked as an AWS solutions architect developing enterprise applications. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.</p>
                     <p>
                       Denis holds a BSc in Computer Science from University of Cape Town and is an active advocate for technology education initiatives across South Africa.
                     </p>
@@ -134,7 +130,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-      
       <CTASection />
     </>
   );
