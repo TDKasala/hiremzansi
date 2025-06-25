@@ -344,6 +344,52 @@ export class ReferralService {
   /**
    * Spend user credits
    */
+  /**
+   * Award manual reward by admin
+   */
+  async awardManualReward(userId: number, rewardType: string, rewardValue: number, description: string): Promise<void> {
+    try {
+      // Create reward record
+      await db.insert(referralRewards).values({
+        userId,
+        rewardType,
+        rewardValue,
+        rewardAmount: rewardValue,
+        description,
+        isRedeemed: false,
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year expiry
+      });
+      
+      // Update user credits based on reward type
+      const credits = await this.getUserCredits(userId);
+      let updateData = {};
+      
+      switch (rewardType) {
+        case 'free_analysis':
+          updateData = { freeAnalysisCredits: (credits.freeAnalysisCredits || 0) + rewardValue };
+          break;
+        case 'scan_credits':
+          updateData = { scanCredits: (credits.scanCredits || 0) + rewardValue };
+          break;
+        case 'premium_month':
+          updateData = { premiumMonths: (credits.premiumMonths || 0) + rewardValue };
+          break;
+        case 'discount_credit':
+          updateData = { discountCredits: (credits.discountCredits || 0) + rewardValue };
+          break;
+      }
+      
+      if (Object.keys(updateData).length > 0) {
+        await db.update(userCredits)
+          .set(updateData)
+          .where(eq(userCredits.userId, userId));
+      }
+    } catch (error) {
+      console.error('Error awarding manual reward:', error);
+      throw error;
+    }
+  }
+
   async spendCredits(userId: number, type: 'free_analysis' | 'scan_credits' | 'professional_month' | 'discount_credit', amount: number = 1): Promise<boolean> {
     const credits = await this.getUserCredits(userId);
     

@@ -61,6 +61,9 @@ import JobRecommendationsPage from "@/pages/JobRecommendationsPage";
 import BlogPost1 from "@/pages/BlogPost1";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminUsers from "@/pages/AdminUsers";
+import AdminJobsPage from "@/pages/AdminJobsPage";
+import AdminReferralsPage from "@/pages/AdminReferralsPage";
 // import WhatsAppAnalysis from "./pages/WhatsAppAnalysis";
 import NotFound from "@/pages/not-found";
 import NotFoundPage from "@/pages/NotFoundPage";
@@ -190,6 +193,9 @@ function App() {
                 <Route path="/admin/login" component={AdminLogin} />
                 <Route path="/admin/dashboard" component={AdminDashboard} />
                 <Route path="/admin" component={AdminDashboard} />
+                <Route path="/admin/users" component={AdminUsers} />
+                <Route path="/admin/jobs" component={AdminJobsPage} />
+                <Route path="/admin/referrals" component={AdminReferralsPage} />
                 <Route path="/skills-quiz" component={SkillsQuizPage} />
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
