@@ -46,8 +46,9 @@ export default function AdminLogin() {
           return;
         }
 
-        // Store token and user data
+        // Store token and user data with multiple keys for compatibility
         localStorage.setItem("admin_token", data.token);
+        localStorage.setItem("adminToken", data.token);
         localStorage.setItem("admin_user", JSON.stringify(data.user));
         
         toast({
@@ -55,8 +56,23 @@ export default function AdminLogin() {
           description: `Welcome back, ${data.user.name || data.user.email}!`,
         });
 
-        // Force redirect to admin dashboard with immediate redirect
-        window.location.replace("/admin/dashboard");
+        // Multiple redirection strategies for maximum reliability
+        console.log('Admin login successful, attempting redirection...');
+        
+        // Strategy 1: Use wouter navigation
+        setLocation("/admin/dashboard");
+        
+        // Strategy 2: Force page navigation as backup
+        setTimeout(() => {
+          console.log('Backup redirection triggered');
+          window.location.href = "/admin/dashboard";
+        }, 100);
+        
+        // Strategy 3: Force replace as final backup
+        setTimeout(() => {
+          console.log('Final redirection fallback');
+          window.location.replace("/admin/dashboard");
+        }, 500);
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Login failed");

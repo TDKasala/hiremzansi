@@ -59,8 +59,6 @@ import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 import JobSeekerMatchesPage from "@/pages/JobSeekerMatchesPage";
 import JobRecommendationsPage from "@/pages/JobRecommendationsPage";
 import BlogPost1 from "@/pages/BlogPost1";
-import AdminLogin from "@/pages/AdminLogin";
-import AdminDashboard from "@/pages/AdminDashboard";
 import AdminUsers from "@/pages/AdminUsers";
 import AdminJobsPage from "@/pages/AdminJobsPage";
 import AdminReferralsPage from "@/pages/AdminReferralsPage";
@@ -98,6 +96,10 @@ import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
 import ResumeBuilder from "@/pages/ResumeBuilder";
 import JobsPage from "@/pages/JobsPage";
 import SkillsQuizPage from "@/pages/SkillsQuizPage";
+
+// Admin components
+import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
 
 function App() {
   return (
@@ -197,6 +199,7 @@ function App() {
                 <Route path="/admin/jobs" component={AdminJobsPage} />
                 <Route path="/admin/referrals" component={AdminReferralsPage} />
                 <Route path="/skills-quiz" component={SkillsQuizPage} />
+                
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>
