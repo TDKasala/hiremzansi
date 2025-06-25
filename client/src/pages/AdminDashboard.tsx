@@ -187,9 +187,7 @@ const AdminDashboard: React.FC = () => {
     
     if (!response.ok) {
       if (response.status === 401) {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_user');
-        setLocation('/admin/login');
+        console.log('AdminQuery: 401 detected, but not redirecting to avoid conflicts');
         throw new Error('Authentication expired');
       }
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -203,6 +201,7 @@ const AdminDashboard: React.FC = () => {
     queryKey: ['/api/admin/stats'],
     queryFn: () => adminQuery('/api/admin/stats'),
     enabled: !!adminUser,
+    retry: false, // Don't retry failed requests
   });
   
   // Fetch users for management
@@ -210,6 +209,7 @@ const AdminDashboard: React.FC = () => {
     queryKey: ['/api/admin/users'],
     queryFn: () => adminQuery('/api/admin/users'),
     enabled: !!adminUser && activeTab === 'users',
+    retry: false, // Don't retry failed requests
   });
   
   // Fetch CVs for management
@@ -217,6 +217,7 @@ const AdminDashboard: React.FC = () => {
     queryKey: ['/api/admin/cvs'],
     queryFn: () => adminQuery('/api/admin/cvs'),
     enabled: !!adminUser && activeTab === 'cvs',
+    retry: false, // Don't retry failed requests
   });
 
   // Fetch system health
