@@ -221,8 +221,11 @@ export default function JobsPage() {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
-                  <p className="text-gray-600">Try adjusting your search filters or check back later for new opportunities.</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs available</h3>
+                  <p className="text-gray-600">
+                    No job postings are currently available. Employers can post jobs using our API - 
+                    see the POST_JOBS_GUIDE.md for implementation details.
+                  </p>
                 </CardContent>
               </Card>
             ) : (

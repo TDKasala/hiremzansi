@@ -93,177 +93,71 @@ export async function getJobPostings(query?: {
   employmentType?: string;
   limit?: number;
 }): Promise<JobPosting[]> {
-  // Return sample data until database schema is updated
-  const sampleJobs = [
-    {
-      id: 1,
-      employerId: 1,
-      title: "Senior Full Stack Developer",
-      description: "Join our dynamic team building cutting-edge web applications for South African businesses. We're looking for an experienced developer who can work with modern technologies and contribute to our growing platform.",
-      location: "Cape Town",
-      province: "Western Cape",
-      city: "Cape Town",
-      employmentType: "Full-time",
-      experienceLevel: "Senior",
-      salaryRange: "45000-65000",
-      requiredSkills: ["JavaScript", "React", "Node.js", "SQL", "Git"],
-      preferredSkills: ["TypeScript", "AWS", "Docker", "MongoDB"],
-      industry: "Technology",
-      department: "Engineering",
-      bbbeePreference: false,
-      nqfRequirement: 7,
-      languageRequirements: ["English"],
-      deadline: new Date("2024-07-15T00:00:00.000Z"),
-      isActive: true,
-      isFeatured: true,
-      isRemote: false,
-      views: 156,
-      applications: 23,
-      createdAt: new Date("2024-06-15T10:30:00.000Z"),
-      updatedAt: new Date("2024-06-15T10:30:00.000Z")
-    },
-    {
-      id: 2,
-      employerId: 2,
-      title: "Junior Web Developer",
-      description: "Great opportunity for a junior developer to grow their skills in a supportive environment. You'll work on exciting projects while learning from experienced mentors.",
-      location: "Johannesburg",
-      province: "Gauteng",
-      city: "Johannesburg",
-      employmentType: "Full-time",
-      experienceLevel: "Junior",
-      salaryRange: "25000-35000",
-      requiredSkills: ["JavaScript", "HTML", "CSS", "Python"],
-      preferredSkills: ["React", "Django", "PostgreSQL"],
-      industry: "Technology",
-      department: "Development",
-      bbbeePreference: false,
-      nqfRequirement: 6,
-      languageRequirements: ["English"],
-      deadline: new Date("2024-07-20T00:00:00.000Z"),
-      isActive: true,
-      isFeatured: false,
-      isRemote: true,
-      views: 89,
-      applications: 15,
-      createdAt: new Date("2024-06-18T14:20:00.000Z"),
-      updatedAt: new Date("2024-06-18T14:20:00.000Z")
-    },
-    {
-      id: 3,
-      employerId: 3,
-      title: "Project Manager - Digital Transformation",
-      description: "Lead digital transformation initiatives for government sector projects. Must have experience with public sector requirements and B-BBEE compliance.",
-      location: "Pretoria",
-      province: "Gauteng",
-      city: "Pretoria",
-      employmentType: "Contract",
-      experienceLevel: "Senior",
-      salaryRange: "55000-75000",
-      requiredSkills: ["Project Management", "Agile", "Digital Transformation", "Government Sector"],
-      preferredSkills: ["PMP", "PRINCE2", "Change Management"],
-      industry: "Government",
-      department: "Operations",
-      bbbeePreference: true,
-      nqfRequirement: 8,
-      languageRequirements: ["English", "Afrikaans"],
-      deadline: new Date("2024-08-01T00:00:00.000Z"),
-      isActive: true,
-      isFeatured: true,
-      isRemote: false,
-      views: 78,
-      applications: 12,
-      createdAt: new Date("2024-06-20T09:15:00.000Z"),
-      updatedAt: new Date("2024-06-20T09:15:00.000Z")
-    },
-    {
-      id: 4,
-      employerId: 4,
-      title: "Marketing Specialist",
-      description: "Drive marketing campaigns for South African retail brand. Focus on digital marketing strategies and B-BBEE supplier development.",
-      location: "Durban",
-      province: "KwaZulu-Natal",
-      city: "Durban",
-      employmentType: "Full-time",
-      experienceLevel: "Mid-level",
-      salaryRange: "35000-45000",
-      requiredSkills: ["Digital Marketing", "SEO", "Social Media", "Analytics"],
-      preferredSkills: ["Google Ads", "Facebook Marketing", "Content Creation"],
-      industry: "Marketing",
-      department: "Marketing",
-      bbbeePreference: false,
-      nqfRequirement: 6,
-      languageRequirements: ["English"],
-      deadline: new Date("2024-07-25T00:00:00.000Z"),
-      isActive: true,
-      isFeatured: false,
-      isRemote: false,
-      views: 45,
-      applications: 8,
-      createdAt: new Date("2024-06-22T11:00:00.000Z"),
-      updatedAt: new Date("2024-06-22T11:00:00.000Z")
-    },
-    {
-      id: 5,
-      employerId: 5,
-      title: "Data Analyst",
-      description: "Analyze business data to drive insights for mining operations. Experience with South African mining regulations preferred.",
-      location: "Johannesburg",
-      province: "Gauteng",
-      city: "Johannesburg",
-      employmentType: "Full-time",
-      experienceLevel: "Mid-level",
-      salaryRange: "40000-55000",
-      requiredSkills: ["Python", "SQL", "Excel", "Data Visualization"],
-      preferredSkills: ["Power BI", "R", "Mining Industry Knowledge"],
-      industry: "Mining",
-      department: "Analytics",
-      bbbeePreference: false,
-      nqfRequirement: 7,
-      languageRequirements: ["English"],
-      deadline: new Date("2024-08-10T00:00:00.000Z"),
-      isActive: true,
-      isFeatured: false,
-      isRemote: true,
-      views: 67,
-      applications: 19,
-      createdAt: new Date("2024-06-25T16:45:00.000Z"),
-      updatedAt: new Date("2024-06-25T16:45:00.000Z")
-    }
-  ];
+  try {
+    let baseQuery = db.select({
+      id: jobPostings.id,
+      employerId: jobPostings.employerId,
+      title: jobPostings.title,
+      description: jobPostings.description,
+      location: jobPostings.location,
+      employmentType: jobPostings.employmentType,
+      experienceLevel: jobPostings.experienceLevel,
+      salaryRange: jobPostings.salaryRange,
+      requiredSkills: jobPostings.requiredSkills,
+      preferredSkills: jobPostings.preferredSkills,
+      industry: jobPostings.industry,
+      deadline: jobPostings.deadline,
+      isActive: jobPostings.isActive,
+      isFeatured: jobPostings.isFeatured,
+      isRemote: jobPostings.isRemote,
+      views: jobPostings.views,
+      applications: jobPostings.applications,
+      createdAt: jobPostings.createdAt,
+      updatedAt: jobPostings.updatedAt,
+    }).from(jobPostings);
 
-  // Apply basic filtering
-  let filteredJobs = sampleJobs;
-  
-  if (query) {
-    if (query.title) {
-      const searchTerm = query.title.toLowerCase();
-      filteredJobs = filteredJobs.filter(job => 
-        job.title.toLowerCase().includes(searchTerm) ||
-        job.description.toLowerCase().includes(searchTerm)
-      );
+    // Apply filters
+    if (query) {
+      if (query.title) {
+        baseQuery = baseQuery.where(sql`${jobPostings.title} ILIKE ${`%${query.title}%`}`);
+      }
+      if (query.location) {
+        baseQuery = baseQuery.where(eq(jobPostings.location, query.location));
+      }
+      if (query.employmentType) {
+        baseQuery = baseQuery.where(eq(jobPostings.employmentType, query.employmentType));
+      }
+      if (query.industry) {
+        baseQuery = baseQuery.where(eq(jobPostings.industry, query.industry));
+      }
+      if (query.limit) {
+        baseQuery = baseQuery.limit(query.limit);
+      }
     }
+
+    // Only active jobs
+    baseQuery = baseQuery.where(eq(jobPostings.isActive, true));
+
+    // Order by created date (newest first)
+    baseQuery = baseQuery.orderBy(desc(jobPostings.createdAt));
+
+    const result = await baseQuery;
     
-    if (query.location) {
-      filteredJobs = filteredJobs.filter(job => 
-        job.province === query.location || job.city === query.location
-      );
-    }
-    
-    if (query.industry) {
-      filteredJobs = filteredJobs.filter(job => job.industry === query.industry);
-    }
-    
-    if (query.employmentType) {
-      filteredJobs = filteredJobs.filter(job => job.employmentType === query.employmentType);
-    }
-    
-    if (query.limit) {
-      filteredJobs = filteredJobs.slice(0, query.limit);
-    }
+    // Add placeholder values for missing fields
+    return result.map(job => ({
+      ...job,
+      province: job.location?.split(',')[1]?.trim() || '',
+      city: job.location?.split(',')[0]?.trim() || '',
+      department: null,
+      bbbeePreference: false,
+      nqfRequirement: null,
+      languageRequirements: ['English']
+    })) as JobPosting[];
+  } catch (error) {
+    console.error('Error fetching job postings:', error);
+    // Return empty array if database query fails
+    return [];
   }
-
-  return filteredJobs as JobPosting[];
 }
 
 export async function getJobPostingsByEmployer(employerId: number): Promise<JobPosting[]> {
