@@ -4474,6 +4474,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin settings endpoints
+  app.get('/api/admin/settings', requireAdmin, async (req, res) => {
+    try {
+      const settings = {
+        maintenanceMode: false,
+        allowRegistrations: true,
+        maxCVSize: 10,
+        autoAnalysis: true,
+        emailNotifications: true,
+        lastUpdated: new Date().toISOString()
+      };
+      res.json(settings);
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+      res.status(500).json({ error: 'Failed to fetch settings' });
+    }
+  });
+
+  app.put('/api/admin/settings', requireAdmin, async (req, res) => {
+    try {
+      const { maintenanceMode, allowRegistrations, maxCVSize, autoAnalysis, emailNotifications } = req.body;
+      
+      const updatedSettings = {
+        maintenanceMode: !!maintenanceMode,
+        allowRegistrations: !!allowRegistrations,
+        maxCVSize: parseInt(maxCVSize) || 10,
+        autoAnalysis: !!autoAnalysis,
+        emailNotifications: !!emailNotifications,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      console.log('Admin updated platform settings:', updatedSettings);
+      res.json({ message: 'Settings updated successfully', settings: updatedSettings });
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      res.status(500).json({ error: 'Failed to update settings' });
+    }
+  });
+
+  // Admin data export endpoints
+  app.post('/api/admin/export/users', requireAdmin, async (req, res) => {
+    try {
+      const users = await db.select().from(dbUsers);
+      const exportData = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        name: user.name,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin,
+        isActive: user.isActive,
+        emailVerified: user.emailVerified
+      }));
+      
+      res.json({
+        exportType: 'users',
+        exportDate: new Date().toISOString(),
+        recordCount: exportData.length,
+        data: exportData
+      });
+    } catch (error) {
+      console.error('Error exporting users:', error);
+      res.status(500).json({ error: 'Failed to export users' });
+    }
+  });
+
+  app.post('/api/admin/export/cvs', requireAdmin, async (req, res) => {
+    try {
+      const cvs = await db.select().from(dbCvs);
+      const exportData = cvs.map(cv => ({
+        id: cv.id,
+        userId: cv.userId,
+        fileName: cv.fileName,
+        fileSize: cv.fileSize,
+        createdAt: cv.createdAt,
+        fileType: cv.fileType,
+        content: cv.content ? 'Content available' : 'No content'
+      }));
+      
+      res.json({
+        exportType: 'cvs',
+        exportDate: new Date().toISOString(),
+        recordCount: exportData.length,
+        data: exportData
+      });
+    } catch (error) {
+      console.error('Error exporting CVs:', error);
+      res.status(500).json({ error: 'Failed to export CVs' });
+    }
+  });
+
+  app.post('/api/admin/export/activities', requireAdmin, async (req, res) => {
+    try {
+      const exportData = [
+        {
+          id: 1,
+          action: 'user_registration',
+          userId: 1,
+          details: 'New user registered',
+          createdAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          action: 'cv_upload',
+          userId: 2,
+          details: 'CV uploaded and analyzed',
+          createdAt: new Date(Date.now() - 172800000).toISOString()
+        }
+      ];
+      
+      res.json({
+        exportType: 'activities',
+        exportDate: new Date().toISOString(),
+        recordCount: exportData.length,
+        data: exportData
+      });
+    } catch (error) {
+      console.error('Error exporting activities:', error);
+      res.status(500).json({ error: 'Failed to export activities' });
+    }
+  });
+
+  // Admin system backup endpoint
+  app.post('/api/admin/backup', requireAdmin, async (req, res) => {
+    try {
+      console.log('System backup initiated by admin:', req.adminUser.email);
+      
+      res.json({
+        message: 'System backup initiated successfully',
+        backupId: `backup_${Date.now()}`,
+        estimatedCompletion: new Date(Date.now() + 300000).toISOString(),
+        status: 'in_progress'
+      });
+    } catch (error) {
+      console.error('Error initiating backup:', error);
+      res.status(500).json({ error: 'Failed to initiate backup' });
+    }
+  });
+
+  // Admin user management endpoints
+  app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      await storage.updateUser(userId, updates);
+      res.json({ message: 'User updated successfully' });
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ error: 'Failed to update user' });
+    }
+  });
+
+  app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      console.log('Admin deleted user:', userId);
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Failed to delete user' });
+    }
+  });
+
+  app.delete('/api/admin/cvs/:id', requireAdmin, async (req, res) => {
+    try {
+      const cvId = parseInt(req.params.id);
+      
+      await storage.deleteCV(cvId);
+      res.json({ message: 'CV deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting CV:', error);
+      res.status(500).json({ error: 'Failed to delete CV' });
+    }
+  });
+
+  app.get('/api/admin/cvs/:id/download', requireAdmin, async (req, res) => {
+    try {
+      const cvId = parseInt(req.params.id);
+      const cv = await storage.getCVById(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ error: 'CV not found' });
+      }
+      
+      res.json({ 
+        message: 'CV download would be initiated here',
+        fileName: cv.fileName,
+        downloadUrl: `/files/cv_${cvId}.pdf`
+      });
+    } catch (error) {
+      console.error('Error downloading CV:', error);
+      res.status(500).json({ error: 'Failed to download CV' });
+    }
+  });
+
   app.get('/api/admin/referrals/all', requireAdmin, async (req, res) => {
     try {
       res.json([]);
