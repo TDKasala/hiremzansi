@@ -28,6 +28,7 @@ import {
   Ban,
   CheckCircle,
   XCircle,
+  Plus,
   Clock,
   Activity,
   Database,
