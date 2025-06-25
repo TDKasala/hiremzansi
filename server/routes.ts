@@ -4597,6 +4597,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/admin/export/jobs', requireAdmin, async (req, res) => {
+    try {
+      const jobs = await db.select().from(jobPostings);
+      const exportData = jobs.map(job => ({
+        id: job.id,
+        title: job.title,
+        description: job.description,
+        company: job.companyName,
+        location: job.location,
+        salaryRange: job.salaryRange,
+        employmentType: job.employmentType,
+        experienceLevel: job.experienceLevel,
+        industry: job.industry,
+        isActive: job.isActive,
+        createdAt: job.createdAt,
+        applications: job.applications || 0
+      }));
+      
+      res.json({
+        exportType: 'jobs',
+        exportDate: new Date().toISOString(),
+        recordCount: exportData.length,
+        data: exportData
+      });
+    } catch (error) {
+      console.error('Error exporting jobs:', error);
+      res.status(500).json({ error: 'Failed to export jobs' });
+    }
+  });
+
   // Admin system backup endpoint
   app.post('/api/admin/backup', requireAdmin, async (req, res) => {
     try {
@@ -4669,6 +4699,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error downloading CV:', error);
       res.status(500).json({ error: 'Failed to download CV' });
+    }
+  });
+
+  // Admin job posting management endpoints
+  app.patch('/api/admin/job-postings/:id', requireAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      await db.update(jobPostings)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(jobPostings.id, jobId));
+      
+      res.json({ message: 'Job posting updated successfully' });
+    } catch (error) {
+      console.error('Error updating job posting:', error);
+      res.status(500).json({ error: 'Failed to update job posting' });
+    }
+  });
+
+  app.delete('/api/admin/job-postings/:id', requireAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      
+      await db.delete(jobPostings).where(eq(jobPostings.id, jobId));
+      res.json({ message: 'Job posting deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting job posting:', error);
+      res.status(500).json({ error: 'Failed to delete job posting' });
     }
   });
 

@@ -76,6 +76,22 @@ interface AdminCV {
   saScore?: number;
 }
 
+interface AdminJobPosting {
+  id: number;
+  title: string;
+  description: string;
+  company: string;
+  location: string;
+  salaryRange: string;
+  employmentType: string;
+  experienceLevel: string;
+  industry: string;
+  createdAt: string;
+  isActive: boolean;
+  applications: number;
+  employerId: number;
+}
+
 interface SystemHealth {
   status: 'healthy' | 'warning' | 'critical';
   database: boolean;
@@ -108,8 +124,11 @@ export default function AdminDashboard() {
   const [showCVDetails, setShowCVDetails] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [selectedCV, setSelectedCV] = useState<AdminCV | null>(null);
+  const [selectedJobPosting, setSelectedJobPosting] = useState<AdminJobPosting | null>(null);
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [cvSearchTerm, setCvSearchTerm] = useState('');
+  const [jobSearchTerm, setJobSearchTerm] = useState('');
+  const [showJobDetails, setShowJobDetails] = useState(false);
   
   // Platform settings state
   const [platformSettings, setPlatformSettings] = useState({
@@ -297,6 +316,13 @@ export default function AdminDashboard() {
     enabled: !!adminUser && activeTab === 'cvs',
   });
 
+  // Fetch job postings
+  const { data: jobPostingsData, isLoading: isJobPostingsLoading } = useQuery<AdminJobPosting[]>({
+    queryKey: ['/api/admin/job-postings'],
+    queryFn: () => adminQuery('/api/admin/job-postings'),
+    enabled: !!adminUser && activeTab === 'jobs',
+  });
+
   // Fetch system health
   const { data: healthData, isLoading: isHealthLoading } = useQuery<SystemHealth>({
     queryKey: ['/api/admin/health'],
@@ -391,6 +417,59 @@ export default function AdminDashboard() {
     },
   });
 
+  // Job posting management mutations
+  const updateJobPostingMutation = useMutation({
+    mutationFn: async (data: { jobId: number; updates: Partial<AdminJobPosting> }) => {
+      console.log('Updating job posting:', data.jobId, 'with data:', data.updates);
+      const response = await adminQuery(`/api/admin/job-postings/${data.jobId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data.updates),
+      });
+      return response;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/job-postings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({ 
+        title: 'Job posting updated successfully',
+        description: `Job ${variables.jobId} has been updated`
+      });
+      setShowJobDetails(false);
+    },
+    onError: (error: any, variables) => {
+      console.error('Job posting update error:', error);
+      toast({ 
+        title: 'Failed to update job posting', 
+        description: error.message || `Could not update job ${variables.jobId}`,
+        variant: 'destructive' 
+      });
+    },
+  });
+
+  const deleteJobPostingMutation = useMutation({
+    mutationFn: async (jobId: number) => {
+      console.log('Deleting job posting:', jobId);
+      const response = await adminQuery(`/api/admin/job-postings/${jobId}`, { method: 'DELETE' });
+      return response;
+    },
+    onSuccess: (data, jobId) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/job-postings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({ 
+        title: 'Job posting deleted successfully',
+        description: `Job ${jobId} has been permanently removed`
+      });
+    },
+    onError: (error: any, jobId) => {
+      console.error('Job posting delete error:', error);
+      toast({ 
+        title: 'Failed to delete job posting', 
+        description: error.message || `Could not delete job ${jobId}`,
+        variant: 'destructive' 
+      });
+    },
+  });
+
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
@@ -420,6 +499,12 @@ export default function AdminDashboard() {
   const filteredCVs = cvsData?.filter(cv => 
     cv.fileName.toLowerCase().includes(cvSearchTerm.toLowerCase()) ||
     cv.userEmail.toLowerCase().includes(cvSearchTerm.toLowerCase())
+  ) || [];
+
+  const filteredJobPostings = jobPostingsData?.filter(job => 
+    job.title.toLowerCase().includes(jobSearchTerm.toLowerCase()) ||
+    job.company.toLowerCase().includes(jobSearchTerm.toLowerCase()) ||
+    job.location.toLowerCase().includes(jobSearchTerm.toLowerCase())
   ) || [];
 
   if (isLoading) {
@@ -458,10 +543,11 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="cvs">CVs</TabsTrigger>
+              <TabsTrigger value="jobs">Jobs</TabsTrigger>
               <TabsTrigger value="health">System</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -720,6 +806,117 @@ export default function AdminDashboard() {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="jobs">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>Job Postings Management</CardTitle>
+                      <CardDescription>Manage job postings and recruitment activities</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search jobs..."
+                          className="pl-8"
+                          value={jobSearchTerm}
+                          onChange={(e) => setJobSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <Button 
+                        onClick={() => exportDataMutation.mutate('jobs')}
+                        disabled={exportDataMutation.isPending}
+                        size="sm"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {isJobPostingsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-3">Job Title</th>
+                            <th className="text-left p-3">Company</th>
+                            <th className="text-left p-3">Location</th>
+                            <th className="text-left p-3">Status</th>
+                            <th className="text-left p-3">Applications</th>
+                            <th className="text-left p-3">Posted</th>
+                            <th className="text-left p-3">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredJobPostings.map((job) => (
+                            <tr key={job.id} className="border-b hover:bg-muted/50">
+                              <td className="p-3">
+                                <div className="font-medium">{job.title}</div>
+                                <div className="text-sm text-muted-foreground">{job.employmentType} • {job.experienceLevel}</div>
+                              </td>
+                              <td className="p-3">
+                                <div className="font-medium">{job.company}</div>
+                                <div className="text-sm text-muted-foreground">{job.industry}</div>
+                              </td>
+                              <td className="p-3">{job.location}</td>
+                              <td className="p-3">
+                                <Badge variant={job.isActive ? 'default' : 'secondary'}>
+                                  {job.isActive ? 'Active' : 'Inactive'}
+                                </Badge>
+                              </td>
+                              <td className="p-3">
+                                <div className="text-center">
+                                  <div className="text-lg font-bold">{job.applications || 0}</div>
+                                  <div className="text-xs text-muted-foreground">applications</div>
+                                </div>
+                              </td>
+                              <td className="p-3 text-sm text-muted-foreground">
+                                {formatDate(job.createdAt)}
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedJobPosting(job);
+                                      setShowJobDetails(true);
+                                    }}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => deleteJobPostingMutation.mutate(job.id)}
+                                    disabled={deleteJobPostingMutation.isPending}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {filteredJobPostings.length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No job postings found
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>
@@ -1134,6 +1331,135 @@ export default function AdminDashboard() {
                     Delete CV
                   </Button>
                 )}
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Job Posting Details Dialog */}
+          <Dialog open={showJobDetails} onOpenChange={setShowJobDetails}>
+            <DialogContent className="max-w-4xl">
+              <DialogHeader>
+                <DialogTitle>Job Posting Details</DialogTitle>
+                <DialogDescription>
+                  View and edit job posting information
+                </DialogDescription>
+              </DialogHeader>
+              {selectedJobPosting && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="jobTitle">Job Title</Label>
+                      <Input
+                        id="jobTitle"
+                        value={selectedJobPosting.title}
+                        onChange={(e) => setSelectedJobPosting({...selectedJobPosting, title: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="jobCompany">Company</Label>
+                      <Input
+                        id="jobCompany"
+                        value={selectedJobPosting.company}
+                        onChange={(e) => setSelectedJobPosting({...selectedJobPosting, company: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="jobLocation">Location</Label>
+                      <Input
+                        id="jobLocation"
+                        value={selectedJobPosting.location}
+                        onChange={(e) => setSelectedJobPosting({...selectedJobPosting, location: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="jobSalary">Salary Range</Label>
+                      <Input
+                        id="jobSalary"
+                        value={selectedJobPosting.salaryRange}
+                        onChange={(e) => setSelectedJobPosting({...selectedJobPosting, salaryRange: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="jobType">Employment Type</Label>
+                      <Select 
+                        value={selectedJobPosting.employmentType} 
+                        onValueChange={(value) => setSelectedJobPosting({...selectedJobPosting, employmentType: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="full-time">Full-time</SelectItem>
+                          <SelectItem value="part-time">Part-time</SelectItem>
+                          <SelectItem value="contract">Contract</SelectItem>
+                          <SelectItem value="internship">Internship</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="jobLevel">Experience Level</Label>
+                      <Select 
+                        value={selectedJobPosting.experienceLevel} 
+                        onValueChange={(value) => setSelectedJobPosting({...selectedJobPosting, experienceLevel: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="entry">Entry Level</SelectItem>
+                          <SelectItem value="mid">Mid Level</SelectItem>
+                          <SelectItem value="senior">Senior Level</SelectItem>
+                          <SelectItem value="executive">Executive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center space-x-2 pt-6">
+                      <Switch 
+                        checked={selectedJobPosting.isActive} 
+                        onCheckedChange={(checked) => setSelectedJobPosting({...selectedJobPosting, isActive: checked})}
+                      />
+                      <Label>Active Job Posting</Label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="jobDescription">Job Description</Label>
+                    <textarea
+                      id="jobDescription"
+                      className="w-full h-32 p-3 border rounded-md resize-none"
+                      value={selectedJobPosting.description}
+                      onChange={(e) => setSelectedJobPosting({...selectedJobPosting, description: e.target.value})}
+                    />
+                  </div>
+                </div>
+              )}
+              <DialogFooter>
+                <Button
+                  onClick={() => {
+                    if (selectedJobPosting) {
+                      const updates = {
+                        title: selectedJobPosting.title,
+                        company: selectedJobPosting.company,
+                        location: selectedJobPosting.location,
+                        salaryRange: selectedJobPosting.salaryRange,
+                        employmentType: selectedJobPosting.employmentType,
+                        experienceLevel: selectedJobPosting.experienceLevel,
+                        description: selectedJobPosting.description,
+                        isActive: selectedJobPosting.isActive
+                      };
+                      updateJobPostingMutation.mutate({ jobId: selectedJobPosting.id, updates });
+                    }
+                  }}
+                  disabled={updateJobPostingMutation.isPending}
+                >
+                  {updateJobPostingMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
