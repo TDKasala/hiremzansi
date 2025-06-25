@@ -100,9 +100,7 @@ export default function AboutPage() {
                       With over 5 years of experience in software development and AI technologies, Denis combines technical expertise with a deep understanding of South Africa's unique job market challenges.
                     </p>
                     <p>Prior to Hire Mzansi, Denis worked as an AWS solutions architect developing enterprise applications. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.</p>
-                    <p>
-                      Denis holds a BSc in Computer Science from University of Cape Town and is an active advocate for technology education initiatives across South Africa.
-                    </p>
+                    
                   </div>
                 </div>
               </div>
