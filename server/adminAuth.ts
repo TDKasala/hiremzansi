@@ -71,14 +71,27 @@ export function generateAdminToken(user: AdminUser): string {
 export function verifyAdminToken(token: string): AdminUser | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
+    console.log('Decoded admin token:', decoded);
+    
+    // Check if this is an admin token - handle both token structures
+    const userId = decoded.userId || decoded.id;
+    const userRole = decoded.role;
+    const isAdmin = decoded.isAdmin || userRole === 'admin';
+    
+    if (!isAdmin) {
+      console.log('Token does not have admin privileges');
+      return null;
+    }
+    
     return {
-      id: decoded.id,
+      id: userId,
       email: decoded.email,
-      name: decoded.name,
-      role: decoded.role,
-      isAdmin: decoded.isAdmin,
+      name: decoded.name || decoded.email,
+      role: userRole,
+      isAdmin: true
     };
   } catch (error) {
+    console.error("Token verification error:", error);
     return null;
   }
 }
@@ -91,13 +104,18 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: "Access token required" });
   }
 
-  const user = verifyAdminToken(token);
-  if (!user || !user.isAdmin) {
-    return res.status(403).json({ message: "Admin access required" });
-  }
+  try {
+    const user = verifyAdminToken(token);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
 
-  req.adminUser = user;
-  next();
+    req.adminUser = user;
+    next();
+  } catch (error) {
+    console.error('Admin token verification error:', error);
+    return res.status(401).json({ message: "Invalid authentication token" });
+  }
 }
 
 declare global {
