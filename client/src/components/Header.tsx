@@ -44,48 +44,65 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link href="/" className="font-bold text-xl md:text-2xl flex items-center">
-          <img src={New_logo} alt="Hire Mzansi Logo" className="h-12 md:h-14 pl-[0px] pr-[0px] pt-[0px] pb-[0px] ml-[6px] mr-[6px]" />
+    <header className="bg-white/95 backdrop-blur-lg border-b border-gray-100 sticky top-0 z-50 transition-all duration-300">
+      <div className="container mx-auto px-4 lg:px-6 py-4 flex justify-between items-center">
+        <Link href="/" className="group flex items-center space-x-3 transition-transform duration-200 hover:scale-105">
+          <div className="relative">
+            <img 
+              src={New_logo} 
+              alt="Hire Mzansi Logo" 
+              className="h-10 md:h-12 transition-all duration-300 group-hover:brightness-110" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-blue-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+          </div>
         </Link>
 
-        <div className="hidden md:flex space-x-1">
+        <nav className="hidden lg:flex items-center space-x-1">
           {navLinks.map((link) => (
             <Link 
               key={link.href} 
               href={link.href}
-              className={`px-3 py-2 rounded-md text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light font-medium transition-colors ${
-                location === link.href ? "bg-brand-blue-light text-brand-blue" : ""
+              className={`relative px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105 group ${
+                location === link.href 
+                  ? "text-white bg-gradient-to-r from-green-500 to-blue-600 shadow-lg shadow-green-500/25" 
+                  : "text-gray-700 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100"
               }`}
             >
-              {link.label}
+              <span className="relative z-10">{link.label}</span>
+              {location === link.href && (
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl opacity-20 animate-pulse"></div>
+              )}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        <div className="flex items-center space-x-3">
-          <div className="mr-3">
+        <div className="flex items-center space-x-4">
+          <div className="hidden md:block">
             <LanguageSelector />
           </div>
           {user ? (
             // Logged in UI
-            (<div className="hidden md:flex items-center space-x-3">
+            (<div className="hidden lg:flex items-center space-x-3">
               <Button
                 variant="outline"
-                className="btn-brand-outline"
+                className="border-2 border-green-500/30 text-green-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:border-green-500 transition-all duration-300 font-medium"
                 asChild
               >
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <User className="h-5 w-5" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="relative rounded-full w-10 h-10 bg-gradient-to-r from-green-100 to-blue-100 hover:from-green-200 hover:to-blue-200 transition-all duration-300 group"
+                  >
+                    <User className="h-5 w-5 text-gray-700 group-hover:text-gray-900 transition-colors" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <div className="px-2 py-1.5 text-sm font-medium">
+                <DropdownMenuContent align="end" className="w-64 bg-white/95 backdrop-blur-lg border border-gray-200 shadow-xl rounded-xl p-1">
+                  <div className="px-3 py-2 text-sm font-medium text-gray-700 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg mb-1">
                     {user.email}
                   </div>
                   <DropdownMenuSeparator />
@@ -149,16 +166,16 @@ export default function Header() {
             </div>)
           ) : (
             // Logged out UI
-            (<div className="hidden md:flex items-center space-x-3">
+            (<div className="hidden lg:flex items-center space-x-3">
               <Button
                 variant="outline"
-                className="border-primary text-primary hover:bg-primary hover:text-white"
+                className="border-2 border-blue-500/30 text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-500 transition-all duration-300 font-medium"
                 asChild
               >
                 <Link href="/auth">{t('common.login')}</Link>
               </Button>
               <Button 
-                className="hidden md:inline-flex"
+                className="bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 asChild
               >
                 <Link href="/auth?tab=register">{t('common.signup')}</Link>
@@ -169,42 +186,48 @@ export default function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-neutral-700"
+            className="lg:hidden relative w-10 h-10 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 transition-all duration-300 group"
             onClick={toggleMobileMenu}
             aria-label="Menu"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5 text-gray-700 group-hover:text-gray-900 transition-colors" />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-400/10 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </Button>
         </div>
       </div>
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-neutral-200">
+        <div className="lg:hidden">
+          <div className="px-4 pt-4 pb-6 space-y-3 bg-gradient-to-b from-white/95 to-gray-50/95 backdrop-blur-lg border-t border-gray-200/50 shadow-lg">
             {navLinks.map((link) => (
               <Link 
                 key={link.href} 
                 href={link.href}
-                className={`block px-3 py-2 rounded-md text-neutral-700 hover:bg-neutral-100 font-medium ${
-                  location === link.href ? "bg-neutral-100" : ""
+                className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  location === link.href 
+                    ? "text-white bg-gradient-to-r from-green-500 to-blue-600 shadow-lg" 
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200"
                 }`}
                 onClick={closeMobileMenu}
               >
                 {link.label}
               </Link>
             ))}
+            <div className="md:block lg:hidden mb-4">
+              <LanguageSelector />
+            </div>
             {user ? (
-              <div className="space-y-2 mt-3 px-3">
+              <div className="space-y-3 mt-4 pt-4 border-t border-gray-200/50">
                 <Link 
                   href="/dashboard"
-                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  className="block px-4 py-3 bg-gradient-to-r from-green-100 to-blue-100 text-green-700 text-center rounded-xl hover:from-green-200 hover:to-blue-200 transition-all duration-300 font-medium"
                   onClick={closeMobileMenu}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   href="/premium-tools"
-                  className="block px-4 py-2 border-2 border-primary bg-primary/5 text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  className="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-center rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
                   onClick={closeMobileMenu}
                 >
                   Premium Tools
@@ -255,7 +278,7 @@ export default function Header() {
                     closeMobileMenu();
                   }}
                   disabled={isLoggingOut}
-                  className="w-full px-4 py-2 bg-red-500 text-white text-center rounded-md hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-center rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg"
                 >
                   {isLoggingOut ? "Logging out..." : (
                     <>
@@ -266,17 +289,17 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div className="flex space-x-2 mt-3 px-3">
+              <div className="flex space-x-3 mt-4 pt-4 border-t border-gray-200/50">
                 <Link 
                   href="/auth"
-                  className="flex-1 px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
+                  className="flex-1 px-4 py-3 border-2 border-blue-500/30 text-blue-700 text-center rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-500 transition-all duration-300 font-medium"
                   onClick={closeMobileMenu}
                 >
                   {t('common.login')}
                 </Link>
                 <Link 
                   href="/auth?tab=register"
-                  className="flex-1 px-4 py-2 bg-primary text-white text-center rounded-md hover:bg-opacity-90 transition-colors"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-center rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
                   onClick={closeMobileMenu}
                 >
                   {t('common.signup')}

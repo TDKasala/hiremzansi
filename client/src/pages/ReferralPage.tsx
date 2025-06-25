@@ -150,7 +150,7 @@ export default function ReferralPage() {
             {t('referral.title')}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            {t('referral.subtitle')}
+            Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis when 3 friends sign up using your referral link.
           </p>
         </div>
         

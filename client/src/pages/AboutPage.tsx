@@ -100,7 +100,7 @@ export default function AboutPage() {
                       With over 5 years of experience in software development and AI technologies, Denis combines technical expertise with a deep understanding of South Africa's unique job market challenges.
                     </p>
                     <p>Prior to Hire Mzansi, Denis worked as an AWS solutions architect developing enterprise applications. His insights into employer ATS systems sparked the idea for a platform specifically designed to help South Africans navigate these digital gatekeepers.</p>
-                    
+                  
                   </div>
                 </div>
               </div>
