@@ -104,6 +104,9 @@ export default function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/referral">Refer & Earn</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/tools/ats-keywords">ATS Keywords</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem>

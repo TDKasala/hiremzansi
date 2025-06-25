@@ -4261,6 +4261,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Premium ATS Keywords Analysis
+  app.post("/api/premium/ats-keywords", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow all authenticated users for testing
+      const hasPremiumAccess = true;
+      
+      const { cvText, jobDescription } = req.body;
+
+      if (!cvText || !jobDescription) {
+        return res.status(400).json({ 
+          message: "Both CV content and job description are required" 
+        });
+      }
+
+      // Import and use the ATS keywords service
+      const { analyzeATSKeywords } = await import('./services/atsKeywordService');
+      const analysis = await analyzeATSKeywords(cvText, jobDescription);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("ATS Keywords analysis error:", error);
+      res.status(500).json({ message: "Analysis failed", error: error.message });
+    }
+  });
+
   // Mount Dynamic Resume Builder routes
   app.use("/api", dynamicResumeBuilderRoutes);
   
