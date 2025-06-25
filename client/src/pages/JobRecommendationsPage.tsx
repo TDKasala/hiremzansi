@@ -174,7 +174,7 @@ export default function JobRecommendationsPage() {
                   <SelectValue placeholder="Province" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Provinces</SelectItem>
+                  <SelectItem value="all">All Provinces</SelectItem>
                   {provinces.map((province) => (
                     <SelectItem key={province} value={province}>
                       {province}
@@ -188,7 +188,7 @@ export default function JobRecommendationsPage() {
                   <SelectValue placeholder="Industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Industries</SelectItem>
+                  <SelectItem value="all">All Industries</SelectItem>
                   {industries.map((industry) => (
                     <SelectItem key={industry} value={industry}>
                       {industry}
@@ -202,7 +202,7 @@ export default function JobRecommendationsPage() {
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   {experienceLevels.map((level) => (
                     <SelectItem key={level} value={level}>
                       {level}

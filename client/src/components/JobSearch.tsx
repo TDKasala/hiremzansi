@@ -193,7 +193,7 @@ export default function JobSearch() {
                     <SelectValue placeholder="All Industries" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Industries</SelectItem>
+                    <SelectItem value="all">All Industries</SelectItem>
                     <SelectItem value="Information Technology">Information Technology</SelectItem>
                     <SelectItem value="Finance">Finance & Banking</SelectItem>
                     <SelectItem value="Healthcare">Healthcare</SelectItem>
@@ -215,7 +215,7 @@ export default function JobSearch() {
                     <SelectValue placeholder="All Job Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Job Types</SelectItem>
+                    <SelectItem value="all">All Job Types</SelectItem>
                     <SelectItem value="full-time">Full-time</SelectItem>
                     <SelectItem value="part-time">Part-time</SelectItem>
                     <SelectItem value="contract">Contract</SelectItem>
@@ -232,7 +232,7 @@ export default function JobSearch() {
                     <SelectValue placeholder="Any Experience" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any Experience</SelectItem>
+                    <SelectItem value="all">Any Experience</SelectItem>
                     <SelectItem value="entry">Entry Level</SelectItem>
                     <SelectItem value="mid">Mid Level</SelectItem>
                     <SelectItem value="senior">Senior Level</SelectItem>

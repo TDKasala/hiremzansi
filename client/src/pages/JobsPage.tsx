@@ -60,9 +60,9 @@ export default function JobsPage() {
   const { data: jobs = [], isLoading } = useQuery<JobPosting[]>({
     queryKey: ['/api/job-postings', { 
       title: searchQuery, 
-      location: locationFilter,
-      industry: industryFilter,
-      employmentType: employmentTypeFilter,
+      location: locationFilter === 'all' ? '' : locationFilter,
+      industry: industryFilter === 'all' ? '' : industryFilter,
+      employmentType: employmentTypeFilter === 'all' ? '' : employmentTypeFilter,
       limit: 50
     }],
     enabled: true
@@ -147,7 +147,7 @@ export default function JobsPage() {
                     <SelectValue placeholder="Province" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Provinces</SelectItem>
+                    <SelectItem value="all">All Provinces</SelectItem>
                     {provinces.map(province => (
                       <SelectItem key={province} value={province}>{province}</SelectItem>
                     ))}
@@ -159,7 +159,7 @@ export default function JobsPage() {
                     <SelectValue placeholder="Industry" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Industries</SelectItem>
+                    <SelectItem value="all">All Industries</SelectItem>
                     {industries.map(industry => (
                       <SelectItem key={industry} value={industry}>{industry}</SelectItem>
                     ))}
@@ -171,7 +171,7 @@ export default function JobsPage() {
                     <SelectValue placeholder="Job Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {employmentTypes.map(type => (
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))}

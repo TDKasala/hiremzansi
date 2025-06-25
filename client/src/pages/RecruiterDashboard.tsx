@@ -436,7 +436,7 @@ export default function RecruiterDashboard() {
                         <SelectValue placeholder="Any location" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any location</SelectItem>
+                        <SelectItem value="all">Any location</SelectItem>
                         <SelectItem value="cape-town">Cape Town</SelectItem>
                         <SelectItem value="johannesburg">Johannesburg</SelectItem>
                         <SelectItem value="durban">Durban</SelectItem>
@@ -450,7 +450,7 @@ export default function RecruiterDashboard() {
                         <SelectValue placeholder="Any level" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any level</SelectItem>
+                        <SelectItem value="all">Any level</SelectItem>
                         <SelectItem value="1">Level 1</SelectItem>
                         <SelectItem value="2">Level 2</SelectItem>
                         <SelectItem value="3">Level 3</SelectItem>
@@ -464,7 +464,7 @@ export default function RecruiterDashboard() {
                         <SelectValue placeholder="Any level" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any level</SelectItem>
+                        <SelectItem value="all">Any level</SelectItem>
                         <SelectItem value="6">Level 6 (Diploma)</SelectItem>
                         <SelectItem value="7">Level 7 (Bachelor's)</SelectItem>
                         <SelectItem value="8">Level 8 (Honours)</SelectItem>
