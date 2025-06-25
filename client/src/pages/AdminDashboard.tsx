@@ -116,14 +116,20 @@ const AdminDashboard: React.FC = () => {
   // Check admin authentication on component mount
   useEffect(() => {
     const checkAdminAuth = async () => {
-      const token = localStorage.getItem('admin_token');
+      console.log('AdminDashboard: Starting authentication check...');
+      const token = localStorage.getItem('admin_token') || localStorage.getItem('adminToken');
+      
+      console.log('AdminDashboard: Token found:', !!token);
+      
       if (!token) {
+        console.log('AdminDashboard: No token, redirecting to login');
         setLocation('/admin/login');
         return;
       }
 
       try {
-        const response = await fetch('/api/admin/me', {
+        console.log('AdminDashboard: Verifying token with server...');
+        const response = await fetch('/api/admin/platform/overview', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -131,14 +137,25 @@ const AdminDashboard: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setAdminUser(data.user);
+          console.log('AdminDashboard: Authentication successful, data received:', data);
+          
+          // Set admin user info
+          setAdminUser({
+            email: 'deniskasala17@gmail.com',
+            name: 'Denis Kasala',
+            role: 'admin'
+          });
+          
+          // Don't redirect, stay on dashboard
         } else {
+          console.log('AdminDashboard: Authentication failed, clearing token');
           localStorage.removeItem('admin_token');
+          localStorage.removeItem('adminToken');
           localStorage.removeItem('admin_user');
           setLocation('/admin/login');
         }
       } catch (error) {
-        console.error('Admin auth check failed:', error);
+        console.error('AdminDashboard: Auth check error:', error);
         setLocation('/admin/login');
       } finally {
         setIsLoading(false);
