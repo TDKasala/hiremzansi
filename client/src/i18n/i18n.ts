@@ -109,7 +109,7 @@ const enTranslations = {
   },
   referral: {
     title: 'Refer 3 Friends, Get a Free Deep Analysis',
-    subtitle: 'Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis (R30 value) when 3 friends sign up using your referral link.',
+    subtitle: 'Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis when 3 friends sign up using your referral link.',
     createAccountDescription: 'Create an account or log in to get your unique referral link and start earning rewards.',
     yourReferralLink: 'Your Referral Link',
     shareLink: 'Share this link with friends, family, and colleagues to earn rewards',
