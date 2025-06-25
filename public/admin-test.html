@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Admin Login Test</h1>
+    <button onclick="testLogin()">Test Admin Login</button>
+    <button onclick="testDashboard()">Test Dashboard Access</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            document.getElementById('results').appendChild(div);
+        }
+
+        async function testLogin() {
+            addResult('Testing admin login...');
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'deniskasala17@gmail.com',
+                        password: '@Deniskasala2025'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('admin_token', data.token);
+                    addResult(`Login successful! Token stored. User: ${data.user.name}`, 'success');
+                    
+                    // Test immediate redirect
+                    addResult('Attempting redirect to dashboard...', 'info');
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1000);
+                } else {
+                    addResult(`Login failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`Login error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDashboard() {
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                addResult('No token found. Login first.', 'error');
+                return;
+            }
+            
+            addResult('Testing dashboard access with stored token...');
+            
+            try {
+                const response = await fetch('/api/admin/platform/overview', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`Dashboard access successful! Users: ${data.totalUsers}, CVs: ${data.totalCVs}`, 'success');
+                } else {
+                    addResult('Dashboard access failed', 'error');
+                }
+            } catch (error) {
+                addResult(`Dashboard error: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            addResult('Storage cleared', 'info');
+        }
+        
+        // Check token on page load
+        window.onload = function() {
+            const token = localStorage.getItem('admin_token');
+            if (token) {
+                addResult('Existing admin token found in storage', 'success');
+            } else {
+                addResult('No admin token in storage', 'info');
+            }
+        };
+    </script>
+</body>
+</html>
