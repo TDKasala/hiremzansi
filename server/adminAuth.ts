@@ -57,6 +57,7 @@ export async function authenticateAdmin(email: string, password: string): Promis
 export function generateAdminToken(user: AdminUser): string {
   return jwt.sign(
     {
+      userId: user.id,
       id: user.id,
       email: user.email,
       name: user.name,
@@ -64,7 +65,7 @@ export function generateAdminToken(user: AdminUser): string {
       isAdmin: user.isAdmin,
     },
     JWT_SECRET,
-    { expiresIn: "24h" }
+    { expiresIn: "7d" }
   );
 }
 
