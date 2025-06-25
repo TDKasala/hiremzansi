@@ -1,12 +1,6 @@
-import OpenAI from "openai";
-
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY environment variable must be set");
+if (!process.env.XAI_API_KEY) {
+  throw new Error("XAI_API_KEY environment variable must be set");
 }
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 interface ATSAnalysis {
   score: number;
@@ -59,25 +53,38 @@ Focus on:
 Provide practical recommendations for keyword optimization while maintaining authenticity.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert ATS optimization specialist with deep knowledge of the South African job market. Provide detailed, actionable keyword analysis."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.3,
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'grok-2-1212',
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert ATS optimization specialist with deep knowledge of the South African job market. Provide detailed, actionable keyword analysis. Always respond with valid JSON."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+      }),
     });
 
-    const analysisText = response.choices[0].message.content;
+    if (!response.ok) {
+      throw new Error(`xAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const analysisText = data.choices?.[0]?.message?.content;
     if (!analysisText) {
-      throw new Error("No analysis received from OpenAI");
+      throw new Error("No analysis received from xAI");
     }
 
     const analysis: ATSAnalysis = JSON.parse(analysisText);

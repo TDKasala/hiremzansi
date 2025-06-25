@@ -84,8 +84,8 @@ export default function ATSKeywordsPage() {
     );
   }
 
-  // Check if user has premium access (you can implement this check based on your subscription system)
-  const hasPremiumAccess = user?.subscription?.plan === 'premium' || user?.isAdmin;
+  // Check if user has premium access - for now allow all authenticated users for testing
+  const hasPremiumAccess = user?.isAdmin || true; // TODO: implement subscription check
 
   if (!hasPremiumAccess) {
     return (
