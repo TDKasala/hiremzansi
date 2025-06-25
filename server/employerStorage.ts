@@ -3,6 +3,11 @@ import {
   notifications,
   users,
   cvs,
+  jobPostings,
+  employers,
+  jobMatches,
+  skills,
+  userSkills,
   type JobPosting, 
   type InsertJobPosting,
   type JobMatch,
@@ -12,7 +17,9 @@ import {
   type UserSkill,
   type InsertUserSkill,
   type Notification,
-  type InsertNotification
+  type InsertNotification,
+  type Employer,
+  type InsertEmployer
 } from "@shared/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 
