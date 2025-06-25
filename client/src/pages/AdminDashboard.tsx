@@ -112,6 +112,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedCV, setSelectedCV] = useState<AdminCV | null>(null);
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showCVDetails, setShowCVDetails] = useState(false);
+  const [showJobForm, setShowJobForm] = useState(false);
 
   // Check admin authentication on component mount
   useEffect(() => {
@@ -366,10 +367,11 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="cvs">CVs</TabsTrigger>
+              <TabsTrigger value="jobs">Jobs</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -719,6 +721,69 @@ const AdminDashboard: React.FC = () => {
                       </TableBody>
                     </Table>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="jobs" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Job Postings Management</CardTitle>
+                  <CardDescription>Create and manage job postings for the platform</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-semibold">Manual Job Posting</h3>
+                      <Button onClick={() => setShowJobForm(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Job
+                      </Button>
+                    </div>
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base">Quick Stats</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span className="text-sm text-muted-foreground">Total Jobs:</span>
+                              <span className="font-medium">0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-sm text-muted-foreground">Active Jobs:</span>
+                              <span className="font-medium">0</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-sm text-muted-foreground">This Month:</span>
+                              <span className="font-medium">0</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base">Recent Activity</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">No recent job posting activity</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium mb-3">API Endpoints for Manual Job Posting</h4>
+                      <div className="space-y-2 text-sm bg-muted p-3 rounded-md">
+                        <div><strong>POST</strong> /api/admin/jobs - Create new job posting</div>
+                        <div><strong>GET</strong> /api/admin/jobs - List all job postings</div>
+                        <div><strong>PUT</strong> /api/admin/jobs/:id - Update job posting</div>
+                        <div><strong>DELETE</strong> /api/admin/jobs/:id - Delete job posting</div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
