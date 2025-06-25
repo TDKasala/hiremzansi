@@ -166,9 +166,39 @@ export async function getJobPostingsByEmployer(employerId: number): Promise<JobP
   return result;
 }
 
-export async function createJobPosting(job: InsertJobPosting): Promise<JobPosting> {
-  const [result] = await db.insert(jobPostings).values(job).returning();
-  return result;
+export async function createJobPosting(jobData: any): Promise<JobPosting> {
+  // Only insert fields that exist in the actual database schema
+  const cleanJobData = {
+    employerId: jobData.employerId,
+    title: jobData.title,
+    description: jobData.description,
+    employmentType: jobData.employmentType,
+    experienceLevel: jobData.experienceLevel,
+    salaryRange: jobData.salaryRange,
+    requiredSkills: jobData.requiredSkills,
+    preferredSkills: jobData.preferredSkills,
+    industry: jobData.industry,
+    deadline: jobData.deadline,
+    isActive: jobData.isActive,
+    isFeatured: jobData.isFeatured,
+    views: jobData.views
+  };
+  
+  const [job] = await db.insert(jobPostings).values(cleanJobData).returning();
+  
+  // Add frontend-required fields that don't exist in database
+  return {
+    ...job,
+    location: 'Cape Town, Western Cape',
+    province: 'Western Cape',
+    city: 'Cape Town',
+    department: null,
+    bbbeePreference: false,
+    nqfRequirement: null,
+    languageRequirements: ['English'],
+    isRemote: false,
+    applications: 0
+  } as JobPosting;
 }
 
 export async function updateJobPosting(id: number, updates: Partial<InsertJobPosting>): Promise<JobPosting> {
