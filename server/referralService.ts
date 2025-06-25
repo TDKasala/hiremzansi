@@ -129,25 +129,25 @@ export class ReferralService {
     // Get referral statistics
     const stats = await this.getReferralStats(referrerId);
     
-    // Award based on milestones - aligned with actual pricing
+    // Award based on milestones - aligned with current pricing
     if (stats.registered >= 1 && !await this.hasReward(referrerId, 'free_analysis')) {
-      await this.awardReward(referrerId, 'free_analysis', 2, 0, '2 Free CV Analyses (Welcome Reward)');
+      await this.awardReward(referrerId, 'free_analysis', 2, 1000, '2 Free CV Analyses (R10 value)');
     }
     
     if (stats.registered >= 3 && !await this.hasReward(referrerId, 'essential_pack')) {
-      await this.awardReward(referrerId, 'essential_pack', 1, 4900, 'Free Essential Pack (R49 value)');
+      await this.awardReward(referrerId, 'essential_pack', 1, 2500, 'Free Essential Pack (R25 value)');
     }
     
     if (stats.registered >= 5 && !await this.hasReward(referrerId, 'professional_month')) {
-      await this.awardReward(referrerId, 'professional_month', 1, 9900, '1-Month Professional Plan (R99 value)');
+      await this.awardReward(referrerId, 'professional_month', 1, 5000, '1-Month Professional Plan (R50 value)');
     }
     
-    if (stats.premiumConversions >= 3 && !await this.hasReward(referrerId, 'professional_bonus')) {
-      await this.awardReward(referrerId, 'professional_month', 1, 9900, 'Bonus Professional Month (Premium Referrals)');
+    if (stats.premiumConversions >= 2 && !await this.hasReward(referrerId, 'professional_bonus')) {
+      await this.awardReward(referrerId, 'professional_month', 1, 5000, 'Bonus Professional Month (Premium Referrals)');
     }
     
     if (stats.registered >= 10 && !await this.hasReward(referrerId, 'annual_discount')) {
-      await this.awardReward(referrerId, 'discount_credit', 1, 20000, '20% Discount on Annual Plans');
+      await this.awardReward(referrerId, 'discount_credit', 1, 10000, '20% Discount on Annual Plans (R100 value)');
     }
   }
 
