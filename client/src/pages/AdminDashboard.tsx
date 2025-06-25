@@ -117,13 +117,18 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const checkAdminAuth = async () => {
       console.log('AdminDashboard: Starting authentication check...');
+      
+      // Add a small delay to ensure token is properly stored after redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const token = localStorage.getItem('admin_token') || localStorage.getItem('adminToken');
       
       console.log('AdminDashboard: Token found:', !!token);
+      console.log('AdminDashboard: Token preview:', token ? token.substring(0, 20) + '...' : 'none');
       
       if (!token) {
-        console.log('AdminDashboard: No token, redirecting to login');
-        setLocation('/admin/login');
+        console.log('AdminDashboard: No token found, redirecting to login');
+        setTimeout(() => setLocation('/admin/login'), 100);
         return;
       }
 
@@ -135,9 +140,12 @@ const AdminDashboard: React.FC = () => {
           }
         });
 
+        console.log('AdminDashboard: Server response status:', response.status);
+
         if (response.ok) {
           const data = await response.json();
-          console.log('AdminDashboard: Authentication successful, data received:', data);
+          console.log('AdminDashboard: Authentication successful, staying on dashboard');
+          console.log('AdminDashboard: Platform data:', data);
           
           // Set admin user info
           setAdminUser({
@@ -146,17 +154,17 @@ const AdminDashboard: React.FC = () => {
             role: 'admin'
           });
           
-          // Don't redirect, stay on dashboard
+          console.log('AdminDashboard: Admin user set, authentication complete');
         } else {
-          console.log('AdminDashboard: Authentication failed, clearing token');
+          console.log('AdminDashboard: Token verification failed, clearing storage');
           localStorage.removeItem('admin_token');
           localStorage.removeItem('adminToken');
           localStorage.removeItem('admin_user');
-          setLocation('/admin/login');
+          setTimeout(() => setLocation('/admin/login'), 100);
         }
       } catch (error) {
-        console.error('AdminDashboard: Auth check error:', error);
-        setLocation('/admin/login');
+        console.error('AdminDashboard: Authentication check failed:', error);
+        setTimeout(() => setLocation('/admin/login'), 100);
       } finally {
         setIsLoading(false);
       }
