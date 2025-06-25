@@ -71,25 +71,29 @@ export function generateAdminToken(user: AdminUser): string {
 export function verifyAdminToken(token: string): AdminUser | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    console.log('Decoded admin token:', decoded);
+    console.log('Admin token verification - decoded:', decoded);
     
-    // Check if this is an admin token - handle both token structures
+    // Handle multiple token structures
     const userId = decoded.userId || decoded.id;
     const userRole = decoded.role;
-    const isAdmin = decoded.isAdmin || userRole === 'admin';
+    const isAdminFlag = decoded.isAdmin;
     
-    if (!isAdmin) {
-      console.log('Token does not have admin privileges');
+    // Must be admin role AND have isAdmin flag
+    if (userRole !== 'admin' || !isAdminFlag) {
+      console.log('Token verification failed - role:', userRole, 'isAdmin:', isAdminFlag);
       return null;
     }
     
-    return {
+    const adminUser = {
       id: userId,
       email: decoded.email,
       name: decoded.name || decoded.email,
       role: userRole,
       isAdmin: true
     };
+    
+    console.log('Admin token verified successfully for user:', adminUser.email);
+    return adminUser;
   } catch (error) {
     console.error("Token verification error:", error);
     return null;
@@ -97,23 +101,33 @@ export function verifyAdminToken(token: string): AdminUser | null {
 }
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  console.log('Admin middleware - checking authorization header');
+  
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
+    console.log('No token provided');
     return res.status(401).json({ message: "Access token required" });
   }
 
   try {
     const user = verifyAdminToken(token);
-    if (!user || !user.isAdmin) {
+    if (!user) {
+      console.log('Token verification failed');
       return res.status(403).json({ message: "Admin access required" });
     }
 
+    if (!user.isAdmin) {
+      console.log('User is not admin:', user);
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    console.log('Admin access granted to:', user.email);
     req.adminUser = user;
     next();
   } catch (error) {
-    console.error('Admin token verification error:', error);
+    console.error('Admin middleware error:', error);
     return res.status(401).json({ message: "Invalid authentication token" });
   }
 }

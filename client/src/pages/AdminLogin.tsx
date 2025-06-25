@@ -55,8 +55,8 @@ export default function AdminLogin() {
           description: `Welcome back, ${data.user.name || data.user.email}!`,
         });
 
-        // Force redirect to admin dashboard
-        window.location.href = "/admin/dashboard";
+        // Force redirect to admin dashboard with immediate redirect
+        window.location.replace("/admin/dashboard");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Login failed");
