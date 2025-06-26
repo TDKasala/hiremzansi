@@ -162,6 +162,7 @@ function App() {
                 <Route path="/tools/cv-checklist" component={CVChecklistPage} />
                 <Route path="/tools/job-fit-quiz" component={JobFitQuizPage} />
                 <Route path="/tools/interview-guide" component={InterviewGuidePage} />
+                <Route path="/tools/interview-practice" component={InterviewPracticePage} />
                 <Route path="/interview-practice" component={InterviewPracticePage} />
                 <Route path="/skill-gap-analysis" component={SkillGapAnalysisPage} />
                 <Route path="/career-path-visualizer" component={CareerPathVisualizerPage} />
