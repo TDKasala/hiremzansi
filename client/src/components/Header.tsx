@@ -53,7 +53,9 @@ export default function Header() {
               alt="Hire Mzansi Logo" 
               className="h-10 md:h-12 transition-all duration-300 group-hover:brightness-110" 
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-blue-500/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-blue-500/30 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 blur-xl animate-pulse"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-green-300/20 to-blue-400/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 blur-2xl delay-100"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/40 via-transparent to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
           </div>
         </Link>
 
