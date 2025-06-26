@@ -6,7 +6,7 @@ Your Hire Mzansi platform has been configured to use your custom domain `hiremza
 ## Changes Made
 1. ✅ Updated BASE_URL to use `https://hiremzansi.co.za`
 2. ✅ Changed email verification redirects to your custom domain
-3. ✅ Modified email sender to use `noreply@hiremzansi.co.za`
+3. ✅ Modified email sender to use `noreply.hiremzansi@atsboost.co.za`
 4. ✅ Enhanced email headers for better deliverability
 5. ✅ Improved email templates to avoid spam triggers
 
@@ -48,7 +48,7 @@ hiremzansi.co.za → "v=spf1 include:sendgrid.net ~all"
 ### Step 5: Update Sender Identity
 1. Go to **Settings** → **Sender Identity** → **Single Sender Verification**
 2. Create a verified sender with:
-   - From Email: `noreply@hiremzansi.co.za`
+   - From Email: `noreply.hiremzansi@atsboost.co.za`
    - From Name: `Hire Mzansi`
    - Reply To: `support@hiremzansi.co.za`
 
