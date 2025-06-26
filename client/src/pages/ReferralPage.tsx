@@ -471,10 +471,7 @@ export default function ReferralPage() {
             Help your network overcome South Africa's 32% unemployment crisis.
             Share Hire Mzansi with friends and earn rewards together.
           </p>
-          <Button size="lg" onClick={copyToClipboard} className="mr-4">
-            <Share2 className="mr-2 h-5 w-5" />
-            Share Your Referral Link
-          </Button>
+          
           
         </div>
       </div>
