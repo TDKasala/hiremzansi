@@ -373,33 +373,33 @@ export default function InterviewPracticePage() {
         />
       </Helmet>
       
-      <div className="container mx-auto px-4 py-10 max-w-6xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-10 max-w-6xl">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 leading-tight">
             AI Interview Practice
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base px-2">
             Practice with AI-generated interview questions tailored to your CV and target roles. 
             Get instant feedback and improve your interview confidence.
           </p>
         </div>
 
         {!sessionStarted ? (
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Session Setup */}
             <div className="lg:col-span-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <Target className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                     Setup Interview Practice
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-sm">
                     Configure your practice session based on the role you're targeting
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
+                <CardContent className="space-y-4 sm:space-y-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="text-sm font-medium mb-2 block">
                         Job Title (Optional)
@@ -408,6 +408,7 @@ export default function InterviewPracticePage() {
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
                         placeholder="e.g., Software Developer"
+                        className="text-sm sm:text-base"
                       />
                     </div>
                     <div>
@@ -415,7 +416,7 @@ export default function InterviewPracticePage() {
                         Interview Type
                       </label>
                       <Select value={interviewType} onValueChange={setInterviewType}>
-                        <SelectTrigger>
+                        <SelectTrigger className="text-sm sm:text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -429,13 +430,13 @@ export default function InterviewPracticePage() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <label className="text-sm font-medium mb-2 block">
                         Difficulty Level
                       </label>
                       <Select value={difficulty} onValueChange={setDifficulty}>
-                        <SelectTrigger>
+                        <SelectTrigger className="text-sm sm:text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -450,7 +451,7 @@ export default function InterviewPracticePage() {
                         Number of Questions
                       </label>
                       <Select value={questionCount} onValueChange={setQuestionCount}>
-                        <SelectTrigger>
+                        <SelectTrigger className="text-sm sm:text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -471,14 +472,14 @@ export default function InterviewPracticePage() {
                       value={jobDescription}
                       onChange={(e) => setJobDescription(e.target.value)}
                       placeholder="Paste the job description here to generate relevant interview questions..."
-                      className="min-h-32"
+                      className="min-h-24 sm:min-h-32 text-sm sm:text-base resize-none"
                     />
                   </div>
 
                   <Button 
                     onClick={startSession} 
                     disabled={createSessionMutation.isPending}
-                    className="w-full"
+                    className="w-full h-11 sm:h-12 text-sm sm:text-base"
                   >
                     {createSessionMutation.isPending ? (
                       "Generating Questions..."
@@ -494,11 +495,11 @@ export default function InterviewPracticePage() {
             </div>
 
             {/* Previous Sessions */}
-            <div>
+            <div className="mt-6 lg:mt-0">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                     Recent Sessions
                   </CardTitle>
                 </CardHeader>
@@ -506,19 +507,19 @@ export default function InterviewPracticePage() {
                   {sessionsLoading ? (
                     <div className="space-y-2">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-16 bg-muted rounded animate-pulse" />
+                        <div key={i} className="h-14 sm:h-16 bg-muted rounded animate-pulse" />
                       ))}
                     </div>
                   ) : sessions && Array.isArray(sessions) && sessions.length > 0 ? (
                     <div className="space-y-2">
                       {sessions.slice(0, 5).map((session: InterviewSession) => (
                         <div key={session.id} className="p-3 border rounded-lg">
-                          <div className="flex justify-between items-start mb-1">
-                            <p className="font-medium text-sm truncate">
+                          <div className="flex justify-between items-start mb-1 gap-2">
+                            <p className="font-medium text-sm truncate min-w-0">
                               {session.jobTitle || "General Interview"}
                             </p>
                             {session.overallScore && (
-                              <Badge variant="outline" className={getScoreColor(session.overallScore)}>
+                              <Badge variant="outline" className={`${getScoreColor(session.overallScore)} text-xs flex-shrink-0`}>
                                 {session.overallScore}%
                               </Badge>
                             )}
@@ -541,47 +542,47 @@ export default function InterviewPracticePage() {
         ) : sessionCompleted ? (
           // Session Results
           <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-                Interview Practice Completed
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="flex flex-col sm:flex-row items-center justify-center gap-2 text-lg sm:text-2xl">
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0" />
+                <span className="leading-tight">Interview Practice Completed</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Here's your performance summary and feedback
               </CardDescription>
             </CardHeader>
             <CardContent>
               {currentSession?.overallScore && (
-                <div className="text-center mb-8">
-                  <div className={`text-6xl font-bold mb-2 ${getScoreColor(currentSession.overallScore)}`}>
+                <div className="text-center mb-6 sm:mb-8">
+                  <div className={`text-4xl sm:text-6xl font-bold mb-2 ${getScoreColor(currentSession.overallScore)}`}>
                     {currentSession.overallScore}%
                   </div>
-                  <p className="text-muted-foreground">Overall Score</p>
+                  <p className="text-muted-foreground text-sm sm:text-base">Overall Score</p>
                 </div>
               )}
 
               {currentSession?.overallFeedback && (
-                <div className="mb-8 p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-semibold mb-2">Overall Feedback</h3>
+                <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold mb-2 text-sm sm:text-base">Overall Feedback</h3>
                   <p className="text-sm">{currentSession.overallFeedback}</p>
                 </div>
               )}
 
-              <div className="space-y-4 mb-8">
-                <h3 className="font-semibold">Question-by-Question Results</h3>
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                <h3 className="font-semibold text-sm sm:text-base">Question-by-Question Results</h3>
                 {currentSession?.questions.map((question, index) => {
                   const evaluation = currentSession.evaluations[question.id];
                   return (
-                    <div key={question.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1">
-                          <Badge className={getDifficultyColor(question.difficulty)}>
+                    <div key={question.id} className="border rounded-lg p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                        <div className="flex-1 min-w-0">
+                          <Badge className={`${getDifficultyColor(question.difficulty)} text-xs`}>
                             {question.difficulty}
                           </Badge>
-                          <p className="font-medium mt-1">{question.text}</p>
+                          <p className="font-medium mt-1 text-sm sm:text-base leading-tight">{question.text}</p>
                         </div>
                         {evaluation && (
-                          <Badge variant="outline" className={getScoreColor(evaluation.score)}>
+                          <Badge variant="outline" className={`${getScoreColor(evaluation.score)} text-xs flex-shrink-0`}>
                             {evaluation.score}%
                           </Badge>
                         )}
@@ -591,8 +592,8 @@ export default function InterviewPracticePage() {
                         <div className="mt-3 space-y-2">
                           {evaluation.strengths.length > 0 && (
                             <div>
-                              <p className="text-sm font-medium text-green-700">Strengths:</p>
-                              <ul className="text-sm text-green-600 ml-4">
+                              <p className="text-xs sm:text-sm font-medium text-green-700">Strengths:</p>
+                              <ul className="text-xs sm:text-sm text-green-600 ml-3 sm:ml-4 space-y-1">
                                 {evaluation.strengths.map((strength, i) => (
                                   <li key={i}>• {strength}</li>
                                 ))}
@@ -602,8 +603,8 @@ export default function InterviewPracticePage() {
                           
                           {evaluation.improvementTips.length > 0 && (
                             <div>
-                              <p className="text-sm font-medium text-orange-700">Improvement Tips:</p>
-                              <ul className="text-sm text-orange-600 ml-4">
+                              <p className="text-xs sm:text-sm font-medium text-orange-700">Improvement Tips:</p>
+                              <ul className="text-xs sm:text-sm text-orange-600 ml-3 sm:ml-4 space-y-1">
                                 {evaluation.improvementTips.map((tip, i) => (
                                   <li key={i}>• {tip}</li>
                                 ))}
@@ -617,12 +618,12 @@ export default function InterviewPracticePage() {
                 })}
               </div>
 
-              <div className="flex gap-4 justify-center">
-                <Button onClick={startNewSession}>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <Button onClick={startNewSession} className="w-full sm:w-auto">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Start New Session
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="w-full sm:w-auto">
                   <Link href="/dashboard">
                     View Dashboard
                   </Link>
@@ -635,19 +636,19 @@ export default function InterviewPracticePage() {
           currentSession && (
             <div className="max-w-4xl mx-auto">
               <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                    <div className="min-w-0">
+                      <CardTitle className="text-lg sm:text-xl truncate">
                         Question {currentQuestionIndex + 1} of {currentSession.questions.length}
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-sm truncate">
                         {currentSession.jobTitle && `${currentSession.jobTitle} Interview`}
                       </CardDescription>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right flex-shrink-0">
                       {timeLeft !== null && (
-                        <div className={`text-2xl font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-primary'}`}>
+                        <div className={`text-xl sm:text-2xl font-bold ${timeLeft <= 30 ? 'text-red-600' : 'text-primary'}`}>
                           {formatTime(timeLeft)}
                         </div>
                       )}
@@ -655,36 +656,36 @@ export default function InterviewPracticePage() {
                   </div>
                   <Progress 
                     value={((currentQuestionIndex + 1) / currentSession.questions.length) * 100} 
-                    className="mt-4"
+                    className="mt-3 sm:mt-4"
                   />
                 </CardHeader>
                 <CardContent>
                   {(() => {
                     const currentQuestion = currentSession.questions[currentQuestionIndex];
                     return (
-                      <div className="space-y-6">
+                      <div className="space-y-4 sm:space-y-6">
                         <div>
-                          <div className="flex items-center gap-2 mb-3">
+                          <div className="flex flex-wrap items-center gap-2 mb-3">
                             <Badge className={getDifficultyColor(currentQuestion.difficulty)}>
                               {currentQuestion.difficulty}
                             </Badge>
-                            <Badge variant="outline">
+                            <Badge variant="outline" className="text-xs">
                               {currentQuestion.type}
                             </Badge>
                             {currentQuestion.timeLimit && (
-                              <Badge variant="outline">
+                              <Badge variant="outline" className="text-xs">
                                 <Clock className="mr-1 h-3 w-3" />
                                 {Math.floor(currentQuestion.timeLimit / 60)}m
                               </Badge>
                             )}
                           </div>
-                          <h2 className="text-xl font-semibold mb-4">
+                          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 leading-tight">
                             {currentQuestion.text}
                           </h2>
                           
                           {currentQuestion.expectedTopics && currentQuestion.expectedTopics.length > 0 && (
                             <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                              <p className="text-sm font-medium text-blue-800 mb-1">
+                              <p className="text-sm font-medium text-blue-800 mb-2">
                                 Consider covering these topics:
                               </p>
                               <div className="flex flex-wrap gap-1">
@@ -706,13 +707,13 @@ export default function InterviewPracticePage() {
                             value={currentAnswer}
                             onChange={(e) => setCurrentAnswer(e.target.value)}
                             placeholder="Type your answer here..."
-                            className="min-h-32"
+                            className="min-h-24 sm:min-h-32 text-sm sm:text-base resize-none"
                           />
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
                           {currentQuestion.timeLimit && !isTimerActive && timeLeft === null && (
-                            <Button onClick={startTimer} variant="outline">
+                            <Button onClick={startTimer} variant="outline" className="w-full sm:w-auto">
                               <Clock className="mr-2 h-4 w-4" />
                               Start Timer
                             </Button>
@@ -721,6 +722,7 @@ export default function InterviewPracticePage() {
                           <Button 
                             onClick={handleSubmitAnswer}
                             disabled={submitAnswerMutation.isPending || !currentAnswer.trim()}
+                            className="w-full sm:flex-1"
                           >
                             {submitAnswerMutation.isPending ? (
                               "Evaluating..."
@@ -728,7 +730,8 @@ export default function InterviewPracticePage() {
                               "Complete Interview"
                             ) : (
                               <>
-                                Submit & Next
+                                <span className="sm:hidden">Submit</span>
+                                <span className="hidden sm:inline">Submit & Next</span>
                                 <ChevronRight className="ml-2 h-4 w-4" />
                               </>
                             )}
@@ -737,8 +740,9 @@ export default function InterviewPracticePage() {
                           <Button 
                             onClick={handleSkipQuestion}
                             variant="outline"
+                            className="w-full sm:w-auto"
                           >
-                            Skip Question
+                            Skip
                           </Button>
                         </div>
                       </div>
@@ -752,18 +756,18 @@ export default function InterviewPracticePage() {
         
         {/* Subscription Prompt Dialog */}
         {showSubscriptionPrompt && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="max-w-md mx-4">
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl">Upgrade to Continue</CardTitle>
-                <CardDescription>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md mx-auto">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-lg sm:text-xl">Upgrade to Continue</CardTitle>
+                <CardDescription className="text-sm">
                   You've reached the free limit of 2 interview questions. Upgrade to practice unlimited questions with our AI-powered interview coach.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">Premium Features:</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">Premium Features:</h4>
+                  <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
                     <li>• Unlimited interview practice sessions</li>
                     <li>• AI-powered answer evaluation</li>
                     <li>• Personalized improvement tips</li>
@@ -772,17 +776,17 @@ export default function InterviewPracticePage() {
                   </ul>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     variant="outline" 
                     onClick={() => setShowSubscriptionPrompt(false)}
-                    className="flex-1"
+                    className="w-full sm:flex-1 text-sm"
                   >
                     Maybe Later
                   </Button>
                   <Button 
                     asChild
-                    className="flex-1"
+                    className="w-full sm:flex-1 text-sm"
                   >
                     <Link href="/pricing">
                       Upgrade Now
