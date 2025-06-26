@@ -379,13 +379,12 @@ export default function TemplatesPage() {
                       </ul>
                     </div>
                   </div>
-                  <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <div className="mt-4 sm:mt-6">
                     <Button size="default" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={handleCreateCoverLetter}>
                       <FileText className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       <span className="hidden sm:inline">{hasPremium ? 'Create Cover Letter' : 'Upgrade for Cover Letters'}</span>
                       <span className="sm:hidden">{hasPremium ? 'Create Letter' : 'Upgrade'}</span>
                     </Button>
-                    
                   </div>
                 </CardContent>
               </Card>
