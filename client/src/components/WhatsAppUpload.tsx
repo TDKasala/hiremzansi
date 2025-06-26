@@ -127,34 +127,7 @@ export const WhatsAppUpload: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Promotional Header */}
-      <div className="bg-gradient-to-r from-green-50 via-blue-50 to-green-50 rounded-xl p-6 border border-green-200">
-        <div className="text-center mb-4">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Badge className="bg-green-500 text-white">NEW</Badge>
-            <h2 className="text-xl font-bold text-green-800">Upload Your CV via WhatsApp</h2>
-          </div>
-          <p className="text-gray-700 mb-4">
-            Need to analyze your CV on the go? Upload directly through WhatsApp and get instant ATS scoring and recommendations.
-          </p>
-          
-          {/* Feature Highlights */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <div className="flex items-center bg-green-100 px-3 py-1 rounded-full">
-              <Smartphone className="h-4 w-4 text-green-600 mr-2" />
-              <span className="text-green-800 font-medium text-sm">Fast & Mobile-Friendly</span>
-            </div>
-            <div className="flex items-center bg-blue-100 px-3 py-1 rounded-full">
-              <Clock className="h-4 w-4 text-blue-600 mr-2" />
-              <span className="text-blue-800 font-medium text-sm">Instant Results</span>
-            </div>
-            <div className="flex items-center bg-purple-100 px-3 py-1 rounded-full">
-              <Zap className="h-4 w-4 text-purple-600 mr-2" />
-              <span className="text-purple-800 font-medium text-sm">No Login Required</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       <Card className="max-w-md mx-auto">
         <CardHeader className="text-center">
