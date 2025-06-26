@@ -155,18 +155,7 @@ export default function SuccessStoriesSection() {
               ))}
             </div>
 
-            <motion.div
-              variants={itemVariants}
-              initial="hidden"
-              animate={isVisible ? "visible" : "hidden"}
-              className="flex justify-center px-4 sm:px-0"
-            >
-              <Link href="/pricing">
-                <Button size="lg" className="bg-primary hover:bg-amber-500 text-white w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base">
-                  Join Our Success Stories
-                </Button>
-              </Link>
-            </motion.div>
+            
           </div>
 
           <div className="flex justify-center order-1 lg:order-2 px-4 sm:px-0">
