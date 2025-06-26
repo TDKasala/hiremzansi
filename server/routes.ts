@@ -2978,15 +2978,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Interview Practice API endpoints
-  app.post("/api/interview/create-session", isAuthenticated, async (req: Request, res: Response) => {
+  // Interview Practice API endpoints - Allow unauthenticated access
+  app.post("/api/interview/create-session", async (req: Request, res: Response) => {
     try {
       const { jobTitle, jobDescription, difficulty, questionCount, type, cvContent } = req.body;
-      const userId = req.user?.id;
-
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      const userId = req.user?.id || 0; // Optional authentication - use 0 for guest users
 
       // Create session using interview simulation service
       const session = await interviewSimulationService.createSession(userId, {
@@ -3005,12 +3001,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/interview/sessions", isAuthenticated, async (req: Request, res: Response) => {
+  app.get("/api/interview/sessions", async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id;
 
       if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
+        // Return empty sessions for unauthenticated users
+        return res.json([]);
       }
 
       // Get user's interview sessions
@@ -3022,15 +3019,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/interview/sessions/:sessionId/answers", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/interview/sessions/:sessionId/answers", async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
       const { questionId, answer } = req.body;
-      const userId = req.user?.id;
-
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      const userId = req.user?.id || 0; // Optional authentication
 
       // Submit answer and get evaluation
       const evaluation = await interviewSimulationService.submitAnswerById(sessionId, questionId, answer, userId);
@@ -3041,14 +3034,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/interview/sessions/:sessionId/complete", isAuthenticated, async (req: Request, res: Response) => {
+  app.post("/api/interview/sessions/:sessionId/complete", async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
-      const userId = req.user?.id;
-
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      const userId = req.user?.id || 0; // Optional authentication
 
       // Complete session and get overall feedback
       const result = await interviewSimulationService.completeSessionById(sessionId, userId);

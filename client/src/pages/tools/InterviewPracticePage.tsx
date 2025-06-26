@@ -104,13 +104,13 @@ export default function InterviewPracticePage() {
   const [questionCount, setQuestionCount] = useState("5");
   const [interviewType, setInterviewType] = useState("general");
 
-  // Fetch user's latest CV for context
+  // Fetch user's latest CV for context (optional for logged-in users)
   const { data: latestCV } = useQuery({
     queryKey: ["/api/latest-cv"],
     enabled: !!user,
   });
 
-  // Fetch user's interview sessions
+  // Fetch user's interview sessions (optional for logged-in users)
   const { data: sessions, isLoading: sessionsLoading } = useQuery({
     queryKey: ["/api/interview/sessions"],
     enabled: !!user,
@@ -361,24 +361,7 @@ export default function InterviewPracticePage() {
     return 'text-red-600';
   };
 
-  if (!user) {
-    return (
-      <div className="container mx-auto px-4 py-10 max-w-4xl">
-        <Alert>
-          <MessageCircle className="h-4 w-4" />
-          <AlertTitle>Authentication Required</AlertTitle>
-          <AlertDescription>
-            Please sign in to access the interview practice feature.
-            <div className="mt-2">
-              <Link href="/auth">
-                <Button size="sm">Sign In</Button>
-              </Link>
-            </div>
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  // Remove authentication requirement - allow all users to access the service
 
   return (
     <>

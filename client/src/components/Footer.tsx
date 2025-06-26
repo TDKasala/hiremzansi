@@ -93,7 +93,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/interview-practice" className="text-neutral-400 hover:text-white transition-colors">
+                <Link href="/tools/interview-practice" className="text-neutral-400 hover:text-white transition-colors">
                   Interview Practice
                 </Link>
               </li>
