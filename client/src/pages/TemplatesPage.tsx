@@ -385,10 +385,7 @@ export default function TemplatesPage() {
                       <span className="hidden sm:inline">{hasPremium ? 'Create Cover Letter' : 'Upgrade for Cover Letters'}</span>
                       <span className="sm:hidden">{hasPremium ? 'Create Letter' : 'Upgrade'}</span>
                     </Button>
-                    <Button variant="outline" size="default" className="w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={() => handleViewExamples('cover-letter')}>
-                      <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      Browse Examples
-                    </Button>
+                    
                   </div>
                 </CardContent>
               </Card>
