@@ -180,18 +180,19 @@ export default function ReferralPage() {
           </Alert>
         )}
         
-        {/* Referral Link Card */}
-        <Card className="mb-8 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Share2 className="h-5 w-5 text-primary" />
-              {t('referral.yourReferralLink')}
-            </CardTitle>
-            <CardDescription>
-              {t('referral.shareLink')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+        {/* Referral Link Card - Only show for authenticated users */}
+        {user && (
+          <Card className="mb-8 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Share2 className="h-5 w-5 text-primary" />
+                {t('referral.yourReferralLink')}
+              </CardTitle>
+              <CardDescription>
+                {t('referral.shareLink')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input 
                 value={referralLink} 
@@ -260,7 +261,10 @@ export default function ReferralPage() {
             </div>
           </CardContent>
         </Card>
+        )}
         
+        {/* Referral Stats - Only show for authenticated users */}
+        {user && (
         <div className="grid md:grid-cols-2 gap-8 mb-10">
           {/* Referral Stats */}
           <Card>
@@ -349,8 +353,10 @@ export default function ReferralPage() {
             </CardContent>
           </Card>
         </div>
+        )}
         
-        {/* Call to Action */}
+        {/* Call to Action - Only show for authenticated users */}
+        {user && (
         <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 text-center mb-10">
           <h2 className="text-2xl font-bold mb-2">Start Earning CV Analysis Credits</h2>
           <p className="mb-4 max-w-2xl mx-auto">
@@ -369,6 +375,7 @@ export default function ReferralPage() {
             </Button>
           </div>
         </div>
+        )}
         
         {/* FAQ Section */}
         <div className="mb-10">
