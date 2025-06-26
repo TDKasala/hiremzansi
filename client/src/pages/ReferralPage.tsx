@@ -65,8 +65,8 @@ export default function ReferralPage() {
   });
 
   useEffect(() => {
-    if (referralData?.referralLink) {
-      setReferralLink(referralData.referralLink);
+    if (referralData && typeof referralData === 'object' && 'referralLink' in referralData) {
+      setReferralLink(referralData.referralLink as string);
     }
   }, [referralData]);
   
@@ -79,14 +79,23 @@ export default function ReferralPage() {
     { type: "10 Friends Sign Up", reward: "20% Annual Discount (R100 savings)" }
   ];
 
-  const displayStats = referralStats || {
+  const displayStats = (referralStats && typeof referralStats === 'object') ? {
+    invited: (referralStats as any).invited || 0,
+    registered: (referralStats as any).registered || 0,
+    premiumConversions: (referralStats as any).premiumConversions || 0,
+    freeAnalysisEarned: (referralStats as any).freeAnalysisEarned || 0,
+  } : {
     invited: 0,
     registered: 0,
     premiumConversions: 0,
     freeAnalysisEarned: 0,
   };
 
-  const displayCredits = userCredits || {
+  const displayCredits = (userCredits && typeof userCredits === 'object') ? {
+    freeAnalysisCredits: (userCredits as any).freeAnalysisCredits || 0,
+    scanCredits: (userCredits as any).scanCredits || 0,
+    premiumMonths: (userCredits as any).premiumMonths || 0,
+  } : {
     freeAnalysisCredits: 0,
     scanCredits: 0,
     premiumMonths: 0,
@@ -133,14 +142,14 @@ export default function ReferralPage() {
   return (
     <>
       <Helmet>
-        <title>Refer 3 Friends, Get Free CV Deep Analysis | Hire Mzansi</title>
+        <title>Refer Friends & Earn CV Credits | Hire Mzansi Referral Program</title>
         <meta 
           name="description" 
-          content="Refer 3 friends to Hire Mzansi and get a FREE CV Deep Analysis (R30 value). Help your network improve their CVs while earning valuable resume optimization benefits." 
+          content="Refer friends to Hire Mzansi and earn valuable CV analysis credits. Help your network improve their CVs while earning rewards for professional development." 
         />
         <meta 
           name="keywords" 
-          content="free CV deep analysis, resume optimization rewards, Hire Mzansi referral, South African CV tool, job application referral" 
+          content="CV analysis credits, resume optimization rewards, Hire Mzansi referral, South African CV tool, job application referral" 
         />
       </Helmet>
       
@@ -150,7 +159,7 @@ export default function ReferralPage() {
             {t('referral.title')}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Help your network improve their job applications and earn valuable rewards. Get a FREE CV Deep Analysis when 3 friends sign up using your referral link.
+            Help your network improve their job applications and earn valuable rewards. Refer friends and unlock progressive benefits from free CV analysis credits to premium plan access.
           </p>
         </div>
         
@@ -334,7 +343,7 @@ export default function ReferralPage() {
               
               <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
                 <p>
-                  <span className="font-medium">Referral Benefits:</span> 3 friends = Free CV Deep Analysis, 10 friends = 1 month Premium account access.
+                  <span className="font-medium">How it works:</span> Earn rewards as your friends sign up and use our services. Each milestone unlocks valuable CV optimization benefits.
                 </p>
               </div>
             </CardContent>
@@ -343,10 +352,9 @@ export default function ReferralPage() {
         
         {/* Call to Action */}
         <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 text-center mb-10">
-          <h2 className="text-2xl font-bold mb-2">Get Your Free CV Deep Analysis</h2>
+          <h2 className="text-2xl font-bold mb-2">Start Earning CV Analysis Credits</h2>
           <p className="mb-4 max-w-2xl mx-auto">
-            Share your referral link with 3 friends and unlock a comprehensive CV Deep Analysis 
-            worth R30—your key to standing out in the competitive South African job market.
+            Share your referral link and earn valuable rewards. From free CV analysis credits to premium plan access—help your network while advancing your career.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button onClick={copyToClipboard} className="bg-green-600 hover:bg-green-700">
@@ -367,24 +375,21 @@ export default function ReferralPage() {
           <h2 className="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
           <div className="grid gap-4">
             <div className="p-4 border rounded-lg">
-              <h3 className="font-bold mb-2">How do I get my free CV Deep Analysis?</h3>
+              <h3 className="font-bold mb-2">How do I earn CV analysis credits?</h3>
               <p className="text-muted-foreground">
-                Share your unique referral link with friends. Once 3 friends create accounts using 
-                your link, you'll automatically receive a free Deep Analysis credit in your account.
+                Share your unique referral link with friends. As they sign up and use our services, you'll automatically receive credits and rewards based on our progressive reward structure.
               </p>
             </div>
             <div className="p-4 border rounded-lg">
-              <h3 className="font-bold mb-2">What's included in the CV Deep Analysis?</h3>
+              <h3 className="font-bold mb-2">What can I do with earned credits?</h3>
               <p className="text-muted-foreground">
-                The Deep Analysis (worth R30) includes professional CV feedback with South African context, 
-                industry-specific keyword recommendations, B-BBEE optimization, and personalized improvement tips.
+                Credits can be used for CV analysis services, including professional feedback with South African context, industry-specific keyword recommendations, B-BBEE optimization, and personalized improvement tips.
               </p>
             </div>
             <div className="p-4 border rounded-lg">
               <h3 className="font-bold mb-2">Is there a limit to how many rewards I can earn?</h3>
               <p className="text-muted-foreground">
-                No! You can earn multiple rewards. For every 3 referrals, you get another free CV Deep Analysis. 
-                At 10 referrals, you'll unlock a free month of Premium account access.
+                No limit! You can earn unlimited rewards. Each friend who signs up earns you credits, and premium conversions unlock even more valuable benefits including free monthly access.
               </p>
             </div>
           </div>
@@ -395,15 +400,15 @@ export default function ReferralPage() {
           <CardContent className="pt-6 pb-6">
             <div className="text-center">
               <h3 className="text-xl md:text-2xl font-bold mb-2">
-                3 Referrals = Free CV Deep Analysis
+                Earn Progressive Rewards Through Referrals
               </h3>
               <p className="mb-4 max-w-2xl mx-auto">
                 Your network needs quality CV feedback to succeed in South Africa's job market.
-                Share Hire Mzansi and get valuable tools to boost your own career journey.
+                Share Hire Mzansi and earn valuable credits and premium access while helping others.
               </p>
               <Button variant="default" className="bg-white text-secondary hover:bg-white/90" asChild>
-                <Link href="/refer">
-                  Start Referring Now
+                <Link href="/dashboard">
+                  View Your Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
