@@ -56,7 +56,7 @@ export function useWhatsApp() {
   // Send verification code
   const { mutate: sendVerification, isPending: isVerifying } = useMutation({
     mutationFn: async (phoneNumber: string) => {
-      const res = await apiRequest("POST", "/api/whatsapp-verify", { phoneNumber });
+      const res = await apiRequest("POST", "/api/whatsapp/verify", { phoneNumber });
       return await res.json();
     },
     onSuccess: () => {

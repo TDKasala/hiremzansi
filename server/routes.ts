@@ -2287,6 +2287,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Newsletter Subscription Route
+  app.post("/api/newsletter/subscribe", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, source } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      // Store newsletter subscription in database
+      const subscriptionData = {
+        email,
+        isActive: true,
+        source: source || 'website',
+        subscriptionDate: new Date()
+      };
+      
+      // For now, we'll just log the subscription since we don't have a newsletter table in our schema
+      console.log('Newsletter subscription:', subscriptionData);
+      
+      res.status(200).json({ 
+        success: true, 
+        message: "Successfully subscribed to newsletter" 
+      });
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error);
+      next(error);
+    }
+  });
+  
   // Template Generation API Routes with Security Measures
   app.post("/api/templates/ai-cv", isAuthenticated, hasActiveSubscription, async (req: Request, res: Response, next: NextFunction) => {
     try {
