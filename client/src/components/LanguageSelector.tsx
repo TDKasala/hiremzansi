@@ -39,26 +39,24 @@ const LanguageSelector = () => {
   };
 
   return (
-    <div className="flex items-center">
-      <Select value={getCurrentLanguage()} onValueChange={changeLanguage}>
-        <SelectTrigger className="w-[140px] h-9 border-muted-foreground/20">
-          <div className="flex items-center gap-2">
-            <Globe className="h-4 w-4" />
-            <span>{getCurrentNativeName()}</span>
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          {languages.map((language) => (
-            <SelectItem key={language.code} value={language.code}>
-              <span className="flex items-center gap-2">
-                <span>{language.nativeName}</span>
-                <span className="text-xs text-muted-foreground">({language.name})</span>
-              </span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={getCurrentLanguage()} onValueChange={changeLanguage}>
+      <SelectTrigger className="w-[100px] h-8 border-0 bg-transparent hover:bg-accent/50 focus:ring-1 focus:ring-primary/20 transition-all duration-200">
+        <div className="flex items-center gap-1.5">
+          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+          <span className="text-sm font-medium">{getCurrentNativeName()}</span>
+        </div>
+      </SelectTrigger>
+      <SelectContent className="min-w-[140px]">
+        {languages.map((language) => (
+          <SelectItem key={language.code} value={language.code} className="cursor-pointer">
+            <div className="flex items-center justify-between w-full">
+              <span className="font-medium">{language.nativeName}</span>
+              <span className="text-xs text-muted-foreground ml-2">({language.name})</span>
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
 
