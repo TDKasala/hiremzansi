@@ -471,10 +471,7 @@ export default function TemplatesPage() {
                       <span className="hidden sm:inline">{hasPremium ? 'Start Building' : 'Upgrade to Build'}</span>
                       <span className="sm:hidden">{hasPremium ? 'Start' : 'Upgrade'}</span>
                     </Button>
-                    <Button variant="outline" size="default" className="w-full sm:w-auto text-sm sm:text-base h-10 sm:h-11" onClick={() => handleViewExamples('dynamic-builder')}>
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      Watch Demo
-                    </Button>
+                    
                   </div>
                 </CardContent>
               </Card>
