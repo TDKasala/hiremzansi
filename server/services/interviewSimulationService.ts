@@ -448,6 +448,9 @@ Average Score: ${averageScore}/100`;
       completedAt: undefined
     };
     
+    // Store the session
+    this.storeSession(session);
+    
     return session;
   }
   
@@ -492,16 +495,56 @@ Average Score: ${averageScore}/100`;
     return session;
   }
   
-  // Get a session by ID (placeholder for database integration)
+  // In-memory storage for sessions (replace with database later)
+  private sessions: Map<string, InterviewSession> = new Map();
+  private userSessions: Map<number, string[]> = new Map();
+
+  // Get a session by ID
   async getSessionById(sessionId: string): Promise<InterviewSession | null> {
-    // TODO: Retrieve session from database
-    return null;
+    return this.sessions.get(sessionId) || null;
   }
   
-  // Get all sessions for a user (placeholder for database integration)
-  async getSessionsByUser(userId: number): Promise<InterviewSession[]> {
-    // TODO: Retrieve sessions from database
-    return [];
+  // Get all sessions for a user
+  async getUserSessions(userId: number): Promise<InterviewSession[]> {
+    const sessionIds = this.userSessions.get(userId) || [];
+    return sessionIds.map(id => this.sessions.get(id)).filter(Boolean) as InterviewSession[];
+  }
+
+  // Store session
+  private storeSession(session: InterviewSession): void {
+    this.sessions.set(session.id, session);
+    
+    const userSessionIds = this.userSessions.get(session.userId) || [];
+    if (!userSessionIds.includes(session.id)) {
+      userSessionIds.push(session.id);
+      this.userSessions.set(session.userId, userSessionIds);
+    }
+  }
+
+  // Submit answer with session ID
+  async submitAnswerById(sessionId: string, questionId: string, answer: string, userId: number): Promise<InterviewEvaluation> {
+    const session = await this.getSessionById(sessionId);
+    if (!session || session.userId !== userId) {
+      throw new Error("Session not found or access denied");
+    }
+
+    const updatedSession = await this.submitAnswer(session, questionId, answer);
+    this.storeSession(updatedSession);
+
+    return updatedSession.evaluations[questionId];
+  }
+
+  // Complete session with session ID
+  async completeSessionById(sessionId: string, userId: number): Promise<InterviewSession> {
+    const session = await this.getSessionById(sessionId);
+    if (!session || session.userId !== userId) {
+      throw new Error("Session not found or access denied");
+    }
+
+    const completedSession = await this.completeSession(session);
+    this.storeSession(completedSession);
+
+    return completedSession;
   }
 }
 

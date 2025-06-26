@@ -77,7 +77,7 @@ import CoverLetterIdeasPage from "@/pages/tools/CoverLetterIdeasPage";
 import CVChecklistPage from "@/pages/tools/CVChecklistPage";
 import JobFitQuizPage from "@/pages/tools/JobFitQuizPage";
 import InterviewGuidePage from "@/pages/tools/InterviewGuidePage";
-import InterviewPracticePage from "@/pages/InterviewPracticePage";
+import InterviewPracticePage from "@/pages/tools/InterviewPracticePage";
 import SkillGapAnalysisPage from "@/pages/SkillGapAnalysisPage";
 import CareerPathVisualizerPage from "@/pages/CareerPathVisualizerPage";
 

@@ -12,6 +12,7 @@ import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
 import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnalysisService";
 import { generateQuizQuestions } from "./services/quizGeneratorService";
 import { careerPathService } from "./services/careerPathService";
+import { interviewSimulationService } from "./services/interviewSimulationService";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -2978,6 +2979,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Interview Practice API endpoints
+  app.post("/api/interview/create-session", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { jobTitle, jobDescription, difficulty, questionCount, type, cvContent } = req.body;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Create session using interview simulation service
+      const session = await interviewSimulationService.createSession(userId, {
+        jobTitle,
+        jobDescription,
+        cvContent,
+        type,
+        questionCount: parseInt(questionCount) || 5,
+        difficulty
+      });
+
+      res.json(session);
+    } catch (error) {
+      console.error("Error creating interview session:", error);
+      res.status(500).json({ error: "Failed to create interview session" });
+    }
+  });
+
+  app.get("/api/interview/sessions", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Get user's interview sessions
+      const sessions = await interviewSimulationService.getUserSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching interview sessions:", error);
+      res.status(500).json({ error: "Failed to fetch sessions" });
+    }
+  });
+
+  app.post("/api/interview/sessions/:sessionId/answers", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      const { questionId, answer } = req.body;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Submit answer and get evaluation
+      const evaluation = await interviewSimulationService.submitAnswerById(sessionId, questionId, answer, userId);
+      res.json(evaluation);
+    } catch (error) {
+      console.error("Error submitting interview answer:", error);
+      res.status(500).json({ error: "Failed to submit answer" });
+    }
+  });
+
+  app.post("/api/interview/sessions/:sessionId/complete", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Complete session and get overall feedback
+      const result = await interviewSimulationService.completeSessionById(sessionId, userId);
+      res.json(result);
+    } catch (error) {
+      console.error("Error completing interview session:", error);
+      res.status(500).json({ error: "Failed to complete session" });
+    }
+  });
+
+  // Legacy endpoint for backward compatibility
   app.post("/api/interview/generate-questions", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { jobTitle, difficulty, questionCount, jobDescription } = req.body;
