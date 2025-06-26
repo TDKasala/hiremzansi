@@ -3835,17 +3835,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin API endpoints - simplified for current database structure
-  app.get("/api/admin/stats", (req: Request, res: Response) => {
+  // Admin API endpoints - with real database data
+  app.get("/api/admin/stats", async (req: Request, res: Response) => {
     try {
-      // Return mock stats since we're in minimal mode
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const JWT_SECRET = process.env.JWT_SECRET || "hire-mzansi-admin-secret-2024";
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      
+      if (!decoded || decoded.role !== 'admin' || !decoded.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Get real stats from database
+      const users = await storage.getAllUsers();
+      const cvs = await storage.getAllCVs();
+      
+      // Calculate real platform statistics
+      const totalUsers = users.length;
+      const activeUsers = users.filter(u => u.isActive !== false).length;
+      const totalCVs = cvs.length;
+      const premiumUsers = 0; // Will be calculated when subscription system is active
+      const totalRevenue = 0; // Will be calculated from payments
+      const monthlyRevenue = 0; // Will be calculated from current month payments
+      
       res.json({
-        totalUsers: 25,
-        totalCVs: 48,
-        totalJobPostings: 12,
-        totalMatches: 156,
-        premiumUsers: 8,
-        activeRecruiters: 5,
+        totalUsers,
+        activeUsers,
+        totalCVs,
+        premiumUsers,
+        totalRevenue,
+        monthlyRevenue
       });
     } catch (error) {
       console.error("Error fetching admin stats:", error);
@@ -3853,69 +3878,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/users", (req: Request, res: Response) => {
+  app.get("/api/admin/users", async (req: Request, res: Response) => {
     try {
-      // Return sample users for admin dashboard
-      const sampleUsers = [
-        {
-          id: 1,
-          email: "john.doe@example.com",
-          name: "John Doe",
-          role: "user",
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          isPremium: false,
-        },
-        {
-          id: 2,
-          email: "jane.smith@example.com", 
-          name: "Jane Smith",
-          role: "premium",
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          lastLogin: new Date().toISOString(),
-          isPremium: true,
-        },
-        {
-          id: 999999,
-          email: "deniskasala17@gmail.com",
-          name: "Denis Kasala",
-          role: "admin",
-          createdAt: new Date(Date.now() - 604800000).toISOString(),
-          lastLogin: new Date().toISOString(),
-          isPremium: false,
-        }
-      ];
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
 
-      res.json(sampleUsers);
+      const JWT_SECRET = process.env.JWT_SECRET || "hire-mzansi-admin-secret-2024";
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      
+      if (!decoded || decoded.role !== 'admin' || !decoded.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Get real users from database
+      const users = await storage.getAllUsers();
+      
+      const adminUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        name: user.name || user.username || 'No name',
+        username: user.username,
+        role: user.role,
+        createdAt: user.createdAt?.toISOString() || new Date().toISOString(),
+        lastLogin: user.lastLogin?.toISOString() || null,
+        isPremium: false,
+        isActive: user.isActive !== false,
+        emailVerified: user.emailVerified || false,
+        subscriptionStatus: 'none',
+        totalCVs: 0
+      }));
+
+      res.json(adminUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
     }
   });
 
-  app.get("/api/admin/cvs", (req: Request, res: Response) => {
+  app.get("/api/admin/cvs", async (req: Request, res: Response) => {
     try {
-      // Return sample CVs for admin dashboard
-      const sampleCVs = [
-        {
-          id: 1,
-          fileName: "john_doe_cv.pdf",
-          userId: 1,
-          userName: "John Doe",
-          uploadedAt: new Date().toISOString(),
-          analysisScore: 85,
-        },
-        {
-          id: 2,
-          fileName: "jane_smith_resume.pdf",
-          userId: 2,
-          userName: "Jane Smith", 
-          uploadedAt: new Date(Date.now() - 86400000).toISOString(),
-          analysisScore: 92,
-        }
-      ];
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
 
-      res.json(sampleCVs);
+      const JWT_SECRET = process.env.JWT_SECRET || "hire-mzansi-admin-secret-2024";
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      
+      if (!decoded || decoded.role !== 'admin' || !decoded.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Get real CVs from database
+      const cvs = await storage.getAllCVs();
+      const users = await storage.getAllUsers();
+      
+      const adminCVs = cvs.map(cv => {
+        const user = users.find(u => u.id === cv.userId);
+        return {
+          id: cv.id,
+          fileName: cv.fileName,
+          userId: cv.userId,
+          userName: user?.name || user?.username || 'Unknown User',
+          userEmail: user?.email || 'unknown@example.com',
+          createdAt: cv.createdAt?.toISOString() || new Date().toISOString(),
+          analysisStatus: 'completed',
+          fileSize: cv.fileSize || 0,
+          atsScore: 0,
+          saScore: 0
+        };
+      });
+
+      res.json(adminCVs);
     } catch (error) {
       console.error("Error fetching CVs:", error);
       res.status(500).json({ error: "Failed to fetch CVs" });
@@ -4875,6 +4915,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Mount admin routes with proper authentication
+  app.use("/api/admin", adminRoutes);
   
   // Create HTTP server
   const httpServer = createServer(app);

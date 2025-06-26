@@ -4,6 +4,7 @@ import { users, cvs, atsScores, saProfiles, plans, subscriptions } from "@shared
 import { count, sql, and, eq, gte, desc } from "drizzle-orm";
 import { sendWeeklyCareerDigests } from "../services/recommendationService";
 import { storage } from "../databaseStorage";
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -18,10 +19,10 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const jwt = require('jsonwebtoken');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+    const JWT_SECRET = process.env.JWT_SECRET || "hire-mzansi-admin-secret-2024";
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
     
-    if (!decoded || decoded.role !== 'admin') {
+    if (!decoded || decoded.role !== 'admin' || !decoded.isAdmin) {
       return res.status(403).json({ error: "Admin access required" });
     }
 
