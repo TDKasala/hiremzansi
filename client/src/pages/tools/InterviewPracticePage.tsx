@@ -82,6 +82,9 @@ export default function InterviewPracticePage() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+
+  // Check if user has active subscription (using isAdmin as proxy for premium for now)
+  const hasActiveSubscription = user?.isAdmin;
   
   // State management
   const [currentSession, setCurrentSession] = useState<InterviewSession | null>(null);
@@ -91,6 +94,8 @@ export default function InterviewPracticePage() {
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionCompleted, setSessionCompleted] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState(0);
+  const [showSubscriptionPrompt, setShowSubscriptionPrompt] = useState(false);
   
   // Form state for session creation
   const [jobTitle, setJobTitle] = useState("");
@@ -174,6 +179,9 @@ export default function InterviewPracticePage() {
           },
         };
         setCurrentSession(updatedSession);
+        
+        // Increment answered questions counter
+        setAnsweredQuestions(prev => prev + 1);
       }
       
       // Move to next question or complete session
@@ -290,6 +298,12 @@ export default function InterviewPracticePage() {
         description: "Please provide an answer before submitting.",
         variant: "destructive",
       });
+      return;
+    }
+
+    // Check subscription limit for non-premium users
+    if (!hasActiveSubscription && answeredQuestions >= 2) {
+      setShowSubscriptionPrompt(true);
       return;
     }
     
@@ -751,6 +765,71 @@ export default function InterviewPracticePage() {
               </Card>
             </div>
           )
+        )}
+        
+        {/* Subscription Prompt Dialog */}
+        {showSubscriptionPrompt && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="max-w-md mx-4">
+              <CardHeader className="text-center">
+                <CardTitle className="text-xl">Upgrade to Continue</CardTitle>
+                <CardDescription>
+                  You've reached the free limit of 2 interview questions. Upgrade to practice unlimited questions with our AI-powered interview coach.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">Premium Features:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Unlimited interview practice sessions</li>
+                    <li>• AI-powered answer evaluation</li>
+                    <li>• Personalized improvement tips</li>
+                    <li>• South African context awareness</li>
+                    <li>• Progress tracking and analytics</li>
+                  </ul>
+                </div>
+                
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowSubscriptionPrompt(false)}
+                    className="flex-1"
+                  >
+                    Maybe Later
+                  </Button>
+                  <Button 
+                    asChild
+                    className="flex-1"
+                  >
+                    <Link href="/pricing">
+                      Upgrade Now
+                    </Link>
+                  </Button>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">
+                    Starting from R25/month • Cancel anytime
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Progress indicator for free users */}
+        {!hasActiveSubscription && answeredQuestions > 0 && (
+          <div className="fixed bottom-4 right-4 bg-white p-3 rounded-lg shadow-lg border">
+            <div className="text-sm text-gray-600">
+              Free questions: {answeredQuestions}/2
+            </div>
+            <div className="w-24 bg-gray-200 rounded-full h-2 mt-1">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all"
+                style={{ width: `${(answeredQuestions / 2) * 100}%` }}
+              />
+            </div>
+          </div>
         )}
       </div>
     </>

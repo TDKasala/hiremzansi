@@ -126,8 +126,8 @@ export default function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem>
-                    <span className="text-gray-400">Interview Practice (Coming Soon)</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/interview-practice">Interview Practice</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/settings">Settings</Link>

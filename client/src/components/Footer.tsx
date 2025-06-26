@@ -93,6 +93,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/interview-practice" className="text-neutral-400 hover:text-white transition-colors">
+                  Interview Practice
+                </Link>
+              </li>
+              <li>
                 <Link href="/blog" className="text-neutral-400 hover:text-white transition-colors">
                   CV Tips
                 </Link>
