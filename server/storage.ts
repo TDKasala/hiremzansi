@@ -142,6 +142,7 @@ export class DatabaseStorage implements IStorage {
       phoneNumber: null,
       phoneVerified: false,
       isTemporary: false,
+      referralCode: 'HMADMIN001',
       createdAt: new Date(),
       updatedAt: new Date()
     });
@@ -230,7 +231,9 @@ export class DatabaseStorage implements IStorage {
         })
         .returning();
       
-      // Note: Referral code temporarily disabled until database migration adds the column
+      // Generate referral code for new user
+      const referralCode = `HM${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substr(2, 3).toUpperCase()}`;
+      user.referralCode = referralCode;
       
       return user;
     } catch (error: any) {
