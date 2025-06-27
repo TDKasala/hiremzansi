@@ -42,6 +42,7 @@ import { db } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import bcrypt from "bcrypt";
 
 // Create memory session store for development
 const MemStore = MemoryStore(session);
@@ -201,43 +202,41 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    // For now, create a simple in-memory user for testing
-    // In production, this would use the actual database
-    const now = new Date();
-    const newUser: User = {
-      id: Math.floor(Math.random() * 10000),
-      username: insertUser.username,
-      email: insertUser.email,
-      password: insertUser.password,
-      name: insertUser.name || null,
-      profilePicture: insertUser.profilePicture || null,
-      role: 'user',
-      isActive: true,
-      emailVerified: false,
-      verificationToken: null,
-      verificationTokenExpiry: null,
-      lastLogin: null,
-      resetToken: null,
-      resetTokenExpiry: null,
-      receiveEmailDigest: true,
-      lastEmailDigestSent: null,
-      phoneNumber: null,
-      phoneVerified: false,
-      isTemporary: false,
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    // Initialize memUsers if it doesn't exist
-    if (!this.memUsers) {
-      this.memUsers = new Map<string, User>();
+  async createUser(userData: any): Promise<User> {
+    try {
+      // Hash the password if provided
+      const hashedPassword = userData.password 
+        ? await bcrypt.hash(userData.password, 12)
+        : userData.password;
+
+      // Try to add the user without referral code first, then update it
+      const [user] = await db
+        .insert(users)
+        .values({
+          username: userData.username,
+          email: userData.email,
+          password: hashedPassword,
+          name: userData.name || null,
+          profilePicture: userData.profilePicture || null,
+          role: userData.role || 'user',
+          isActive: userData.isActive ?? true,
+          emailVerified: userData.emailVerified ?? false,
+          receiveEmailDigest: userData.receiveEmailDigest ?? true,
+          phoneNumber: userData.phoneNumber || null,
+          phoneVerified: userData.phoneVerified ?? false,
+          isTemporary: userData.isTemporary ?? false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      
+      // Note: Referral code temporarily disabled until database migration adds the column
+      
+      return user;
+    } catch (error: any) {
+      console.error("Error creating user in database:", error);
+      throw new Error(`Failed to create user: ${error.message}`);
     }
-    
-    // Store in memory for development (replace with actual DB in production)
-    this.memUsers.set(newUser.email, newUser);
-    
-    return newUser;
   }
 
   async updateUser(id: number, updates: any): Promise<User> {
