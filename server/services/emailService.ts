@@ -505,7 +505,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
   
   try {
     // Use verified sender with proper domain name
-    const fromAddress = options.from || 'noreply.hiremzansi@atsboost.co.za';
+    const fromAddress = options.from || 'noreply@hiremzansi.co.za';
     
     // Prepare Brevo email data
     const emailData = new SendSmtpEmail();
