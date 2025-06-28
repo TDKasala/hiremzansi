@@ -43,6 +43,7 @@ interface PersonalizedWelcomeProps {
 
 export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelcomeProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [liveTime, setLiveTime] = useState(new Date());
   
   // Get user's latest CV data
   const { data: latestCV } = useQuery<CVData>({
@@ -63,6 +64,12 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
     return () => clearInterval(timer);
   }, []);
 
+  // Update live time every second
+  useEffect(() => {
+    const liveTimer = setInterval(() => setLiveTime(new Date()), 1000);
+    return () => clearInterval(liveTimer);
+  }, []);
+
   const getTimeGreeting = () => {
     const hour = currentTime.getHours();
     if (hour < 12) return 'Good morning';
@@ -80,6 +87,15 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
       weekday: 'long',
       day: 'numeric',
       month: 'long'
+    });
+  };
+
+  const formatLiveTime = (date: Date) => {
+    return date.toLocaleTimeString('en-ZA', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
     });
   };
 
@@ -117,6 +133,8 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                   
                   <p className="text-lg sm:text-xl text-gray-600 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                     <span className="font-medium text-gray-800">{formatDate(currentTime)}</span>
+                    <span className="mx-2 text-purple-500">•</span>
+                    <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded-md text-sm">{formatLiveTime(liveTime)}</span>
                     <span className="mx-2 text-purple-500">•</span>
                     <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent font-semibold">
                       Transform your career with AI-powered CV optimization
@@ -228,7 +246,9 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                       {getTimeGreeting()}, {getUserName()}! 🌟
                     </h1>
                     <p className="text-lg text-gray-600">
-                      {formatDate(currentTime)} • Ready to boost your career today?
+                      {formatDate(currentTime)} • 
+                      <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded-md text-sm mx-2">{formatLiveTime(liveTime)}</span>
+                      • Ready to boost your career today?
                     </p>
                   </div>
 
