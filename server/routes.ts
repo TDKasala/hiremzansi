@@ -1617,7 +1617,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user statistics for personalized welcome screen
   app.get("/api/user/stats", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
       
       // Get CV analysis count and latest analysis date
       const cvs = await storage.getCVsByUserId(userId);
