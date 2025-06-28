@@ -15,7 +15,7 @@ export function SignIn() {
   const [error, setError] = useState<string | null>(null);
   const [, setLocation] = useLocation();
   
-  const { signIn } = useAuth();
+  const { signIn, checkAuth } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,22 +28,17 @@ export function SignIn() {
     
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+      // Use AuthContext signIn method for proper state management
+      const result = await signIn(email, password);
+      
+      if (result.error) {
+        throw result.error;
       }
       
-      // Refresh the page to update auth state
-      window.location.href = '/dashboard';
+      // Refresh auth state and redirect to dashboard
+      await checkAuth();
+      setLocation('/dashboard');
     } catch (err: any) {
       console.error('Sign in error:', err);
       setError(err.message || 'Invalid email or password');
