@@ -84,20 +84,19 @@ export default function ChatBot({ variant = 'floating', className = '' }: ChatBo
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; sessionId: string }) => {
-      return await apiRequest('/api/chat/message', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return await apiRequest('POST', '/api/chat/message', data);
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       // Remove typing indicator
       setMessages(prev => prev.filter(msg => !msg.typing));
+      
+      // Parse the response JSON
+      const data = await response.json();
       
       // Add bot response
       setMessages(prev => [...prev, {
         id: `bot_${Date.now()}`,
-        content: response.message,
+        content: data.message || 'Sorry, I had trouble processing your request.',
         sender: 'bot',
         timestamp: new Date()
       }]);
