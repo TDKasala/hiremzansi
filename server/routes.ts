@@ -1910,7 +1910,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create CV record
       const cv = await storage.saveCV(cvData);
       
-      res.status(201).json(cv);
+      // Return response in the format the frontend expects
+      res.status(201).json({
+        success: true,
+        cv: cv,
+        message: "CV uploaded successfully"
+      });
     } catch (error) {
       console.error("Error processing upload:", error);
       res.status(500).json({ 
