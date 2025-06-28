@@ -1,14 +1,17 @@
 import OpenAI from "openai";
 
-// Initialize xAI client (primary) and OpenAI client (fallback)
-const xai = new OpenAI({
-  baseURL: "https://api.x.ai/v1",
-  apiKey: process.env.XAI_API_KEY,
-});
-
+// Initialize OpenAI client (fallback)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Function to get current xAI client with fresh API key
+function getXAIClient() {
+  return new OpenAI({
+    baseURL: "https://api.x.ai/v1",
+    apiKey: "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq",
+  });
+}
 
 export interface CVAnalysisResult {
   atsScore: number;
@@ -46,8 +49,10 @@ class XAIService {
   private async makeRequest(prompt: string, maxTokens: number = 4000): Promise<string> {
     // Try xAI first, fallback to OpenAI
     try {
-      const response = await xai.chat.completions.create({
-        model: "grok-2-1212",
+      const xaiClient = getXAIClient();
+      console.log("Using xAI API key:", "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq".substring(0, 15) + "...");
+      const response = await xaiClient.chat.completions.create({
+        model: "grok-3-mini",
         messages: [{ role: "user", content: prompt }],
         max_tokens: maxTokens,
         temperature: 0.7,
