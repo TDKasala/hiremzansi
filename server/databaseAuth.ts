@@ -104,24 +104,34 @@ export const databaseAuth = {
   },
 
   async verifyEmailToken(token: string) {
+    console.log('Verifying email token:', token);
     const tokenData = emailVerificationTokens.get(token);
+    console.log('Token data found:', tokenData ? 'Yes' : 'No');
+    
     if (!tokenData) {
+      console.log('Token not found in memory store');
       return false;
     }
 
     if (new Date() > tokenData.expires) {
+      console.log('Token has expired');
       emailVerificationTokens.delete(token);
       return false;
     }
 
     // Mark user as verified
+    console.log('Updating user verification status for email:', tokenData.email);
     const user = await this.getUserByEmail(tokenData.email);
     if (user) {
+      console.log('User found, updating verification status');
       await storage.updateUser(user.id, { 
         emailVerified: true,
         verificationToken: null,
         verificationTokenExpiry: null
       });
+      console.log('User verification status updated successfully');
+    } else {
+      console.log('User not found for email:', tokenData.email);
     }
 
     emailVerificationTokens.delete(token);
