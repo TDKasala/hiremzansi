@@ -1,19 +1,20 @@
-import { MailService } from '@sendgrid/mail';
-import type { MailDataRequired } from '@sendgrid/mail';
+import { TransactionalEmailsApi, SendSmtpEmail, TransactionalEmailsApiApiKeys } from '@getbrevo/brevo';
 
-// Initialize SendGrid mail service
-const mailService = new MailService();
-
-// Check if SendGrid API key is available
-const sendgridApiKey = process.env.SENDGRID_API_KEY;
+// Initialize Brevo (formerly Sendinblue) mail service
+let apiInstance: TransactionalEmailsApi;
 let emailServiceEnabled = false;
 
-if (sendgridApiKey) {
-  mailService.setApiKey(sendgridApiKey);
+// Check if Brevo API key is available
+const brevoApiKey = process.env.BREVO_API_KEY || process.env.SENDGRID_API_KEY; // Fallback to SendGrid key for smooth transition
+
+if (brevoApiKey) {
+  // Initialize Brevo API with API key
+  apiInstance = new TransactionalEmailsApi();
+  apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
   emailServiceEnabled = true;
-  console.log('SendGrid email service initialized successfully');
+  console.log('Brevo email service initialized successfully');
 } else {
-  console.warn('SENDGRID_API_KEY not found in environment variables. Email service will be disabled.');
+  console.warn('BREVO_API_KEY not found in environment variables. Email service will be disabled.');
 }
 
 // Email templates
@@ -479,7 +480,7 @@ interface EmailOptions {
 }
 
 /**
- * Send an email using SendGrid
+ * Send an email using Brevo (formerly Sendinblue)
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   if (!emailServiceEnabled) {
@@ -506,45 +507,32 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     // Use verified sender with proper domain name
     const fromAddress = options.from || 'noreply.hiremzansi@atsboost.co.za';
     
-    const emailData: MailDataRequired = {
-      to: options.to,
-      from: {
-        email: fromAddress,
-        name: 'Hire Mzansi'
-      },
-      replyTo: {
-        email: 'support@hiremzansi.co.za',
-        name: 'Hire Mzansi Support'
-      },
-      subject: options.subject,
-      text: options.text || '',
-      html: options.html || '',
-      // Add headers to improve deliverability
-      headers: {
-        'X-Priority': '1',
-        'X-MSMail-Priority': 'High',
-        'Importance': 'High',
-        'List-Unsubscribe': '<mailto:unsubscribe@hiremzansi.co.za>',
-        'X-Mailer': 'Hire Mzansi Email Service'
-      },
-      // Add tracking settings to improve reputation
-      trackingSettings: {
-        clickTracking: {
-          enable: false
-        },
-        openTracking: {
-          enable: false
-        }
-      }
+    // Prepare Brevo email data
+    const emailData = new SendSmtpEmail();
+    emailData.to = [{ email: options.to }];
+    emailData.sender = { email: fromAddress, name: 'Hire Mzansi' };
+    emailData.replyTo = { email: 'support@hiremzansi.co.za', name: 'Hire Mzansi Support' };
+    emailData.subject = options.subject;
+    emailData.textContent = options.text || '';
+    emailData.htmlContent = options.html || '';
+    
+    // Add headers for better deliverability
+    emailData.headers = {
+      'X-Priority': '1',
+      'X-MSMail-Priority': 'High',
+      'Importance': 'High',
+      'List-Unsubscribe': '<mailto:unsubscribe@hiremzansi.co.za>',
+      'X-Mailer': 'Hire Mzansi Email Service'
     };
     
-    await mailService.send(emailData);
+    // Send email via Brevo
+    await apiInstance.sendTransacEmail(emailData);
     
     console.log(`Email sent successfully to ${options.to}`);
     return true;
   } catch (error) {
     if (isDevelopment) {
-      console.log('SendGrid sender not verified yet - using development mode');
+      console.log('Brevo sender not verified yet - using development mode');
       return true; // Return true in development to continue flow
     }
     console.error('Failed to send email:', error);

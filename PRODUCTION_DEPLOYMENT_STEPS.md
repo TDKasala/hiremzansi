@@ -6,7 +6,7 @@ To launch Hire Mzansi in production, you need these API keys:
 
 ### 1. Essential Services
 - **XAI_API_KEY**: For AI-powered CV analysis (core feature)
-- **SENDGRID_API_KEY**: For email verification and notifications
+- **BREVO_API_KEY**: For email verification and notifications (migrated from SendGrid)
 - **SESSION_SECRET**: Secure random string for session encryption
 
 ### 2. Optional Services
@@ -36,10 +36,10 @@ Set these in your Replit deployment:
 
 ```bash
 NODE_ENV=production
-DATABASE_URL=your_supabase_postgresql_url
-SESSION_SECRET=your_secure_random_string_32_chars_min
+DATABASE_URL=your_neon_postgresql_url
+SESSION_SECRET=d2d77211c82bcd23f9dea2b84413a46acec55c976cf61c79f84d71ad47526ecf
 XAI_API_KEY=your_xai_api_key
-SENDGRID_API_KEY=your_sendgrid_api_key
+BREVO_API_KEY=your_brevo_api_key
 OPENAI_API_KEY=your_openai_api_key (optional)
 TWILIO_ACCOUNT_SID=your_twilio_sid (optional)
 TWILIO_AUTH_TOKEN=your_twilio_token (optional)
