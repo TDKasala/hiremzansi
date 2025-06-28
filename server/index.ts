@@ -1,6 +1,9 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+import cookieParser from "cookie-parser";
+import { Pool } from "pg";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
@@ -12,8 +15,32 @@ import { setupScheduledTasks, cleanupScheduledTasks } from "./services/scheduled
 
 const app = express();
 
+// Add cookie parser middleware for JWT authentication
+app.use(cookieParser());
+
+// Configure PostgreSQL session store with proper node-postgres pool
+const PgSession = connectPgSimple(session);
+
+// Create a proper node-postgres pool for sessions
+const sessionPool = new Pool({
+  host: process.env.PGHOST,
+  port: parseInt(process.env.PGPORT || '5432'),
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: { rejectUnauthorized: false },
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
 // Configure session middleware for authentication persistence
 app.use(session({
+  store: new PgSession({
+    pool: sessionPool,
+    tableName: 'session',
+    createTableIfMissing: true
+  }),
   secret: process.env.SESSION_SECRET || 'dev-session-secret-key',
   resave: false,
   saveUninitialized: false,

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./databaseStorage";
 import { initializeDatabase } from "./db-init";
 import multer from "multer";
+import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { extractTextFromPDF } from "./services/simplePdfParser";
 import { extractTextFromDOCX } from "./services/docxParser";
@@ -409,16 +410,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Store user in session
-      (req as any).session.userId = user.id;
-      (req as any).session.user = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        name: user.name,
-        role: user.role
-      };
+      // Generate JWT token for authentication
+      const token = jwt.sign(
+        { 
+          userId: user.id,
+          email: user.email,
+          username: user.username,
+          name: user.name,
+          role: user.role
+        }, 
+        process.env.JWT_SECRET || 'fallback-secret-key-for-development', 
+        { expiresIn: '7d' }
+      );
 
+      // Set token as httpOnly cookie
+      res.cookie('auth_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+
+      console.log('User authenticated successfully:', user.email);
       res.json({ 
         message: "Login successful",
         user: {
@@ -427,7 +440,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: user.username,
           name: user.name,
           role: user.role,
-          emailVerified: user.emailVerified
+          emailVerified: user.emailVerified,
+          isAdmin: user.role === 'admin'
         },
         redirectTo: "/dashboard"
       });
@@ -494,20 +508,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Session-based authentication middleware
-  const requireSession = (req: Request, res: Response, next: NextFunction) => {
-    const session = (req as any).session;
-    if (!session?.userId) {
+  // JWT cookie-based authentication middleware
+  const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies?.auth_token;
+    
+    if (!token) {
+      console.log('Authentication failed: No auth token cookie');
       return res.status(401).json({ message: "Authentication required" });
     }
-    (req as any).user = session.user;
-    next();
+    
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+      (req as any).user = {
+        id: decoded.userId,
+        email: decoded.email,
+        username: decoded.username,
+        name: decoded.name,
+        role: decoded.role,
+        isAdmin: decoded.role === 'admin'
+      };
+      console.log('Authentication successful for user:', decoded.email);
+      next();
+    } catch (error) {
+      console.log('Authentication failed: Invalid token');
+      return res.status(401).json({ message: "Authentication required" });
+    }
   };
 
-  app.get("/api/auth/me", requireSession, async (req: Request, res: Response, next: NextFunction) => {
+  app.get("/api/auth/me", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const sessionUser = (req as any).user;
-      const user = await databaseAuth.getUserByEmail(sessionUser.email);
+      const authenticatedUser = (req as any).user;
+      const user = await databaseAuth.getUserByEmail(authenticatedUser.email);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -518,7 +549,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: user.email,
         username: user.username,
         name: user.name,
-        role: user.role
+        role: user.role,
+        emailVerified: user.emailVerified,
+        isAdmin: user.role === 'admin'
       });
     } catch (error) {
       console.error("Get user error:", error);
@@ -527,13 +560,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/auth/logout", (req: Request, res: Response) => {
-    (req as any).session.destroy((err: any) => {
-      if (err) {
-        console.error("Logout error:", err);
-        return res.status(500).json({ message: "Failed to logout" });
-      }
-      res.json({ message: "Logged out successfully" });
+    // Clear the authentication cookie
+    res.clearCookie('auth_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax'
     });
+    
+    console.log('User logged out successfully');
+    res.json({ message: "Logged out successfully" });
   });
 
   // Use the admin routes from admin.ts
