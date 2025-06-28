@@ -513,7 +513,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     emailData.sender = { email: fromAddress, name: 'Hire Mzansi' };
     emailData.replyTo = { email: 'support@hiremzansi.co.za', name: 'Hire Mzansi Support' };
     emailData.subject = options.subject;
-    emailData.textContent = options.text || '';
+    emailData.textContent = options.text || `Please visit ${options.html ? 'the link in this email' : 'our website'} to complete your action.`;
     emailData.htmlContent = options.html || '';
     
     // Add headers for better deliverability
@@ -531,11 +531,12 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     console.log(`Email sent successfully to ${options.to}`);
     return true;
   } catch (error) {
+    console.error('Failed to send email via Brevo:', error);
     if (isDevelopment) {
       console.log('Brevo sender not verified yet - using development mode');
+      console.log('Error details:', error.response?.data || error.message);
       return true; // Return true in development to continue flow
     }
-    console.error('Failed to send email:', error);
     return false;
   }
 }
