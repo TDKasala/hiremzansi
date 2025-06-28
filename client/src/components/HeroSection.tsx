@@ -123,9 +123,7 @@ export default function HeroSection() {
               <Badge className="bg-primary/90 hover:bg-primary font-bold mb-4">
                 {t('home.southAfricanFocused')}
               </Badge>
-              <h1 className="text-3xl md:text-5xl font-bold mb-4">
-                AI-Powered CV Optimization for South Africa
-              </h1>
+              
             </div>
             <p className="text-lg md:text-xl mb-6 text-white font-normal">
               Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
