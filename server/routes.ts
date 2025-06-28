@@ -13,6 +13,8 @@ import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnaly
 import { generateQuizQuestions } from "./services/quizGeneratorService";
 import { careerPathService } from "./services/careerPathService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
+import { linkTrackingService } from "./services/linkTrackingService";
+import { extractTrackingData, handleLinkClick } from "./middleware/linkTrackingMiddleware";
 import { 
   insertUserSchema, 
   insertCvSchema, 
@@ -44,7 +46,6 @@ import crypto from "crypto";
 import { payfastService } from "./services/payfastService";
 import { whatsappService } from "./services/whatsappService";
 import { jobBoardService } from "./services/jobBoardService";
-import { interviewSimulationService } from "./services/interviewSimulationService";
 import { jobMatchingService } from "./services/jobMatchingService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
 import { chatService } from "./services/chatService";
@@ -537,6 +538,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Use the admin routes from admin.ts
   app.use("/api/admin", adminRoutes);
+
+  // Link Tracking Routes
+  
+  // Middleware to add tracking data to all requests
+  app.use(extractTrackingData);
+  
+  // Record a link click
+  app.post("/api/track/click", handleLinkClick);
+  
+  // Admin analytics endpoints
+  app.get("/api/admin/analytics/overview", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const dateRange = req.query.days ? {
+        start: new Date(Date.now() - parseInt(req.query.days as string) * 24 * 60 * 60 * 1000),
+        end: new Date()
+      } : undefined;
+
+      const analytics = await linkTrackingService.getClickAnalytics(dateRange);
+      res.json(analytics);
+    } catch (error) {
+      console.error('Error getting analytics overview:', error);
+      res.status(500).json({ error: 'Failed to get analytics data' });
+    }
+  });
+
+  app.get("/api/admin/analytics/top-links", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const dateRange = req.query.days ? {
+        start: new Date(Date.now() - parseInt(req.query.days as string) * 24 * 60 * 60 * 1000),
+        end: new Date()
+      } : undefined;
+
+      const topLinks = await linkTrackingService.getTopLinks(limit, dateRange);
+      res.json(topLinks);
+    } catch (error) {
+      console.error('Error getting top links:', error);
+      res.status(500).json({ error: 'Failed to get top links' });
+    }
+  });
+
+  app.get("/api/admin/analytics/trends", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const trends = await linkTrackingService.getClickTrends(days);
+      res.json(trends);
+    } catch (error) {
+      console.error('Error getting click trends:', error);
+      res.status(500).json({ error: 'Failed to get click trends' });
+    }
+  });
   
   // Health check endpoints
   app.get("/api/health", async (_req: Request, res: Response, next: NextFunction) => {

@@ -38,6 +38,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet';
+import LinkAnalyticsDashboard from '@/components/admin/LinkAnalyticsDashboard';
 
 interface AdminStats {
   totalUsers: number;
@@ -543,11 +544,12 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-7">
+            <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="cvs">CVs</TabsTrigger>
               <TabsTrigger value="jobs">Jobs</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="health">System</TabsTrigger>
               <TabsTrigger value="activity">Activity</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -921,6 +923,10 @@ export default function AdminDashboard() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <LinkAnalyticsDashboard />
             </TabsContent>
 
             <TabsContent value="health">

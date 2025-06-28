@@ -863,3 +863,76 @@ export const insertNewsletterSubscriptionSchema = createInsertSchema(newsletterS
 
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSubscriptionSchema>;
+
+// Link Analytics Schema
+export const linkTracking = pgTable("link_tracking", {
+  id: serial("id").primaryKey(),
+  linkName: text("link_name").notNull(), // e.g., "header_logo", "footer_home", "pricing_button"
+  linkUrl: text("link_url").notNull(), // The destination URL
+  linkType: text("link_type").notNull(), // "internal", "external", "download", "action"
+  category: text("category").notNull(), // "navigation", "cta", "social", "referral"
+  page: text("page").notNull(), // Which page the link was clicked from
+  isActive: boolean("is_active").default(true),
+  description: text("description"), // Optional description of the link
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const linkClicks = pgTable("link_clicks", {
+  id: serial("id").primaryKey(),
+  linkId: integer("link_id").references(() => linkTracking.id).notNull(),
+  userId: integer("user_id").references(() => users.id), // null for anonymous users
+  sessionId: text("session_id"), // Track anonymous users via session
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  referer: text("referer"),
+  country: text("country"),
+  city: text("city"),
+  device: text("device"), // mobile, desktop, tablet
+  browser: text("browser"),
+  os: text("os"),
+  clickedAt: timestamp("clicked_at").defaultNow(),
+});
+
+export const linkTrackingRelations = relations(linkTracking, ({ many }) => ({
+  clicks: many(linkClicks),
+}));
+
+export const linkClicksRelations = relations(linkClicks, ({ one }) => ({
+  link: one(linkTracking, {
+    fields: [linkClicks.linkId],
+    references: [linkTracking.id],
+  }),
+  user: one(users, {
+    fields: [linkClicks.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertLinkTrackingSchema = createInsertSchema(linkTracking).pick({
+  linkName: true,
+  linkUrl: true,
+  linkType: true,
+  category: true,
+  page: true,
+  description: true,
+});
+
+export const insertLinkClickSchema = createInsertSchema(linkClicks).pick({
+  linkId: true,
+  userId: true,
+  sessionId: true,
+  ipAddress: true,
+  userAgent: true,
+  referer: true,
+  country: true,
+  city: true,
+  device: true,
+  browser: true,
+  os: true,
+});
+
+export type LinkTracking = typeof linkTracking.$inferSelect;
+export type LinkClick = typeof linkClicks.$inferSelect;
+export type InsertLinkTracking = z.infer<typeof insertLinkTrackingSchema>;
+export type InsertLinkClick = z.infer<typeof insertLinkClickSchema>;
