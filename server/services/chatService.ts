@@ -1,15 +1,17 @@
 import OpenAI from "openai";
 
-// Initialize xAI client
-const xai = new OpenAI({ 
-  baseURL: "https://api.x.ai/v1", 
-  apiKey: process.env.XAI_API_KEY 
-});
-
 // Initialize OpenAI client as fallback
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null;
+
+// Function to get current xAI client with fresh API key
+function getXAIClient() {
+  return new OpenAI({
+    baseURL: "https://api.x.ai/v1",
+    apiKey: "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq",
+  });
+}
 
 interface ChatSession {
   sessionId: string;
@@ -313,8 +315,9 @@ Our analysis checks for 25+ ATS factors specifically tuned for South African emp
       // Try xAI first
       if (process.env.XAI_API_KEY) {
         try {
-          const response = await xai.chat.completions.create({
-            model: "grok-2-1212",
+          const xaiClient = getXAIClient();
+          const response = await xaiClient.chat.completions.create({
+            model: "grok-3-mini",
             messages: messages,
             max_tokens: 300,
             temperature: 0.7,

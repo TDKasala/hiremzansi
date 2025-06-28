@@ -2018,7 +2018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if the CV belongs to the current user (if authenticated)
-      const isAuthenticated = req.isAuthenticated();
+      const isAuthenticated = !!req.user;
       const hasAccess = !isAuthenticated || !cv.userId || cv.userId === req.user?.id;
       
       if (!hasAccess) {
