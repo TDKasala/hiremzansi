@@ -44,30 +44,7 @@ export default function JobSitesPage() {
       verifiedEmployers: true,
       bestFor: "Wide range of jobs with easy application process"
     },
-    {
-      name: "LinkedIn Jobs",
-      url: "https://www.linkedin.com/jobs",
-      description: "Combines job listings with professional networking, allowing job seekers to connect with employers and see who they might know at companies of interest.",
-      features: ["Network Insights", "Professional Profiles", "Direct Messaging", "Skill Assessments"],
-      specialization: "Professional services, Tech, Finance",
-      rating: 4.6,
-      location: "South Africa & Global",
-      companyCount: "15,000+",
-      verifiedEmployers: true,
-      bestFor: "Networking while job hunting"
-    },
-    {
-      name: "Best Jobs South Africa",
-      url: "https://www.bestjobs.co.za",
-      description: "Specializes in highly-skilled professional positions with focus on the South African market. Features detailed job descriptions and direct application processes.",
-      features: ["B-BBEE Focused", "NQF Level Filters", "Provincial Search", "Local Company Focus"],
-      specialization: "Professional Services, Government",
-      rating: 4.1,
-      location: "South Africa (All Provinces)",
-      companyCount: "2,000+",
-      verifiedEmployers: true,
-      bestFor: "South African specific employment requirements"
-    },
+
     {
       name: "JobMail",
       url: "https://www.jobmail.co.za",
@@ -105,28 +82,16 @@ export default function JobSitesPage() {
       bestFor: "Creative industry positions"
     },
     {
-      name: "SA Learnerships",
-      url: "https://www.salearnerships.com",
-      description: "Focuses on learnerships, internships, and training opportunities for young South Africans entering the job market or looking to gain skills.",
-      features: ["Learnership Listings", "Bursary Information", "Skills Development", "Youth Employment"],
-      specialization: "Learnerships, Internships, Graduate Programs",
-      rating: 4.4,
-      location: "South Africa (National)",
-      companyCount: "1,000+",
+      name: "MyFitJobs",
+      url: "https://www.myfitjobs.co.za",
+      description: "A modern South African job portal focused on matching candidates with positions that align with their skills, experience, and career goals through intelligent job matching algorithms.",
+      features: ["Smart Job Matching", "Skills Assessment", "Career Path Guidance", "Personalized Recommendations"],
+      specialization: "Tech, Finance, Healthcare, Engineering",
+      rating: 4.3,
+      location: "South Africa (Major Cities)",
+      companyCount: "2,500+",
       verifiedEmployers: true,
-      bestFor: "Youth entering the job market"
-    },
-    {
-      name: "Jobs.co.za",
-      url: "https://www.jobs.co.za",
-      description: "A well-established South African job board with a strong focus on local positions and companies, featuring detailed company profiles and industry guides.",
-      features: ["Company Profiles", "Industry Guides", "Local Business Focus", "Provincial Filters"],
-      specialization: "All industries with South African focus",
-      rating: 4.2,
-      location: "South Africa (National)",
-      companyCount: "3,000+",
-      verifiedEmployers: true,
-      bestFor: "Detailed information about local companies"
+      bestFor: "Personalized job matching based on skills and preferences"
     }
   ];
 
