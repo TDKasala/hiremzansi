@@ -1561,6 +1561,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user statistics for personalized welcome screen
+  app.get("/api/user/stats", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get CV analysis count and latest analysis date
+      const cvs = await storage.getCVsByUserId(userId);
+      const totalAnalyses = cvs.length;
+      
+      let lastAnalysisDate = null;
+      if (cvs.length > 0) {
+        const sortedCVs = cvs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        lastAnalysisDate = sortedCVs[0].createdAt;
+      }
+
+      // Get latest CV analysis score if available
+      let latestScore = null;
+      if (cvs.length > 0) {
+        const latestCV = cvs[0];
+        if (latestCV.analysis) {
+          latestScore = latestCV.analysis.overallScore;
+        }
+      }
+
+      // Get subscription status
+      const subscription = await storage.getSubscription(userId);
+      
+      res.json({
+        totalAnalyses,
+        lastAnalysisDate,
+        latestScore,
+        hasSubscription: !!subscription,
+        subscriptionStatus: subscription?.status || null,
+        memberSince: req.user.createdAt
+      });
+    } catch (error) {
+      console.error('Error getting user stats:', error);
+      next(error);
+    }
+  });
+
   // Get latest CV for authenticated user
   app.get("/api/latest-cv", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {

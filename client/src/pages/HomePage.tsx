@@ -15,9 +15,19 @@ import { CVOptimizationShowcase } from "@/components/CVOptimizationShowcase";
 import { CVAnalysisFeatures } from "@/components/CVAnalysisFeatures";
 import { PremiumRecruiterSection } from "@/components/PremiumRecruiterSection";
 import { JobSeekerMatchingBanner } from "@/components/JobSeekerBenefitsAlert";
+import { PersonalizedWelcome } from "@/components/PersonalizedWelcome";
+import { useQuery } from '@tanstack/react-query';
 
 
 export default function HomePage() {
+  // Check authentication status
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['/api/auth/me'],
+    retry: false,
+  });
+
+  const isAuthenticated = !!user;
+
   return (
     <>
       <Helmet>
@@ -37,8 +47,17 @@ export default function HomePage() {
         <link rel="canonical" href="https://hiremzansi.co.za/" />
       </Helmet>
       
-      <HeroSection />
-      <UploadSection />
+      {/* Personalized welcome screen - shown first when authenticated */}
+      {!isLoading && <PersonalizedWelcome user={user} isAuthenticated={isAuthenticated} />}
+      
+      {/* Traditional hero section only for non-authenticated users */}
+      {!isAuthenticated && !isLoading && (
+        <>
+          <HeroSection />
+          <UploadSection />
+        </>
+      )}
+      
       <WhatsAppPromoSection />
       <CVOptimizationShowcase />
       <PremiumRecruiterSection />
