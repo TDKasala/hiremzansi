@@ -118,7 +118,6 @@ export default function JobsPage() {
         <meta property="og:title" content="Job Search - Find Your Dream Job in South Africa" />
         <meta property="og:description" content="Discover job opportunities across South Africa with intelligent matching based on your skills and preferences." />
       </Helmet>
-
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
@@ -206,7 +205,7 @@ export default function JobsPage() {
           <div className="space-y-4">
             {isLoading ? (
               // Loading skeleton
-              Array.from({ length: 5 }).map((_, index) => (
+              (Array.from({ length: 5 }).map((_, index) => (
                 <Card key={index} className="animate-pulse">
                   <CardContent className="p-6">
                     <div className="space-y-3">
@@ -216,16 +215,13 @@ export default function JobsPage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))
+              )))
             ) : (jobs as JobPosting[]).length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs available</h3>
-                  <p className="text-gray-600">
-                    No job postings are currently available. Employers can post jobs using our API - 
-                    see the POST_JOBS_GUIDE.md for implementation details.
-                  </p>
+                  <p className="text-gray-600">No job postings are currently available. Employers can post jobs using our API.</p>
                 </CardContent>
               </Card>
             ) : (
