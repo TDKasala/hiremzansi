@@ -3262,6 +3262,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Inquire about company culture',
               'Show genuine interest in the organization'
             ]
+          },
+          {
+            id: '11',
+            question: 'What attracted you to our company specifically?',
+            type: 'behavioral',
+            category: 'Company Interest',
+            difficulty: 'easy',
+            tips: [
+              'Research the company thoroughly beforehand',
+              'Mention specific values or initiatives',
+              'Connect company mission to your values',
+              'Show genuine enthusiasm and knowledge'
+            ]
+          },
+          {
+            id: '12',
+            question: 'How do you define success in a work environment?',
+            type: 'behavioral',
+            category: 'Success Definition',
+            difficulty: 'easy',
+            tips: [
+              'Include both personal and team achievements',
+              'Mention measurable outcomes',
+              'Show alignment with company goals',
+              'Demonstrate growth mindset'
+            ]
+          },
+          {
+            id: '13',
+            question: 'What type of work schedule do you prefer?',
+            type: 'behavioral',
+            category: 'Work Preferences',
+            difficulty: 'easy',
+            tips: [
+              'Show flexibility and adaptability',
+              'Consider the role requirements',
+              'Mention productivity preferences',
+              'Be honest but accommodating'
+            ]
+          },
+          {
+            id: '14',
+            question: 'How do you stay updated with industry trends?',
+            type: 'behavioral',
+            category: 'Professional Development',
+            difficulty: 'easy',
+            tips: [
+              'Mention specific resources you use',
+              'Show continuous learning commitment',
+              'Include formal and informal learning',
+              'Demonstrate proactive approach'
+            ]
+          },
+          {
+            id: '15',
+            question: 'What role do you typically play in team projects?',
+            type: 'behavioral',
+            category: 'Team Dynamics',
+            difficulty: 'easy',
+            tips: [
+              'Show versatility in different roles',
+              'Mention collaboration skills',
+              'Provide specific examples',
+              'Demonstrate team contribution'
+            ]
+          },
+          {
+            id: '16',
+            question: 'How do you celebrate achievements at work?',
+            type: 'behavioral',
+            category: 'Recognition',
+            difficulty: 'easy',
+            tips: [
+              'Show appreciation for team efforts',
+              'Mention both individual and group celebrations',
+              'Demonstrate positive workplace culture',
+              'Include recognition of others'
+            ]
+          },
+          {
+            id: '17',
+            question: 'What makes you excited to come to work each day?',
+            type: 'behavioral',
+            category: 'Work Motivation',
+            difficulty: 'easy',
+            tips: [
+              'Be genuine about your motivations',
+              'Connect to the role and company',
+              'Show passion and enthusiasm',
+              'Mention growth and impact opportunities'
+            ]
           }
         ],
         medium: [
@@ -3394,6 +3485,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Demonstrate ownership and responsibility',
               'Highlight positive outcomes for the team'
             ]
+          },
+          {
+            id: '21',
+            question: 'How do you handle receiving constructive criticism from colleagues?',
+            type: 'behavioral',
+            category: 'Feedback Reception',
+            difficulty: 'medium',
+            tips: [
+              'Show openness to feedback',
+              'Demonstrate emotional intelligence',
+              'Explain your learning process',
+              'Give examples of implementing feedback'
+            ]
+          },
+          {
+            id: '22',
+            question: 'Describe a time when you had to meet a challenging deadline.',
+            type: 'behavioral',
+            category: 'Deadline Management',
+            difficulty: 'medium',
+            tips: [
+              'Explain your planning approach',
+              'Show time management skills',
+              'Mention collaboration if applicable',
+              'Highlight successful completion'
+            ]
+          },
+          {
+            id: '23',
+            question: 'How do you approach building relationships with new team members?',
+            type: 'behavioral',
+            category: 'Relationship Building',
+            difficulty: 'medium',
+            tips: [
+              'Show interpersonal skills',
+              'Mention specific strategies',
+              'Demonstrate inclusivity',
+              'Focus on team integration'
+            ]
+          },
+          {
+            id: '24',
+            question: 'Tell me about a time you had to solve a problem creatively.',
+            type: 'behavioral',
+            category: 'Creative Problem Solving',
+            difficulty: 'medium',
+            tips: [
+              'Describe your thought process',
+              'Show innovation and creativity',
+              'Explain alternative approaches considered',
+              'Highlight unique solution benefits'
+            ]
+          },
+          {
+            id: '25',
+            question: 'How do you maintain quality while working efficiently?',
+            type: 'behavioral',
+            category: 'Quality Management',
+            difficulty: 'medium',
+            tips: [
+              'Explain quality control processes',
+              'Show attention to detail',
+              'Mention efficiency strategies',
+              'Demonstrate balance between speed and accuracy'
+            ]
+          },
+          {
+            id: '26',
+            question: 'Describe a situation where you had to explain complex information to someone.',
+            type: 'behavioral',
+            category: 'Communication Skills',
+            difficulty: 'medium',
+            tips: [
+              'Show ability to simplify concepts',
+              'Demonstrate patience and clarity',
+              'Mention different communication styles',
+              'Focus on successful understanding achieved'
+            ]
+          },
+          {
+            id: '27',
+            question: 'How do you stay motivated during repetitive or routine tasks?',
+            type: 'behavioral',
+            category: 'Self-Motivation',
+            difficulty: 'medium',
+            tips: [
+              'Show positive attitude toward all work',
+              'Mention strategies for staying engaged',
+              'Demonstrate reliability and consistency',
+              'Connect routine work to larger goals'
+            ]
           }
         ],
         hard: [
@@ -3525,6 +3707,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Explain constructive dialogue approach',
               'Demonstrate ethical decision-making',
               'Focus on finding common ground'
+            ]
+          },
+          {
+            id: '31',
+            question: 'Describe a time when you had to lead a project with team members who had conflicting priorities.',
+            type: 'behavioral',
+            category: 'Conflict Leadership',
+            difficulty: 'hard',
+            tips: [
+              'Show diplomatic leadership skills',
+              'Explain priority alignment strategies',
+              'Demonstrate negotiation abilities',
+              'Focus on collaborative solutions'
+            ]
+          },
+          {
+            id: '32',
+            question: 'Tell me about a time you had to make an unpopular decision that was necessary for the team.',
+            type: 'behavioral',
+            category: 'Difficult Decisions',
+            difficulty: 'hard',
+            tips: [
+              'Show courage in decision-making',
+              'Explain your reasoning process',
+              'Demonstrate communication of difficult messages',
+              'Focus on long-term benefits achieved'
+            ]
+          },
+          {
+            id: '33',
+            question: 'How would you handle discovering that a colleague is not meeting performance standards?',
+            type: 'situational',
+            category: 'Performance Management',
+            difficulty: 'hard',
+            tips: [
+              'Show professional approach to sensitive issues',
+              'Explain constructive feedback strategies',
+              'Demonstrate support and development mindset',
+              'Focus on proper escalation procedures'
+            ]
+          },
+          {
+            id: '34',
+            question: 'Describe a situation where you had to rebuild trust after a significant mistake.',
+            type: 'behavioral',
+            category: 'Trust Recovery',
+            difficulty: 'hard',
+            tips: [
+              'Show accountability and ownership',
+              'Explain trust-building strategies',
+              'Demonstrate lessons learned',
+              'Focus on relationship restoration'
+            ]
+          },
+          {
+            id: '35',
+            question: 'How would you approach implementing a major change that affects the entire organization?',
+            type: 'situational',
+            category: 'Organizational Change',
+            difficulty: 'hard',
+            tips: [
+              'Show strategic thinking and planning',
+              'Explain change management principles',
+              'Demonstrate stakeholder engagement',
+              'Focus on resistance management and buy-in'
+            ]
+          },
+          {
+            id: '36',
+            question: 'Tell me about a time you had to work with someone whose work style was completely different from yours.',
+            type: 'behavioral',
+            category: 'Style Adaptation',
+            difficulty: 'hard',
+            tips: [
+              'Show adaptability and flexibility',
+              'Explain bridge-building strategies',
+              'Demonstrate respect for different approaches',
+              'Focus on successful collaboration achieved'
+            ]
+          },
+          {
+            id: '37',
+            question: 'How would you handle a situation where you disagree with a strategic decision from senior leadership?',
+            type: 'situational',
+            category: 'Strategic Disagreement',
+            difficulty: 'hard',
+            tips: [
+              'Show respect for hierarchy while maintaining integrity',
+              'Explain professional disagreement approaches',
+              'Demonstrate constructive feedback skills',
+              'Focus on understanding and alignment'
             ]
           }
         ]
