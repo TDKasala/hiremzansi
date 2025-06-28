@@ -3158,11 +3158,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Show how they benefit the employer',
               'Be genuine and confident'
             ]
+          },
+          {
+            id: '3',
+            question: 'Why are you interested in this position?',
+            type: 'behavioral',
+            category: 'Motivation',
+            difficulty: 'easy',
+            tips: [
+              'Research the company beforehand',
+              'Show enthusiasm for the role',
+              'Connect your skills to the position',
+              'Mention specific aspects that excite you'
+            ]
+          },
+          {
+            id: '4',
+            question: 'What are your career goals for the next 5 years?',
+            type: 'behavioral',
+            category: 'Career Vision',
+            difficulty: 'easy',
+            tips: [
+              'Align goals with the company direction',
+              'Show ambition but be realistic',
+              'Mention skill development plans',
+              'Demonstrate long-term thinking'
+            ]
+          },
+          {
+            id: '5',
+            question: 'Describe your ideal work environment.',
+            type: 'behavioral',
+            category: 'Work Style',
+            difficulty: 'easy',
+            tips: [
+              'Match your answer to the company culture',
+              'Mention collaboration and independence balance',
+              'Show flexibility and adaptability',
+              'Avoid being too specific or demanding'
+            ]
+          },
+          {
+            id: '6',
+            question: 'What motivates you to do your best work?',
+            type: 'behavioral',
+            category: 'Motivation',
+            difficulty: 'easy',
+            tips: [
+              'Be genuine about your motivations',
+              'Connect to professional growth',
+              'Mention impact and achievements',
+              'Show intrinsic motivation'
+            ]
+          },
+          {
+            id: '7',
+            question: 'How do you handle feedback and criticism?',
+            type: 'behavioral',
+            category: 'Professional Development',
+            difficulty: 'easy',
+            tips: [
+              'Show openness to learning',
+              'Mention specific examples',
+              'Demonstrate growth mindset',
+              'Explain your feedback process'
+            ]
+          },
+          {
+            id: '8',
+            question: 'Why are you leaving your current position?',
+            type: 'behavioral',
+            category: 'Career Transition',
+            difficulty: 'easy',
+            tips: [
+              'Stay positive about previous employers',
+              'Focus on growth opportunities',
+              'Avoid negative comments',
+              'Show forward-thinking approach'
+            ]
+          },
+          {
+            id: '9',
+            question: 'What makes you unique compared to other candidates?',
+            type: 'behavioral',
+            category: 'Self Assessment',
+            difficulty: 'easy',
+            tips: [
+              'Highlight distinctive skills or experiences',
+              'Provide concrete examples',
+              'Show confidence without arrogance',
+              'Connect uniqueness to job requirements'
+            ]
+          },
+          {
+            id: '10',
+            question: 'Do you have any questions for us?',
+            type: 'behavioral',
+            category: 'Engagement',
+            difficulty: 'easy',
+            tips: [
+              'Always prepare thoughtful questions',
+              'Ask about role expectations',
+              'Inquire about company culture',
+              'Show genuine interest in the organization'
+            ]
           }
         ],
         medium: [
           {
-            id: '3',
+            id: '11',
             question: 'Describe a challenging project you worked on and how you overcame obstacles.',
             type: 'behavioral',
             category: 'Problem Solving',
@@ -3175,7 +3279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ]
           },
           {
-            id: '4',
+            id: '12',
             question: 'How do you handle working under pressure and tight deadlines?',
             type: 'behavioral',
             category: 'Work Style',
@@ -3186,11 +3290,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Mention stress management techniques',
               'Demonstrate adaptability'
             ]
+          },
+          {
+            id: '13',
+            question: 'Tell me about a time you had to learn something new quickly.',
+            type: 'behavioral',
+            category: 'Learning Ability',
+            difficulty: 'medium',
+            tips: [
+              'Show your learning process',
+              'Mention resources you used',
+              'Demonstrate quick adaptation',
+              'Highlight successful implementation'
+            ]
+          },
+          {
+            id: '14',
+            question: 'Describe a situation where you had to work with limited resources.',
+            type: 'behavioral',
+            category: 'Resource Management',
+            difficulty: 'medium',
+            tips: [
+              'Show creativity and resourcefulness',
+              'Explain prioritization strategies',
+              'Demonstrate problem-solving skills',
+              'Highlight positive outcomes'
+            ]
+          },
+          {
+            id: '15',
+            question: 'How do you prioritize tasks when everything seems urgent?',
+            type: 'behavioral',
+            category: 'Time Management',
+            difficulty: 'medium',
+            tips: [
+              'Explain your prioritization framework',
+              'Mention stakeholder communication',
+              'Show systematic approach',
+              'Demonstrate decision-making skills'
+            ]
+          },
+          {
+            id: '16',
+            question: 'Tell me about a time you disagreed with your manager or supervisor.',
+            type: 'behavioral',
+            category: 'Communication',
+            difficulty: 'medium',
+            tips: [
+              'Show respectful communication',
+              'Explain your reasoning clearly',
+              'Demonstrate professional approach',
+              'Focus on positive resolution'
+            ]
+          },
+          {
+            id: '17',
+            question: 'Describe a time when you had to adapt to significant changes at work.',
+            type: 'behavioral',
+            category: 'Adaptability',
+            difficulty: 'medium',
+            tips: [
+              'Show flexibility and positive attitude',
+              'Explain adaptation strategies',
+              'Mention support for team members',
+              'Highlight successful outcomes'
+            ]
+          },
+          {
+            id: '18',
+            question: 'How do you handle multiple competing priorities?',
+            type: 'behavioral',
+            category: 'Organization',
+            difficulty: 'medium',
+            tips: [
+              'Describe your organizational system',
+              'Mention time management tools',
+              'Show stakeholder communication',
+              'Demonstrate systematic approach'
+            ]
+          },
+          {
+            id: '19',
+            question: 'Tell me about a time you had to convince someone to see your point of view.',
+            type: 'behavioral',
+            category: 'Influence',
+            difficulty: 'medium',
+            tips: [
+              'Show persuasion and communication skills',
+              'Explain your approach and reasoning',
+              'Demonstrate empathy and understanding',
+              'Highlight collaborative resolution'
+            ]
+          },
+          {
+            id: '20',
+            question: 'Describe a situation where you took initiative beyond your job description.',
+            type: 'behavioral',
+            category: 'Initiative',
+            difficulty: 'medium',
+            tips: [
+              'Show proactive thinking',
+              'Explain the impact of your actions',
+              'Demonstrate ownership and responsibility',
+              'Highlight positive outcomes for the team'
+            ]
           }
         ],
         hard: [
           {
-            id: '5',
+            id: '21',
             question: 'Describe a time when you had to work with a difficult team member.',
             type: 'situational',
             category: 'Teamwork',
@@ -3200,6 +3408,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
               'Show communication skills',
               'Demonstrate conflict resolution',
               'Emphasize positive outcomes'
+            ]
+          },
+          {
+            id: '22',
+            question: 'Tell me about a time you failed at something important. How did you handle it?',
+            type: 'behavioral',
+            category: 'Resilience',
+            difficulty: 'hard',
+            tips: [
+              'Be honest but choose appropriate example',
+              'Focus on lessons learned',
+              'Show accountability and growth',
+              'Demonstrate recovery and improvement'
+            ]
+          },
+          {
+            id: '23',
+            question: 'Describe a situation where you had to make a difficult decision with incomplete information.',
+            type: 'behavioral',
+            category: 'Decision Making',
+            difficulty: 'hard',
+            tips: [
+              'Explain your decision-making process',
+              'Show risk assessment skills',
+              'Mention stakeholder consultation',
+              'Demonstrate confidence and accountability'
+            ]
+          },
+          {
+            id: '24',
+            question: 'How would you handle a situation where you witnessed unethical behavior at work?',
+            type: 'situational',
+            category: 'Ethics',
+            difficulty: 'hard',
+            tips: [
+              'Show strong ethical standards',
+              'Explain proper escalation procedures',
+              'Demonstrate courage and integrity',
+              'Mention company policies and procedures'
+            ]
+          },
+          {
+            id: '25',
+            question: 'Tell me about a time you had to deliver bad news to stakeholders.',
+            type: 'behavioral',
+            category: 'Communication',
+            difficulty: 'hard',
+            tips: [
+              'Show transparency and honesty',
+              'Explain your communication strategy',
+              'Demonstrate empathy and professionalism',
+              'Focus on solution-oriented approach'
+            ]
+          },
+          {
+            id: '26',
+            question: 'Describe a situation where you had to manage competing interests of different stakeholders.',
+            type: 'behavioral',
+            category: 'Stakeholder Management',
+            difficulty: 'hard',
+            tips: [
+              'Show diplomatic communication skills',
+              'Explain negotiation and compromise',
+              'Demonstrate strategic thinking',
+              'Highlight win-win solutions'
+            ]
+          },
+          {
+            id: '27',
+            question: 'How would you approach leading a team through a major organizational change?',
+            type: 'situational',
+            category: 'Leadership',
+            difficulty: 'hard',
+            tips: [
+              'Show change management understanding',
+              'Explain communication strategies',
+              'Demonstrate empathy and support',
+              'Focus on team engagement and buy-in'
+            ]
+          },
+          {
+            id: '28',
+            question: 'Tell me about a time you had to take responsibility for a team mistake.',
+            type: 'behavioral',
+            category: 'Accountability',
+            difficulty: 'hard',
+            tips: [
+              'Show leadership and accountability',
+              'Explain problem-solving approach',
+              'Demonstrate team protection',
+              'Focus on learning and improvement'
+            ]
+          },
+          {
+            id: '29',
+            question: 'Describe a situation where you had to challenge the status quo or established processes.',
+            type: 'behavioral',
+            category: 'Innovation',
+            difficulty: 'hard',
+            tips: [
+              'Show analytical and critical thinking',
+              'Explain evidence-based approach',
+              'Demonstrate change management skills',
+              'Highlight positive business impact'
+            ]
+          },
+          {
+            id: '30',
+            question: 'How would you handle a situation where your values conflict with company expectations?',
+            type: 'situational',
+            category: 'Values Alignment',
+            difficulty: 'hard',
+            tips: [
+              'Show strong personal values',
+              'Explain constructive dialogue approach',
+              'Demonstrate ethical decision-making',
+              'Focus on finding common ground'
             ]
           }
         ]
