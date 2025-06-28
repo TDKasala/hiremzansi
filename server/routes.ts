@@ -47,6 +47,7 @@ import { jobBoardService } from "./services/jobBoardService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { jobMatchingService } from "./services/jobMatchingService";
 import { skillGapAnalyzerService } from "./services/skillGapAnalyzerService";
+import { chatService } from "./services/chatService";
 import * as employerStorage from "./employerStorage";
 import adminRoutes from "./routes/admin";
 import testXaiApiRoutes from "./routes/testXaiApi";
@@ -5588,6 +5589,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'Broadcasting capability confirmed',
         adminAccess: true
       });
+    }
+  });
+
+  // Chat API routes
+  app.post('/api/chat/message', async (req, res) => {
+    try {
+      const { sessionId, message } = req.body;
+      
+      if (!sessionId || !message) {
+        return res.status(400).json({ error: 'Session ID and message are required' });
+      }
+      
+      const response = await chatService.processMessage(sessionId, message);
+      res.json(response);
+    } catch (error) {
+      console.error('Chat error:', error);
+      res.status(500).json({ 
+        error: 'Chat service temporarily unavailable',
+        message: 'Thanks for your question! I\'m having a brief technical moment. Please try again in a moment.',
+        confidence: 0.1,
+        category: 'error'
+      });
+    }
+  });
+
+  app.get('/api/chat/session/:sessionId/stats', async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const stats = chatService.getSessionStats(sessionId);
+      res.json(stats);
+    } catch (error) {
+      console.error('Chat stats error:', error);
+      res.status(500).json({ error: 'Failed to get session stats' });
     }
   });
 

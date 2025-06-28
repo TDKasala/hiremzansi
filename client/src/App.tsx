@@ -9,6 +9,7 @@ import { MotivationProvider } from "./hooks/use-motivation";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
 import { EmailVerificationHandler } from "./components/EmailVerificationHandler";
+import ChatBot from "@/components/ChatBot";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
@@ -206,6 +207,7 @@ function App() {
               </Switch>
                 <EmailVerificationHandler />
                 <Toaster />
+                <ChatBot variant="floating" />
               </Layout>
             </MotivationProvider>
           </AuthProvider>
