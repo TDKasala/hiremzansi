@@ -16,6 +16,7 @@ import { CVAnalysisFeatures } from "@/components/CVAnalysisFeatures";
 import { PremiumRecruiterSection } from "@/components/PremiumRecruiterSection";
 import { JobSeekerMatchingBanner } from "@/components/JobSeekerBenefitsAlert";
 import { PersonalizedWelcome } from "@/components/PersonalizedWelcome";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { useQuery } from '@tanstack/react-query';
 
 
@@ -63,6 +64,7 @@ export default function HomePage() {
       <PremiumRecruiterSection />
       <JobSeekerMatchingBanner />
       <PricingSection />
+      <NewsletterSignup />
       <SuccessStoriesSection />
       <TestimonialsSection />
 

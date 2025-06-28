@@ -12,7 +12,8 @@ import {
   skills, 
   userSkills, 
   notifications,
-  premiumJobMatches
+  premiumJobMatches,
+  newsletterSubscriptions
 } from '@shared/schema';
 import { eq, desc, and, or, like, gte, lte, count, sql } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
@@ -30,6 +31,7 @@ type JobMatch = typeof jobMatches.$inferSelect;
 type Skill = typeof skills.$inferSelect;
 type UserSkill = typeof userSkills.$inferSelect;
 type Notification = typeof notifications.$inferSelect;
+type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 
 export interface IStorage {
   // User operations
@@ -102,6 +104,13 @@ export interface IStorage {
   createPremiumJobMatch(matchData: any): Promise<any>;
   unlockCandidateContact(matchId: number, recruiterId: number): Promise<any>;
   getJobSeekerMatches(userId: number): Promise<any[]>;
+  
+  // Newsletter operations
+  createNewsletterSubscription(email: string, source?: string): Promise<NewsletterSubscription>;
+  getNewsletterSubscription(email: string): Promise<NewsletterSubscription | null>;
+  getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
+  updateNewsletterSubscription(id: number, updates: Partial<NewsletterSubscription>): Promise<void>;
+  unsubscribeNewsletter(email: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -686,6 +695,65 @@ export class DatabaseStorage implements IStorage {
         province: candidate.province,
       }
     };
+  }
+
+  // Newsletter operations
+  async createNewsletterSubscription(email: string, source?: string): Promise<NewsletterSubscription> {
+    try {
+      const [subscription] = await db
+        .insert(newsletterSubscriptions)
+        .values({
+          email: email.toLowerCase().trim(),
+          source: source || 'website',
+          subscribedAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+      return subscription;
+    } catch (error: any) {
+      if (error.code === '23505') { // Unique constraint violation
+        throw new Error('Email already subscribed');
+      }
+      throw error;
+    }
+  }
+
+  async getNewsletterSubscription(email: string): Promise<NewsletterSubscription | null> {
+    const [subscription] = await db
+      .select()
+      .from(newsletterSubscriptions)
+      .where(eq(newsletterSubscriptions.email, email.toLowerCase().trim()));
+    return subscription || null;
+  }
+
+  async getAllNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
+    return await db
+      .select()
+      .from(newsletterSubscriptions)
+      .where(eq(newsletterSubscriptions.isActive, true))
+      .orderBy(desc(newsletterSubscriptions.subscribedAt));
+  }
+
+  async updateNewsletterSubscription(id: number, updates: Partial<NewsletterSubscription>): Promise<void> {
+    await db
+      .update(newsletterSubscriptions)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(newsletterSubscriptions.id, id));
+  }
+
+  async unsubscribeNewsletter(email: string): Promise<void> {
+    await db
+      .update(newsletterSubscriptions)
+      .set({
+        isActive: false,
+        unsubscribedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(newsletterSubscriptions.email, email.toLowerCase().trim()));
   }
 }
 

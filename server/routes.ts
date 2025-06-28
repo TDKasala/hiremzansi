@@ -5591,6 +5591,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Newsletter subscription routes
+  app.post('/api/newsletter/subscribe', async (req, res) => {
+    try {
+      const { email, source } = req.body;
+      
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: 'Valid email address is required' });
+      }
+
+      // Check if already subscribed
+      const existing = await storage.getNewsletterSubscription(email);
+      if (existing && existing.isActive) {
+        return res.status(409).json({ error: 'Email already subscribed' });
+      }
+      
+      // If previously unsubscribed, reactivate
+      if (existing && !existing.isActive) {
+        await storage.updateNewsletterSubscription(existing.id, {
+          isActive: true,
+          subscribedAt: new Date(),
+          unsubscribedAt: null,
+          source: source || 'website'
+        });
+        return res.status(200).json({ 
+          message: 'Successfully resubscribed to newsletter',
+          subscription: existing
+        });
+      }
+
+      // Create new subscription
+      const subscription = await storage.createNewsletterSubscription(email, source);
+      
+      res.status(201).json({
+        message: 'Successfully subscribed to newsletter',
+        subscription: {
+          id: subscription.id,
+          email: subscription.email,
+          source: subscription.source,
+          subscribedAt: subscription.subscribedAt
+        }
+      });
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error);
+      if (error.message === 'Email already subscribed') {
+        res.status(409).json({ error: 'Email already subscribed' });
+      } else {
+        res.status(500).json({ error: 'Failed to subscribe to newsletter' });
+      }
+    }
+  });
+
+  app.post('/api/newsletter/unsubscribe', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email || typeof email !== 'string') {
+        return res.status(400).json({ error: 'Valid email address is required' });
+      }
+
+      await storage.unsubscribeNewsletter(email);
+      
+      res.json({ message: 'Successfully unsubscribed from newsletter' });
+    } catch (error) {
+      console.error('Newsletter unsubscribe error:', error);
+      res.status(500).json({ error: 'Failed to unsubscribe from newsletter' });
+    }
+  });
+
+  // Admin newsletter management routes
+  app.get('/api/admin/newsletter/subscriptions', requireAdmin, async (req, res) => {
+    try {
+      const subscriptions = await storage.getAllNewsletterSubscriptions();
+      res.json({
+        subscriptions,
+        totalCount: subscriptions.length,
+        activeCount: subscriptions.filter(s => s.isActive).length
+      });
+    } catch (error) {
+      console.error('Error fetching newsletter subscriptions:', error);
+      res.status(500).json({ error: 'Failed to fetch newsletter subscriptions' });
+    }
+  });
+
   // Mount admin routes with proper authentication
   app.use("/api/admin", adminRoutes);
   
