@@ -209,7 +209,7 @@ The Hire Mzansi Team
       text-align: center;
       border-bottom: 4px solid #ffca28;
     }
-    .logo { max-width: 200px; }
+    .logo { max-width: 200px; height: auto; }
     .content { padding: 20px; }
     .button {
       display: inline-block;
@@ -239,7 +239,7 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/hire-mzansi-logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Welcome to Hire Mzansi!</h1>
@@ -308,7 +308,7 @@ The Hire Mzansi Team
       text-align: center;
       border-bottom: 4px solid #ffca28;
     }
-    .logo { max-width: 200px; }
+    .logo { max-width: 200px; height: auto; }
     .content { padding: 20px; }
     .button {
       display: inline-block;
@@ -338,7 +338,7 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/hire-mzansi-logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Reset Your Password</h1>
@@ -405,7 +405,7 @@ The Hire Mzansi Team
       text-align: center;
       border-bottom: 4px solid #ffca28;
     }
-    .logo { max-width: 200px; }
+    .logo { max-width: 200px; height: auto; }
     .content { padding: 20px; }
     .button {
       display: inline-block;
@@ -435,7 +435,7 @@ The Hire Mzansi Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://hiremzansi.co.za/logo.png" alt="Hire Mzansi Logo" class="logo">
+      <img src="https://hiremzansi.co.za/hire-mzansi-logo.png" alt="Hire Mzansi Logo" class="logo">
     </div>
     <div class="content">
       <h1>Verify Your Email Address</h1>
