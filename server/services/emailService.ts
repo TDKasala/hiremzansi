@@ -534,7 +534,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     console.error('Failed to send email via Brevo:', error);
     if (isDevelopment) {
       console.log('Brevo sender not verified yet - using development mode');
-      console.log('Error details:', error.response?.data || error.message);
+      console.log('Error details:', (error as any).response?.data || (error as any).message);
       return true; // Return true in development to continue flow
     }
     return false;

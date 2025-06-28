@@ -3534,7 +3534,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (difficulty === 'all') {
         selectedQuestions = [...questionPool.easy, ...questionPool.medium, ...questionPool.hard];
       } else {
-        selectedQuestions = questionPool[difficulty] || questionPool.medium;
+        selectedQuestions = questionPool[difficulty as keyof typeof questionPool] || questionPool.medium;
       }
       
       // Shuffle and limit to requested count
