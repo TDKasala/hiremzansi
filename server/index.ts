@@ -34,13 +34,21 @@ app.use((req, res, next) => {
     return res.redirect(301, `https://hiremzansi.co.za${req.originalUrl}`);
   }
   
-  // Set security headers for primary domain with cache control
+  // Set security headers for primary domain with cache control (except for static assets)
+  const isStaticAsset = req.url && (req.url.endsWith('.png') || req.url.endsWith('.jpg') || req.url.endsWith('.jpeg') || req.url.endsWith('.gif') || req.url.endsWith('.ico') || req.url.endsWith('.svg'));
+  
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+  
+  if (!isStaticAsset) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  } else {
+    // Cache static assets for better performance
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours
+  }
   
   // Set canonical domain headers and HSTS for security
   if (host === 'hiremzansi.co.za') {
@@ -91,6 +99,16 @@ app.use((req, res, next) => {
     // Skip database initialization for now to ensure platform runs
     log('Starting platform in development mode');
     
+    // Serve static files from public directory BEFORE Vite middleware
+    app.use(express.static('public', {
+      maxAge: '1d', // Cache static assets for 1 day
+      setHeaders: (res, path) => {
+        if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.svg') || path.endsWith('.ico')) {
+          res.setHeader('Content-Type', 'image/' + path.split('.').pop());
+        }
+      }
+    }));
+
     // Add API route protection BEFORE Vite middleware
     app.use((req, res, next) => {
       // Only apply special handling to API routes
