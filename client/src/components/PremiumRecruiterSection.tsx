@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,130 @@ import {
   Eye,
   Bell
 } from 'lucide-react';
+
+// Casino-style slot machine counter component
+interface SlotMachineCounterProps {
+  endValue: string;
+  delay?: number;
+  duration?: number;
+  className?: string;
+}
+
+function SlotMachineCounter({ endValue, delay = 0, duration = 2000, className = "" }: SlotMachineCounterProps) {
+  const [currentValue, setCurrentValue] = useState("000");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  // Extract numeric value and suffix from endValue (e.g., "500+" -> {value: 500, suffix: "+"})
+  const parseValue = (value: string) => {
+    const match = value.match(/^(\d+)(.*)$/);
+    if (match) {
+      return { value: parseInt(match[1]), suffix: match[2] };
+    }
+    return { value: parseInt(value) || 0, suffix: "" };
+  };
+
+  const { value: targetNumber, suffix } = parseValue(endValue);
+
+  // Intersection Observer to trigger animation when visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  // Start casino animation when visible
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const startAnimation = () => {
+      setIsAnimating(true);
+      
+      // Generate random numbers rapidly (slot machine effect)
+      intervalRef.current = setInterval(() => {
+        const randomNum = Math.floor(Math.random() * (targetNumber * 2));
+        const paddedNum = randomNum.toString().padStart(targetNumber.toString().length, '0');
+        setCurrentValue(paddedNum + suffix);
+      }, 50);
+
+      // Stop at target value after duration
+      timeoutRef.current = setTimeout(() => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+        
+        // Smooth transition to final value
+        let current = parseInt(currentValue);
+        const step = Math.max(1, Math.floor((Math.abs(targetNumber - current)) / 20));
+        
+        const finalCountdown = setInterval(() => {
+          if (current === targetNumber) {
+            clearInterval(finalCountdown);
+            setCurrentValue(endValue);
+            setIsAnimating(false);
+            return;
+          }
+          
+          if (current < targetNumber) {
+            current = Math.min(targetNumber, current + step);
+          } else {
+            current = Math.max(targetNumber, current - step);
+          }
+          
+          const paddedNum = current.toString().padStart(targetNumber.toString().length, '0');
+          setCurrentValue(paddedNum + suffix);
+        }, 50);
+      }, duration - 500);
+    };
+
+    const timer = setTimeout(startAnimation, delay);
+
+    return () => {
+      clearTimeout(timer);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [isVisible, targetNumber, endValue, delay, duration, suffix]);
+
+  return (
+    <div ref={elementRef} className={`relative overflow-hidden ${className}`}>
+      <div 
+        className={`transition-all duration-300 ${isAnimating ? 'scale-110' : 'scale-100'}`}
+        style={{
+          fontFamily: 'monospace',
+          textShadow: isAnimating ? '0 0 10px currentColor' : 'none',
+          filter: isAnimating ? 'brightness(1.2)' : 'brightness(1)',
+        }}
+      >
+        {currentValue}
+      </div>
+      
+      {/* Casino-style glow effect */}
+      {isAnimating && (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 opacity-20 blur-sm"></div>
+      )}
+      
+      {/* Spinning border effect */}
+      {isAnimating && (
+        <div className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 animate-spin"></div>
+      )}
+    </div>
+  );
+}
 
 export function PremiumRecruiterSection() {
   return (
@@ -186,23 +310,70 @@ export function PremiumRecruiterSection() {
           </div>
         </div>
 
-        {/* Stats Section */}
+        {/* Stats Section with Casino Animation */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">500+</div>
-            <div className="text-gray-600">Active Candidates</div>
+          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="relative mb-4">
+              <SlotMachineCounter 
+                endValue="500+" 
+                delay={0}
+                duration={2500}
+                className="text-3xl font-bold text-purple-600 mb-2 drop-shadow-lg"
+              />
+              {/* Floating icons */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-purple-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-purple-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Active Candidates</div>
+            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-400 to-purple-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
           </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">85%</div>
-            <div className="text-gray-600">Average Match Accuracy</div>
+          
+          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="relative mb-4">
+              <SlotMachineCounter 
+                endValue="85%" 
+                delay={300}
+                duration={2800}
+                className="text-3xl font-bold text-blue-600 mb-2 drop-shadow-lg"
+              />
+              {/* Floating icons */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-500"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Average Match Accuracy</div>
+            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
           </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">24h</div>
-            <div className="text-gray-600">Average Response Time</div>
+          
+          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="relative mb-4">
+              <SlotMachineCounter 
+                endValue="24h" 
+                delay={600}
+                duration={3100}
+                className="text-3xl font-bold text-green-600 mb-2 drop-shadow-lg"
+              />
+              {/* Floating icons */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-1000"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-green-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Average Response Time</div>
+            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
           </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-orange-600 mb-2">95%</div>
-            <div className="text-gray-600">Recruiter Satisfaction</div>
+          
+          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="relative mb-4">
+              <SlotMachineCounter 
+                endValue="95%" 
+                delay={900}
+                duration={3400}
+                className="text-3xl font-bold text-orange-600 mb-2 drop-shadow-lg"
+              />
+              {/* Floating icons */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-1500"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-orange-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
+            </div>
+            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Recruiter Satisfaction</div>
+            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
           </div>
         </div>
 
