@@ -1,9 +1,7 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
+
 import cookieParser from "cookie-parser";
-import { Pool } from "pg";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
@@ -18,39 +16,7 @@ const app = express();
 // Add cookie parser middleware for JWT authentication
 app.use(cookieParser());
 
-// Configure PostgreSQL session store with proper node-postgres pool
-const PgSession = connectPgSimple(session);
-
-// Create a proper node-postgres pool for sessions
-const sessionPool = new Pool({
-  host: process.env.PGHOST,
-  port: parseInt(process.env.PGPORT || '5432'),
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  ssl: { rejectUnauthorized: false },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-// Configure session middleware for authentication persistence
-app.use(session({
-  store: new PgSession({
-    pool: sessionPool,
-    tableName: 'session',
-    createTableIfMissing: true
-  }),
-  secret: process.env.SESSION_SECRET || 'dev-session-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true, // Always use secure cookies since Replit serves over HTTPS
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: 'lax' // Allow cookies to be sent on navigation
-  }
-}));
+// JWT authentication system - no session middleware needed
 
 // Force redirect to custom domain and set primary domain headers
 app.use((req, res, next) => {
