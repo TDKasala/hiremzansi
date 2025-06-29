@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { xaiService } from '../services/xaiService';
-// @ts-ignore - pdf-parse types not available
-import * as pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 
 const router = Router();
