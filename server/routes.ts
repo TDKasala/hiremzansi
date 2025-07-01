@@ -2150,6 +2150,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get CV details by ID
+  app.get("/api/cv/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const cvId = parseInt(req.params.id);
+      
+      if (isNaN(cvId)) {
+        return res.status(400).json({ error: "Invalid CV ID" });
+      }
+      
+      const cv = await storage.getCVById(cvId);
+      
+      if (!cv) {
+        return res.status(404).json({ error: "CV not found" });
+      }
+      
+      // Check if the user owns this CV or has access to it
+      const hasAccess = !cv.userId || cv.userId === req.user?.id;
+      
+      if (!hasAccess) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      // Get ATS scores if CV is analyzed
+      let atsScore = null;
+      if (cv.isAnalyzed) {
+        try {
+          const scores = await storage.getATSScoresByCVId(cvId);
+          if (scores && scores.length > 0) {
+            atsScore = scores[0]; // Get the latest score
+          }
+        } catch (error) {
+          console.error('Error fetching ATS scores:', error);
+        }
+      }
+      
+      // Format response with all required fields for CVDetailsPage
+      const response = {
+        id: cv.id,
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        fileSize: cv.fileSize,
+        content: cv.content,
+        uploadDate: cv.createdAt,
+        isAnalyzed: cv.isAnalyzed || false,
+        userId: cv.userId,
+        atsScore: atsScore
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error("Error fetching CV details:", error);
+      next(error);
+    }
+  });
+
   // Update CV details
   app.put("/api/cv/:id", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
