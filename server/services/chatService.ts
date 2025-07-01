@@ -7,9 +7,14 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 
 // Function to get current xAI client with fresh API key
 function getXAIClient() {
+  const apiKey = process.env.XAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("XAI_API_KEY environment variable is required");
+  }
+  
   return new OpenAI({
     baseURL: "https://api.x.ai/v1",
-    apiKey: "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq",
+    apiKey: apiKey,
   });
 }
 
