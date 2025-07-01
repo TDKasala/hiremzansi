@@ -249,206 +249,130 @@ export function CVOptimizationShowcase() {
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-6 relative z-10">
-                {/* Overall Score Section */}
-                <div className="relative p-4 rounded-lg bg-gradient-to-r from-green-100 to-green-50 border border-green-200 hover:border-green-300 transition-colors duration-300">
+              <CardContent className="space-y-4 relative z-10 p-4">
+                {/* Compact Overall Score Section */}
+                <div className="relative p-3 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold text-green-900 flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                      Overall Score
-                    </span>
-                    <span className="text-3xl font-bold text-green-600 drop-shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="font-medium text-green-800 text-sm">CV Score</span>
+                    </div>
+                    <div className="text-2xl font-bold text-green-600">
                       <AnimatedProgressCounter 
                         endValue={sampleAnalysis.overallScore} 
                         isVisible={isVisible}
-                        delay={300}
+                        delay={200}
                         suffix="/100"
                       />
-                    </span>
+                    </div>
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-2">
                     <AnimatedProgress 
                       value={sampleAnalysis.overallScore} 
-                      className="h-4 rounded-full shadow-inner" 
-                      delay={300} 
+                      className="h-2 rounded-full" 
+                      delay={200} 
                       isVisible={isVisible} 
                     />
                   </div>
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-600 rounded-lg opacity-0 hover:opacity-10 transition-opacity duration-500 pointer-events-none"></div>
                 </div>
 
-                {/* Metrics Grid */}
-                <div className="grid grid-cols-3 gap-4 py-6 border-t border-green-200">
+                {/* Compact Metrics Grid */}
+                <div className="grid grid-cols-3 gap-2">
                   {[
-                    { 
-                      value: sampleAnalysis.atsCompatibility, 
-                      label: "ATS Compatible", 
-                      color: "green", 
-                      delay: 600,
-                      icon: "🎯"
-                    },
-                    { 
-                      value: sampleAnalysis.saContext, 
-                      label: "SA Context", 
-                      color: "blue", 
-                      delay: 800,
-                      icon: "🇿🇦"
-                    },
-                    { 
-                      value: sampleAnalysis.skillsMatch, 
-                      label: "Skills Match", 
-                      color: "purple", 
-                      delay: 1000,
-                      icon: "🎪"
-                    }
+                    { value: sampleAnalysis.atsCompatibility, label: "ATS", color: "green", delay: 400 },
+                    { value: sampleAnalysis.saContext, label: "SA Context", color: "blue", delay: 500 },
+                    { value: sampleAnalysis.skillsMatch, label: "Skills", color: "purple", delay: 600 }
                   ].map((metric, index) => (
-                    <div 
-                      key={index} 
-                      className="group/metric text-center space-y-3 p-3 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-md cursor-pointer"
-                      style={{ animationDelay: `${metric.delay}ms` }}
-                    >
-                      <div className="relative">
-                        <div className="text-xs opacity-60 mb-1">{metric.icon}</div>
-                        <div className={`text-xl font-bold text-${metric.color}-700 group-hover/metric:text-${metric.color}-800 transition-colors duration-300 drop-shadow-sm`}>
-                          <AnimatedProgressCounter 
-                            endValue={metric.value} 
-                            isVisible={isVisible}
-                            delay={metric.delay}
-                            suffix="%"
-                          />
-                        </div>
-                        <div className="text-xs text-gray-600 font-medium mt-1 group-hover/metric:text-gray-700 transition-colors duration-300">
-                          {metric.label}
-                        </div>
-                        {/* Animated progress ring */}
-                        <div className="mt-2">
-                          <AnimatedProgress 
-                            value={metric.value} 
-                            className="h-2 rounded-full shadow-sm" 
-                            delay={metric.delay} 
-                            isVisible={isVisible} 
-                          />
-                        </div>
-                        {/* Hover glow */}
-                        <div className={`absolute inset-0 bg-${metric.color}-400 rounded-lg opacity-0 group-hover/metric:opacity-10 transition-opacity duration-300 pointer-events-none`}></div>
+                    <div key={index} className="text-center p-2 rounded-lg hover:bg-white/60 transition-all duration-300 hover:scale-105">
+                      <div className={`text-lg font-bold text-${metric.color}-600 mb-1`}>
+                        <AnimatedProgressCounter 
+                          endValue={metric.value} 
+                          isVisible={isVisible}
+                          delay={metric.delay}
+                          suffix="%"
+                        />
+                      </div>
+                      <div className="text-xs text-gray-600 font-medium">{metric.label}</div>
+                      <div className="mt-1">
+                        <AnimatedProgress 
+                          value={metric.value} 
+                          className="h-1 rounded-full" 
+                          delay={metric.delay} 
+                          isVisible={isVisible} 
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Improvements Section */}
-                <div className="border-t border-green-200 pt-6">
-                  <h4 className="font-semibold mb-4 flex items-center gap-3 text-green-900 group-hover:text-green-800 transition-colors duration-300">
-                    <div className="relative">
-                      <TrendingUp className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      <div className="absolute inset-0 bg-green-400 rounded blur-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
-                    </div>
-                    Key Improvements
-                    <div className="ml-auto text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      {sampleAnalysis.improvements.length} suggestions
-                    </div>
-                  </h4>
-                  <div className="space-y-3">
-                    {sampleAnalysis.improvements.map((improvement, i) => (
-                      <div 
-                        key={i} 
-                        className="group/item flex items-start gap-3 text-sm p-3 rounded-lg hover:bg-orange-50 transition-all duration-300 hover:scale-[1.02] hover:shadow-sm border border-transparent hover:border-orange-200"
-                        style={{ animationDelay: `${1200 + i * 100}ms` }}
-                      >
-                        <div className="relative mt-0.5">
-                          <AlertTriangle className="h-4 w-4 text-orange-500 group-hover/item:text-orange-600 transition-colors duration-300 group-hover/item:scale-110" />
-                          <div className="absolute inset-0 bg-orange-400 rounded blur-sm opacity-0 group-hover/item:opacity-20 transition-opacity duration-300"></div>
-                        </div>
-                        <span className="text-gray-700 group-hover/item:text-gray-800 transition-colors duration-300 leading-relaxed">
-                          {improvement}
-                        </span>
-                        <div className="ml-auto opacity-0 group-hover/item:opacity-100 transition-opacity duration-300">
-                          <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                        </div>
+                {/* Compact Improvements Section */}
+                <div className="border-t border-gray-200 pt-3">
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-green-800 text-sm">Top Improvements</span>
+                    <div className="ml-auto text-xs text-gray-500">{sampleAnalysis.improvements.length}</div>
+                  </div>
+                  <div className="space-y-2">
+                    {sampleAnalysis.improvements.slice(0, 2).map((improvement, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs p-2 rounded-md hover:bg-orange-50 transition-colors duration-300">
+                        <AlertTriangle className="h-3 w-3 text-orange-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 leading-relaxed">{improvement}</span>
                       </div>
                     ))}
+                    {sampleAnalysis.improvements.length > 2 && (
+                      <div className="text-center">
+                        <span className="text-xs text-gray-500">+{sampleAnalysis.improvements.length - 2} more suggestions</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Stats and CTA Section */}
-            <div className="text-center space-y-6">
-              {/* Success Stats */}
-              <div className="flex items-center justify-center gap-8 text-sm">
-                <div className="group flex items-center gap-2 p-3 rounded-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 cursor-pointer">
-                  <div className="relative">
-                    <Users className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
-                    <div className="absolute inset-0 bg-blue-400 rounded blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  </div>
-                  <span className="font-semibold text-gray-700 group-hover:text-blue-700 transition-colors duration-300">
-                    10,000+ CVs analyzed
-                  </span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {/* Compact CTA Section */}
+            <div className="text-center space-y-4">
+              {/* Compact Success Stats */}
+              <div className="flex items-center justify-center gap-6 text-xs">
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <Users className="h-3 w-3 text-blue-500" />
+                  <span className="font-medium">10k+ analyzed</span>
                 </div>
-                <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
-                <div className="group flex items-center gap-2 p-3 rounded-lg hover:bg-green-50 transition-all duration-300 hover:scale-105 cursor-pointer">
-                  <div className="relative">
-                    <FileText className="h-5 w-5 text-green-600 group-hover:text-green-700 transition-colors duration-300" />
-                    <div className="absolute inset-0 bg-green-400 rounded blur-sm opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  </div>
-                  <span className="font-semibold text-gray-700 group-hover:text-green-700 transition-colors duration-300">
-                    95% accuracy rate
-                  </span>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="w-px h-4 bg-gray-300"></div>
+                <div className="flex items-center gap-1.5 text-gray-600">
+                  <FileText className="h-3 w-3 text-green-500" />
+                  <span className="font-medium">95% accuracy</span>
                 </div>
               </div>
               
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {/* Compact Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/upload">
                   <Button 
-                    size="lg" 
-                    className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 px-8 py-3"
+                    size="default" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 px-6 py-2"
                   >
-                    {/* Animated background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    
-                    {/* Button content */}
-                    <div className="relative flex items-center gap-2">
-                      <Zap className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      <span className="font-semibold">Analyze My CV Now</span>
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                    
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity duration-700"></div>
+                    <Zap className="h-4 w-4 mr-2" />
+                    <span className="font-medium">Analyze My CV</span>
                   </Button>
                 </Link>
                 
                 <Link href="/how-it-works">
                   <Button 
-                    size="lg" 
+                    size="default" 
                     variant="outline" 
-                    className="group relative overflow-hidden border-2 border-gray-300 hover:border-blue-400 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 px-8 py-3"
+                    className="border border-gray-300 hover:border-blue-400 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 shadow-sm hover:shadow-md transition-all duration-300 px-6 py-2"
                   >
-                    {/* Animated border */}
-                    <div className="absolute inset-0 border-2 border-blue-400 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {/* Button content */}
-                    <div className="relative flex items-center gap-2">
-                      <FileText className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      <span className="font-semibold">See How It Works</span>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </div>
-                    
-                    {/* Hover glow */}
-                    <div className="absolute inset-0 bg-blue-100 opacity-0 group-hover:opacity-50 transition-opacity duration-300 rounded-md"></div>
+                    <FileText className="h-4 w-4 mr-2" />
+                    <span className="font-medium">How It Works</span>
                   </Button>
                 </Link>
               </div>
               
-              {/* Trust indicator */}
-              <div className="flex items-center justify-center gap-2 text-xs text-gray-500 opacity-0 animate-fade-in-up" style={{ animationDelay: '1500ms', animationFillMode: 'forwards' }}>
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Trusted by South African professionals</span>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse animation-delay-500"></div>
+              {/* Compact Trust indicator */}
+              <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                <span>Trusted by SA professionals</span>
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
               </div>
             </div>
           </div>
