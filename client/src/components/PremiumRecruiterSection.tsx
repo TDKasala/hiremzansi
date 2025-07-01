@@ -272,72 +272,7 @@ export function PremiumRecruiterSection() {
           </div>
         </div>
 
-        {/* Stats Section with Elegant Animation */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="relative mb-4">
-              <ElegantCounter 
-                endValue="500+" 
-                delay={0}
-                duration={2500}
-                className="text-3xl font-bold text-purple-600 mb-2 drop-shadow-lg"
-              />
-              {/* Floating icons */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-purple-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-purple-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
-            </div>
-            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Active Candidates</div>
-            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-purple-400 to-purple-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
-          </div>
-          
-          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="relative mb-4">
-              <ElegantCounter 
-                endValue="85%" 
-                delay={300}
-                duration={2800}
-                className="text-3xl font-bold text-blue-600 mb-2 drop-shadow-lg"
-              />
-              {/* Floating icons */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-blue-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-500"></div>
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
-            </div>
-            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Average Match Accuracy</div>
-            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
-          </div>
-          
-          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="relative mb-4">
-              <ElegantCounter 
-                endValue="24h" 
-                delay={600}
-                duration={3100}
-                className="text-3xl font-bold text-green-600 mb-2 drop-shadow-lg"
-              />
-              {/* Floating icons */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-1000"></div>
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-green-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
-            </div>
-            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Average Response Time</div>
-            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
-          </div>
-          
-          <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="relative mb-4">
-              <ElegantCounter 
-                endValue="95%" 
-                delay={900}
-                duration={3400}
-                className="text-3xl font-bold text-orange-600 mb-2 drop-shadow-lg"
-              />
-              {/* Floating icons */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full animate-bounce opacity-60 group-hover:opacity-100 transition-opacity duration-300 animation-delay-1500"></div>
-              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-orange-300 rounded-full animate-pulse opacity-40 group-hover:opacity-80 transition-opacity duration-300"></div>
-            </div>
-            <div className="text-gray-600 font-medium group-hover:text-gray-700 transition-colors duration-300">Recruiter Satisfaction</div>
-            <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-orange-400 to-orange-600 transition-all duration-500 mx-auto mt-2 rounded-full"></div>
-          </div>
-        </div>
+        
 
         
 
