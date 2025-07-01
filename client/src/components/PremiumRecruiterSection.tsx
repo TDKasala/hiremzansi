@@ -19,19 +19,16 @@ import {
   Bell
 } from 'lucide-react';
 
-// Casino-style slot machine counter component
-interface SlotMachineCounterProps {
+// Elegant animated counter component
+interface ElegantCounterProps {
   endValue: string;
   delay?: number;
   duration?: number;
   className?: string;
 }
 
-function SlotMachineCounter({ endValue, delay = 0, duration = 2000, className = "" }: SlotMachineCounterProps) {
-  const [currentValue, setCurrentValue] = useState("000");
-  const [isAnimating, setIsAnimating] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+function ElegantCounter({ endValue, delay = 0, duration = 2000, className = "" }: ElegantCounterProps) {
+  const [displayValue, setDisplayValue] = useState("0");
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -64,81 +61,46 @@ function SlotMachineCounter({ endValue, delay = 0, duration = 2000, className = 
     return () => observer.disconnect();
   }, [isVisible]);
 
-  // Start casino animation when visible
+  // Start elegant animation when visible
   useEffect(() => {
     if (!isVisible) return;
 
     const startAnimation = () => {
-      setIsAnimating(true);
-      
-      // Generate random numbers rapidly (slot machine effect)
-      intervalRef.current = setInterval(() => {
-        const randomNum = Math.floor(Math.random() * (targetNumber * 2));
-        const paddedNum = randomNum.toString().padStart(targetNumber.toString().length, '0');
-        setCurrentValue(paddedNum + suffix);
-      }, 50);
+      let startTime: number;
 
-      // Stop at target value after duration
-      timeoutRef.current = setTimeout(() => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
+      const animate = (currentTime: number) => {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Use easeOutCubic for smooth, elegant animation
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const currentNumber = Math.floor(easeOutCubic * targetNumber);
+        
+        setDisplayValue(currentNumber + suffix);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayValue(endValue);
         }
-        
-        // Smooth transition to final value
-        let current = parseInt(currentValue);
-        const step = Math.max(1, Math.floor((Math.abs(targetNumber - current)) / 20));
-        
-        const finalCountdown = setInterval(() => {
-          if (current === targetNumber) {
-            clearInterval(finalCountdown);
-            setCurrentValue(endValue);
-            setIsAnimating(false);
-            return;
-          }
-          
-          if (current < targetNumber) {
-            current = Math.min(targetNumber, current + step);
-          } else {
-            current = Math.max(targetNumber, current - step);
-          }
-          
-          const paddedNum = current.toString().padStart(targetNumber.toString().length, '0');
-          setCurrentValue(paddedNum + suffix);
-        }, 50);
-      }, duration - 500);
+      };
+
+      requestAnimationFrame(animate);
     };
 
     const timer = setTimeout(startAnimation, delay);
-
-    return () => {
-      clearTimeout(timer);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
+    return () => clearTimeout(timer);
   }, [isVisible, targetNumber, endValue, delay, duration, suffix]);
 
   return (
-    <div ref={elementRef} className={`relative overflow-hidden ${className}`}>
-      <div 
-        className={`transition-all duration-300 ${isAnimating ? 'scale-110' : 'scale-100'}`}
-        style={{
-          fontFamily: 'monospace',
-          textShadow: isAnimating ? '0 0 10px currentColor' : 'none',
-          filter: isAnimating ? 'brightness(1.2)' : 'brightness(1)',
-        }}
-      >
-        {currentValue}
+    <div ref={elementRef} className={`transform transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'} ${className}`}>
+      <div className="relative">
+        {displayValue}
+        
+        {/* Subtle glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-10 blur-sm animate-pulse"></div>
       </div>
-      
-      {/* Casino-style glow effect */}
-      {isAnimating && (
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 opacity-20 blur-sm"></div>
-      )}
-      
-      {/* Spinning border effect */}
-      {isAnimating && (
-        <div className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 animate-spin"></div>
-      )}
     </div>
   );
 }
@@ -310,11 +272,11 @@ export function PremiumRecruiterSection() {
           </div>
         </div>
 
-        {/* Stats Section with Casino Animation */}
+        {/* Stats Section with Elegant Animation */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
             <div className="relative mb-4">
-              <SlotMachineCounter 
+              <ElegantCounter 
                 endValue="500+" 
                 delay={0}
                 duration={2500}
@@ -330,7 +292,7 @@ export function PremiumRecruiterSection() {
           
           <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
             <div className="relative mb-4">
-              <SlotMachineCounter 
+              <ElegantCounter 
                 endValue="85%" 
                 delay={300}
                 duration={2800}
@@ -346,7 +308,7 @@ export function PremiumRecruiterSection() {
           
           <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
             <div className="relative mb-4">
-              <SlotMachineCounter 
+              <ElegantCounter 
                 endValue="24h" 
                 delay={600}
                 duration={3100}
@@ -362,7 +324,7 @@ export function PremiumRecruiterSection() {
           
           <div className="group text-center p-6 rounded-lg hover:bg-white/50 transition-all duration-300 hover:scale-105 hover:shadow-lg">
             <div className="relative mb-4">
-              <SlotMachineCounter 
+              <ElegantCounter 
                 endValue="95%" 
                 delay={900}
                 duration={3400}
