@@ -10,9 +10,9 @@ The application follows a modern full-stack architecture:
 
 **Frontend**: React SPA with TypeScript, TailwindCSS, and Shadcn UI components
 **Backend**: Express.js REST API with TypeScript  
-**Database**: PostgreSQL with Supabase as the hosted database provider
+**Database**: PostgreSQL with Neon as the hosted database provider
 **AI Services**: Primary integration with xAI (Grok models) and OpenAI as fallback
-**Authentication**: Session-based authentication with secure cookie management
+**Authentication**: JWT-based authentication with secure cookie management
 **Deployment**: Configured for Replit with fallback support for Vercel
 
 The system uses a monolithic architecture with clear separation between client and server code, sharing common types and schemas through a shared directory.
@@ -60,7 +60,7 @@ The system uses a monolithic architecture with clear separation between client a
 ## External Dependencies
 
 ### Required Services
-- **Supabase**: PostgreSQL database hosting and authentication
+- **Neon PostgreSQL**: Database hosting with SSL connection
 - **xAI API**: Primary AI service for CV analysis and job matching
 - **OpenAI API**: Fallback AI service for reliability
 
@@ -91,10 +91,10 @@ The application requires several environment variables as documented in `.env.ex
 - Optimized for global CDN distribution
 
 ### Database Setup
-- Supabase project with PostgreSQL backend
-- Complete schema available in `supabase-schema.sql`
-- Row Level Security (RLS) policies for data protection
-- Admin user creation scripts for initial setup
+- Neon PostgreSQL with SSL connection required
+- Database connection via individual environment variables (PGHOST, PGUSER, PGPASSWORD, PGDATABASE)
+- Complete schema managed through Drizzle ORM
+- Admin user creation and initialization scripts for setup
 
 The deployment strategy prioritizes Replit for development and testing, with Vercel as the production deployment target. Both platforms support the full feature set with appropriate configuration.
 
@@ -155,6 +155,7 @@ The deployment strategy prioritizes Replit for development and testing, with Ver
 - July 1, 2025: XAI API KEY UPDATE AND VALIDATION COMPLETE - Successfully updated xAI API key (xai-O1xSO3enl5WxdZovrvVjD5be1ECK3q8ozSWYychZY37wDzgEiUINGv6vtXgtxpp1DLsXAH8tusj0NhvE) and conducted comprehensive testing. Verified Grok-3-mini model connectivity, CV analysis functionality with ATS scoring, South African context assessment, and JSON response formatting. API integration fully operational with 1,233 token usage for detailed CV analysis including BEE compliance evaluation and local market fit assessment. Platform ready for production CV optimization services.
 - July 1, 2025: PRODUCTION DEPLOYMENT IMPLEMENTATION COMPLETE - Successfully implemented new xAI API key and prepared comprehensive production deployment configuration. Enhanced error handling with retry logic, exponential backoff, and OpenAI fallback system. Created production deployment checklist with security features, performance metrics, and monitoring endpoints. CV optimization showcase redesigned for 60% space efficiency with compact metrics, streamlined improvements display, and elegant CTA sections. Platform architecture fully production-ready with authenticated CV upload, AI analysis pipeline, and comprehensive admin dashboard. Ready for immediate production deployment on Replit with custom domain support.
 - July 1, 2025: PROFESSIONAL EMAIL TEMPLATES REDESIGN COMPLETE - Completely redesigned all email templates with professional branding and Hire Mzansi logo integration. Created unified email template base function with modern typography, gradient designs, responsive layouts, and consistent footer branding. Updated email verification, password reset, welcome, and career digest templates with premium styling, clear call-to-action buttons, improved mobile responsiveness, and professional color schemes. All emails now display official Hire Mzansi logo and maintain brand consistency across email communications. Enhanced email functions include proper error handling and professional sender configuration.
+- July 1, 2025: DATABASE CONFIGURATION CORRECTION COMPLETE - Corrected all documentation and references from Supabase to Neon PostgreSQL which is the actual database provider being used. Updated system architecture documentation, deployment guides, and environment variable configurations to accurately reflect Neon PostgreSQL connection with SSL requirements. Database is hosted at ep-mute-meadow-a6ogb9al.us-west-2.aws.neon.tech with individual environment variables (PGHOST, PGUSER, PGPASSWORD, PGDATABASE) for connection management. All references now correctly identify Neon as the database hosting provider.
 - June 28, 2025: EMAIL VERIFICATION SYSTEM DEBUGGING AND RESOLUTION COMPLETE - Resolved email verification redirect loop issue by fixing upload response format mismatch and adding comprehensive logging to verification process. Backend now returns proper nested structure { success: true, cv: { id: XX } } that frontend expects. Enhanced verification token logging confirmed complete email verification workflow: token generation → email delivery → verification processing → database update → successful login. Email verification system now fully operational with proper database persistence and user authentication flow.
 - June 29, 2025: AUTHENTICATION SYSTEM MIGRATION TO JWT COMPLETE - Successfully migrated from failing PostgreSQL session-based authentication to robust JWT token system. Implemented secure HTTP-only cookie-based JWT authentication with proper token generation, validation, and cleanup. Removed conflicting session middleware that was causing database errors. Complete authentication flow now operational: login sets JWT cookie → requests authenticate via cookie → logout clears cookie → failed requests properly return 401. Backend authentication system tested and confirmed 100% functional with proper security headers and cookie management.
 

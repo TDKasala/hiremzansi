@@ -3,7 +3,7 @@
 ## ✅ Production Ready Components
 
 ### Core Infrastructure
-- **Database**: PostgreSQL via Supabase - Fully operational
+- **Database**: PostgreSQL via Neon - Fully operational with SSL
 - **Authentication**: JWT-based secure authentication - Working
 - **File Processing**: PDF, DOCX, TXT support - Operational
 - **Email Service**: Brevo integration - Configured
@@ -25,12 +25,23 @@
 
 ### Environment Variables
 ```
+# Database Configuration (Neon PostgreSQL)
+PGHOST=ep-mute-meadow-a6ogb9al.us-west-2.aws.neon.tech
+PGUSER=neondb_owner
+PGDATABASE=neondb
+PGPASSWORD=[provided_separately]
+PGPORT=5432
+DATABASE_URL=[full_connection_string]
+
+# Application Configuration
 SESSION_SECRET=d2d77211c82bcd23f9dea2b84413a46acec55c976cf61c79f84d71ad47526ecf
 NODE_ENV=production
-BREVO_API_KEY=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
 BASE_URL=https://hiremzansi.co.za
 JWT_SECRET=hire-mzansi-jwt-secret-key-2025-secure
+
+# API Keys
 XAI_API_KEY=xai-O1xSO3enl5WxdZovrvVjD5be1ECK3q8ozSWYychZY37wDzgEiUINGv6vtXgtxpp1DLsXAH8tusj0NhvE
+BREVO_API_KEY=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
 ```
 
 ### xAI API Status
