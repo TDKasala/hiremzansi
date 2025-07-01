@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { xaiService } from '../services/xaiService';
-import pdfParse from 'pdf-parse';
+// Import pdf-parse dynamically since it's CommonJS
+let pdfParse: any;
 import mammoth from 'mammoth';
 
 const router = Router();
@@ -27,6 +28,9 @@ async function extractTextFromFile(file: Express.Multer.File): Promise<string> {
   try {
     switch (file.mimetype) {
       case 'application/pdf':
+        if (!pdfParse) {
+          pdfParse = (await import('pdf-parse')).default;
+        }
         const pdfData = await pdfParse(file.buffer);
         return pdfData.text;
       

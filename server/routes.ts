@@ -41,7 +41,6 @@ import { verifyToken, hashPassword, authenticateUser, generateToken } from "./au
 import { isAuthenticated as authMiddleware, isAdmin as adminMiddleware } from "./auth";
 import { databaseAuth, authenticateToken } from "./databaseAuth";
 import { simpleAuth } from "./simpleAuth";
-import jwt from "jsonwebtoken";
 import { sendPasswordResetEmail } from "./services/emailService";
 import crypto from "crypto";
 import { payfastService } from "./services/payfastService";
@@ -90,29 +89,35 @@ const upload = multer({
   }
 });
 
-const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  // Check for authorization header
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
-    try {
-      const decoded = databaseAuth.verifyToken(token);
-      if (decoded) {
-        (req as any).user = decoded;
-        return next();
-      }
-    } catch (error) {
-      // Token invalid, continue to unauthorized response
-    }
+// JWT-based authentication middleware
+const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies?.auth_token;
+  
+  if (!token) {
+    console.log('Authentication failed: No auth token cookie');
+    return res.status(401).json({ message: "Authentication required" });
   }
   
-  // Check session-based authentication if available
-  if (req.session && (req.session as any).userId) {
-    return next();
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-for-development') as any;
+    (req as any).user = {
+      id: decoded.userId,
+      email: decoded.email,
+      username: decoded.username,
+      name: decoded.name,
+      role: decoded.role,
+      isAdmin: decoded.role === 'admin'
+    };
+    console.log('Authentication successful for user:', decoded.email);
+    next();
+  } catch (error) {
+    console.log('Authentication failed: Invalid token');
+    return res.status(401).json({ message: "Authentication required" });
   }
-  
-  res.status(401).json({ error: "Authentication required" });
 };
+
+// Use the JWT-based authentication middleware 
+const isAuthenticated = requireAuth;
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   // Check for authorization header

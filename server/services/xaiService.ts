@@ -9,7 +9,7 @@ const openai = new OpenAI({
 function getXAIClient() {
   return new OpenAI({
     baseURL: "https://api.x.ai/v1",
-    apiKey: "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq",
+    apiKey: process.env.XAI_API_KEY,
   });
 }
 
