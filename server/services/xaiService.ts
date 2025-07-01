@@ -7,9 +7,19 @@ const openai = new OpenAI({
 
 // Function to get current xAI client with fresh API key
 function getXAIClient() {
+  // Force the new API key - the user provided this key
+  const newApiKey = "xai-O1xSO3enl5WxdZovrvVjD5be1ECK3q8ozSWYychZY37wDzgEiUINGv6vtXgtxpp1DLsXAH8tusj0NhvE";
+  const apiKey = newApiKey || process.env.XAI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("XAI_API_KEY environment variable is not set");
+  }
+  
+  console.log(`Using xAI API key: ${apiKey.substring(0, 20)}...`);
+  
   return new OpenAI({
     baseURL: "https://api.x.ai/v1",
-    apiKey: process.env.XAI_API_KEY,
+    apiKey: apiKey,
   });
 }
 
@@ -47,35 +57,87 @@ export interface CareerGuidanceResult {
 
 class XAIService {
   private async makeRequest(prompt: string, maxTokens: number = 4000): Promise<string> {
-    // Try xAI first, fallback to OpenAI
-    try {
-      const xaiClient = getXAIClient();
-      console.log("Using xAI API key:", process.env.XAI_API_KEY?.substring(0, 15) + "...");
-      const response = await xaiClient.chat.completions.create({
-        model: "grok-3-mini",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: maxTokens,
-        temperature: 0.7,
-      });
+    const apiKey = process.env.XAI_API_KEY;
+    
+    // Enhanced logging for debugging
+    console.log("=== xAI Request Starting ===");
+    console.log("API Key configured:", !!apiKey);
+    console.log("API Key prefix:", apiKey?.substring(0, 20) + "...");
+    
+    if (!apiKey) {
+      console.warn("XAI_API_KEY not configured, using OpenAI fallback");
+      return this.makeOpenAIRequest(prompt, maxTokens);
+    }
 
-      console.log("Successfully used xAI for CV analysis");
-      return response.choices[0].message.content || "";
-    } catch (xaiError: any) {
-      console.log("xAI failed, falling back to OpenAI:", xaiError.message);
-      
+    // Try xAI with retry logic
+    for (let attempt = 1; attempt <= 3; attempt++) {
       try {
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
+        console.log(`xAI attempt ${attempt}/3`);
+        const xaiClient = getXAIClient();
+        
+        const response = await xaiClient.chat.completions.create({
+          model: "grok-3-mini",
           messages: [{ role: "user", content: prompt }],
           max_tokens: maxTokens,
-          temperature: 0.7,
+          temperature: 0.1,
         });
 
-        return response.choices[0].message.content || "";
-      } catch (openaiError) {
-        console.error("Both xAI and OpenAI failed:", openaiError);
-        throw new Error("Failed to process with AI services");
+        const content = response.choices[0]?.message?.content;
+        if (!content) {
+          throw new Error("Empty response from xAI");
+        }
+
+        console.log("✅ xAI request successful");
+        console.log("Response length:", content.length);
+        return content;
+        
+      } catch (xaiError: any) {
+        console.error(`❌ xAI attempt ${attempt} failed:`, {
+          message: xaiError.message,
+          status: xaiError.status,
+          code: xaiError.code,
+          type: xaiError.type
+        });
+        
+        if (attempt === 3) {
+          console.log("All xAI attempts failed, using OpenAI fallback");
+          return this.makeOpenAIRequest(prompt, maxTokens);
+        }
+        
+        // Wait before retry with exponential backoff
+        const waitTime = 1000 * Math.pow(2, attempt - 1);
+        console.log(`Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
       }
+    }
+    
+    throw new Error("All attempts failed");
+  }
+
+  private async makeOpenAIRequest(prompt: string, maxTokens: number = 4000): Promise<string> {
+    try {
+      console.log("Using OpenAI fallback...");
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: maxTokens,
+        temperature: 0.1,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        throw new Error("Empty response from OpenAI");
+      }
+
+      console.log("✅ OpenAI fallback successful");
+      return content;
+    } catch (openaiError: any) {
+      console.error("❌ OpenAI fallback failed:", {
+        message: openaiError.message,
+        status: openaiError.status,
+        code: openaiError.code
+      });
+      throw new Error(`AI services unavailable: ${openaiError.message}`);
     }
   }
 
@@ -119,9 +181,10 @@ class XAIService {
         keywords: ["React", "Node.js", "JavaScript"],
         missingKeywords: ["TypeScript", "Testing"],
         southAfricanContext: {
-          bbbeeConsiderations: "Profile shows diverse technical background",
-          localRelevance: "Good",
-          provinceRelevance: "Applicable nationwide"
+          beeCompliance: "Profile shows diverse technical background",
+          localMarketFit: "Good",
+          industryRelevance: "good",
+          languageAppropriate: true
         }
       };
     }
