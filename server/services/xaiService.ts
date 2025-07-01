@@ -50,7 +50,7 @@ class XAIService {
     // Try xAI first, fallback to OpenAI
     try {
       const xaiClient = getXAIClient();
-      console.log("Using xAI API key:", "xai-rspUY3X7CS55MH0ClJT0nxCT2D9bmXUln8YB0dcriOULNlHi30teZCH7WQha1vOgIWnE9OavQzERsteq".substring(0, 15) + "...");
+      console.log("Using xAI API key:", process.env.XAI_API_KEY?.substring(0, 15) + "...");
       const response = await xaiClient.chat.completions.create({
         model: "grok-3-mini",
         messages: [{ role: "user", content: prompt }],
