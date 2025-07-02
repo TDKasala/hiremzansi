@@ -16,7 +16,7 @@ export const databaseAuth = {
         email: userData.email,
         password: userData.password,
         name: userData.name || null,
-        role: 'user',
+        role: userData.role || 'user',
         isActive: true,
         emailVerified: false,
       });

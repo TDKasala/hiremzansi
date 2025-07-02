@@ -347,7 +347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Authentication Routes - Simple Implementation
   app.post("/api/auth/signup", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password, name, username } = req.body;
+      const { email, password, name, username, userType } = req.body;
       
       if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
@@ -359,12 +359,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User already exists with this email" });
       }
 
+      // Determine role based on userType
+      const role = userType === 'employer' ? 'employer' : 'user';
+      
       // Create user using database auth system
       const result = await databaseAuth.createUser({
         username: username || email.split('@')[0],
         email,
         password,
-        name: name || ''
+        name: name || '',
+        role: role
       });
       
       const newUser = result.user;

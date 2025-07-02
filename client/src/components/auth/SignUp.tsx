@@ -12,6 +12,7 @@ export function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [userType, setUserType] = useState<'job_seeker' | 'employer' | ''>('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,8 +26,8 @@ export function SignUp() {
     e.preventDefault();
     setError(null);
     
-    if (!email || !password || !name) {
-      setError('All fields are required');
+    if (!email || !password || !name || !userType) {
+      setError('All fields are required, including account type');
       return;
     }
     
@@ -56,7 +57,8 @@ export function SignUp() {
           email,
           password,
           name,
-          username: email.split('@')[0]
+          username: email.split('@')[0],
+          userType
         }),
       });
 
@@ -193,6 +195,56 @@ export function SignUp() {
                   required
                   className="h-12 border-gray-200 focus:border-primary focus:ring-primary/20 transition-all duration-200"
                 />
+              </div>
+
+              {/* User Type Selection */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold text-gray-700">
+                  I am a...
+                </Label>
+                <div className="grid grid-cols-1 gap-3">
+                  <div
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                      userType === 'job_seeker'
+                        ? 'border-primary bg-primary/5 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setUserType('job_seeker')}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        userType === 'job_seeker'
+                          ? 'border-primary bg-primary'
+                          : 'border-gray-300'
+                      }`} />
+                      <div>
+                        <div className="font-medium text-gray-900">Job Seeker</div>
+                        <div className="text-sm text-gray-600">Looking for job opportunities and CV optimization</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                      userType === 'employer'
+                        ? 'border-primary bg-primary/5 shadow-sm'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setUserType('employer')}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        userType === 'employer'
+                          ? 'border-primary bg-primary'
+                          : 'border-gray-300'
+                      }`} />
+                      <div>
+                        <div className="font-medium text-gray-900">Employer/Recruiter</div>
+                        <div className="text-sm text-gray-600">Looking to hire candidates and post job listings</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
