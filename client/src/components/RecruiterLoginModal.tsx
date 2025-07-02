@@ -52,12 +52,12 @@ export function RecruiterLoginModal({
     onSuccess: (data) => {
       toast({
         title: "Login Successful",
-        description: "Redirecting to job posting page...",
+        description: "Redirecting to your recruiter dashboard...",
       });
       onClose();
-      // Redirect to job posting page after successful login
+      // Redirect to recruiter dashboard after successful login
       setTimeout(() => {
-        window.location.href = '/post-job';
+        window.location.href = '/recruiter/dashboard';
       }, 1000);
     },
     onError: (error: Error) => {

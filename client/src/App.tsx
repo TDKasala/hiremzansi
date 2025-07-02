@@ -96,6 +96,7 @@ import AIToolsResumeOptimization from "@/pages/blog/AIToolsResumeOptimization";
 import SouthAfricanCVGuide from "@/pages/blog/SouthAfricanCVGuide";
 import ResumeBuilder from "@/pages/ResumeBuilder";
 import JobsPage from "@/pages/JobsPage";
+import PostJobPage from "@/pages/PostJobPage";
 import SkillsQuizPage from "@/pages/SkillsQuizPage";
 
 // Admin components
@@ -189,6 +190,7 @@ function App() {
                 <ProtectedRoute path="/subscription" component={SubscriptionPage} />
                 <ProtectedRoute path="/recruiter/matches" component={RecruiterMatchingPage} />
                 <ProtectedRoute path="/recruiter/dashboard" component={RecruiterDashboard} />
+                <ProtectedRoute path="/post-job" component={PostJobPage} />
                 <ProtectedRoute path="/job-seeker/matches" component={JobSeekerMatchesPage} />
                 <ProtectedRoute path="/job-recommendations" component={JobRecommendationsPage} />
                 <ProtectedRoute path="/job-seeker/profile" component={JobSeekerProfile} />
