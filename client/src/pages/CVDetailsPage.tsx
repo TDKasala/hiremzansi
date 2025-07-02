@@ -68,6 +68,24 @@ const CVDetailsPage: React.FC = () => {
     staleTime: 60000, // Cache for 1 minute to prevent unnecessary refetches
   });
 
+  // Automatically switch to analysis tab when CV is analyzed and ATS score is available
+  useEffect(() => {
+    if (cv?.isAnalyzed && atsScore) {
+      // Only auto-switch if we're still on the default 'overview' tab
+      // This allows users to manually switch tabs without interference
+      if (activeTab === 'overview') {
+        setActiveTab('analysis');
+      }
+    }
+  }, [cv?.isAnalyzed, atsScore, activeTab]);
+
+  // Handle direct navigation - set analysis as default for analyzed CVs
+  useEffect(() => {
+    if (cv?.isAnalyzed && !scoreLoading && atsScore) {
+      setActiveTab('analysis');
+    }
+  }, [cv?.isAnalyzed, scoreLoading, atsScore]);
+
   if (cvLoading || scoreLoading) {
     return (
       <div className="container mx-auto p-4 flex items-center justify-center min-h-[70vh]">
@@ -158,11 +176,23 @@ const CVDetailsPage: React.FC = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 w-full md:w-1/2 mb-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analysis" disabled={!cv.isAnalyzed}>
-            ATS Analysis
-          </TabsTrigger>
-          <TabsTrigger value="content">CV Content</TabsTrigger>
+          {cv.isAnalyzed ? (
+            <>
+              <TabsTrigger value="analysis">
+                ATS Analysis
+              </TabsTrigger>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="content">CV Content</TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="analysis" disabled={!cv.isAnalyzed}>
+                ATS Analysis
+              </TabsTrigger>
+              <TabsTrigger value="content">CV Content</TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">

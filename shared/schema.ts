@@ -645,7 +645,7 @@ export const subscriptions = pgTable("subscriptions", {
   cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
   paymentMethod: text("payment_method"),
   scansUsed: integer("scans_used").default(0),
-  templatesUsed: integer("templates_used").default(0),
+  // templatesUsed: integer("templates_used").default(0), // TODO: Add this column to database
   lastScanReset: timestamp("last_scan_reset"),
   lastTemplateReset: timestamp("last_template_reset"),
   createdAt: timestamp("created_at").defaultNow(),
