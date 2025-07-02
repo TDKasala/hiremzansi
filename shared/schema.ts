@@ -331,14 +331,14 @@ export const employers = pgTable("employers", {
   companySize: text("company_size"),
   website: text("website"),
   description: text("description"),
-  location: text("location"),
-  province: text("province"),
-  city: text("city"),
+  // location: text("location"), // TODO: Add to database
+  // province: text("province"), // TODO: Add to database
+  // city: text("city"), // TODO: Add to database
   logo: text("logo"),
-  bbbeeLevel: integer("bbbee_level"),
-  bbbeeScore: real("bbbee_score"),
+  // bbbeeLevel: integer("bbbee_level"), // TODO: Add to database
+  // bbbeeScore: real("bbbee_score"), // TODO: Add to database
   isVerified: boolean("is_verified").default(false),
-  verificationDocuments: text("verification_documents").array(),
+  // verificationDocuments: text("verification_documents").array(), // TODO: Add to database
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -646,8 +646,8 @@ export const subscriptions = pgTable("subscriptions", {
   paymentMethod: text("payment_method"),
   scansUsed: integer("scans_used").default(0),
   // templatesUsed: integer("templates_used").default(0), // TODO: Add this column to database
-  lastScanReset: timestamp("last_scan_reset"),
-  lastTemplateReset: timestamp("last_template_reset"),
+  // lastScanReset: timestamp("last_scan_reset"), // TODO: Add to database
+  // lastTemplateReset: timestamp("last_template_reset"), // TODO: Add to database
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
