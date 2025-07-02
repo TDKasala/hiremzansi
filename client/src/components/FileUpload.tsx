@@ -33,6 +33,7 @@ export default function FileUpload({
   const [jobDescription, setJobDescription] = useState("");
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [uploadedCvId, setUploadedCvId] = useState<number | null>(null);
+  const [uploadedCVData, setUploadedCVData] = useState<any>(null);
   const { toast } = useToast();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -111,6 +112,8 @@ export default function FileUpload({
       if (data.cv && data.cv.id) {
         console.log("Setting CV ID:", data.cv.id);
         setUploadedCvId(data.cv.id);
+        // Store the CV data for later use
+        setUploadedCVData(data.cv);
         // Show the consent dialog after successful upload
         console.log("Showing consent dialog...");
         setShowConsentDialog(true);
@@ -191,9 +194,18 @@ export default function FileUpload({
         description: `Your CV has been analyzed with a score of ${data.score}%`,
       });
       
-      // Now call the callback after analysis is complete
+      // Now call the callback after analysis is complete with combined data
       if (onUploadComplete) {
-        onUploadComplete(data);
+        const combinedData = {
+          cv: uploadedCVData,
+          score: data.score,
+          analysis: {
+            strengths: data.strengths || [],
+            improvements: data.improvements || [],
+            suggestions: data.suggestions || []
+          }
+        };
+        onUploadComplete(combinedData);
       }
       
     } catch (err: any) {

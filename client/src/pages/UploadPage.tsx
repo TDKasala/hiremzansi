@@ -62,6 +62,11 @@ export default function UploadPage() {
     score: number;
     isGuest?: boolean;
     guestAnalysis?: GuestAnalysis;
+    analysis?: {
+      strengths: string[];
+      improvements: string[];
+      suggestions: string[];
+    };
   }
   
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -87,6 +92,15 @@ export default function UploadPage() {
         limitedStrengths: data.guestAnalysis?.limitedStrengths || [],
         limitedImprovements: data.guestAnalysis?.limitedImprovements || [],
         upgradeSuggestion: data.guestAnalysis?.upgradeSuggestion || "Create an account for more features."
+      };
+    }
+    
+    // Add full analysis if present
+    if (data.analysis) {
+      result.analysis = {
+        strengths: data.analysis.strengths || [],
+        improvements: data.analysis.improvements || [],
+        suggestions: data.analysis.suggestions || []
       };
     }
     
@@ -345,18 +359,90 @@ export default function UploadPage() {
                         </>
                       ) : (
                         <>
-                          <Alert variant="default">
-                            <Info className="h-4 w-4" />
-                            <AlertTitle>Next Steps</AlertTitle>
-                            <AlertDescription>
-                              View detailed analysis and South African specific recommendations for your CV.
-                            </AlertDescription>
-                          </Alert>
-                          
-                          <div className="mt-4 flex justify-center">
-                            <Button onClick={() => navigate(`/cv/${analysisResult.cv.id}`)}>
-                              View Full Analysis
-                            </Button>
+                          {/* Simple ATS Results Display */}
+                          <div className="space-y-4">
+                            {/* Score Display */}
+                            <div className="text-center p-6 bg-primary/5 rounded-lg">
+                              <h3 className="text-lg font-semibold mb-2">Your ATS Score</h3>
+                              <div className="text-5xl font-bold text-primary mb-2">
+                                {analysisResult.score || 0}%
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {analysisResult.score >= 80 ? 'Excellent' : 
+                                 analysisResult.score >= 60 ? 'Good' : 
+                                 analysisResult.score >= 40 ? 'Fair' : 'Needs Improvement'}
+                              </p>
+                            </div>
+
+                            {/* Key Findings */}
+                            {analysisResult.analysis && (
+                              <div className="space-y-3">
+                                {/* Strengths */}
+                                {analysisResult.analysis.strengths && analysisResult.analysis.strengths.length > 0 && (
+                                  <div>
+                                    <h4 className="font-medium flex items-center text-green-700 mb-2">
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      What's Working Well
+                                    </h4>
+                                    <ul className="space-y-1 text-sm">
+                                      {analysisResult.analysis.strengths.slice(0, 3).map((strength: string, i: number) => (
+                                        <li key={i} className="flex items-start">
+                                          <span className="text-green-500 mr-2">•</span>
+                                          <span>{strength}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Areas to Improve */}
+                                {analysisResult.analysis.improvements && analysisResult.analysis.improvements.length > 0 && (
+                                  <div>
+                                    <h4 className="font-medium flex items-center text-amber-700 mb-2">
+                                      <AlertTriangle className="h-4 w-4 mr-2" />
+                                      Areas to Improve
+                                    </h4>
+                                    <ul className="space-y-1 text-sm">
+                                      {analysisResult.analysis.improvements.slice(0, 3).map((improvement: string, i: number) => (
+                                        <li key={i} className="flex items-start">
+                                          <span className="text-amber-500 mr-2">•</span>
+                                          <span>{improvement}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+
+                                {/* Quick Tips */}
+                                {analysisResult.analysis.suggestions && analysisResult.analysis.suggestions.length > 0 && (
+                                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                                    <h4 className="font-medium text-blue-900 mb-2">Quick Tips</h4>
+                                    <ul className="space-y-1 text-sm text-blue-800">
+                                      {analysisResult.analysis.suggestions.slice(0, 2).map((tip: string, i: number) => (
+                                        <li key={i}>{tip}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                              <Button onClick={() => navigate(`/cv/${analysisResult.cv.id}`)} variant="outline" className="flex-1">
+                                View Detailed Report
+                              </Button>
+                              <Button 
+                                onClick={() => {
+                                  setAnalysisResult(null);
+                                  setUploadedCvId(null);
+                                  setJobDescription('');
+                                }}
+                                className="flex-1"
+                              >
+                                Analyze Another CV
+                              </Button>
+                            </div>
                           </div>
                         </>
                       )}
