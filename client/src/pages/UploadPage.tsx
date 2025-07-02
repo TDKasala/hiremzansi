@@ -79,6 +79,8 @@ export default function UploadPage() {
   });
 
   const handleUploadComplete = (data: any) => {
+    console.log("handleUploadComplete called with data:", data);
+    
     // Create analysis result with support for guest mode
     const result: AnalysisResult = {
       cv: data.cv,
@@ -104,12 +106,13 @@ export default function UploadPage() {
       };
     }
     
+    console.log("Setting analysisResult to:", result);
     setAnalysisResult(result);
     
-    // Show the consent dialog with CV ID and score
-    setUploadedCvId(data.cv.id);
-    setUploadedScore(data.score);
-    setShowConsentDialog(true);
+    // Don't show consent dialog again since analysis is complete
+    // setUploadedCvId(data.cv.id);
+    // setUploadedScore(data.score);
+    // setShowConsentDialog(true);
   };
   
   // Handle consent dialog confirm action
@@ -366,6 +369,10 @@ export default function UploadPage() {
                               <h3 className="text-lg font-semibold mb-2">Your ATS Score</h3>
                               <div className="text-5xl font-bold text-primary mb-2">
                                 {analysisResult.score || 0}%
+                              </div>
+                              {/* Debug info */}
+                              <div className="text-xs text-gray-400 mt-1">
+                                Debug: Score={analysisResult.score}, Analysis present={!!analysisResult.analysis}
                               </div>
                               <p className="text-sm text-muted-foreground">
                                 {analysisResult.score >= 80 ? 'Excellent' : 

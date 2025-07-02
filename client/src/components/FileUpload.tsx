@@ -196,15 +196,17 @@ export default function FileUpload({
       
       // Now call the callback after analysis is complete with combined data
       if (onUploadComplete) {
+        console.log("Analysis response from backend:", data);
         const combinedData = {
           cv: uploadedCVData,
           score: data.score,
           analysis: {
             strengths: data.strengths || [],
             improvements: data.improvements || [],
-            suggestions: data.suggestions || []
+            suggestions: data.suggestions || data.improvements || [] // fallback to improvements if no suggestions
           }
         };
+        console.log("Sending combined data to parent:", combinedData);
         onUploadComplete(combinedData);
       }
       

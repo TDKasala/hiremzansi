@@ -1,0 +1,38 @@
+John Doe
+Software Developer
+
+Contact:
+Email: john.doe@email.com
+Phone: +27 11 123 4567
+Location: Johannesburg, South Africa
+
+Summary:
+Experienced software developer with 5 years of experience in web development.
+Proficient in JavaScript, React, Node.js, and Python. Strong problem-solving skills
+and ability to work in team environments.
+
+Experience:
+Senior Developer at TechCorp (2022-2024)
+- Developed and maintained web applications using React and Node.js
+- Led a team of 3 junior developers
+- Improved application performance by 40%
+
+Junior Developer at StartupXYZ (2020-2022)
+- Built responsive web interfaces using HTML, CSS, and JavaScript
+- Collaborated with designers and backend developers
+- Participated in agile development processes
+
+Education:
+Bachelor of Science in Computer Science
+University of the Witwatersrand (2016-2020)
+
+Skills:
+- JavaScript, TypeScript, React, Node.js
+- Python, Django, Flask
+- HTML, CSS, Bootstrap
+- Git, GitHub, Docker
+- Agile methodologies
+
+Languages:
+- English (Native)
+- Afrikaans (Conversational)
