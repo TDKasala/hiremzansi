@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '../context/AuthContext';
+import { RecruiterLoginModal } from '@/components/RecruiterLoginModal';
 import { 
   MapPin, 
   Building, 
@@ -18,7 +19,8 @@ import {
   Eye,
   Heart,
   Briefcase,
-  Calendar
+  Calendar,
+  Plus
 } from 'lucide-react';
 
 interface JobPosting {
@@ -55,6 +57,7 @@ export default function JobsPage() {
   const [locationFilter, setLocationFilter] = useState('');
   const [industryFilter, setIndustryFilter] = useState('');
   const [employmentTypeFilter, setEmploymentTypeFilter] = useState('');
+  const [showRecruiterModal, setShowRecruiterModal] = useState(false);
 
   // Fetch job postings
   const { data: jobs = [], isLoading } = useQuery<JobPosting[]>({
@@ -333,6 +336,24 @@ export default function JobsPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Floating Action Button for Recruiters */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <RecruiterLoginModal
+          isOpen={showRecruiterModal}
+          onClose={() => setShowRecruiterModal(false)}
+          onLoginSuccess={() => {
+            // Redirect to recruiter dashboard or job posting form
+            window.location.href = '/recruiter/dashboard';
+          }}
+          triggerComponent={
+            <Button size="lg" className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+              <Plus className="h-5 w-5 mr-2" />
+              Post Job
+            </Button>
+          }
+        />
       </div>
     </>
   );

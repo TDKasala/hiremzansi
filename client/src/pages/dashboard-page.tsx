@@ -39,6 +39,8 @@ import {
   Bell,
   Target,
   CreditCard,
+  Search,
+  Edit,
 } from "lucide-react";
 import { CV } from "@shared/schema";
 import DeepAnalysisCard from "@/components/DeepAnalysisCard";
@@ -112,10 +114,7 @@ export default function DashboardPage() {
           />
         )}
         
-        <MotivationalBanner 
-          location="dashboard"
-          cvCount={userCVs?.length || 0}
-        />
+        {/* Removed daily motivation feature as requested */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -145,7 +144,7 @@ export default function DashboardPage() {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid md:grid-cols-5 grid-cols-3 gap-2 h-auto">
+          <TabsList className="grid md:grid-cols-6 grid-cols-3 gap-2 h-auto">
             <TabsTrigger value="overview" className="px-4 py-2">
               <PieChart className="mr-2 h-4 w-4" />
               Overview
@@ -153,6 +152,14 @@ export default function DashboardPage() {
             <TabsTrigger value="cvs" className="px-4 py-2">
               <FileText className="mr-2 h-4 w-4" />
               My CVs
+            </TabsTrigger>
+            <TabsTrigger value="ats-keywords" className="px-4 py-2">
+              <Search className="mr-2 h-4 w-4" />
+              ATS Keywords
+            </TabsTrigger>
+            <TabsTrigger value="cv-editor" className="px-4 py-2">
+              <Edit className="mr-2 h-4 w-4" />
+              CV Editor
             </TabsTrigger>
             <TabsTrigger value="deep-analysis" className="px-4 py-2">
               <LineChart className="mr-2 h-4 w-4" />
@@ -391,6 +398,73 @@ export default function DashboardPage() {
                     </Button>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ats-keywords" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Search className="mr-2 h-5 w-5" />
+                  ATS Keywords Analysis
+                </CardTitle>
+                <CardDescription>
+                  Analyze your CV against job descriptions to find missing keywords
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Get detailed insights on how to optimize your CV for Applicant Tracking Systems (ATS) 
+                    with our premium keywords analysis tool.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button asChild>
+                      <Link href="/tools/ats-keywords">
+                        <Search className="mr-2 h-4 w-4" />
+                        Start ATS Analysis
+                      </Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/premium-tools">
+                        View All Premium Tools
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="cv-editor" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Edit className="mr-2 h-5 w-5" />
+                  Real-Time CV Editor
+                </CardTitle>
+                <CardDescription>
+                  Edit and optimize your CV in real-time with AI suggestions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Our intelligent CV editor provides real-time suggestions and optimizations 
+                    specifically for the South African job market.
+                  </p>
+                  <div className="bg-muted/30 border border-dashed rounded-lg p-6 text-center">
+                    <Edit className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-medium mb-2">Real-Time CV Editor</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Coming soon - Edit your CV with live AI feedback and ATS optimization
+                    </p>
+                    <Button variant="outline" disabled>
+                      Editor Coming Soon
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

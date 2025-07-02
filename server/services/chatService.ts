@@ -1,22 +1,19 @@
 import OpenAI from "openai";
 
+// Initialize LocalAI client (primary)
+function getLocalAIClient() {
+  const baseURL = process.env.LOCALAI_BASE_URL || "http://localhost:8080/v1";
+  
+  return new OpenAI({
+    baseURL: baseURL,
+    apiKey: "not-needed", // LocalAI doesn't require an API key
+  });
+}
+
 // Initialize OpenAI client as fallback
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 }) : null;
-
-// Function to get current xAI client with fresh API key
-function getXAIClient() {
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("XAI_API_KEY environment variable is required");
-  }
-  
-  return new OpenAI({
-    baseURL: "https://api.x.ai/v1",
-    apiKey: apiKey,
-  });
-}
 
 interface ChatSession {
   sessionId: string;
@@ -317,25 +314,23 @@ Our analysis checks for 25+ ATS factors specifically tuned for South African emp
 
   private async generateAIResponse(messages: any[], category: string): Promise<{ message: string; confidence: number }> {
     try {
-      // Try xAI first
-      if (process.env.XAI_API_KEY) {
-        try {
-          const xaiClient = getXAIClient();
-          const response = await xaiClient.chat.completions.create({
-            model: "grok-3-mini",
-            messages: messages,
-            max_tokens: 300,
-            temperature: 0.7,
-          });
+      // Try LocalAI first
+      try {
+        const localaiClient = getLocalAIClient();
+        const response = await localaiClient.chat.completions.create({
+          model: "gpt-4", // LocalAI model name - adjust based on your setup
+          messages: messages,
+          max_tokens: 300,
+          temperature: 0.7,
+        });
 
-          const message = response.choices[0].message.content || '';
-          return {
-            message: message.trim(),
-            confidence: 0.9
-          };
-        } catch (xaiError) {
-          console.log('xAI chat failed, trying OpenAI:', xaiError);
-        }
+        const message = response.choices[0].message.content || '';
+        return {
+          message: message.trim(),
+          confidence: 0.9
+        };
+      } catch (localaiError) {
+        console.log('LocalAI chat failed, trying OpenAI fallback:', localaiError);
       }
 
       // Try OpenAI as fallback
