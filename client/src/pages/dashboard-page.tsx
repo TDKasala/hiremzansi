@@ -45,6 +45,7 @@ import {
   Edit,
   CheckCircle,
   Save,
+  Crown,
 } from "lucide-react";
 import { CV } from "@shared/schema";
 import DeepAnalysisCard from "@/components/DeepAnalysisCard";
@@ -53,6 +54,7 @@ import { WelcomeBanner } from "@/components/WelcomeBanner";
 import { JobMatchingDashboard } from "@/components/JobMatchingDashboard";
 import { JobSeekerMatchNotifications } from "@/components/JobSeekerMatchNotifications";
 import { JobSeekerBenefitsAlert } from "@/components/JobSeekerBenefitsAlert";
+import { SkillGapAnalysis } from "@/components/SkillGapAnalysis";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -433,445 +435,79 @@ export default function DashboardPage() {
           </TabsContent>
           
           <TabsContent value="skill-gap-analysis" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              {/* Skill Gap Analysis */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold mb-4 flex items-center">
-                  <Target className="mr-2 h-5 w-5 text-primary" />
-                  Skill Gap Analysis
-                </h2>
-                
-                {userCVs && userCVs.length > 0 ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Skills Analysis for {userCVs[0].fileName}</CardTitle>
-                      <CardDescription>
-                        Identify skill gaps and get recommendations for career advancement
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* Current Skills */}
-                      <div>
-                        <h3 className="font-medium mb-3">Current Skills</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="secondary">React</Badge>
-                          <Badge variant="secondary">JavaScript</Badge>
-                          <Badge variant="secondary">TypeScript</Badge>
-                          <Badge variant="secondary">Node.js</Badge>
-                          <Badge variant="secondary">PostgreSQL</Badge>
-                        </div>
-                      </div>
-                      
-                      {/* Skill Gaps */}
-                      <div>
-                        <h3 className="font-medium mb-3">Recommended Skills to Learn</h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div>
-                              <span className="font-medium">Docker & Containerization</span>
-                              <p className="text-sm text-muted-foreground">High demand in DevOps roles</p>
-                            </div>
-                            <Badge variant="destructive">Missing</Badge>
-                          </div>
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div>
-                              <span className="font-medium">AWS Cloud Services</span>
-                              <p className="text-sm text-muted-foreground">Essential for cloud-native development</p>
-                            </div>
-                            <Badge variant="destructive">Missing</Badge>
-                          </div>
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <div>
-                              <span className="font-medium">Python</span>
-                              <p className="text-sm text-muted-foreground">Expanding opportunities in data science</p>
-                            </div>
-                            <Badge variant="secondary">Beginner</Badge>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Action Items */}
-                      <div>
-                        <h3 className="font-medium mb-3">Learning Recommendations</h3>
-                        <div className="space-y-2">
-                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                            <span>Complete Docker fundamentals course (High priority)</span>
-                          </div>
-                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-blue-500 mr-3" />
-                            <span>Get AWS certified (Medium priority)</span>
-                          </div>
-                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-orange-500 mr-3" />
-                            <span>Build a Python portfolio project (Low priority)</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card>
-                    <CardContent className="py-8">
-                      <div className="text-center">
-                        <div className="mx-auto bg-muted w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                          <Target className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <h3 className="font-medium text-lg mb-2">No CV Available</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Please upload a CV to get a detailed deep analysis report.
-                        </p>
-                        <Button asChild>
-                          <Link href="/upload">
-                            <CloudUpload className="mr-2 h-4 w-4" />
-                            Upload CV
-                          </Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-              
-              {/* Premium features preview */}
+            <SkillGapAnalysis />
+          </TabsContent>
+
+          {/* Job Matches Tab */}
+          <TabsContent value="job-matches" className="space-y-6">
+            <JobMatchingDashboard />
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications" className="space-y-6">
+            <JobSeekerMatchNotifications />
+          </TabsContent>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
+            {/* Profile Section */}
+            {user && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Sparkles className="mr-2 h-5 w-5 text-primary" />
-                    Premium Features
+                    <User className="mr-2 h-5 w-5" />
+                    Profile Information
                   </CardTitle>
                   <CardDescription>
-                    Access additional tools tailored for the South African job market
+                    Manage your personal information and preferences
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <div className="flex items-start">
-                        <div className="bg-primary/10 p-2 rounded-full mr-3">
-                          <Target className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Real-time CV Editor</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Get AI-powered suggestions specific to the South African job market.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <div className="bg-primary/10 p-2 rounded-full mr-3">
-                          <Award className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">B-BBEE Optimization</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Enhance your CV with proper B-BBEE certification presentation.
-                          </p>
-                        </div>
-                      </div>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Name</label>
+                      <p className="text-muted-foreground">
+                        {user.name || user.email}
+                      </p>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-start">
-                        <div className="bg-primary/10 p-2 rounded-full mr-3">
-                          <Bell className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Job Alert Notifications</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Receive SMS alerts when jobs matching your skills become available.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <div className="bg-primary/10 p-2 rounded-full mr-3">
-                          <CreditCard className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">South African Interview Prep</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Practice with questions specific to South African employers.
-                          </p>
-                        </div>
-                      </div>
+                    <div>
+                      <label className="text-sm font-medium">Email</label>
+                      <p className="text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="w-full">
-                    <Link href="/premium-tools">
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Access Premium Tools
-                    </Link>
+                  <Button variant="outline">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Edit Profile
                   </Button>
-                </CardFooter>
+                </CardContent>
               </Card>
-            </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="job-matches" className="space-y-6">
-            <JobMatchingDashboard cvId={userCVs?.[0]?.id} />
-          </TabsContent>
-
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Match Notifications</CardTitle>
-                <CardDescription>Anonymous alerts about jobs matching your CV</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <JobSeekerMatchNotifications />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Profile</CardTitle>
-                <CardDescription>South African professional information</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isProfileLoading ? (
-                  <div className="text-center py-8">
-                    <div className="spinner border-4 border-primary border-t-transparent h-12 w-12 rounded-full mx-auto animate-spin"></div>
-                    <p className="mt-4 text-muted-foreground">Loading your profile...</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Name</label>
-                        <input
-                          type="text"
-                          value={user?.name || ""}
-                          readOnly
-                          className="w-full p-2 border rounded-md bg-muted"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Email</label>
-                        <input
-                          type="email"
-                          value={user?.email || ""}
-                          readOnly
-                          className="w-full p-2 border rounded-md bg-muted"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">South African Information</h3>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-1">B-BBEE Status</label>
-                          <select
-                            className="w-full p-2 border rounded-md"
-                            defaultValue=""
-                          >
-                            <option value="" disabled>Select B-BBEE Level</option>
-                            <option value="level-1">Level 1 Contributor</option>
-                            <option value="level-2">Level 2 Contributor</option>
-                            <option value="level-3">Level 3 Contributor</option>
-                            <option value="level-4">Level 4 Contributor</option>
-                            <option value="level-5">Level 5 Contributor</option>
-                            <option value="level-6">Level 6 Contributor</option>
-                            <option value="level-7">Level 7 Contributor</option>
-                            <option value="level-8">Level 8 Contributor</option>
-                            <option value="non-compliant">Non-Compliant</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-1">Province</label>
-                          <select
-                            className="w-full p-2 border rounded-md"
-                            defaultValue=""
-                          >
-                            <option value="" disabled>Select Province</option>
-                            <option value="gauteng">Gauteng</option>
-                            <option value="western-cape">Western Cape</option>
-                            <option value="eastern-cape">Eastern Cape</option>
-                            <option value="northern-cape">Northern Cape</option>
-                            <option value="kwazulu-natal">KwaZulu-Natal</option>
-                            <option value="free-state">Free State</option>
-                            <option value="north-west">North West</option>
-                            <option value="mpumalanga">Mpumalanga</option>
-                            <option value="limpopo">Limpopo</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">WhatsApp Notifications</h3>
-                      <form onSubmit={handleWhatsappSubmit}>
-                        <div className="space-y-4">
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              id="whatsapp-enabled"
-                              className="mr-2"
-                              checked={whatsappEnabled}
-                              onChange={() => setWhatsappEnabled(!whatsappEnabled)}
-                            />
-                            <label htmlFor="whatsapp-enabled">
-                              Enable WhatsApp notifications for job alerts and CV analysis
-                            </label>
-                          </div>
-                          
-                          {whatsappEnabled && (
-                            <div>
-                              <label className="block text-sm font-medium mb-1">
-                                WhatsApp Number (South African format)
-                              </label>
-                              <div className="flex space-x-2">
-                                <input
-                                  type="text"
-                                  value={phoneNumber}
-                                  onChange={(e) => setPhoneNumber(e.target.value)}
-                                  placeholder="e.g. 0711234567"
-                                  className="flex-1 p-2 border rounded-md"
-                                />
-                                {!whatsappSettings?.verified && (
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleSendVerification}
-                                    disabled={isVerifyingWhatsapp}
-                                  >
-                                    {isVerifyingWhatsapp ? "Sending..." : "Verify"}
-                                  </Button>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                We'll send a verification code to this number
-                              </p>
-                            </div>
-                          )}
-                          
-                          <div className="pt-2">
-                            <Button 
-                              type="submit" 
-                              disabled={isUpdatingWhatsapp}
-                            >
-                              {isUpdatingWhatsapp ? "Saving..." : "Save Settings"}
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        {whatsappSettings?.verified && (
-                          <div className="bg-green-50 border border-green-200 rounded-md p-3 text-green-800 text-sm mt-4">
-                            <div className="flex items-center">
-                              <div className="mr-2 text-green-500">✓</div>
-                              <span>Your WhatsApp number has been verified</span>
-                            </div>
-                          </div>
-                        )}
-                      </form>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
+          {/* Subscription Tab */}
           <TabsContent value="subscription" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Subscription Status</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Crown className="mr-2 h-5 w-5" />
+                  Subscription & Billing
+                </CardTitle>
                 <CardDescription>
-                  Manage your Hire Mzansi subscription
+                  Manage your subscription and billing preferences
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="p-4 border border-primary/30 rounded-lg bg-primary/5">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <h3 className="text-lg font-medium flex items-center">
-                          <Award className="text-primary mr-2 h-5 w-5" />
-                          Free Plan
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Basic ATS scanning with limited features
-                        </p>
-                      </div>
-                      <div className="mt-4 md:mt-0">
-                        <Button asChild>
-                          <Link href="/premium-tools">
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            Upgrade to Premium
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Available Plans</h3>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <h3 className="font-medium">Deep Analysis</h3>
-                          <p className="text-sm text-muted-foreground">
-                            ZAR 30.00 per CV
-                          </p>
-                          <ul className="text-sm mt-2 space-y-1">
-                            <li className="flex items-center">
-                              <span className="text-primary mr-2">✓</span>
-                              South African market optimization
-                            </li>
-                            <li className="flex items-center">
-                              <span className="text-primary mr-2">✓</span>
-                              B-BBEE presentation suggestions
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-4 md:mt-0">
-                          <Button variant="outline" asChild>
-                            <Link href="/deep-analysis">
-                              Get Deep Analysis
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <h3 className="font-medium">Premium Monthly</h3>
-                          <p className="text-sm text-muted-foreground">
-                            ZAR 185.00 per month
-                          </p>
-                          <ul className="text-sm mt-2 space-y-1">
-                            <li className="flex items-center">
-                              <span className="text-primary mr-2">✓</span>
-                              Unlimited CV analyses
-                            </li>
-                            <li className="flex items-center">
-                              <span className="text-primary mr-2">✓</span>
-                              Real-time CV editor
-                            </li>
-                            <li className="flex items-center">
-                              <span className="text-primary mr-2">✓</span>
-                              Job alert notifications
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-4 md:mt-0">
-                          <Button variant="outline" asChild>
-                            <Link href="/premium-tools">
-                              Subscribe
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="text-center py-6">
+                  <Crown className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="font-medium mb-2">Free Plan</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You're currently on the free plan. Upgrade for advanced features.
+                  </p>
+                  <Button asChild>
+                    <Link href="/pricing">
+                      Upgrade to Premium
+                    </Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>

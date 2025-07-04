@@ -1721,6 +1721,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user skills for authenticated user
+  app.get("/api/user-skills", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const userSkills = await storage.getUserSkills(userId);
+      res.json(userSkills);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Analyze skill gaps for authenticated user
+  app.post("/api/analyze-skill-gaps", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { targetRole, cvId, currentSkills } = req.body;
+      
+      if (!targetRole) {
+        return res.status(400).json({ error: "Target role is required" });
+      }
+
+      let cvContent = '';
+      if (cvId) {
+        const cv = await storage.getCVById(cvId);
+        if (cv && cv.userId === userId) {
+          cvContent = cv.content;
+        }
+      }
+
+      // Mock analysis data based on target role
+      const analysisData = {
+        currentSkills: [
+          { name: "React", level: "advanced", marketDemand: "very-high", salaryImpact: 15 },
+          { name: "JavaScript", level: "advanced", marketDemand: "very-high", salaryImpact: 20 },
+          { name: "TypeScript", level: "intermediate", marketDemand: "high", salaryImpact: 12 },
+          { name: "Node.js", level: "intermediate", marketDemand: "high", salaryImpact: 18 },
+          { name: "PostgreSQL", level: "beginner", marketDemand: "medium", salaryImpact: 8 }
+        ],
+        skillGaps: [
+          {
+            skill: "Docker & Containerization",
+            priority: "critical",
+            reason: "Essential for modern DevOps practices and cloud deployment",
+            marketValue: 25,
+            learningPath: ["Docker Basics", "Docker Compose", "Kubernetes Fundamentals"],
+            timeToAcquire: "2-3 months",
+            relatedRoles: ["Full Stack Developer", "DevOps Engineer", "Cloud Architect"]
+          },
+          {
+            skill: "AWS Cloud Services",
+            priority: "high",
+            reason: "High demand in South African tech companies, 35% salary increase potential",
+            marketValue: 30,
+            learningPath: ["AWS Fundamentals", "EC2 & S3", "Lambda Functions", "AWS Certification"],
+            timeToAcquire: "3-4 months",
+            relatedRoles: ["Cloud Developer", "Solutions Architect", "DevOps Engineer"]
+          },
+          {
+            skill: "Python",
+            priority: "medium",
+            reason: "Expanding opportunities in data science and machine learning",
+            marketValue: 22,
+            learningPath: ["Python Basics", "Data Analysis with Pandas", "Web Development with Django"],
+            timeToAcquire: "2-3 months",
+            relatedRoles: ["Data Scientist", "Backend Developer", "ML Engineer"]
+          }
+        ],
+        learningRecommendations: [
+          {
+            skill: "Docker & Containerization",
+            priority: 1,
+            description: "Master containerization for modern application deployment",
+            resources: [
+              {
+                title: "Docker Mastery Course",
+                type: "course",
+                provider: "Udemy",
+                duration: "20 hours",
+                cost: "paid"
+              }
+            ],
+            prerequisites: ["Basic Linux commands", "Understanding of web applications"],
+            outcomes: ["Deploy containerized applications", "Manage Docker containers", "Use Docker Compose"]
+          }
+        ],
+        salaryProjection: {
+          current: 45000,
+          potential: 58500,
+          increase: 30
+        },
+        marketInsights: {
+          trending: ["AI/ML", "Cloud Computing", "Cybersecurity", "Data Science"],
+          inDemand: ["React", "Python", "AWS", "Docker", "Kubernetes"],
+          emerging: ["Web3", "Blockchain", "IoT", "Edge Computing"]
+        }
+      };
+
+      res.json(analysisData);
+    } catch (error) {
+      console.error('Error analyzing skill gaps:', error);
+      next(error);
+    }
+  });
+
   // Get personalized job recommendations for authenticated users
   app.get("/api/job-recommendations", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
     try {
