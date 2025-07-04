@@ -98,6 +98,7 @@ import ResumeBuilder from "@/pages/ResumeBuilder";
 import JobsPage from "@/pages/JobsPage";
 import PostJobPage from "@/pages/PostJobPage";
 import SkillsQuizPage from "@/pages/SkillsQuizPage";
+import OptimizedCVPage from "@/pages/OptimizedCVPage";
 
 // Admin components
 import AdminLogin from "@/pages/AdminLogin";
@@ -177,6 +178,7 @@ function App() {
                 <ProtectedRoute path="/upload" component={UploadPage} />
                 <ProtectedRoute path="/cv/:id" component={CVDetailsPage} />
                 <ProtectedRoute path="/cv/latest" component={LatestCVPage} />
+                <ProtectedRoute path="/cv/optimized" component={OptimizedCVPage} />
                 <ProtectedRoute path="/deep-analysis" component={DeepAnalysisPage} />
                 <Route path="/ats-results" component={ATSResultsPage} />
       

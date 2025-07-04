@@ -120,18 +120,22 @@ declare global {
 }
 
 export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+  // Check for auth token in cookies first, then Authorization header
+  const token = req.cookies.auth_token || 
+    (req.headers.authorization && req.headers.authorization.split(' ')[1]);
 
   if (!token) {
-    return res.status(401).json({ message: "Access token required" });
+    console.log("Authentication failed: No auth token cookie");
+    return res.status(401).json({ message: "Authentication required" });
   }
 
   const user = verifyToken(token);
   if (!user) {
+    console.log("Authentication failed: Invalid token");
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 
+  console.log("Authentication successful for user:", user.email);
   req.user = user;
   next();
 }

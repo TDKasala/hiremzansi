@@ -5867,6 +5867,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CV Optimization API endpoints
+  app.post('/api/cv/optimize', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { content, type } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: 'CV content is required' });
+      }
+
+      // Use xAI service for CV optimization with South African context
+      const prompt = `You are an expert CV optimizer specializing in the South African job market. Optimize the following CV content for ATS compatibility and local hiring practices.
+
+Please improve the CV by:
+1. Enhancing ATS keyword optimization
+2. Adding South African market context where relevant
+3. Improving professional language and formatting
+4. Including B-BBEE considerations if applicable
+5. Ensuring proper NQF level references for education
+6. Using South African English conventions
+
+Original CV Content:
+${content}
+
+Please return a well-formatted, professional CV that will perform well with South African ATS systems and recruiters.`;
+
+      const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'grok-3-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert CV optimization specialist for the South African job market. Always provide professional, ATS-optimized content.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 2000,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to optimize CV');
+      }
+
+      const aiResponse = await response.json();
+      const optimizedContent = aiResponse.choices[0]?.message?.content;
+
+      if (!optimizedContent) {
+        throw new Error('No optimized content received');
+      }
+
+      // Save the optimized CV as a new draft
+      const userId = req.user!.id;
+      const cvData = {
+        userId,
+        fileName: 'AI-Optimized-CV.txt',
+        fileType: 'text/plain',
+        fileSize: optimizedContent.length,
+        content: optimizedContent,
+        uploadMethod: 'ai_generated'
+      };
+
+      const savedCV = await storage.saveCV(cvData);
+
+      res.json({
+        success: true,
+        optimizedContent,
+        cvId: savedCV.id,
+        message: 'CV optimized successfully'
+      });
+
+    } catch (error) {
+      console.error('CV optimization error:', error);
+      res.status(500).json({ 
+        error: 'Failed to optimize CV. Please try again.',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.post('/api/cv/save-draft', authMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { content, fileName, type } = req.body;
+      
+      if (!content || typeof content !== 'string') {
+        return res.status(400).json({ error: 'CV content is required' });
+      }
+
+      const userId = req.user!.id;
+      const cvData = {
+        userId,
+        fileName: fileName || 'CV-Draft.txt',
+        fileType: 'text/plain',
+        fileSize: content.length,
+        content,
+        uploadMethod: type || 'manual_entry'
+      };
+
+      const savedCV = await storage.saveCV(cvData);
+
+      res.json({
+        success: true,
+        cv: savedCV,
+        message: 'CV draft saved successfully'
+      });
+
+    } catch (error) {
+      console.error('CV save error:', error);
+      res.status(500).json({ 
+        error: 'Failed to save CV draft. Please try again.'
+      });
+    }
+  });
+
   // Mount admin routes with proper authentication
   app.use("/api/admin", adminRoutes);
   
