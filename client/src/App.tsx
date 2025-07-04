@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { ScrollToTop } from "@/lib/scroll-to-top";
 import { EmailVerificationHandler } from "./components/EmailVerificationHandler";
 import ChatBot from "@/components/ChatBot";
+import { RoleBasedRouter } from "@/components/RoleBasedRouter";
 
 import Layout from "@/components/Layout";
 import HomePage from "@/pages/HomePage";
@@ -113,6 +114,7 @@ function App() {
             <MotivationProvider>
               <Layout>
               <ScrollToTop />
+              <RoleBasedRouter>
               <Switch>
                 <Route path="/" component={HomePage} />
                 <Route path="/how-it-works" component={HowItWorksPage} />
@@ -209,6 +211,7 @@ function App() {
                 <Route path="/404" component={NotFoundPage} />
                 <Route component={NotFound} />
               </Switch>
+              </RoleBasedRouter>
                 <EmailVerificationHandler />
                 <Toaster />
                 <ChatBot variant="floating" />

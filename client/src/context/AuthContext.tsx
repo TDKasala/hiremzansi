@@ -6,6 +6,7 @@ interface AuthUser {
   email: string;
   name?: string;
   isAdmin?: boolean;
+  isEmployer?: boolean;
 }
 
 // Define the shape of our auth context
@@ -47,8 +48,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const userData = await response.json();
+        
+        // Check if user is an employer by trying to fetch employer profile
+        try {
+          const employerResponse = await fetch('/api/employers/me', {
+            credentials: 'include'
+          });
+          
+          if (employerResponse.ok) {
+            userData.isEmployer = true;
+          } else {
+            userData.isEmployer = false;
+          }
+        } catch (err) {
+          userData.isEmployer = false;
+        }
+        
         setUser(userData);
-        console.log('Auth state changed:', 'AUTHENTICATED');
+        console.log('Auth state changed:', 'AUTHENTICATED', userData.isEmployer ? '(EMPLOYER)' : '(JOB_SEEKER)');
       } else {
         setUser(null);
         console.log('Auth state changed:', 'SIGNED_OUT');
