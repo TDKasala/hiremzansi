@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MotivationalBanner } from "@/components/MotivationalBanner";
+
 import { ConsentDialog } from "@/components/ConsentDialog";
 import { 
   AlertCircle, 
@@ -197,11 +197,6 @@ export default function UploadPage() {
               </Button>
             </div>
           </div>
-        ) : (
-          <MotivationalBanner
-            location="upload"
-            cvCount={cvs?.length || 0}
-          />
         )}
         <header className="mb-5 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">CV Analysis Tool</h1>
