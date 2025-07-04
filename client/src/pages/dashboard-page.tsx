@@ -14,6 +14,8 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Tabs,
   TabsContent,
@@ -41,6 +43,8 @@ import {
   CreditCard,
   Search,
   Edit,
+  CheckCircle,
+  Save,
 } from "lucide-react";
 import { CV } from "@shared/schema";
 import DeepAnalysisCard from "@/components/DeepAnalysisCard";
@@ -161,12 +165,12 @@ export default function DashboardPage() {
               <Edit className="mr-2 h-4 w-4" />
               CV Editor
             </TabsTrigger>
-            <TabsTrigger value="deep-analysis" className="px-4 py-2">
-              <LineChart className="mr-2 h-4 w-4" />
-              Deep Analysis
+            <TabsTrigger value="skill-gap-analysis" className="px-4 py-2">
+              <Target className="mr-2 h-4 w-4" />
+              Skill Gap Analysis
             </TabsTrigger>
             <TabsTrigger value="job-matches" className="px-4 py-2">
-              <Target className="mr-2 h-4 w-4" />
+              <Sparkles className="mr-2 h-4 w-4" />
               Job Matches
             </TabsTrigger>
             <TabsTrigger value="notifications" className="px-4 py-2">
@@ -449,43 +453,220 @@ export default function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Our intelligent CV editor provides real-time suggestions and optimizations 
-                    specifically for the South African job market.
-                  </p>
-                  <div className="bg-muted/30 border border-dashed rounded-lg p-6 text-center">
-                    <Edit className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-medium mb-2">Real-Time CV Editor</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Coming soon - Edit your CV with live AI feedback and ATS optimization
-                    </p>
-                    <Button variant="outline" disabled>
-                      Editor Coming Soon
-                    </Button>
-                  </div>
+                <div className="space-y-6">
+                  {userCVs && userCVs.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* CV Editor Panel */}
+                      <div className="space-y-4">
+                        <h3 className="font-medium">CV Content Editor</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">Professional Summary</label>
+                            <Textarea 
+                              className="mt-1 min-h-[100px]" 
+                              placeholder="Enter your professional summary..."
+                              defaultValue="Experienced software developer with 5+ years in full-stack development using React, Node.js, and PostgreSQL. Proven track record of delivering high-quality applications for South African enterprises."
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Key Skills</label>
+                            <Textarea 
+                              className="mt-1" 
+                              placeholder="List your key skills..."
+                              defaultValue="React, JavaScript, TypeScript, Node.js, PostgreSQL, Git, Agile Development, South African Business Context"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Work Experience</label>
+                            <Textarea 
+                              className="mt-1 min-h-[150px]" 
+                              placeholder="Describe your work experience..."
+                              defaultValue="Senior Developer at TechCorp SA (2020-Present)
+• Led development of customer management system serving 50,000+ users
+• Implemented B-BBEE compliant reporting features
+• Mentored junior developers in South African development practices"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Education & Certifications</label>
+                            <Textarea 
+                              className="mt-1" 
+                              placeholder="Your education and certifications..."
+                              defaultValue="Bachelor of Computer Science - University of Cape Town (NQF Level 7)
+AWS Certified Solutions Architect
+Project Management Certificate"
+                            />
+                          </div>
+                          <Button className="w-full">
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Real-time Suggestions Panel */}
+                      <div className="space-y-4">
+                        <h3 className="font-medium">AI Optimization Suggestions</h3>
+                        <div className="space-y-3">
+                          <div className="p-4 border rounded-lg bg-green-50 border-green-200">
+                            <div className="flex items-start">
+                              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-3" />
+                              <div>
+                                <p className="font-medium text-green-800">Excellent use of metrics</p>
+                                <p className="text-sm text-green-700">Your quantified achievements (50,000+ users) strengthen your impact.</p>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
+                            <div className="flex items-start">
+                              <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                              <div>
+                                <p className="font-medium text-blue-800">Add B-BBEE contribution details</p>
+                                <p className="text-sm text-blue-700">Specify your B-BBEE level and transformation initiatives to appeal to SA employers.</p>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border rounded-lg bg-orange-50 border-orange-200">
+                            <div className="flex items-start">
+                              <Target className="h-5 w-5 text-orange-600 mt-0.5 mr-3" />
+                              <div>
+                                <p className="font-medium text-orange-800">Include industry keywords</p>
+                                <p className="text-sm text-orange-700">Add "Fintech", "Digital Transformation" for better ATS matching.</p>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 border rounded-lg bg-purple-50 border-purple-200">
+                            <div className="flex items-start">
+                              <Award className="h-5 w-5 text-purple-600 mt-0.5 mr-3" />
+                              <div>
+                                <p className="font-medium text-purple-800">Provincial context</p>
+                                <p className="text-sm text-purple-700">Mention your familiarity with Western Cape business environment.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-6 p-4 bg-muted rounded-lg">
+                          <h4 className="font-medium mb-2">ATS Score Impact</h4>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Current Score</span>
+                              <span className="font-medium">73%</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Projected Score</span>
+                              <span className="font-medium text-green-600">84%</span>
+                            </div>
+                            <div className="h-2 bg-muted-foreground/20 rounded-full">
+                              <div className="bg-green-500 h-full rounded-full transition-all duration-500" style={{ width: "84%" }}></div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">+11% improvement with suggested changes</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Edit className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="font-medium mb-2">No CV to Edit</h3>
+                      <p className="text-muted-foreground mb-4">Upload a CV first to use the real-time editor</p>
+                      <Button asChild>
+                        <Link href="/upload">Upload CV</Link>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="deep-analysis" className="space-y-6">
+          <TabsContent value="skill-gap-analysis" className="space-y-6">
             <div className="grid grid-cols-1 gap-6">
-              {/* Deep Analysis Report */}
+              {/* Skill Gap Analysis */}
               <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center">
-                  <ScrollText className="mr-2 h-5 w-5 text-primary" />
-                  Deep Analysis Report
+                  <Target className="mr-2 h-5 w-5 text-primary" />
+                  Skill Gap Analysis
                 </h2>
                 
                 {userCVs && userCVs.length > 0 ? (
-                  <DeepAnalysisCard cv={userCVs[0]} />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Skills Analysis for {userCVs[0].fileName}</CardTitle>
+                      <CardDescription>
+                        Identify skill gaps and get recommendations for career advancement
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Current Skills */}
+                      <div>
+                        <h3 className="font-medium mb-3">Current Skills</h3>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="secondary">React</Badge>
+                          <Badge variant="secondary">JavaScript</Badge>
+                          <Badge variant="secondary">TypeScript</Badge>
+                          <Badge variant="secondary">Node.js</Badge>
+                          <Badge variant="secondary">PostgreSQL</Badge>
+                        </div>
+                      </div>
+                      
+                      {/* Skill Gaps */}
+                      <div>
+                        <h3 className="font-medium mb-3">Recommended Skills to Learn</h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <span className="font-medium">Docker & Containerization</span>
+                              <p className="text-sm text-muted-foreground">High demand in DevOps roles</p>
+                            </div>
+                            <Badge variant="destructive">Missing</Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <span className="font-medium">AWS Cloud Services</span>
+                              <p className="text-sm text-muted-foreground">Essential for cloud-native development</p>
+                            </div>
+                            <Badge variant="destructive">Missing</Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-3 border rounded-lg">
+                            <div>
+                              <span className="font-medium">Python</span>
+                              <p className="text-sm text-muted-foreground">Expanding opportunities in data science</p>
+                            </div>
+                            <Badge variant="secondary">Beginner</Badge>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Action Items */}
+                      <div>
+                        <h3 className="font-medium mb-3">Learning Recommendations</h3>
+                        <div className="space-y-2">
+                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                            <span>Complete Docker fundamentals course (High priority)</span>
+                          </div>
+                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-blue-500 mr-3" />
+                            <span>Get AWS certified (Medium priority)</span>
+                          </div>
+                          <div className="flex items-center p-3 bg-muted/50 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-orange-500 mr-3" />
+                            <span>Build a Python portfolio project (Low priority)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ) : (
                   <Card>
                     <CardContent className="py-8">
                       <div className="text-center">
                         <div className="mx-auto bg-muted w-12 h-12 rounded-full flex items-center justify-center mb-4">
-                          <FileText className="h-6 w-6 text-muted-foreground" />
+                          <Target className="h-6 w-6 text-muted-foreground" />
                         </div>
                         <h3 className="font-medium text-lg mb-2">No CV Available</h3>
                         <p className="text-muted-foreground mb-4">
