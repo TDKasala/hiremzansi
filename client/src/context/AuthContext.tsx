@@ -110,7 +110,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(data.message || 'Login failed');
       }
 
+      // Set user immediately from login response
       setUser(data.user);
+      console.log('Auth state changed:', 'AUTHENTICATED');
+      
+      // Wait a bit for cookie to be set, then verify with checkAuth
+      setTimeout(async () => {
+        await checkAuth();
+      }, 100);
+      
       return { data, error: null };
     } catch (error) {
       console.error('Error signing in:', error);

@@ -36,9 +36,10 @@ export function SignIn() {
         throw result.error;
       }
       
-      // Refresh auth state and redirect to dashboard
-      await checkAuth();
-      setLocation('/dashboard');
+      // Wait for auth state to be properly updated, then redirect
+      setTimeout(() => {
+        setLocation('/dashboard');
+      }, 200);
     } catch (err: any) {
       console.error('Sign in error:', err);
       setError(err.message || 'Invalid email or password');
