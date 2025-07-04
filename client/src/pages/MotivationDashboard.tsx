@@ -15,8 +15,7 @@ import {
   RefreshCw,
   Star
 } from 'lucide-react';
-import MotivationalProgress from '@/components/MotivationalProgress';
-import MotivationalQuote from '@/components/MotivationalQuote';
+// Motivational components have been removed
 import Confetti from '@/components/ui/confetti';
 import { useMotivation } from '@/hooks/use-motivation';
 
@@ -93,8 +92,7 @@ export default function MotivationDashboard() {
         
         {/* Progress Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-6">
-          {/* Motivational quote */}
-          <MotivationalQuote type="sa-specific" />
+          {/* Motivational quote section removed */}
           
           {/* CV optimization journey */}
           <Card>
@@ -108,10 +106,19 @@ export default function MotivationDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <MotivationalProgress 
-                currentStep={journeyStep} 
-                totalSteps={4} 
-              />
+              {/* Progress component removed - using simple progress display */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{journeyStep}/4 steps</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(journeyStep / 4) * 100}%` }}
+                  />
+                </div>
+              </div>
               
               <div className="flex justify-between items-center pt-4">
                 <Button variant="outline" size="sm" onClick={resetJourney}>

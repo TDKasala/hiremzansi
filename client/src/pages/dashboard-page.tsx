@@ -5,7 +5,7 @@ import { useWhatsApp } from "@/hooks/use-whatsapp";
 import { useQuery } from "@tanstack/react-query";
 import { getQueryFn } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { MotivationalBanner } from "@/components/MotivationalBanner";
+
 import {
   Card,
   CardContent,

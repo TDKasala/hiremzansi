@@ -168,7 +168,7 @@ export default function UploadPage() {
       </Helmet>
       
       <div className="container mx-auto py-5 sm:py-8 max-w-4xl">
-        {!user ? (
+        {!user && (
           <div className="mb-6 bg-primary/10 border border-primary/20 rounded-lg p-4 shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1">
