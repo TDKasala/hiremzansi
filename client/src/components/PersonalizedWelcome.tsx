@@ -167,10 +167,8 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                       <div className="flex-1 text-center sm:text-right">
                         <div className="relative inline-block">
                           <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 rounded-lg blur-sm opacity-20"></div>
-                          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent">
-                            <span className="font-bold text-lg sm:text-xl leading-tight">
-                              Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
-                            </span>
+                          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent font-bold text-lg sm:text-xl leading-tight">
+                            Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
                           </div>
                           
                           {/* Animated underline */}
