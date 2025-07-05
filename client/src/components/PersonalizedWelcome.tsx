@@ -163,18 +163,7 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                         </div>
                       </div>
                       
-                      {/* Main Message */}
-                      <div className="flex-1 text-center sm:text-right">
-                        <div className="relative inline-block">
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 rounded-lg blur-sm opacity-20"></div>
-                          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent font-bold text-lg sm:text-xl leading-tight">
-                            Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
-                          </div>
-                          
-                          {/* Animated underline */}
-                          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 scale-x-0 animate-expand-width animation-delay-500"></div>
-                        </div>
-                      </div>
+                      
                     </div>
                     
                     {/* Bottom glow effect */}
