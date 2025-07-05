@@ -118,17 +118,7 @@ export default function HeroSection() {
     <section id="home" className="bg-gradient-to-r from-secondary to-neutral-900 text-white py-12 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col items-center justify-center text-center">
-            <Badge className="bg-primary/90 hover:bg-primary font-bold mb-4">
-              {t('home.southAfricanFocused')}
-            </Badge>
-            
-            
-
-            
-            
-            
-          </div>
+          
           
           {/* Modern CV showcase with image */}
           <div className="md:w-1/2 flex justify-center relative">
