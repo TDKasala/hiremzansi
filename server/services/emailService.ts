@@ -481,16 +481,15 @@ Congratulations! You've just joined South Africa's most powerful AI-driven caree
 
 ⚡ YOUR IMMEDIATE NEXT STEPS:
 1. Access Your Dashboard: https://hiremzansi.co.za/dashboard
-2. Upload Your CV (Get FREE R500 Analysis)
+2. Upload Your CV for FREE Analysis
 3. Receive Instant ATS Optimization Report
 4. Browse 1,000+ Premium Job Opportunities
 
 🎁 EXCLUSIVE WELCOME BENEFITS (LIMITED TIME):
-✓ FREE Professional CV Analysis (Worth R500)
+✓ FREE Professional CV Analysis
 ✓ Advanced ATS Compatibility Report
 ✓ South African Salary Benchmarking
 ✓ B-BBEE Compliance Assessment
-✓ 30-Day Premium Features Access
 ✓ Direct Connection to 500+ Hiring Managers
 
 📊 WHAT MAKES US #1 IN SOUTH AFRICA:
@@ -513,7 +512,7 @@ Congratulations! You've just joined South Africa's most powerful AI-driven caree
 
 Ready to transform your career? Start now: https://hiremzansi.co.za/dashboard
 
-Questions? WhatsApp us: +27 12 345 6789
+Questions? WhatsApp us: +27
 
 Your Success. Our Mission.
 The Hire Mzansi Team
@@ -750,7 +749,7 @@ VERIFY YOUR ACCOUNT: ${verificationLink}
 • R50+ Million in Salary Increases Generated
 
 ⚡ IMMEDIATE BENEFITS AFTER VERIFICATION:
-✓ Free AI CV Analysis (Worth R500)
+✓ Free AI CV Analysis
 ✓ ATS Compatibility Report
 ✓ South African Market Insights
 ✓ Personalized Career Roadmap
@@ -761,7 +760,7 @@ VERIFY YOUR ACCOUNT: ${verificationLink}
 
 Ready to transform your career? Verify now: ${verificationLink}
 
-Questions? Reply to this email or WhatsApp us at +27 12 345 6789
+Questions? Reply to this email or WhatsApp us at +27 
 
 Transform. Succeed. Prosper.
 The Hire Mzansi Team
