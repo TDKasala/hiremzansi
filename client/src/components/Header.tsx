@@ -204,19 +204,19 @@ export default function Header() {
       {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-50" onClick={closeMobileMenu}>
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/50" />
           <div 
-            className="absolute right-0 top-0 h-full w-1/2 bg-white/80 backdrop-blur-lg border-l border-gray-200/50 shadow-2xl"
+            className="absolute top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 space-y-3 overflow-y-auto h-full">
-              <div className="flex justify-between items-center mb-6">
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={closeMobileMenu}
-                  className="h-8 w-8 rounded-full"
+                  className="h-8 w-8"
                 >
                   <span className="sr-only">Close menu</span>
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,10 +229,10 @@ export default function Header() {
                 <Link 
                   key={link.href} 
                   href={link.href}
-                  className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 text-right ${
+                  className={`block px-3 py-2 rounded font-medium mb-1 ${
                     location === link.href 
-                      ? "text-white bg-gradient-to-r from-green-500 to-blue-600 shadow-lg" 
-                      : "text-gray-700 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200"
+                      ? "text-blue-600 bg-blue-50" 
+                      : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                   }`}
                   onClick={closeMobileMenu}
                 >
@@ -240,50 +240,50 @@ export default function Header() {
                 </Link>
               ))}
               
-              <div className="md:block lg:hidden mb-4">
+              <div className="md:block lg:hidden my-4">
                 <LanguageSelector />
               </div>
               
               {user ? (
-                <div className="space-y-3 mt-4 pt-4 border-t border-gray-200/50">
+                <div className="space-y-2 mt-4 pt-4 border-t border-gray-200">
                   <Link 
                     href="/dashboard"
-                    className="block px-4 py-3 bg-gradient-to-r from-green-100 to-blue-100 text-green-700 text-right rounded-xl hover:from-green-200 hover:to-blue-200 transition-all duration-300 font-medium"
+                    className="block px-3 py-2 bg-blue-50 text-blue-700 rounded font-medium hover:bg-blue-100"
                     onClick={closeMobileMenu}
                   >
                     Dashboard
                   </Link>
                   <Link 
                     href="/premium-tools"
-                    className="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-right rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
+                    className="block px-3 py-2 bg-green-50 text-green-700 rounded font-medium hover:bg-green-100"
                     onClick={closeMobileMenu}
                   >
                     Premium Tools
                   </Link>
                   <Link 
                     href="/job-sites"
-                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
                     onClick={closeMobileMenu}
                   >
                     Job Board
                   </Link>
                   <Link 
                     href="/referral"
-                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
                     onClick={closeMobileMenu}
                   >
                     Refer & Earn
                   </Link>
                   <Link 
                     href="/interview/practice"
-                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
                     onClick={closeMobileMenu}
                   >
                     Interview Practice
                   </Link>
                   <Link 
                     href="/skills/analyze"
-                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
                     onClick={closeMobileMenu}
                   >
                     Skill Gap Analysis
@@ -292,7 +292,7 @@ export default function Header() {
                   {user && user.isAdmin && (
                     <Link 
                       href="/admin"
-                      className="block px-4 py-2 border-2 border-amber-500 bg-amber-100 text-amber-700 font-medium text-right rounded-md hover:bg-amber-200 transition-colors"
+                      className="block px-3 py-2 bg-amber-50 text-amber-700 font-medium rounded hover:bg-amber-100"
                       onClick={closeMobileMenu}
                     >
                       Admin Dashboard
@@ -306,7 +306,7 @@ export default function Header() {
                       closeMobileMenu();
                     }}
                     disabled={isLoggingOut}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-right rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-end gap-2 font-medium shadow-lg"
+                    className="w-full px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100 flex items-center justify-between font-medium"
                   >
                     {isLoggingOut ? "Logging out..." : (
                       <>
@@ -317,17 +317,17 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col space-y-3 mt-4 pt-4 border-t border-gray-200/50">
+                <div className="flex space-x-2 mt-4 pt-4 border-t border-gray-200">
                   <Link 
                     href="/auth"
-                    className="flex-1 px-4 py-3 border-2 border-blue-500/30 text-blue-700 text-right rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-500 transition-all duration-300 font-medium"
+                    className="flex-1 px-3 py-2 text-center border border-blue-500 text-blue-700 rounded hover:bg-blue-50"
                     onClick={closeMobileMenu}
                   >
                     {t('common.login')}
                   </Link>
                   <Link 
                     href="/auth?tab=register"
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-right rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
+                    className="flex-1 px-3 py-2 text-center bg-blue-600 text-white rounded hover:bg-blue-700"
                     onClick={closeMobileMenu}
                   >
                     {t('common.signup')}

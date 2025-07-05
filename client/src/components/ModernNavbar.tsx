@@ -43,11 +43,6 @@ export function ModernNavbar() {
     visible: { opacity: 1, scale: 1, y: 0 }
   };
 
-  const mobileMenuVariants = {
-    hidden: { opacity: 0, x: '100%' },
-    visible: { opacity: 1, x: 0 }
-  };
-
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -247,64 +242,38 @@ export function ModernNavbar() {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            variants={mobileMenuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            transition={{ duration: 0.3 }}
-            className="md:hidden fixed inset-y-0 right-0 w-72 xs:w-80 sm:w-96 bg-white shadow-xl border-l border-gray-200 z-50"
-          >
-            <div className="p-4 xs:p-6">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-1.5">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-lg font-bold text-gray-900">Hire Mzansi</span>
-                </div>
-                <button
-                  onClick={() => setIsMenuOpen(false)}
-                  className="p-2 rounded-lg text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <nav className="space-y-2 sm:space-y-3">
-                {navItems.map((item, index) => (
-                  <motion.button
+      {isMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <div className="absolute top-16 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
+            <div className="p-4">
+              <nav className="space-y-2">
+                {navItems.map((item) => (
+                  <button
                     key={item.path}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
                     onClick={() => {
                       setLocation(item.path);
                       setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light rounded-lg transition-colors"
+                    className="block w-full text-left py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded"
                   >
                     {item.label}
-                  </motion.button>
+                  </button>
                 ))}
               </nav>
 
               {!user && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3"
-                >
+                <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
                   <Button
                     onClick={() => {
                       setLocation('/signin');
                       setIsMenuOpen(false);
                     }}
                     variant="outline"
-                    className="w-full py-2.5 sm:py-3 text-sm sm:text-base"
+                    className="w-full"
                   >
                     Sign In
                   </Button>
@@ -313,30 +282,16 @@ export function ModernNavbar() {
                       setLocation('/signup');
                       setIsMenuOpen(false);
                     }}
-                    className="w-full btn-brand py-2.5 sm:py-3 text-sm sm:text-base"
+                    className="w-full"
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
                     Get Started
                   </Button>
-                </motion.div>
+                </div>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsMenuOpen(false)}
-            className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
-          />
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </motion.nav>
   );
 }
