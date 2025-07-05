@@ -59,7 +59,7 @@ import { WelcomeBanner } from "@/components/WelcomeBanner";
 import { JobMatchingDashboard } from "@/components/JobMatchingDashboard";
 import { JobSeekerMatchNotifications } from "@/components/JobSeekerMatchNotifications";
 import { JobSeekerBenefitsAlert } from "@/components/JobSeekerBenefitsAlert";
-import { SkillGapAnalysis } from "@/components/SkillGapAnalysis";
+import SkillGapAnalysis from "@/components/SkillGapAnalysis";
 
 function DashboardPage() {
   const { user } = useAuth();
