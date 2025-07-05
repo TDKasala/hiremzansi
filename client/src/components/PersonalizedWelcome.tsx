@@ -102,17 +102,17 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
   // Unauthenticated welcome screen
   if (!isAuthenticated) {
     return (
-      <section className="py-12 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      <section className="min-h-screen flex items-center justify-center py-6 xs:py-8 sm:py-12 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-4 -left-4 w-72 h-72 bg-blue-400/10 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute top-20 -right-4 w-96 h-96 bg-purple-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute -bottom-8 left-1/3 w-80 h-80 bg-green-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute -top-4 -left-4 w-48 xs:w-56 sm:w-64 md:w-72 h-48 xs:h-56 sm:h-64 md:h-72 bg-blue-400/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-20 -right-4 w-56 xs:w-64 sm:w-72 md:w-80 lg:w-96 h-56 xs:h-64 sm:h-72 md:h-80 lg:h-96 bg-purple-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute -bottom-8 left-1/3 w-52 xs:w-60 sm:w-68 md:w-80 h-52 xs:h-60 sm:h-68 md:h-80 bg-green-400/10 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
-        <div className="container mx-auto px-4 relative">
-          <Card className="max-w-4xl mx-auto border-0 shadow-2xl bg-white/90 backdrop-blur-md hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1">
-            <CardContent className="p-8 relative">
+        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 relative w-full">
+          <Card className="max-w-6xl mx-auto border-0 shadow-2xl bg-white/90 backdrop-blur-md hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1">
+            <CardContent className="p-4 xs:p-6 sm:p-8 md:p-10 lg:p-12 relative">
               {/* Decorative gradient border */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-lg opacity-20 blur-sm"></div>
               <div className="absolute inset-[1px] bg-white rounded-lg"></div>
@@ -120,15 +120,15 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
               <div className="relative z-10 text-center space-y-8">
                 {/* Enhanced greeting with typing animation */}
                 <div className="space-y-4">
-                  <div className="relative">
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 animate-fade-in-up">
+                  <div className="relative px-2 xs:px-4 sm:px-6">
+                    <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl font-bold text-gray-900 animate-fade-in-up leading-tight">
                       <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent">
                         {getTimeGreeting()}, welcome to Hire Mzansi!
                       </span>
-                      <span className="inline-block animate-wave ml-2">👋</span>
+                      <span className="inline-block animate-wave ml-1 xs:ml-2">👋</span>
                     </h1>
                     {/* Animated underline */}
-                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 animate-expand-width"></div>
+                    <div className="absolute -bottom-1 xs:-bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0.5 xs:h-1 bg-gradient-to-r from-blue-500 to-purple-500 animate-expand-width"></div>
                   </div>
                   
                   {/* Enhanced status bar with glassmorphism design */}
@@ -141,23 +141,23 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                     <div className="absolute bottom-2 left-6 w-2 h-2 bg-purple-400/40 rounded-full animate-ping animation-delay-500"></div>
                     <div className="absolute top-1/2 right-8 w-1.5 h-1.5 bg-green-400/40 rounded-full animate-pulse animation-delay-1000"></div>
                     
-                    <div className="relative z-10 p-3 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+                    <div className="relative z-10 p-2 xs:p-3 sm:p-4 md:p-6 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 md:gap-6">
                       {/* Date and Time Section */}
                       <div className="flex flex-col xs:flex-row items-center justify-center gap-2 sm:gap-4 w-full sm:w-auto">
-                        <div className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200/50 shadow-sm">
-                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span className="font-semibold text-gray-800 text-xs sm:text-sm md:text-base whitespace-nowrap">{formatDate(currentTime)}</span>
+                        <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-3 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl px-2 xs:px-3 sm:px-4 py-1 xs:py-1.5 sm:py-2 border border-gray-200/50 shadow-sm">
+                          <div className="w-1 h-1 xs:w-1.5 xs:h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span className="font-semibold text-gray-800 text-xs xs:text-sm sm:text-base whitespace-nowrap">{formatDate(currentTime)}</span>
                         </div>
                         
                         <div className="hidden sm:block w-px h-6 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
                         
                         <div className="relative group">
                           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                          <div className="relative bg-gradient-to-r from-blue-50/90 to-indigo-50/90 backdrop-blur-sm rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border border-blue-200/50 shadow-sm group-hover:shadow-md transition-all duration-300">
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></div>
-                              <span className="font-mono text-blue-700 font-bold text-xs sm:text-sm md:text-base">{formatLiveTime(liveTime)}</span>
-                              <div className="text-xs text-blue-600/70 hidden sm:inline">LIVE</div>
+                          <div className="relative bg-gradient-to-r from-blue-50/90 to-indigo-50/90 backdrop-blur-sm rounded-xl px-2 xs:px-3 sm:px-4 py-1 xs:py-1.5 sm:py-2 border border-blue-200/50 shadow-sm group-hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2">
+                              <div className="w-1 h-1 xs:w-1.5 xs:h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="font-mono text-blue-700 font-bold text-xs xs:text-sm sm:text-base">{formatLiveTime(liveTime)}</span>
+                              <div className="text-xs text-blue-600/70 hidden xs:inline">LIVE</div>
                             </div>
                           </div>
                         </div>
@@ -259,17 +259,17 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
 
   // Authenticated personalized welcome screen
   return (
-    <section className="py-6 sm:py-8 lg:py-12 bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6">
-        <div className="max-w-7xl mx-auto">
+    <section className="min-h-screen flex items-center justify-center py-4 xs:py-6 sm:py-8 lg:py-12 bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 w-full">
+        <div className="max-w-7xl mx-auto w-full">
           {/* Main Welcome Card */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm mb-4 sm:mb-6">
-            <CardContent className="p-4 sm:p-6 lg:p-8">
+          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm mb-4 xs:mb-6 sm:mb-8">
+            <CardContent className="p-3 xs:p-4 sm:p-6 md:p-8 lg:p-10">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {/* Personalized Greeting */}
                 <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                   <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 break-words">
+                    <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 break-words leading-tight">
                       {getTimeGreeting()}, {getUserName()}! 🌟
                     </h1>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 text-sm sm:text-base lg:text-lg text-gray-600">
