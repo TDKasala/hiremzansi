@@ -125,9 +125,7 @@ export default function HeroSection() {
               </Badge>
               
             </div>
-            <p className="text-lg md:text-xl mb-6 text-white font-normal">
-              Beat South Africa's competitive job market with AI-powered CV analysis that considers B-BBEE requirements, ATS compatibility, and local industry standards.
-            </p>
+            
             
 
             
