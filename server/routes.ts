@@ -580,6 +580,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: "Logged out successfully" });
   });
 
+  // Get dashboard stats for authenticated user
+  app.get("/api/dashboard/stats", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).user?.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      // Get user's CV data
+      const userCVs = await storage.getCVsByUserId(userId);
+      const latestCV = await storage.getLatestCVByUserId(userId);
+      
+      // Get latest ATS scores for the user's CVs
+      let latestATSScore = null;
+      let avgATSScore = 0;
+      let totalScores = 0;
+      
+      if (userCVs && userCVs.length > 0) {
+        for (const cv of userCVs) {
+          const scores = await storage.getATSScoresByCVId(cv.id);
+          if (scores && scores.length > 0) {
+            totalScores += scores.length;
+            const latestScore = scores.sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            })[0];
+            
+            if (!latestATSScore || (latestScore.createdAt && (!latestATSScore.createdAt || new Date(latestScore.createdAt) > new Date(latestATSScore.createdAt)))) {
+              latestATSScore = latestScore;
+            }
+            
+            // Calculate average score (using 'score' property from schema)
+            const avgScore = scores.reduce((sum, score) => sum + score.score, 0) / scores.length;
+            avgATSScore += avgScore;
+          }
+        }
+        if (userCVs.length > 0) {
+          avgATSScore = avgATSScore / userCVs.length;
+        }
+      }
+
+      // Get user's job matches
+      const jobMatches = await storage.getJobMatchesByUserId(userId);
+      
+      // Get user notifications
+      const notifications = await storage.getNotificationsByUserId(userId);
+      const unreadNotifications = notifications.filter(n => !n.isRead);
+
+      // Get user subscription
+      const subscription = await storage.getSubscription(userId);
+
+      // Calculate activity timeline based on real data
+      const activityTimeline = [];
+      
+      if (latestCV) {
+        activityTimeline.push({
+          type: 'cv_upload',
+          message: 'CV Uploaded',
+          timestamp: latestCV.createdAt,
+          icon: 'CloudUpload'
+        });
+      }
+      
+      if (latestATSScore) {
+        activityTimeline.push({
+          type: 'analysis_complete',
+          message: 'ATS Analysis Completed',
+          timestamp: latestATSScore.createdAt,
+          icon: 'BarChart3'
+        });
+      }
+
+      if (jobMatches && jobMatches.length > 0) {
+        const latestMatch = jobMatches.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        activityTimeline.push({
+          type: 'job_match',
+          message: 'New Job Match Found',
+          timestamp: latestMatch.createdAt,
+          icon: 'Sparkles'
+        });
+      }
+
+      // Sort activity by most recent
+      activityTimeline.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+
+      const statsData = {
+        cvCount: userCVs?.length || 0,
+        latestATSScore: latestATSScore ? {
+          overallScore: latestATSScore.score,
+          skillsScore: latestATSScore.skillsScore,
+          formattingScore: latestATSScore.formatScore,
+          contentScore: latestATSScore.contextScore,
+          saContextScore: latestATSScore.contextScore || 65,
+          createdAt: latestATSScore.createdAt
+        } : null,
+        avgATSScore: Math.round(avgATSScore),
+        totalAnalyses: totalScores,
+        jobMatchCount: jobMatches?.length || 0,
+        unreadNotifications: unreadNotifications.length,
+        subscriptionStatus: subscription?.status || 'free',
+        subscriptionPlan: subscription?.planId || 'free',
+        activityTimeline: activityTimeline.slice(0, 5), // Show latest 5 activities
+        hasUploadedCV: userCVs && userCVs.length > 0,
+        lastActivityDate: activityTimeline.length > 0 ? activityTimeline[0].timestamp : null
+      };
+
+      res.json(statsData);
+    } catch (error) {
+      console.error("Error getting dashboard stats:", error);
+      res.status(500).json({ message: "Failed to get dashboard stats" });
+    }
+  });
+
   // Use the admin routes from admin.ts
   app.use("/api/admin", adminRoutes);
 

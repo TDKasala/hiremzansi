@@ -80,6 +80,12 @@ export default function DashboardPage() {
     queryKey: ["/api/profile"],
     queryFn: getQueryFn({ on401: "throw" }),
   });
+
+  // Get real dashboard stats instead of using demo data
+  const { data: dashboardStats, isLoading: isStatsLoading } = useQuery<any>({
+    queryKey: ["/api/dashboard/stats"],
+    queryFn: getQueryFn({ on401: "throw" }),
+  });
   
   // Update local state when WhatsApp settings are loaded
   React.useEffect(() => {
@@ -178,122 +184,191 @@ export default function DashboardPage() {
 
           <TabsContent value="overview" className="space-y-6">
             <JobSeekerBenefitsAlert />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">CV Score</CardTitle>
-                  <CardDescription>Latest ATS score</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="ats-score-display mx-auto" style={{"--score-percentage": "73%"} as any}>
-                    <div className="flex justify-center items-center h-full">
-                      <span className="ats-score-text text-4xl font-bold">73%</span>
-                    </div>
-                  </div>
-                  <div className="text-center mt-4">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href="/cv/latest">
-                        View Details
-                        <ChevronRight className="ml-1 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            
+            {isStatsLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, i) => (
+                  <Card key={i}>
+                    <CardHeader className="pb-2">
+                      <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">CV Score</CardTitle>
+                    <CardDescription>Latest ATS score</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-2">
+                    {dashboardStats?.latestATSScore ? (
+                      <>
+                        <div className="ats-score-display mx-auto" style={{"--score-percentage": `${dashboardStats.latestATSScore.overallScore}%`} as any}>
+                          <div className="flex justify-center items-center h-full">
+                            <span className="ats-score-text text-4xl font-bold">{dashboardStats.latestATSScore.overallScore}%</span>
+                          </div>
+                        </div>
+                        <div className="text-center mt-4">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href="/cv/latest">
+                              View Details
+                              <ChevronRight className="ml-1 h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">No CV analysis yet</p>
+                        <Button variant="outline" size="sm" asChild className="mt-2">
+                          <Link href="/upload">
+                            Upload CV
+                            <Plus className="ml-1 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">CV Analysis</CardTitle>
-                  <CardDescription>Score breakdown</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Skills Match</span>
-                        <span className="font-medium">68%</span>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">CV Analysis</CardTitle>
+                    <CardDescription>Score breakdown</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-2">
+                    {dashboardStats?.latestATSScore ? (
+                      <>
+                        <div className="space-y-2">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Skills Match</span>
+                              <span className="font-medium">{dashboardStats.latestATSScore.skillsScore}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="bg-blue-500 h-full rounded-full" style={{ width: `${dashboardStats.latestATSScore.skillsScore}%` }}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Formatting</span>
+                              <span className="font-medium">{dashboardStats.latestATSScore.formattingScore}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="bg-green-500 h-full rounded-full" style={{ width: `${dashboardStats.latestATSScore.formattingScore}%` }}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>SA Context</span>
+                              <span className="font-medium">{dashboardStats.latestATSScore.saContextScore}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="bg-orange-500 h-full rounded-full" style={{ width: `${dashboardStats.latestATSScore.saContextScore}%` }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-center mt-4">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href="/cv/latest">
+                              Detailed Analysis
+                              <ChevronRight className="ml-1 h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Upload a CV to see detailed analysis</p>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-brand-blue h-full rounded-full" style={{ width: "68%" }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Formatting</span>
-                        <span className="font-medium">85%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-brand-green h-full rounded-full" style={{ width: "85%" }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>SA Context</span>
-                        <span className="font-medium">65%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="bg-brand-orange h-full rounded-full" style={{ width: "65%" }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center mt-4">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href="/cv/latest">
-                        Detailed Analysis
-                        <ChevronRight className="ml-1 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    )}
+                  </CardContent>
+                </Card>
 
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Activity</CardTitle>
+                    <CardDescription>Recent actions</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-2">
+                    {dashboardStats?.activityTimeline && dashboardStats.activityTimeline.length > 0 ? (
+                      <div className="space-y-4">
+                        {dashboardStats.activityTimeline.slice(0, 3).map((activity: any, index: number) => (
+                          <div key={index} className="flex">
+                            <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600">
+                              {activity.icon === 'CloudUpload' && <CloudUpload className="h-5 w-5" />}
+                              {activity.icon === 'BarChart3' && <BarChart3 className="h-5 w-5" />}
+                              {activity.icon === 'Sparkles' && <Sparkles className="h-5 w-5" />}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{activity.message}</p>
+                              <p className="text-xs text-muted-foreground">
+                                <Clock className="inline h-3 w-3 mr-1" />
+                                {new Date(activity.timestamp).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">No recent activity</p>
+                        <Button variant="outline" size="sm" asChild className="mt-2">
+                          <Link href="/upload">
+                            Start with CV Upload
+                            <Plus className="ml-1 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Real Statistics Summary */}
+            {dashboardStats && (
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Activity</CardTitle>
-                  <CardDescription>Recent actions</CardDescription>
+                <CardHeader>
+                  <CardTitle>Your Platform Activity</CardTitle>
+                  <CardDescription>Summary of your progress</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="space-y-4">
-                    <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-blue-light text-brand-blue">
-                        <CloudUpload className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">CV Uploaded</p>
-                        <p className="text-xs text-muted-foreground">
-                          <Clock className="inline h-3 w-3 mr-1" />
-                          Just now
-                        </p>
-                      </div>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">{dashboardStats.cvCount}</div>
+                      <div className="text-sm text-muted-foreground">CVs Uploaded</div>
                     </div>
-                    <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-green-light text-brand-green">
-                        <BarChart3 className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">ATS Analysis Completed</p>
-                        <p className="text-xs text-muted-foreground">
-                          <Clock className="inline h-3 w-3 mr-1" />
-                          5 minutes ago
-                        </p>
-                      </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">{dashboardStats.totalAnalyses}</div>
+                      <div className="text-sm text-muted-foreground">Analyses Done</div>
                     </div>
-                    <div className="flex">
-                      <div className="mr-4 flex items-center justify-center w-10 h-10 rounded-full bg-brand-orange-light text-brand-orange">
-                        <Settings className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Profile Updated</p>
-                        <p className="text-xs text-muted-foreground">
-                          <Clock className="inline h-3 w-3 mr-1" />
-                          3 hours ago
-                        </p>
-                      </div>
+                    <div className="text-center p-3 bg-orange-50 rounded-lg">
+                      <div className="text-2xl font-bold text-orange-600">{dashboardStats.jobMatchCount}</div>
+                      <div className="text-sm text-muted-foreground">Job Matches</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">{dashboardStats.unreadNotifications}</div>
+                      <div className="text-sm text-muted-foreground">Notifications</div>
                     </div>
                   </div>
+                  {dashboardStats.avgATSScore > 0 && (
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Average ATS Score</span>
+                        <span className="text-xl font-bold text-gray-800">{dashboardStats.avgATSScore}%</span>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            </div>
+            )}
 
             <Card>
               <CardHeader>
