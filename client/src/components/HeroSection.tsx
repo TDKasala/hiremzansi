@@ -127,10 +127,7 @@ export default function HeroSection() {
 
             
             
-            <div className="mt-4 sm:mt-6 text-white flex items-center justify-center md:justify-start text-xs sm:text-sm">
-              <Shield className="h-4 w-4 mr-2 text-primary flex-shrink-0" />
-              <span>{t('home.dataSecure')}</span>
-            </div>
+            
           </div>
           
           {/* Modern CV showcase with image */}
