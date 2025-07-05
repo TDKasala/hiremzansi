@@ -16,7 +16,8 @@ import {
   ArrowRight,
   Building2,
   Eye,
-  Bell
+  Bell,
+  MapPin
 } from 'lucide-react';
 
 // Elegant animated counter component
@@ -207,69 +208,137 @@ export function PremiumRecruiterSection() {
             </div>
           </div>
 
-          {/* Sample Dashboard Preview */}
-          <div className="bg-white rounded-lg shadow-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-gray-900">Your Matches Dashboard</h4>
-              <Badge className="bg-green-100 text-green-800">2 New</Badge>
-            </div>
-            
-            {/* Sample Match Cards */}
-            <div className="space-y-3">
-              <div className="border rounded-lg p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                        <span className="text-sm font-bold text-green-600">92%</span>
-                      </div>
-                      <span className="font-medium text-gray-900">Senior Project Manager</span>
-                    </div>
-                    <p className="text-sm text-gray-600">Johannesburg • 8+ years • B-BBEE Level 1</p>
+          {/* Premium Dashboard Preview - Redesigned */}
+          <Card className="relative overflow-hidden border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-indigo-50 shadow-2xl">
+            {/* Dashboard Header */}
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Building2 className="h-6 w-6" />
+                  Premium Recruiter Dashboard
+                </CardTitle>
+                <Badge className="bg-green-400 text-green-900 hover:bg-green-300">
+                  3 New Matches
+                </Badge>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-6 space-y-6">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Building2 className="h-6 w-6 text-white" />
                   </div>
-                  <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                    <Eye className="h-4 w-4 mr-1" />
-                    R250
-                  </Button>
+                  <p className="text-2xl font-bold text-blue-900">6</p>
+                  <p className="text-xs text-blue-700">Active Jobs</p>
                 </div>
-                <div className="flex gap-2">
-                  <Badge variant="secondary" className="text-xs">Project Management</Badge>
-                  <Badge variant="secondary" className="text-xs">Agile</Badge>
-                  <Badge variant="secondary" className="text-xs">SAP</Badge>
+                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-green-900">34</p>
+                  <p className="text-xs text-green-700">Total Matches</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Eye className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-purple-900">12</p>
+                  <p className="text-xs text-purple-700">Unlocked</p>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                  <div className="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-2xl font-bold text-orange-900">94%</p>
+                  <p className="text-xs text-orange-700">Success Rate</p>
                 </div>
               </div>
 
-              <div className="border rounded-lg p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                        <span className="text-sm font-bold text-blue-600">87%</span>
+              {/* Premium Match Cards */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  Top Candidate Matches
+                </h4>
+                
+                {/* Enhanced Match Card 1 */}
+                <div className="group relative overflow-hidden border-2 border-green-200 rounded-lg p-4 bg-gradient-to-r from-green-50 via-white to-green-50 hover:shadow-lg transition-all duration-300 hover:border-green-300">
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-sm font-bold text-white">94%</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-900">Senior DevOps Engineer</span>
+                          <div className="flex items-center gap-1 mt-1">
+                            <MapPin className="h-3 w-3 text-gray-500" />
+                            <span className="text-xs text-gray-600">Cape Town • 8+ years • B-BBEE Level 1</span>
+                          </div>
+                        </div>
                       </div>
-                      <span className="font-medium text-gray-900">Full Stack Developer</span>
                     </div>
-                    <p className="text-sm text-gray-600">Cape Town • 5+ years • B-BBEE Level 2</p>
+                    <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+                      <Eye className="h-4 w-4 mr-1" />
+                      R500
+                    </Button>
                   </div>
-                  <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                    <Eye className="h-4 w-4 mr-1" />
-                    R200
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">Kubernetes</Badge>
+                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">AWS</Badge>
+                    <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">Docker</Badge>
+                    <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">+7 more</Badge>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Badge variant="secondary" className="text-xs">React</Badge>
-                  <Badge variant="secondary" className="text-xs">Node.js</Badge>
-                  <Badge variant="secondary" className="text-xs">PostgreSQL</Badge>
+
+                {/* Enhanced Match Card 2 */}
+                <div className="group relative overflow-hidden border-2 border-blue-200 rounded-lg p-4 bg-gradient-to-r from-blue-50 via-white to-blue-50 hover:shadow-lg transition-all duration-300 hover:border-blue-300">
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-blue-400 rounded-full animate-pulse animation-delay-500"></div>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-sm font-bold text-white">91%</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-900">Product Manager</span>
+                          <div className="flex items-center gap-1 mt-1">
+                            <MapPin className="h-3 w-3 text-gray-500" />
+                            <span className="text-xs text-gray-600">Johannesburg • 6+ years • B-BBEE Level 2</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Button size="sm" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+                      <Eye className="h-4 w-4 mr-1" />
+                      R500
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">Agile</Badge>
+                    <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">Scrum</Badge>
+                    <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800">Data Analysis</Badge>
+                    <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">+5 more</Badge>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-4 pt-4 border-t">
-              <Button variant="outline" className="w-full">
-                <Users className="h-4 w-4 mr-2" />
-                View All Matches
-              </Button>
-            </div>
-          </div>
+              {/* Enhanced Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                <Button className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Users className="h-4 w-4 mr-2" />
+                  View All Matches
+                </Button>
+                <Button variant="outline" className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Analytics
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         
@@ -283,7 +352,7 @@ export function PremiumRecruiterSection() {
           </h3>
           <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
             Join leading South African companies using our premium matching service 
-            to find quality candidates efficiently and confidentially.
+            to find quality candidates efficiently and confidentially. Pay only R500 per successful match.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/recruiter/matches">
