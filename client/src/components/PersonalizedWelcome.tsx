@@ -131,15 +131,57 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 animate-expand-width"></div>
                   </div>
                   
-                  <p className="text-lg sm:text-xl text-gray-600 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <span className="font-medium text-gray-800">{formatDate(currentTime)}</span>
-                    <span className="mx-2 text-purple-500">•</span>
-                    <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded-md text-sm">{formatLiveTime(liveTime)}</span>
-                    <span className="mx-2 text-purple-500">•</span>
-                    <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent font-semibold">
-                      Transform your career with AI-powered CV optimization
-                    </span>
-                  </p>
+                  {/* Enhanced status bar with glassmorphism design */}
+                  <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-white/80 via-white/90 to-white/80 backdrop-blur-xl border border-white/20 shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-green-500/10 animate-pulse"></div>
+                    
+                    {/* Floating orbs */}
+                    <div className="absolute top-2 right-4 w-3 h-3 bg-blue-400/40 rounded-full animate-bounce"></div>
+                    <div className="absolute bottom-2 left-6 w-2 h-2 bg-purple-400/40 rounded-full animate-ping animation-delay-500"></div>
+                    <div className="absolute top-1/2 right-8 w-1.5 h-1.5 bg-green-400/40 rounded-full animate-pulse animation-delay-1000"></div>
+                    
+                    <div className="relative z-10 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      {/* Date and Time Section */}
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl px-4 py-2 border border-gray-200/50 shadow-sm">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span className="font-semibold text-gray-800 text-sm sm:text-base">{formatDate(currentTime)}</span>
+                        </div>
+                        
+                        <div className="hidden sm:block w-px h-6 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
+                        
+                        <div className="relative group">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                          <div className="relative bg-gradient-to-r from-blue-50/90 to-indigo-50/90 backdrop-blur-sm rounded-xl px-4 py-2 border border-blue-200/50 shadow-sm group-hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="font-mono text-blue-700 font-bold text-sm sm:text-base">{formatLiveTime(liveTime)}</span>
+                              <div className="text-xs text-blue-600/70 hidden sm:inline">LIVE</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Main Message */}
+                      <div className="flex-1 text-center sm:text-right">
+                        <div className="relative inline-block">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 rounded-lg blur-sm opacity-20"></div>
+                          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 bg-clip-text text-transparent">
+                            <span className="font-bold text-lg sm:text-xl leading-tight">
+                              Transform your career with AI-powered CV optimization
+                            </span>
+                          </div>
+                          
+                          {/* Animated underline */}
+                          <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 scale-x-0 animate-expand-width animation-delay-500"></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom glow effect */}
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent"></div>
+                  </div>
                 </div>
 
                 {/* Enhanced feature cards with staggered animations */}
