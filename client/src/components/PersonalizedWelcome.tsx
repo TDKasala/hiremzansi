@@ -143,7 +143,7 @@ export function PersonalizedWelcome({ user, isAuthenticated }: PersonalizedWelco
                     
                     <div className="relative z-10 p-3 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
                       {/* Date and Time Section */}
-                      <div className="flex flex-col xs:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                      <div className="flex flex-col xs:flex-row items-center justify-center gap-2 sm:gap-4 w-full sm:w-auto">
                         <div className="flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-gray-50/80 to-gray-100/80 backdrop-blur-sm rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200/50 shadow-sm">
                           <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full animate-pulse"></div>
                           <span className="font-semibold text-gray-800 text-xs sm:text-sm md:text-base whitespace-nowrap">{formatDate(currentTime)}</span>
