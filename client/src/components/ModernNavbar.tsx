@@ -59,18 +59,18 @@ export function ModernNavbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <motion.div
-            className="flex items-center space-x-2 cursor-pointer"
+            className="flex items-center space-x-1.5 sm:space-x-2 cursor-pointer"
             onClick={() => setLocation('/')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <div className="relative">
               <motion.div
-                className="w-10 h-10 bg-gradient-brand rounded-xl p-2"
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-brand rounded-lg sm:rounded-xl p-1.5 sm:p-2"
                 animate={{ 
                   boxShadow: [
                     '0 0 0 0 rgba(31, 184, 217, 0.4)',
@@ -80,14 +80,14 @@ export function ModernNavbar() {
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <TrendingUp className="w-6 h-6 text-white" />
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </motion.div>
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xl font-bold bg-gradient-brand bg-clip-text text-transparent">
+            <div className="hidden xs:block">
+              <h1 className="text-lg sm:text-xl font-bold bg-gradient-brand bg-clip-text text-transparent">
                 Hire Mzansi
               </h1>
-              <p className="text-xs text-muted-foreground">South Africa's #1 CV Platform</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">South Africa's #1 CV Platform</p>
             </div>
           </motion.div>
 
@@ -121,27 +121,27 @@ export function ModernNavbar() {
           </div>
 
           {/* User Menu / Auth Buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
             {user ? (
               <div className="relative">
                 <motion.button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 p-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                  className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
                     {user.isAdmin ? (
-                      <Crown className="w-4 h-4" />
+                      <Crown className="w-3 h-3 sm:w-4 sm:h-4" />
                     ) : (
-                      <User className="w-4 h-4" />
+                      <User className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
                   </div>
-                  <span className="hidden sm:block text-sm font-medium">
+                  <span className="hidden md:block text-xs sm:text-sm font-medium max-w-24 lg:max-w-none truncate">
                     {user.name || user.email}
                   </span>
                   {user.isAdmin && (
-                    <Badge variant="secondary" className="hidden sm:flex bg-yellow-400 text-yellow-900">
+                    <Badge variant="secondary" className="hidden lg:flex bg-yellow-400 text-yellow-900 text-xs">
                       <Shield className="w-3 h-3 mr-1" />
                       Admin
                     </Badge>
@@ -214,20 +214,21 @@ export function ModernNavbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <Button
                   variant="ghost"
                   onClick={() => setLocation('/signin')}
-                  className="text-sm font-medium"
+                  className="text-xs sm:text-sm font-medium px-2 sm:px-4 py-1.5 sm:py-2"
                 >
                   Sign In
                 </Button>
                 <Button
                   onClick={() => setLocation('/signup')}
-                  className="btn-brand"
+                  className="btn-brand text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2"
                 >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Get Started
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden xs:inline">Get Started</span>
+                  <span className="xs:hidden">Start</span>
                 </Button>
               </div>
             )}
@@ -254,9 +255,9 @@ export function ModernNavbar() {
             animate="visible"
             exit="hidden"
             transition={{ duration: 0.3 }}
-            className="md:hidden fixed inset-y-0 right-0 w-80 bg-white shadow-xl border-l border-gray-200 z-50"
+            className="md:hidden fixed inset-y-0 right-0 w-72 xs:w-80 sm:w-96 bg-white shadow-xl border-l border-gray-200 z-50"
           >
-            <div className="p-6">
+            <div className="p-4 xs:p-6">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-1.5">
@@ -272,7 +273,7 @@ export function ModernNavbar() {
                 </button>
               </div>
 
-              <nav className="space-y-4">
+              <nav className="space-y-2 sm:space-y-3">
                 {navItems.map((item, index) => (
                   <motion.button
                     key={item.path}
@@ -283,7 +284,7 @@ export function ModernNavbar() {
                       setLocation(item.path);
                       setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left py-3 px-4 text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light rounded-lg transition-colors"
+                    className="block w-full text-left py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 hover:text-brand-blue hover:bg-brand-blue-light rounded-lg transition-colors"
                   >
                     {item.label}
                   </motion.button>
@@ -295,7 +296,7 @@ export function ModernNavbar() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="mt-8 space-y-3"
+                  className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3"
                 >
                   <Button
                     onClick={() => {
@@ -303,7 +304,7 @@ export function ModernNavbar() {
                       setIsMenuOpen(false);
                     }}
                     variant="outline"
-                    className="w-full"
+                    className="w-full py-2.5 sm:py-3 text-sm sm:text-base"
                   >
                     Sign In
                   </Button>
@@ -312,7 +313,7 @@ export function ModernNavbar() {
                       setLocation('/signup');
                       setIsMenuOpen(false);
                     }}
-                    className="w-full btn-brand"
+                    className="w-full btn-brand py-2.5 sm:py-3 text-sm sm:text-base"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Get Started
