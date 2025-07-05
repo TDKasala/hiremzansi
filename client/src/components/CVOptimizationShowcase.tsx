@@ -232,22 +232,6 @@ export function CVOptimizationShowcase() {
               <div className="absolute top-4 right-4 w-2 h-2 bg-green-400 rounded-full animate-pulse opacity-60"></div>
               <div className="absolute top-8 right-12 w-1 h-1 bg-blue-400 rounded-full animate-ping opacity-40 animation-delay-500"></div>
               <div className="absolute top-12 right-8 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce opacity-50 animation-delay-1000"></div>
-              
-              <CardHeader className="relative z-10">
-                <div className="flex items-center gap-3 group-hover:gap-4 transition-all duration-300">
-                  <div className="relative">
-                    <Zap className="h-7 w-7 text-green-600 group-hover:text-green-700 transition-colors duration-300 drop-shadow-sm" />
-                    <div className="absolute inset-0 bg-green-400 rounded-full blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
-                  </div>
-                  <CardTitle className="text-green-900 group-hover:text-green-800 transition-colors duration-300 text-lg font-bold">
-                    Sample Analysis Results
-                  </CardTitle>
-                  <div className="ml-auto flex items-center gap-1 text-xs text-green-600 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-x-4 group-hover:translate-x-0">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Live Demo
-                  </div>
-                </div>
-              </CardHeader>
             </Card>
 
             {/* Compact CTA Section */}
