@@ -1556,6 +1556,212 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Profile Management Routes
+  
+  // Get user profile with SA profile data
+  app.get("/api/profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Get user data
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Get SA profile data
+      const [saProfile] = await db.select().from(saProfiles).where(eq(saProfiles.userId, userId));
+      
+      // Combine user and SA profile data
+      const profileData = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        profilePicture: user.profilePicture,
+        phoneNumber: user.phoneNumber,
+        phoneVerified: user.phoneVerified,
+        emailVerified: user.emailVerified,
+        receiveEmailDigest: user.receiveEmailDigest,
+        referralCode: user.referralCode,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        saProfile: saProfile || null
+      };
+      
+      res.json(profileData);
+    } catch (error) {
+      console.error("Error getting profile:", error);
+      res.status(500).json({ error: "Failed to get profile data" });
+    }
+  });
+  
+  // Update user profile
+  app.put("/api/profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { name, phoneNumber, receiveEmailDigest } = req.body;
+      
+      // Update user data
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          name: name || undefined,
+          phoneNumber: phoneNumber || undefined,
+          receiveEmailDigest: receiveEmailDigest !== undefined ? receiveEmailDigest : undefined,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      res.json({
+        message: "Profile updated successfully",
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+  
+  // Create or update SA profile
+  app.post("/api/profile/sa-profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { 
+        province, 
+        city, 
+        bbbeeStatus, 
+        bbbeeLevel, 
+        nqfLevel, 
+        preferredLanguages, 
+        industries, 
+        jobTypes,
+        whatsappEnabled,
+        whatsappNumber
+      } = req.body;
+      
+      // Check if SA profile exists
+      const [existingProfile] = await db.select().from(saProfiles).where(eq(saProfiles.userId, userId));
+      
+      if (existingProfile) {
+        // Update existing profile
+        const [updatedProfile] = await db
+          .update(saProfiles)
+          .set({
+            province: province || undefined,
+            city: city || undefined,
+            bbbeeStatus: bbbeeStatus || undefined,
+            bbbeeLevel: bbbeeLevel || undefined,
+            nqfLevel: nqfLevel || undefined,
+            preferredLanguages: preferredLanguages || undefined,
+            industries: industries || undefined,
+            jobTypes: jobTypes || undefined,
+            whatsappEnabled: whatsappEnabled !== undefined ? whatsappEnabled : undefined,
+            whatsappNumber: whatsappNumber || undefined,
+            updatedAt: new Date()
+          })
+          .where(eq(saProfiles.userId, userId))
+          .returning();
+          
+        res.json({
+          message: "SA profile updated successfully",
+          saProfile: updatedProfile
+        });
+      } else {
+        // Create new profile
+        const [newProfile] = await db
+          .insert(saProfiles)
+          .values({
+            userId,
+            province,
+            city,
+            bbbeeStatus,
+            bbbeeLevel,
+            nqfLevel,
+            preferredLanguages,
+            industries,
+            jobTypes,
+            whatsappEnabled: whatsappEnabled || false,
+            whatsappNumber
+          })
+          .returning();
+          
+        res.json({
+          message: "SA profile created successfully",
+          saProfile: newProfile
+        });
+      }
+    } catch (error) {
+      console.error("Error updating SA profile:", error);
+      res.status(500).json({ error: "Failed to update SA profile" });
+    }
+  });
+  
+  // Update profile picture
+  app.post("/api/profile/picture", isAuthenticated, upload.single("profilePicture"), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+      
+      // In a real implementation, you would upload to cloud storage (AWS S3, Cloudinary, etc.)
+      // For now, we'll store the file path
+      const profilePicturePath = `/uploads/profile-pictures/${req.file.filename}`;
+      
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          profilePicture: profilePicturePath,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId))
+        .returning();
+      
+      res.json({
+        message: "Profile picture updated successfully",
+        profilePicture: profilePicturePath,
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      res.status(500).json({ error: "Failed to update profile picture" });
+    }
+  });
+  
+  // Delete user account
+  app.delete("/api/profile", isAuthenticated, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user!.id;
+      const { confirmEmail } = req.body;
+      
+      // Verify user wants to delete account
+      if (confirmEmail !== req.user!.email) {
+        return res.status(400).json({ 
+          error: "Email confirmation required",
+          message: "Please enter your email address to confirm account deletion"
+        });
+      }
+      
+      // Delete related data first (due to foreign key constraints)
+      await db.delete(saProfiles).where(eq(saProfiles.userId, userId));
+      await db.delete(cvs).where(eq(cvs.userId, userId));
+      await db.delete(subscriptions).where(eq(subscriptions.userId, userId));
+      await db.delete(notifications).where(eq(notifications.userId, userId));
+      
+      // Delete user account
+      await db.delete(users).where(eq(users.id, userId));
+      
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
+  });
+  
   // Notification Routes
   
   // Get notifications for the authenticated user

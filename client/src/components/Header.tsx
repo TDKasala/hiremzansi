@@ -203,115 +203,138 @@ export default function Header() {
       </div>
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden">
-          <div className="px-4 pt-4 pb-6 space-y-3 bg-gradient-to-b from-white/95 to-gray-50/95 backdrop-blur-lg border-t border-gray-200/50 shadow-lg">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                  location === link.href 
-                    ? "text-white bg-gradient-to-r from-green-500 to-blue-600 shadow-lg" 
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200"
-                }`}
-                onClick={closeMobileMenu}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="md:block lg:hidden mb-4">
-              <LanguageSelector />
-            </div>
-            {user ? (
-              <div className="space-y-3 mt-4 pt-4 border-t border-gray-200/50">
+        <div className="lg:hidden fixed inset-0 z-50" onClick={closeMobileMenu}>
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+          <div 
+            className="absolute right-0 top-0 h-full w-1/2 bg-white/80 backdrop-blur-lg border-l border-gray-200/50 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 space-y-3 overflow-y-auto h-full">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeMobileMenu}
+                  className="h-8 w-8 rounded-full"
+                >
+                  <span className="sr-only">Close menu</span>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              </div>
+              
+              {navLinks.map((link) => (
                 <Link 
-                  href="/dashboard"
-                  className="block px-4 py-3 bg-gradient-to-r from-green-100 to-blue-100 text-green-700 text-center rounded-xl hover:from-green-200 hover:to-blue-200 transition-all duration-300 font-medium"
+                  key={link.href} 
+                  href={link.href}
+                  className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 text-right ${
+                    location === link.href 
+                      ? "text-white bg-gradient-to-r from-green-500 to-blue-600 shadow-lg" 
+                      : "text-gray-700 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200"
+                  }`}
                   onClick={closeMobileMenu}
                 >
-                  Dashboard
+                  {link.label}
                 </Link>
-                <Link 
-                  href="/premium-tools"
-                  className="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-center rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
-                  onClick={closeMobileMenu}
-                >
-                  Premium Tools
-                </Link>
-                <Link 
-                  href="/job-sites"
-                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  Job Board
-                </Link>
-                <Link 
-                  href="/referral"
-                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  Refer & Earn
-                </Link>
-                <Link 
-                  href="/interview/practice"
-                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  Interview Practice
-                </Link>
-                <Link 
-                  href="/skills/analyze"
-                  className="block px-4 py-2 border border-primary text-primary text-center rounded-md hover:bg-primary hover:text-white transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  Skill Gap Analysis
-                </Link>
-                
-                {user && user.isAdmin && (
+              ))}
+              
+              <div className="md:block lg:hidden mb-4">
+                <LanguageSelector />
+              </div>
+              
+              {user ? (
+                <div className="space-y-3 mt-4 pt-4 border-t border-gray-200/50">
                   <Link 
-                    href="/admin"
-                    className="block px-4 py-2 border-2 border-amber-500 bg-amber-100 text-amber-700 font-medium text-center rounded-md hover:bg-amber-200 transition-colors"
+                    href="/dashboard"
+                    className="block px-4 py-3 bg-gradient-to-r from-green-100 to-blue-100 text-green-700 text-right rounded-xl hover:from-green-200 hover:to-blue-200 transition-all duration-300 font-medium"
                     onClick={closeMobileMenu}
                   >
-                    Admin Dashboard
+                    Dashboard
                   </Link>
-                )}
-                <button
-                  onClick={async () => {
-                    setIsLoggingOut(true);
-                    await signOut();
-                    setIsLoggingOut(false);
-                    closeMobileMenu();
-                  }}
-                  disabled={isLoggingOut}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-center rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium shadow-lg"
-                >
-                  {isLoggingOut ? "Logging out..." : (
-                    <>
-                      <LogOut className="h-4 w-4" />
-                      <span>{t('common.logout')}</span>
-                    </>
+                  <Link 
+                    href="/premium-tools"
+                    className="block px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-right rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
+                    onClick={closeMobileMenu}
+                  >
+                    Premium Tools
+                  </Link>
+                  <Link 
+                    href="/job-sites"
+                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Job Board
+                  </Link>
+                  <Link 
+                    href="/referral"
+                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Refer & Earn
+                  </Link>
+                  <Link 
+                    href="/interview/practice"
+                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Interview Practice
+                  </Link>
+                  <Link 
+                    href="/skills/analyze"
+                    className="block px-4 py-2 border border-primary text-primary text-right rounded-md hover:bg-primary hover:text-white transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    Skill Gap Analysis
+                  </Link>
+                  
+                  {user && user.isAdmin && (
+                    <Link 
+                      href="/admin"
+                      className="block px-4 py-2 border-2 border-amber-500 bg-amber-100 text-amber-700 font-medium text-right rounded-md hover:bg-amber-200 transition-colors"
+                      onClick={closeMobileMenu}
+                    >
+                      Admin Dashboard
+                    </Link>
                   )}
-                </button>
-              </div>
-            ) : (
-              <div className="flex space-x-3 mt-4 pt-4 border-t border-gray-200/50">
-                <Link 
-                  href="/auth"
-                  className="flex-1 px-4 py-3 border-2 border-blue-500/30 text-blue-700 text-center rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-500 transition-all duration-300 font-medium"
-                  onClick={closeMobileMenu}
-                >
-                  {t('common.login')}
-                </Link>
-                <Link 
-                  href="/auth?tab=register"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-center rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
-                  onClick={closeMobileMenu}
-                >
-                  {t('common.signup')}
-                </Link>
-              </div>
-            )}
+                  <button
+                    onClick={async () => {
+                      setIsLoggingOut(true);
+                      await signOut();
+                      setIsLoggingOut(false);
+                      closeMobileMenu();
+                    }}
+                    disabled={isLoggingOut}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-right rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-end gap-2 font-medium shadow-lg"
+                  >
+                    {isLoggingOut ? "Logging out..." : (
+                      <>
+                        <span>{t('common.logout')}</span>
+                        <LogOut className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col space-y-3 mt-4 pt-4 border-t border-gray-200/50">
+                  <Link 
+                    href="/auth"
+                    className="flex-1 px-4 py-3 border-2 border-blue-500/30 text-blue-700 text-right rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-500 transition-all duration-300 font-medium"
+                    onClick={closeMobileMenu}
+                  >
+                    {t('common.login')}
+                  </Link>
+                  <Link 
+                    href="/auth?tab=register"
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-right rounded-xl hover:from-green-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg"
+                    onClick={closeMobileMenu}
+                  >
+                    {t('common.signup')}
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

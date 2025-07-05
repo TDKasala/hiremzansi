@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useWhatsApp } from "@/hooks/use-whatsapp";
-import { useQuery } from "@tanstack/react-query";
-import { getQueryFn } from "@/lib/queryClient";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -16,6 +16,11 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import {
   Tabs,
   TabsContent,
@@ -56,7 +61,7 @@ import { JobSeekerMatchNotifications } from "@/components/JobSeekerMatchNotifica
 import { JobSeekerBenefitsAlert } from "@/components/JobSeekerBenefitsAlert";
 import { SkillGapAnalysis } from "@/components/SkillGapAnalysis";
 
-export default function DashboardPage() {
+function DashboardPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -525,38 +530,7 @@ export default function DashboardPage() {
 
           {/* Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
-            {/* Profile Section */}
-            {user && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="mr-2 h-5 w-5" />
-                    Profile Information
-                  </CardTitle>
-                  <CardDescription>
-                    Manage your personal information and preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium">Name</label>
-                      <p className="text-muted-foreground">
-                        {user.name || user.email}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Email</label>
-                      <p className="text-muted-foreground">{user.email}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+            <ProfileManagement />
           </TabsContent>
 
           {/* Subscription Tab */}
@@ -592,3 +566,421 @@ export default function DashboardPage() {
     </>
   );
 }
+
+// Profile Management Component
+function ProfileManagement() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phoneNumber: "",
+    receiveEmailDigest: true,
+    // SA Profile fields
+    province: "",
+    city: "",
+    bbbeeStatus: "",
+    bbbeeLevel: "",
+    nqfLevel: "",
+    preferredLanguages: [] as string[],
+    industries: [] as string[],
+    jobTypes: [] as string[],
+    whatsappEnabled: false,
+    whatsappNumber: ""
+  });
+
+  // Fetch profile data
+  const { data: profileData, isLoading: profileLoading } = useQuery({
+    queryKey: ["/api/profile"],
+    queryFn: () => fetch("/api/profile").then(res => res.json()),
+  });
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/profile"] });
+      setIsEditing(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update SA Profile mutation
+  const updateSaProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/profile/sa-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update SA profile");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "SA Profile Updated",
+        description: "Your South African profile has been successfully updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/profile"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update SA profile",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize form data when profile loads
+  React.useEffect(() => {
+    if (profileData && typeof profileData === 'object') {
+      setFormData({
+        name: profileData.name || "",
+        phoneNumber: profileData.phoneNumber || "",
+        receiveEmailDigest: profileData.receiveEmailDigest !== undefined ? profileData.receiveEmailDigest : true,
+        province: profileData.saProfile?.province || "",
+        city: profileData.saProfile?.city || "",
+        bbbeeStatus: profileData.saProfile?.bbbeeStatus || "",
+        bbbeeLevel: profileData.saProfile?.bbbeeLevel || "",
+        nqfLevel: profileData.saProfile?.nqfLevel || "",
+        preferredLanguages: profileData.saProfile?.preferredLanguages || [],
+        industries: profileData.saProfile?.industries || [],
+        jobTypes: profileData.saProfile?.jobTypes || [],
+        whatsappEnabled: profileData.saProfile?.whatsappEnabled || false,
+        whatsappNumber: profileData.saProfile?.whatsappNumber || ""
+      });
+    }
+  }, [profileData]);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      // Update basic profile
+      await updateProfileMutation.mutateAsync({
+        name: formData.name,
+        phoneNumber: formData.phoneNumber,
+        receiveEmailDigest: formData.receiveEmailDigest,
+      });
+
+      // Update SA profile
+      await updateSaProfileMutation.mutateAsync({
+        province: formData.province,
+        city: formData.city,
+        bbbeeStatus: formData.bbbeeStatus,
+        bbbeeLevel: formData.bbbeeLevel ? parseInt(formData.bbbeeLevel) : null,
+        nqfLevel: formData.nqfLevel ? parseInt(formData.nqfLevel) : null,
+        preferredLanguages: formData.preferredLanguages,
+        industries: formData.industries,
+        jobTypes: formData.jobTypes,
+        whatsappEnabled: formData.whatsappEnabled,
+        whatsappNumber: formData.whatsappNumber,
+      });
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
+
+  if (profileLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
+          <div className="h-24 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const southAfricanProvinces = [
+    "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", 
+    "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"
+  ];
+
+  const bbbeeStatuses = [
+    "African", "Coloured", "Indian", "White", "Not Specified"
+  ];
+
+  const nqfLevels = [
+    { value: "1", label: "NQF Level 1 (Grade 9)" },
+    { value: "2", label: "NQF Level 2 (Grade 10)" },
+    { value: "3", label: "NQF Level 3 (Grade 11)" },
+    { value: "4", label: "NQF Level 4 (Matric)" },
+    { value: "5", label: "NQF Level 5 (Higher Certificate)" },
+    { value: "6", label: "NQF Level 6 (Diploma)" },
+    { value: "7", label: "NQF Level 7 (Bachelor's Degree)" },
+    { value: "8", label: "NQF Level 8 (Honours)" },
+    { value: "9", label: "NQF Level 9 (Master's)" },
+    { value: "10", label: "NQF Level 10 (Doctorate)" }
+  ];
+
+  const jobTypes = [
+    "Permanent", "Contract", "Temporary", "Part-time", "Freelance", "Internship"
+  ];
+
+  const industries = [
+    "Information Technology", "Finance", "Healthcare", "Education", "Manufacturing",
+    "Retail", "Construction", "Mining", "Agriculture", "Tourism", "Transport", "Other"
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Profile Header */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center">
+              <User className="mr-2 h-5 w-5" />
+              Profile Information
+            </CardTitle>
+            <CardDescription>
+              Manage your personal information and preferences
+            </CardDescription>
+          </div>
+          <Button
+            variant={isEditing ? "default" : "outline"}
+            onClick={() => {
+              if (isEditing) {
+                handleSaveProfile();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+            disabled={updateProfileMutation.isPending || updateSaProfileMutation.isPending}
+          >
+            {isEditing ? (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                {(updateProfileMutation.isPending || updateSaProfileMutation.isPending) ? "Saving..." : "Save Changes"}
+              </>
+            ) : (
+              <>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Profile
+              </>
+            )}
+          </Button>
+        </CardHeader>
+      </Card>
+
+      {/* Basic Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Basic Information</CardTitle>
+          <CardDescription>
+            Your core account information
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              {isEditing ? (
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Enter your full name"
+                />
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {profileData?.name || "Not specified"}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <p className="text-muted-foreground p-2 bg-muted rounded">
+                {profileData?.email}
+                {profileData?.emailVerified && (
+                  <CheckCircle className="inline ml-2 h-4 w-4 text-green-500" />
+                )}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              {isEditing ? (
+                <Input
+                  id="phone"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  placeholder="Enter your phone number"
+                />
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {profileData?.phoneNumber || "Not specified"}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="digest">Email Preferences</Label>
+              <div className="flex items-center space-x-2 p-2">
+                <Switch
+                  id="digest"
+                  checked={formData.receiveEmailDigest}
+                  onCheckedChange={(checked) => handleInputChange("receiveEmailDigest", checked)}
+                  disabled={!isEditing}
+                />
+                <Label htmlFor="digest" className="text-sm">
+                  Receive career digest emails
+                </Label>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* South African Profile */}
+      <Card>
+        <CardHeader>
+          <CardTitle>South African Profile</CardTitle>
+          <CardDescription>
+            Information specific to the South African job market
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="province">Province</Label>
+              {isEditing ? (
+                <Select
+                  value={formData.province}
+                  onValueChange={(value) => handleInputChange("province", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {southAfricanProvinces.map((province) => (
+                      <SelectItem key={province} value={province}>
+                        {province}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {formData.province || "Not specified"}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              {isEditing ? (
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => handleInputChange("city", e.target.value)}
+                  placeholder="Enter your city"
+                />
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {formData.city || "Not specified"}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="bbbee">B-BBEE Status</Label>
+              {isEditing ? (
+                <Select
+                  value={formData.bbbeeStatus}
+                  onValueChange={(value) => handleInputChange("bbbeeStatus", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select B-BBEE status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bbbeeStatuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {formData.bbbeeStatus || "Not specified"}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nqf">NQF Level</Label>
+              {isEditing ? (
+                <Select
+                  value={formData.nqfLevel}
+                  onValueChange={(value) => handleInputChange("nqfLevel", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select NQF level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {nqfLevels.map((level) => (
+                      <SelectItem key={level.value} value={level.value}>
+                        {level.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-muted-foreground p-2 bg-muted rounded">
+                  {formData.nqfLevel ? nqfLevels.find(l => l.value === formData.nqfLevel)?.label : "Not specified"}
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {isEditing && (
+        <div className="flex justify-end space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditing(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveProfile}
+            disabled={updateProfileMutation.isPending || updateSaProfileMutation.isPending}
+          >
+            {(updateProfileMutation.isPending || updateSaProfileMutation.isPending) && (
+              <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+            )}
+            Save Changes
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default DashboardPage;
