@@ -119,12 +119,9 @@ export default function HeroSection() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col items-center justify-center text-center">
-            <div className="relative w-full">
-              <Badge className="bg-primary/90 hover:bg-primary font-bold mb-4">
-                {t('home.southAfricanFocused')}
-              </Badge>
-              
-            </div>
+            <Badge className="bg-primary/90 hover:bg-primary font-bold mb-4">
+              {t('home.southAfricanFocused')}
+            </Badge>
             
             
 
