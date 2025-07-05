@@ -75,74 +75,74 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-8 sm:py-16 bg-neutral-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-secondary mb-3 sm:mb-4">
+    <section id="pricing" className="min-h-screen flex items-center justify-center py-6 xs:py-8 sm:py-12 lg:py-16 bg-neutral-50">
+      <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 w-full">
+        <div className="text-center mb-6 xs:mb-8 sm:mb-10 lg:mb-12">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-secondary mb-2 xs:mb-3 sm:mb-4 leading-tight px-2 xs:px-4">
             Choose Your Plan
           </h2>
-          <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto px-2">
+          <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-neutral-600 max-w-4xl mx-auto px-2 xs:px-4 leading-relaxed">
             Affordable CV optimization plans designed for South African job seekers
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 xs:gap-5 sm:gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <div 
               key={index} 
-              className={`bg-white rounded-lg shadow-lg p-6 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              className={`bg-white rounded-lg shadow-lg p-4 xs:p-5 sm:p-6 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                 plan.highlighted 
                   ? 'border-primary bg-gradient-to-b from-primary/5 to-white relative' 
                   : 'border-neutral-200'
               }`}
             >
               {plan.highlighted && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-medium">
+                <div className="absolute -top-2 xs:-top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-primary text-white px-3 xs:px-4 py-1 rounded-full text-xs xs:text-sm font-medium">
                     Most Popular
                   </span>
                 </div>
               )}
               
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-secondary mb-2">
+              <div className="text-center mb-4 xs:mb-5 sm:mb-6">
+                <h3 className="text-lg xs:text-xl sm:text-2xl font-bold text-secondary mb-1 xs:mb-2 leading-tight">
                   {plan.name}
                 </h3>
-                <div className="mb-3">
+                <div className="mb-2 xs:mb-3">
                   {isLaunchDiscountActive && plan.name !== "Free Trial" ? (
                     <div className="text-center">
-                      <div className="text-sm text-gray-500 line-through mb-1">
+                      <div className="text-xs xs:text-sm text-gray-500 line-through mb-1">
                         {plan.name === "Essential Pack" ? "ZAR 49" :
                          plan.name === "Professional" ? "ZAR 99/month" :
                          plan.name === "Business Annual" ? "ZAR 999/year" : ""}
                       </div>
-                      <div className="text-2xl font-bold text-primary flex items-center justify-center gap-2">
+                      <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-primary flex items-center justify-center gap-1 xs:gap-2">
                         {plan.price}
-                        <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">50% OFF</span>
+                        <span className="bg-red-500 text-white text-xs px-1.5 xs:px-2 py-0.5 xs:py-1 rounded-full">50% OFF</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-xl xs:text-2xl sm:text-3xl font-bold text-primary">
                       {plan.price}
                     </div>
                   )}
                 </div>
-                <p className="text-neutral-600 text-sm">{plan.description}</p>
+                <p className="text-neutral-600 text-xs xs:text-sm leading-relaxed">{plan.description}</p>
               </div>
 
-              <ul className="space-y-2 mb-8 min-h-[180px]">
+              <ul className="space-y-1.5 xs:space-y-2 mb-6 xs:mb-7 sm:mb-8 min-h-[140px] xs:min-h-[160px] sm:min-h-[180px]">
                 {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start text-sm">
+                  <li key={featureIndex} className="flex items-start text-xs xs:text-sm">
                     {feature.included ? (
-                      <Check className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <Check className="h-3 w-3 xs:h-4 xs:w-4 text-green-600 mr-1.5 xs:mr-2 mt-0.5 flex-shrink-0" />
                     ) : (
-                      <X className="h-4 w-4 text-neutral-400 mr-2 mt-0.5 flex-shrink-0" />
+                      <X className="h-3 w-3 xs:h-4 xs:w-4 text-neutral-400 mr-1.5 xs:mr-2 mt-0.5 flex-shrink-0" />
                     )}
                     <span
                       className={
                         feature.included
-                          ? "text-neutral-700"
-                          : "text-neutral-400"
+                          ? "text-neutral-700 leading-relaxed"
+                          : "text-neutral-400 leading-relaxed"
                       }
                     >
                       {feature.name}
@@ -153,7 +153,7 @@ export default function PricingSection() {
 
               <Link href={plan.buttonLink}>
                 <Button
-                  className="w-full"
+                  className="w-full text-xs xs:text-sm py-2 xs:py-2.5 sm:py-3"
                   variant={plan.highlighted ? "default" : (plan.buttonVariant || "outline")}
                 >
                   {plan.buttonText}
@@ -163,8 +163,8 @@ export default function PricingSection() {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-neutral-600 text-sm">
+        <div className="text-center mt-8 xs:mt-10 sm:mt-12">
+          <p className="text-neutral-600 text-xs xs:text-sm leading-relaxed px-2 xs:px-4">
             All prices in South African Rand (ZAR). No hidden fees.
           </p>
         </div>
