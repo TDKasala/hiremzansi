@@ -112,13 +112,7 @@ export function JobSeekerMatchingBanner() {
             <p className="text-sm text-gray-600">Receive tips based on real employer preferences</p>
           </div>
 
-          <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <CheckCircle className="h-6 w-6 text-orange-600" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Always Free</h3>
-            <p className="text-sm text-gray-600">No charges for job seekers, ever. Keep your CV active</p>
-          </div>
+          
         </div>
 
         
