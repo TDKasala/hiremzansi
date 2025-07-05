@@ -11,7 +11,9 @@ import { performDeepAnalysis } from "./services/atsScoring";
 import { localAIService } from "./services/localAI";
 import { analyzeCV as analyzeResume } from "./services/simpleAtsAnalysis";
 import { analyzeCVContent, formatAnalysisForResponse } from "./services/atsAnalysisService";
+import { xaiService } from "./services/xaiService";
 import { generateQuizQuestions } from "./services/quizGeneratorService";
+import OpenAI from "openai";
 import { careerPathService } from "./services/careerPathService";
 import { interviewSimulationService } from "./services/interviewSimulationService";
 import { linkTrackingService } from "./services/linkTrackingService";
@@ -33,6 +35,7 @@ import {
   skills,
   subscriptions,
   plans,
+  notifications,
 } from "@shared/schema";
 import { eq, desc, sql, and } from "drizzle-orm";
 import { db } from "./db";
@@ -1406,8 +1409,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userSkill = await employerStorage.addUserSkill({
         userId,
         skillId,
-        proficiency,
-        yearsExperience: yearsExperience || 0
+        proficiencyLevel: proficiency,
+        yearsOfExperience: yearsExperience || 0
       });
       
       res.status(201).json(userSkill);
@@ -4273,66 +4276,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Calculate match percentage based on role similarity and experience
-      let baseMatch = 45;
-      if (currentRole.toLowerCase().includes(targetRole.toLowerCase()) || 
-          targetRole.toLowerCase().includes(currentRole.toLowerCase())) {
-        baseMatch += 25;
-      }
-      if (experience === 'senior') baseMatch += 10;
-      if (experience === 'mid') baseMatch += 5;
-      
-      const overallMatch = Math.min(Math.max(baseMatch + Math.random() * 20, 30), 85);
-      
-      // Generate skill analysis based on target role
-      const commonSkills = [
-        { name: 'Communication Skills', match: 95, description: 'Strong verbal and written communication abilities', importance: 9 },
-        { name: 'Problem Solving', match: 88, description: 'Analytical thinking and solution-oriented approach', importance: 8 },
-        { name: 'Team Collaboration', match: 82, description: 'Experience working effectively in team environments', importance: 7 },
-        { name: 'Project Management', match: 75, description: 'Basic project coordination and delivery experience', importance: 6 }
-      ];
-      
-      const missingSkills = [
-        { name: `${targetRole} Specific Technology`, match: 25, description: 'Core technical skills required for the target role', importance: 10 },
-        { name: 'Industry Standards & Practices', match: 35, description: `${industry} sector knowledge and best practices`, importance: 8 },
-        { name: 'Advanced Analytics', match: 20, description: 'Data analysis and interpretation capabilities', importance: 7 },
-        { name: 'Leadership & Mentoring', match: 40, description: 'Team leadership and knowledge transfer skills', importance: 6 }
-      ];
-      
-      const analysisResult = {
-        overallMatch: Math.round(overallMatch),
-        summary: `Based on your ${currentRole} background and ${experience}-level experience, you have a ${Math.round(overallMatch)}% match for ${targetRole} roles. There are some key skill gaps to address, but with focused development, you can significantly improve your competitiveness.`,
-        recommendations: `Focus on developing the missing technical skills through practical projects and industry certifications. Build a portfolio showcasing relevant work and consider joining professional communities in ${industry}.`,
-        matchedSkills: commonSkills,
-        missingSkills: missingSkills,
-        actionPlan: {
-          shortTerm: [
-            `Complete online certification in ${targetRole} fundamentals`,
-            'Update LinkedIn profile with relevant keywords',
-            'Start building a portfolio of relevant projects',
-            'Join professional groups and communities'
+      // Use AI service for comprehensive skill gap analysis
+      try {
+        const analysisPrompt = `Analyze skill gap for career transition in South African context:
+        
+Current Role: ${currentRole}
+Target Role: ${targetRole}  
+Experience Level: ${experience}
+Industry: ${industry}
+Current Skills: ${currentSkills}
+
+Provide JSON response with:
+- overallMatch (percentage)
+- summary (detailed analysis)
+- recommendations (specific actionable advice)
+- matchedSkills (array with name, match%, description, importance)
+- missingSkills (array with name, match%, description, importance)
+- actionPlan (shortTerm, mediumTerm, longTerm arrays)
+- marketInsights (salaryRange in ZAR, demandLevel, growthProjection for SA market)
+
+Focus on South African job market context, B-BBEE considerations, and local industry requirements.`;
+
+        // Use OpenAI fallback for skill gap analysis with custom prompt
+        const openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        });
+        
+        const response = await openai.chat.completions.create({
+          model: "gpt-4",
+          messages: [
+            {
+              role: "system",
+              content: "You are a South African career advisor expert. Provide skill gap analysis as valid JSON response only."
+            },
+            {
+              role: "user",
+              content: analysisPrompt
+            }
           ],
-          mediumTerm: [
-            'Gain hands-on experience through freelance or volunteer projects',
-            'Attend industry conferences and networking events',
-            'Seek mentorship from professionals in your target role',
-            'Consider specialized training programs or bootcamps'
-          ],
-          longTerm: [
-            'Pursue advanced certifications or formal education',
-            'Build a strong professional network in the industry',
-            'Develop thought leadership through content creation',
-            'Consider transition roles that bridge your current and target positions'
-          ]
-        },
-        marketInsights: {
-          salaryRange: 'R350,000 - R650,000 annually',
-          demandLevel: 'High demand',
-          growthProjection: '15% growth expected over next 3 years'
+          temperature: 0.7,
+          max_tokens: 2000
+        });
+        
+        const analysisText = response.choices[0]?.message?.content || "";
+        
+        try {
+          const parsedAnalysis = JSON.parse(analysisText);
+          res.json(parsedAnalysis);
+        } catch (parseError) {
+          // Fallback structured response for South African context
+          const analysisResult = {
+            overallMatch: 65,
+            summary: `Career transition analysis from ${currentRole} to ${targetRole} in South African market context. Assessment considers local industry requirements and B-BBEE transformation goals.`,
+            recommendations: `Focus on developing ${targetRole} competencies through certified training programs. Consider local industry associations and South African professional bodies for networking and skill development.`,
+            matchedSkills: [
+              { name: 'Communication Skills', match: 85, description: 'Professional communication abilities', importance: 8 },
+              { name: 'Problem Solving', match: 75, description: 'Analytical thinking capabilities', importance: 7 }
+            ],
+            missingSkills: [
+              { name: `${targetRole} Technical Skills`, match: 30, description: 'Core technical competencies for target role', importance: 10 },
+              { name: 'Industry Certification', match: 25, description: 'Relevant professional certifications', importance: 8 }
+            ],
+            actionPlan: {
+              shortTerm: ['Research role requirements', 'Identify skill gaps', 'Find relevant courses'],
+              mediumTerm: ['Complete certifications', 'Build portfolio', 'Gain practical experience'],
+              longTerm: ['Develop expertise', 'Build professional network', 'Pursue leadership roles']
+            },
+            marketInsights: {
+              salaryRange: `R${Math.floor(Math.random() * 300000 + 250000).toLocaleString()} - R${Math.floor(Math.random() * 200000 + 600000).toLocaleString()} annually`,
+              demandLevel: 'Moderate to High demand',
+              growthProjection: 'Growing sector with transformation opportunities'
+            }
+          };
+          res.json(analysisResult);
         }
-      };
-      
-      res.json(analysisResult);
+      } catch (aiError) {
+        console.error("AI service unavailable:", aiError);
+        res.status(503).json({ 
+          error: "Analysis service temporarily unavailable",
+          message: "Please try again later or contact support"
+        });
+      }
     } catch (error) {
       console.error("Error analyzing skill gap:", error);
       res.status(500).json({ error: "Failed to analyze skill gap" });
@@ -4474,116 +4498,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cvId = parseInt(req.params.cvId);
       const userId = req.user.id;
       
-      // Sample job matches data for demonstration
-      const sampleJobMatches = [
-        {
-          id: 1,
-          matchScore: 85,
-          skillsMatchScore: 88,
-          experienceMatchScore: 82,
-          locationMatchScore: 90,
-          saContextScore: 85,
-          matchedSkills: ["JavaScript", "React", "Node.js", "SQL", "Agile"],
-          missingSkills: ["TypeScript", "AWS", "Docker"],
-          matchReasons: [
-            "Strong match for required JavaScript and React skills",
-            "Experience level aligns with job requirements",
-            "Located in preferred province (Western Cape)"
-          ],
-          improvementSuggestions: [
-            "Add TypeScript experience to increase match score",
-            "Consider AWS certification for cloud skills",
-            "Highlight project management experience"
-          ],
-          isViewed: false,
-          isApplied: false,
-          status: "matched",
-          job: {
-            id: 1,
-            title: "Senior Full Stack Developer",
-            company: "TechCorp SA",
-            location: "Cape Town",
-            province: "Western Cape",
-            employmentType: "Full-time",
-            salaryRange: "45000-65000",
-            description: "Join our dynamic team building cutting-edge web applications...",
-            requiredSkills: ["JavaScript", "React", "Node.js", "SQL"],
-            isRemote: false,
-            isFeatured: true
-          }
-        },
-        {
-          id: 2,
-          matchScore: 72,
-          skillsMatchScore: 75,
-          experienceMatchScore: 70,
-          locationMatchScore: 85,
-          saContextScore: 65,
-          matchedSkills: ["JavaScript", "HTML", "CSS", "Git"],
-          missingSkills: ["Python", "Django", "PostgreSQL"],
-          matchReasons: [
-            "Good foundation in web development technologies",
-            "Location preference matches job location"
-          ],
-          improvementSuggestions: [
-            "Learn Python and Django for better backend skills",
-            "Add database experience with PostgreSQL"
-          ],
-          isViewed: true,
-          isApplied: false,
-          status: "matched",
-          job: {
-            id: 2,
-            title: "Junior Web Developer",
-            company: "Digital Solutions SA",
-            location: "Johannesburg",
-            province: "Gauteng",
-            employmentType: "Full-time",
-            salaryRange: "25000-35000",
-            description: "Great opportunity for a junior developer to grow...",
-            requiredSkills: ["JavaScript", "HTML", "CSS", "Python"],
-            isRemote: true,
-            isFeatured: false
-          }
-        },
-        {
-          id: 3,
-          matchScore: 78,
-          skillsMatchScore: 80,
-          experienceMatchScore: 75,
-          locationMatchScore: 70,
-          saContextScore: 88,
-          matchedSkills: ["Project Management", "Agile", "Scrum", "Communication"],
-          missingSkills: ["PMP Certification", "PRINCE2"],
-          matchReasons: [
-            "Strong project management background",
-            "Excellent B-BBEE compliance alignment",
-            "Agile methodology experience matches requirements"
-          ],
-          improvementSuggestions: [
-            "Obtain PMP certification for senior roles",
-            "Consider PRINCE2 training for government projects"
-          ],
-          isViewed: false,
-          isApplied: false,
-          status: "matched",
-          job: {
-            id: 3,
-            title: "Project Manager - Digital Transformation",
-            company: "SA Government Solutions",
-            location: "Pretoria",
-            province: "Gauteng",
-            employmentType: "Contract",
-            salaryRange: "55000-75000",
-            description: "Lead digital transformation initiatives for government sector...",
-            requiredSkills: ["Project Management", "Agile", "Digital Transformation"],
-            isRemote: false,
-            isFeatured: true
-          }
-        }
-      ];
+      // Get real job matches from database
+      const userJobMatches = await db.select()
+        .from(jobMatches)
+        .where(eq(jobMatches.cvId, cvId))
+        .orderBy(desc(jobMatches.matchScore))
+        .limit(20);
       
-      res.json(sampleJobMatches);
+      if (userJobMatches.length === 0) {
+        res.json([]);
+        return;
+      }
+      
+      // Get associated job postings for each match
+      const jobMatchesWithDetails = await Promise.all(
+        userJobMatches.map(async (match) => {
+          const jobPosting = await db.select()
+            .from(jobPostings)
+            .where(eq(jobPostings.id, match.jobId))
+            .limit(1);
+          
+          return {
+            id: match.id,
+            matchScore: match.matchScore,
+            skillsMatchScore: match.skillsMatchScore || 0,
+            experienceMatchScore: match.experienceMatchScore || 0,
+            locationMatchScore: match.locationMatchScore || 0,
+            saContextScore: match.saContextScore || 0,
+            matchedSkills: match.matchedSkills || [],
+            missingSkills: match.missingSkills || [],
+            matchReasons: match.matchReasons || [],
+            improvementSuggestions: match.improvementSuggestions || [],
+            isViewed: match.isViewed || false,
+            isApplied: match.isApplied || false,
+            status: match.status || 'pending',
+            job: jobPosting[0] ? {
+              id: jobPosting[0].id,
+              title: jobPosting[0].title,
+              company: "Company Name", // This would come from employer table
+              location: jobPosting[0].location,
+              province: jobPosting[0].province,
+              employmentType: jobPosting[0].employmentType,
+              salaryRange: jobPosting[0].salaryRange,
+              description: jobPosting[0].description,
+              requiredSkills: jobPosting[0].requiredSkills || [],
+              isRemote: jobPosting[0].isRemote || false,
+              isFeatured: false
+            } : null
+          };
+        })
+      );
+      
+      // Filter out matches where job posting no longer exists
+      const validMatches = jobMatchesWithDetails.filter(match => match.job !== null);
+      
+      res.json(validMatches);
     } catch (error) {
       console.error("Error fetching job matches:", error);
       res.status(500).json({ error: "Failed to fetch job matches" });
@@ -4803,68 +4772,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       
-      // Sample notifications for job seekers (without revealing full job details)
-      const sampleNotifications = [
-        {
-          id: 1,
-          type: "potential_match",
-          title: "New High-Match Opportunity Available",
-          message: "A recruiter has posted a position that's 87% compatible with your skills. Consider optimizing your CV to increase your chances.",
-          matchStrength: 87,
-          industry: "Technology",
-          location: "Cape Town, Western Cape",
-          optimizationTips: [
-            "Add TypeScript experience to match job requirements",
-            "Highlight your Agile methodology experience more prominently",
-            "Include specific project outcomes and metrics"
-          ],
-          requiredSkills: ["JavaScript", "React", "Node.js"],
-          missingSkills: ["TypeScript", "AWS"],
-          isRead: false,
-          createdAt: "2024-06-15T10:30:00.000Z",
-          urgency: "high"
-        },
-        {
-          id: 2,
-          type: "cv_optimization",
-          title: "Optimize CV for Better Matches",
-          message: "Your current CV matches 72% with available positions. Small improvements could increase this to 85%+.",
-          matchStrength: 72,
-          industry: "Technology",
-          location: "Johannesburg, Gauteng",
-          optimizationTips: [
-            "Add more specific technical skills",
-            "Include industry certifications",
-            "Quantify your achievements with numbers"
-          ],
-          requiredSkills: ["JavaScript", "HTML", "CSS"],
-          missingSkills: ["Python", "Django", "PostgreSQL"],
-          isRead: true,
-          createdAt: "2024-06-14T14:20:00.000Z",
-          urgency: "medium"
-        },
-        {
-          id: 3,
-          type: "skill_suggestion",
-          title: "Hot Skills in Your Industry",
-          message: "B-BBEE compliance skills are in high demand. Adding this could unlock premium government positions.",
-          matchStrength: 78,
-          industry: "Government",
-          location: "Pretoria, Gauteng",
-          optimizationTips: [
-            "Add B-BBEE compliance experience",
-            "Highlight government sector projects",
-            "Include public sector certifications"
-          ],
-          requiredSkills: ["Project Management", "Agile"],
-          missingSkills: ["B-BBEE Compliance", "Government Regulations"],
-          isRead: false,
-          createdAt: "2024-06-13T09:15:00.000Z",
-          urgency: "low"
-        }
-      ];
+      // Get real notifications from database
+      const userNotifications = await db.select()
+        .from(notifications)
+        .where(eq(notifications.userId, userId))
+        .orderBy(desc(notifications.createdAt))
+        .limit(50);
       
-      res.json(sampleNotifications);
+      // Format notifications for response
+      const formattedNotifications = userNotifications.map(notification => ({
+        id: notification.id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+        priority: notification.priority || 'medium',
+        actionUrl: notification.actionUrl,
+        actionText: notification.actionText,
+        metadata: notification.metadata
+      }));
+      
+      res.json(formattedNotifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
       res.status(500).json({ error: "Failed to fetch notifications" });
