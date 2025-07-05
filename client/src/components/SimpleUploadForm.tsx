@@ -220,9 +220,7 @@ export default function SimpleUploadForm({
                     >
                       I consent to Hire Mzansi processing my CV data (POPIA compliant) *
                     </label>
-                    <p className="text-xs text-neutral-500 mt-1">
-                      This consent is required to proceed with analysis as per South African data protection laws
-                    </p>
+                    
                   </div>
                 </div>
                 
