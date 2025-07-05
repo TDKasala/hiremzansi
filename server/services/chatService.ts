@@ -1,12 +1,18 @@
 import OpenAI from "openai";
 
-// Initialize LocalAI client (primary)
-function getLocalAIClient() {
-  const baseURL = process.env.LOCALAI_BASE_URL || "http://localhost:8080/v1";
+// Initialize xAI client (primary)
+function getXAIClient() {
+  // Use the verified API key from xAI service
+  const newApiKey = "xai-O1xSO3enl5WxdZovrvVjD5be1ECK3q8ozSWYychZY37wDzgEiUINGv6vtXgtxpp1DLsXAH8tusj0NhvE";
+  const apiKey = newApiKey || process.env.XAI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("XAI_API_KEY environment variable is not set");
+  }
   
   return new OpenAI({
-    baseURL: baseURL,
-    apiKey: "not-needed", // LocalAI doesn't require an API key
+    baseURL: "https://api.x.ai/v1",
+    apiKey: apiKey,
   });
 }
 
@@ -314,23 +320,29 @@ Our analysis checks for 25+ ATS factors specifically tuned for South African emp
 
   private async generateAIResponse(messages: any[], category: string): Promise<{ message: string; confidence: number }> {
     try {
-      // Try LocalAI first
+      // Try xAI first
       try {
-        const localaiClient = getLocalAIClient();
-        const response = await localaiClient.chat.completions.create({
-          model: "gpt-4", // LocalAI model name - adjust based on your setup
+        const xaiClient = getXAIClient();
+        console.log('Sending messages to xAI:', JSON.stringify(messages, null, 2));
+        const response = await xaiClient.chat.completions.create({
+          model: "grok-3-mini",
           messages: messages,
-          max_tokens: 300,
-          temperature: 0.7,
+          max_tokens: 500,
+          temperature: 0.3,
+          stream: false,
         });
 
-        const message = response.choices[0].message.content || '';
+        console.log('xAI response received:', JSON.stringify(response, null, 2));
+        // For Grok models, the actual response content might be in reasoning_content
+        const choice = response.choices[0];
+        const message = choice.message.content || (choice.message as any).reasoning_content || '';
+        console.log('Extracted message:', message);
         return {
           message: message.trim(),
-          confidence: 0.9
+          confidence: 0.95
         };
-      } catch (localaiError) {
-        console.log('LocalAI chat failed, trying OpenAI fallback:', localaiError);
+      } catch (xaiError) {
+        console.log('xAI chat failed, trying OpenAI fallback:', xaiError);
       }
 
       // Try OpenAI as fallback

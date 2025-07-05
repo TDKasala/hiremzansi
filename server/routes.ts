@@ -584,9 +584,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get dashboard stats for authenticated user
-  app.get("/api/dashboard/stats", requireAuth, async (req: Request, res: Response) => {
+  app.get("/api/dashboard/stats", isAuthenticated, async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).user?.userId;
+      const userId = req.user!.id;
       
       if (!userId) {
         return res.status(401).json({ message: "User not found" });
@@ -2370,8 +2370,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Use the local AI service for resume text analysis only
-      const analysis = await localAIService.analyzeResume(resumeContent, jobDescription);
+      // Use xAI service for resume text analysis
+      const analysis = await xaiService.analyzeCV(resumeContent, jobDescription);
       
       res.json(analysis);
     } catch (error) {
@@ -4515,7 +4515,7 @@ Focus on South African job market context, B-BBEE considerations, and local indu
         userJobMatches.map(async (match) => {
           const jobPosting = await db.select()
             .from(jobPostings)
-            .where(eq(jobPostings.id, match.jobId))
+            .where(eq(jobPostings.id, match.jobPostingId))
             .limit(1);
           
           return {
