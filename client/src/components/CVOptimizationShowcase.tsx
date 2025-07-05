@@ -224,15 +224,7 @@ export function CVOptimizationShowcase() {
 
           {/* Sample Analysis Results */}
           <div className="space-y-6">
-            <Card className="group relative overflow-hidden border-2 border-green-200 bg-gradient-to-br from-green-50 via-white to-green-50 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.02] hover:border-green-300">
-              {/* Animated background pattern */}
-              <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-green-400 to-blue-500 transform scale-110 group-hover:scale-125 transition-transform duration-1000"></div>
-              
-              {/* Floating particles effect */}
-              <div className="absolute top-4 right-4 w-2 h-2 bg-green-400 rounded-full animate-pulse opacity-60"></div>
-              <div className="absolute top-8 right-12 w-1 h-1 bg-blue-400 rounded-full animate-ping opacity-40 animation-delay-500"></div>
-              <div className="absolute top-12 right-8 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce opacity-50 animation-delay-1000"></div>
-            </Card>
+            
 
             {/* Compact CTA Section */}
             <div className="text-center space-y-4">
