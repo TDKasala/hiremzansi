@@ -72,22 +72,6 @@ export default function PricingSection() {
       buttonLink: "/auth",
       buttonVariant: "outline",
     },
-    {
-      name: "Business Annual",
-      price: isLaunchDiscountActive ? "ZAR 500/year" : "ZAR 999/year",
-      description: isLaunchDiscountActive ? "Best value - Save 65% with launch discount!" : "Best value - Save 15%",
-      features: [
-        { name: "20 CV Analyses/Month", included: true },
-        { name: "All Professional Features", included: true },
-        { name: "Bulk Analysis Tools", included: true },
-        { name: "API Access", included: true },
-        { name: "15% Annual Savings", included: true },
-        { name: "Dedicated Account Manager", included: true },
-      ],
-      buttonText: "Choose Annual",
-      buttonLink: "/auth",
-      buttonVariant: "secondary",
-    },
   ];
 
   return (

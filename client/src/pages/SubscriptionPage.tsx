@@ -81,24 +81,6 @@ const plans = [
     popular: false,
     highlighted: true,
   },
-  {
-    id: 'business-annual',
-    name: 'Business Annual',
-    price: isLaunchDiscountActive ? 50000 : 99900, // ZAR 500.00 or 999.00 in cents
-    originalPrice: 99900,
-    interval: 'year',
-    features: [
-      '20 CV Analyses/Month',
-      'All Professional Features',
-      'Bulk Analysis Tools',
-      'API Access',
-      'Dedicated Account Manager',
-      '15% Annual Savings',
-    ],
-    scanLimit: 20,
-    popular: false,
-    highlighted: false,
-  },
 ];
 
 export default function SubscriptionPage() {
