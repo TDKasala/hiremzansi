@@ -115,16 +115,14 @@ export default function HeroSection() {
   }, []);
   
   return (
-    <section id="home" className="bg-gradient-to-r from-secondary to-neutral-900 text-white py-12 md:py-24 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center">
-          
-          
-          {/* Modern CV showcase with image */}
-          <div className="md:w-1/2 flex justify-center relative">
+    <section id="home" className="bg-gradient-to-r from-secondary to-neutral-900 text-white py-8 sm:py-12 md:py-16 lg:py-20 xl:py-24 overflow-hidden min-h-screen flex items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="flex flex-col items-center justify-center text-center w-full">
+          {/* Modern CV showcase with image - Centered */}
+          <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl flex justify-center relative">
             {/* Modern CV with animations */}
             <div 
-              className={`relative w-full max-w-md rounded-lg shadow-2xl transition-all duration-1000 overflow-hidden
+              className={`relative w-full rounded-lg shadow-2xl transition-all duration-1000 overflow-hidden
                 ${isAnimated ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
               style={{ 
                 transformStyle: 'preserve-3d',
@@ -138,12 +136,12 @@ export default function HeroSection() {
                   animation: isAnimated ? 'float 6s ease-in-out infinite' : 'none',
                 }}
               >
-                <div className="bg-white text-black p-4 rounded-lg shadow-lg text-[16px] ml-[20px] mr-[20px] pt-[20px] pb-[20px] pl-[21px] pr-[21px]">
+                <div className="bg-white text-black p-2 sm:p-3 md:p-4 lg:p-5 xl:p-6 rounded-lg shadow-lg text-xs sm:text-sm md:text-base lg:text-lg mx-2 sm:mx-3 md:mx-4 lg:mx-5 xl:mx-6 my-2 sm:my-3 md:my-4 lg:my-5 xl:my-6">
                   <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-between">
                     <div>
                       <div className="overflow-hidden">
                         <h2 
-                          className={`text-lg font-bold mb-1 transform ${isAnimated ? 'animate-name-slide-in' : ''}`}
+                          className={`text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 transform ${isAnimated ? 'animate-name-slide-in' : ''}`}
                           style={{ 
                             animation: isAnimated ? 'name-slide-in 1.2s ease-out forwards' : 'none',
                             opacity: 0,
@@ -155,7 +153,7 @@ export default function HeroSection() {
                       </div>
                       <div className="overflow-hidden">
                         <h3 
-                          className={`text-brand-orange font-semibold text-sm mb-2 ${isAnimated ? 'animate-position-fade-in' : ''}`}
+                          className={`text-brand-orange font-semibold text-xs sm:text-sm md:text-base lg:text-lg mb-1 sm:mb-2 ${isAnimated ? 'animate-position-fade-in' : ''}`}
                           style={{ 
                             animation: isAnimated ? 'position-fade-in 1.5s ease-out forwards 0.6s' : 'none',
                             opacity: 0
@@ -165,7 +163,7 @@ export default function HeroSection() {
                         </h3>
                       </div>
                       <div 
-                        className={`text-gray-600 text-sm ${isAnimated ? 'animate-contact-fade-in' : ''}`}
+                        className={`text-gray-600 text-xs sm:text-sm md:text-base ${isAnimated ? 'animate-contact-fade-in' : ''}`}
                         style={{ 
                           animation: isAnimated ? 'contact-fade-in 1.8s ease-out forwards 1s' : 'none',
                           opacity: 0
@@ -177,7 +175,7 @@ export default function HeroSection() {
                       </div>
                     </div>
                     <div 
-                      className={`w-16 h-16 rounded-full bg-gray-200 overflow-hidden ${isAnimated ? 'animate-photo-pop' : ''}`}
+                      className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 xl:w-20 xl:h-20 rounded-full bg-gray-200 overflow-hidden ${isAnimated ? 'animate-photo-pop' : ''}`}
                       style={{ 
                         animation: isAnimated ? 'photo-pop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s' : 'none',
                         opacity: 0,
@@ -192,30 +190,30 @@ export default function HeroSection() {
                     </div>
                   </div>
                   
-                  <div className="mb-3">
-                    <div className="bg-brand-orange text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Key Skills</div>
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      <span className="text-xs bg-brand-blue-light text-brand-blue px-2 py-1 rounded-md">Software Development</span>
-                      <span className="text-xs bg-brand-green-light text-brand-green px-2 py-1 rounded-md">Data Analysis</span>
-                      <span className="text-xs bg-brand-orange-light text-brand-orange px-2 py-1 rounded-md">Team Leadership</span>
-                      <span className="text-xs bg-brand-blue-light text-brand-blue px-2 py-1 rounded-md">Python</span>
-                      <span className="text-xs bg-brand-green-light text-brand-green px-2 py-1 rounded-md">SQL</span>
+                  <div className="mb-2 sm:mb-3">
+                    <div className="bg-brand-orange text-white px-2 sm:px-3 py-1 rounded-md font-bold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">Key Skills</div>
+                    <div className="flex flex-wrap gap-1 mb-2 sm:mb-3">
+                      <span className="text-xs sm:text-sm bg-brand-blue-light text-brand-blue px-1 sm:px-2 py-1 rounded-md">Software Development</span>
+                      <span className="text-xs sm:text-sm bg-brand-green-light text-brand-green px-1 sm:px-2 py-1 rounded-md">Data Analysis</span>
+                      <span className="text-xs sm:text-sm bg-brand-orange-light text-brand-orange px-1 sm:px-2 py-1 rounded-md">Team Leadership</span>
+                      <span className="text-xs sm:text-sm bg-brand-blue-light text-brand-blue px-1 sm:px-2 py-1 rounded-md">Python</span>
+                      <span className="text-xs sm:text-sm bg-brand-green-light text-brand-green px-1 sm:px-2 py-1 rounded-md">SQL</span>
                     </div>
                     
-                    <div className="bg-brand-blue text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">Experience</div>
-                    <div className="mb-3">
-                      <p className="font-bold text-sm">Senior Developer</p>
-                      <p className="text-xs">InnovaTech Solutions</p>
-                      <p className="text-xs text-gray-600">2022 - Present</p>
-                      <ul className="list-disc ml-4 text-xs mt-1">
+                    <div className="bg-brand-blue text-white px-2 sm:px-3 py-1 rounded-md font-bold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">Experience</div>
+                    <div className="mb-2 sm:mb-3">
+                      <p className="font-bold text-xs sm:text-sm md:text-base">Senior Developer</p>
+                      <p className="text-xs sm:text-sm">InnovaTech Solutions</p>
+                      <p className="text-xs sm:text-sm text-gray-600">2022 - Present</p>
+                      <ul className="list-disc ml-3 sm:ml-4 text-xs sm:text-sm mt-1">
                         <li>Led development team of 5 engineers</li>
                         <li>Implemented data analytics platform</li>
                         <li>Reduced system downtime by 35%</li>
                       </ul>
                     </div>
                     
-                    <div className="bg-brand-green text-white px-3 py-1 rounded-md font-bold mb-2 text-sm">SA Qualifications</div>
-                    <ul className="list-disc ml-4 text-xs">
+                    <div className="bg-brand-green text-white px-2 sm:px-3 py-1 rounded-md font-bold mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">SA Qualifications</div>
+                    <ul className="list-disc ml-3 sm:ml-4 text-xs sm:text-sm">
                       <li>BSc Computer Science (NQF Level 7)</li>
                       <li>MICT SETA Python Certification</li>
                       <li>B-BBEE Level 2 Contributor</li>
@@ -251,13 +249,13 @@ export default function HeroSection() {
               
               {/* Floating 92% score that appears with a bounce effect */}
               <div 
-                className={`absolute bottom-3 right-6 w-16 h-16 rounded-full bg-green-400 flex items-center justify-center opacity-0
+                className={`absolute bottom-2 sm:bottom-3 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 xl:w-20 xl:h-20 rounded-full bg-green-400 flex items-center justify-center opacity-0
                   ${isAnimated ? 'animate-score-appear' : ''}`}
                 style={{ 
                   animation: isAnimated ? 'score-appear 1s forwards 3s, float 3s ease-in-out infinite 4s' : 'none',
                 }}
               >
-                <span className="text-2xl font-bold text-white">92%</span>
+                <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white">92%</span>
               </div>
               
               {/* Animated scan effect */}
