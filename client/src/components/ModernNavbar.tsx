@@ -267,16 +267,6 @@ export function ModernNavbar() {
 
               {user ? (
                 <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-                  <button
-                    onClick={() => {
-                      setLocation('/dashboard');
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded flex items-center"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </button>
                   {user.isAdmin && (
                     <button
                       onClick={() => {
@@ -289,16 +279,6 @@ export function ModernNavbar() {
                       Admin Dashboard
                     </button>
                   )}
-                  <button
-                    onClick={() => {
-                      setLocation('/settings');
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left text-gray-700 hover:bg-gray-50 rounded flex items-center"
-                  >
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </button>
                   <button
                     onClick={() => {
                       signOut();

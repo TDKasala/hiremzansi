@@ -246,49 +246,6 @@ export default function Header() {
               
               {user ? (
                 <div className="space-y-2 mt-4 pt-4 border-t border-gray-200">
-                  <Link 
-                    href="/dashboard"
-                    className="block px-3 py-2 bg-blue-50 text-blue-700 rounded font-medium hover:bg-blue-100"
-                    onClick={closeMobileMenu}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link 
-                    href="/premium-tools"
-                    className="block px-3 py-2 bg-green-50 text-green-700 rounded font-medium hover:bg-green-100"
-                    onClick={closeMobileMenu}
-                  >
-                    Premium Tools
-                  </Link>
-                  <Link 
-                    href="/job-sites"
-                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
-                    onClick={closeMobileMenu}
-                  >
-                    Job Board
-                  </Link>
-                  <Link 
-                    href="/referral"
-                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
-                    onClick={closeMobileMenu}
-                  >
-                    Refer & Earn
-                  </Link>
-                  <Link 
-                    href="/interview/practice"
-                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
-                    onClick={closeMobileMenu}
-                  >
-                    Interview Practice
-                  </Link>
-                  <Link 
-                    href="/skills/analyze"
-                    className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded"
-                    onClick={closeMobileMenu}
-                  >
-                    Skill Gap Analysis
-                  </Link>
-                  
                   {user && user.isAdmin && (
                     <Link 
                       href="/admin"
