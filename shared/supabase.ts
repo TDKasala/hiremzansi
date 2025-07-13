@@ -1,12 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize the Supabase client
-// Use import.meta.env for Vite/client-side, fallback to process.env for server-side
-// Disable Supabase client for CV optimization platform
-const supabaseUrl = 'https://placeholder.supabase.co';
-const supabaseAnonKey = 'placeholder-key';
+// Use environment variables for production, fallback to placeholder for development
+const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'placeholder-key';
 
-// Create a disabled Supabase client that won't interfere with the app
+// Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,

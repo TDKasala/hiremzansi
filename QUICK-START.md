@@ -1,108 +1,47 @@
-# ATSBoost Quick Start Guide
+# Quick Start: Deploy to Vercel with Supabase
 
-This guide will help you quickly set up and run the ATSBoost project locally.
+## 🚀 5-Minute Deployment Guide
 
-## Prerequisites
+### Step 1: Supabase Setup (2 minutes)
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Copy your project URL and anon key from Settings > API
+3. Go to SQL Editor and run the schema from `COMPLETE_SUPABASE_SETUP.md`
 
-- Node.js 18+ 
-- PostgreSQL 16+
-- API keys for xAI (Grok)
+### Step 2: Vercel Deployment (3 minutes)
+1. Go to [vercel.com](https://vercel.com) and sign up with GitHub
+2. Click "New Project" and import your repository
+3. Configure build settings:
+   - Framework: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist/public`
+4. Add environment variables:
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key
+   NODE_ENV=production
+   ```
+5. Click "Deploy"
 
-## Step 1: Clone and Install
+### Step 3: Test Your Deployment
+1. Visit your Vercel URL
+2. Test the health endpoint: `https://your-app.vercel.app/api/health`
+3. Try uploading a CV to test the analysis feature
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/atsboost.git
-cd atsboost
+## ✅ Success Checklist
+- [ ] Application loads without errors
+- [ ] API health endpoint responds
+- [ ] CV upload and analysis works
+- [ ] Supabase connection is active
 
-# Install dependencies
-npm install
-```
+## 🔧 Troubleshooting
+- **Build fails**: Check build logs and verify all dependencies
+- **API errors**: Verify environment variables are set correctly
+- **Database issues**: Ensure Supabase schema is properly created
 
-## Step 2: Set Up Environment Variables
+## 📚 Next Steps
+- Add custom domain
+- Configure additional services (email, SMS, payments)
+- Set up monitoring and analytics
+- Implement advanced features
 
-Create a `.env` file in the root directory:
-
-```
-# Database
-DATABASE_URL=postgresql://username:password@localhost:5432/atsboost
-
-# AI Services
-XAI_API_KEY=your_xai_api_key
-
-# Session
-SESSION_SECRET=your_session_secret
-
-# Email (optional)
-SENDGRID_API_KEY=your_sendgrid_api_key
-
-# Payment (optional)
-PAYFAST_MERCHANT_ID=your_payfast_merchant_id
-PAYFAST_MERCHANT_KEY=your_payfast_merchant_key
-```
-
-## Step 3: Set Up the Database
-
-```bash
-# Create the database
-psql -c "CREATE DATABASE atsboost;"
-
-# Run migrations
-npm run db:push
-```
-
-## Step 4: Start the Development Server
-
-```bash
-npm run dev
-```
-
-The application will be available at http://localhost:5000
-
-## Step 5: Test CV Analysis
-
-1. Open the application in your browser
-2. Upload a CV file (PDF, DOCX, or TXT)
-3. Follow the prompts to analyze the CV
-
-## API Testing Endpoints
-
-For testing the PDF extraction and OCR capabilities:
-```
-POST /api/test-pdf-extraction
-```
-
-For testing the xAI integration without credits:
-```
-POST /api/test-cv-analysis/:id
-```
-
-## Troubleshooting
-
-### Database Connection Issues
-- Check if PostgreSQL is running
-- Verify DATABASE_URL in .env file
-- Ensure database user has proper permissions
-
-### API Key Issues
-- Verify XAI_API_KEY in .env file
-- Check API key status in xAI dashboard
-- Ensure API credits are available
-
-### PDF Extraction Issues
-- Install Tesseract dependencies if OCR is not working
-- For Unix/Linux: `sudo apt-get install tesseract-ocr`
-- For macOS: `brew install tesseract`
-
-## Next Steps
-
-- Check the full [README.md](README.md) for more details
-- Review [DOCUMENTATION.md](DOCUMENTATION.md) for technical details
-- See [CONTRIBUTING.md](CONTRIBUTING.md) to contribute to the project
-
-## Getting Help
-
-If you encounter any issues, please:
-1. Check the [documentation](DOCUMENTATION.md)
-2. Open an issue on GitHub
-3. Contact the maintainers at support@atsboost.co.za
+Your Hire Mzansi CV optimization platform is now live! 🎉

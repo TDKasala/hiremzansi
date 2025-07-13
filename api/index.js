@@ -1,13 +1,15 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = 'https://vkfqohfaxapfajwrzebz.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrZnFvaGZheGFwZmFqd3J6ZWJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMjAyODgsImV4cCI6MjA2NDg5NjI4OH0.-qVAAZSOYmkN6IPQOxgagMjd5ywfQqsosp9udH2lpTA';
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'placeholder-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -17,14 +19,17 @@ module.exports = async (req, res) => {
   const path = url?.split('?')[0] || '';
 
   try {
+    // Health check endpoint
     if (method === 'GET' && path.includes('health')) {
       return res.status(200).json({ 
         status: 'ok', 
         timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
         supabase: !!supabase
       });
     }
 
+    // CV upload and analysis endpoint
     if (method === 'POST' && path.includes('upload')) {
       const score = Math.floor(Math.random() * 40) + 60;
       const content = req.body?.title || 'Sample CV content';
@@ -55,7 +60,7 @@ module.exports = async (req, res) => {
       };
 
       let cvRecord = null;
-      if (supabase) {
+      if (supabase && supabaseUrl !== 'https://placeholder.supabase.co') {
         try {
           const { data } = await supabase
             .from('cvs')
@@ -82,6 +87,7 @@ module.exports = async (req, res) => {
       });
     }
 
+    // Newsletter subscription endpoint
     if (method === 'POST' && path.includes('newsletter')) {
       const { email } = req.body || {};
       
@@ -89,7 +95,7 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: 'Valid email is required' });
       }
 
-      if (supabase) {
+      if (supabase && supabaseUrl !== 'https://placeholder.supabase.co') {
         try {
           await supabase
             .from('newsletter_subscriptions')
@@ -105,7 +111,8 @@ module.exports = async (req, res) => {
       });
     }
 
-    return res.status(404).json({ error: 'Not found' });
+    // Default response for unmatched routes
+    return res.status(404).json({ error: 'API endpoint not found' });
 
   } catch (error) {
     console.error('API error:', error);
