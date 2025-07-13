@@ -1,6 +1,4 @@
 const { createClient } = require('@supabase/supabase-js');
-const path = require('path');
-const fs = require('fs');
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
@@ -119,57 +117,167 @@ module.exports = async (req, res) => {
       return res.status(404).json({ error: 'API endpoint not found' });
     }
 
-    // Serve static files and React app for non-API routes
-    const distPath = path.join(__dirname, '..', 'dist', 'public');
-    const indexPath = path.join(distPath, 'index.html');
-    
-    // Check if the requested path is a file
-    const filePath = path.join(distPath, pathname);
-    
-    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      // Serve the static file
-      return res.sendFile(filePath);
-    } else {
-      // Serve the React app (SPA fallback)
-      if (fs.existsSync(indexPath)) {
-        return res.sendFile(indexPath);
-      } else {
-        // If no build files exist, serve a simple HTML response
-        return res.status(200).send(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Hire Mzansi - CV Optimization Platform</title>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1">
-              <style>
-                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
-                .container { max-width: 600px; margin: 0 auto; }
-                .logo { font-size: 2em; color: #4ade80; margin-bottom: 20px; }
-                .status { color: #666; margin: 20px 0; }
-                .api-test { margin: 20px 0; }
-                a { color: #4ade80; text-decoration: none; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="logo">🚀 Hire Mzansi</div>
-                <h1>CV Optimization Platform</h1>
-                <div class="status">
-                  <p>✅ Server is running</p>
-                  <p>🔧 Build in progress...</p>
-                </div>
-                <div class="api-test">
-                  <h3>API Status:</h3>
-                  <p><a href="/api/health" target="_blank">Test API Health</a></p>
-                </div>
-                <p>Please wait while the application builds...</p>
+    // Serve the main application for all non-API routes
+    return res.status(200).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Hire Mzansi - CV Optimization Platform</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+            }
+            .container {
+              text-align: center;
+              max-width: 600px;
+              padding: 2rem;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 20px;
+              backdrop-filter: blur(10px);
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+            .logo {
+              font-size: 3rem;
+              margin-bottom: 1rem;
+              font-weight: bold;
+            }
+            h1 {
+              font-size: 2.5rem;
+              margin-bottom: 1rem;
+              font-weight: 300;
+            }
+            .subtitle {
+              font-size: 1.2rem;
+              margin-bottom: 2rem;
+              opacity: 0.9;
+            }
+            .features {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 1rem;
+              margin: 2rem 0;
+            }
+            .feature {
+              background: rgba(255, 255, 255, 0.1);
+              padding: 1rem;
+              border-radius: 10px;
+              border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .feature h3 {
+              margin-bottom: 0.5rem;
+              color: #4ade80;
+            }
+            .cta {
+              margin-top: 2rem;
+            }
+            .btn {
+              display: inline-block;
+              background: #4ade80;
+              color: #1f2937;
+              padding: 1rem 2rem;
+              border-radius: 50px;
+              text-decoration: none;
+              font-weight: bold;
+              transition: all 0.3s ease;
+              margin: 0.5rem;
+            }
+            .btn:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 10px 20px rgba(74, 222, 128, 0.3);
+            }
+            .api-status {
+              margin-top: 2rem;
+              padding: 1rem;
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 10px;
+            }
+            .status-item {
+              margin: 0.5rem 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.5rem;
+            }
+            .status-ok { color: #4ade80; }
+            .status-loading { color: #fbbf24; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">🚀</div>
+            <h1>Hire Mzansi</h1>
+            <p class="subtitle">AI-Powered CV Optimization Platform for South African Job Seekers</p>
+            
+            <div class="features">
+              <div class="feature">
+                <h3>🤖 AI Analysis</h3>
+                <p>Advanced CV optimization with AI insights</p>
               </div>
-            </body>
-          </html>
-        `);
-      }
-    }
+              <div class="feature">
+                <h3>🇿🇦 SA Focus</h3>
+                <p>B-BBEE compliant and locally optimized</p>
+              </div>
+              <div class="feature">
+                <h3>📊 ATS Friendly</h3>
+                <p>Get past Applicant Tracking Systems</p>
+              </div>
+            </div>
+            
+            <div class="cta">
+              <a href="/api/health" class="btn" target="_blank">Test API</a>
+              <a href="#" class="btn" onclick="testUpload()">Test CV Upload</a>
+            </div>
+            
+            <div class="api-status">
+              <h3>System Status</h3>
+              <div class="status-item">
+                <span class="status-ok">✅</span>
+                <span>Server Running</span>
+              </div>
+              <div class="status-item">
+                <span class="status-loading">⏳</span>
+                <span>Full App Loading...</span>
+              </div>
+            </div>
+          </div>
+          
+          <script>
+            async function testUpload() {
+              try {
+                const response = await fetch('/api/upload', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ title: 'Test CV' })
+                });
+                const data = await response.json();
+                alert('API Test: ' + JSON.stringify(data, null, 2));
+              } catch (error) {
+                alert('API Error: ' + error.message);
+              }
+            }
+            
+            // Test API health on load
+            fetch('/api/health')
+              .then(response => response.json())
+              .then(data => {
+                console.log('API Health:', data);
+              })
+              .catch(error => {
+                console.error('API Error:', error);
+              });
+          </script>
+        </body>
+      </html>
+    `);
 
   } catch (error) {
     console.error('API error:', error);
